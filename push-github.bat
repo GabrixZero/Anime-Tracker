@@ -14,6 +14,9 @@ echo.
 echo Enviando branch feature/core-setup...
 git push -u origin feature/core-setup
 echo.
+echo Enviando branch feature/mvc-architecture-api...
+git push -u origin feature/mvc-architecture-api
+echo.
 echo ================================================================
 echo   Pronto! Todas as branches foram sincronizadas no GitHub.
 echo ================================================================
