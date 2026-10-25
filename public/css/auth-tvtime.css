@@ -1,0 +1,281 @@
+/* ================================================================
+   SHOWVAULT · ESTILO AUTÊNTICO DE LOGIN & CADASTRO TV SHOW TIME
+   ================================================================ */
+
+.tvtime-auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(8, 9, 14, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: authFadeIn 0.25s ease-out;
+}
+
+.tvtime-auth-overlay.hidden {
+  display: none;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tvtime-auth-card {
+  position: relative;
+  background: #141620;
+  border: 1px solid rgba(255, 208, 0, 0.25);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 460px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), var(--shadow-gold);
+  animation: authScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authScale {
+  from { transform: scale(0.95) translateY(12px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Fundo com Pôsteres Translúcidos (Assinatura TV Time) */
+.tvtime-auth-backdrop {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(ellipse at center, rgba(20, 22, 32, 0.88) 20%, rgba(14, 16, 24, 0.98) 100%),
+    url('https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+.tvtime-auth-content {
+  position: relative;
+  z-index: 2;
+  padding: 2.5rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.tvtime-auth-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--bg-card-border);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tvtime-auth-close:hover {
+  background: var(--accent-rose);
+  border-color: var(--accent-rose);
+}
+
+/* Cabeçalho TV Time */
+.tvtime-auth-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.tvtime-badge-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--tvtime-yellow), #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 4px 18px rgba(255, 208, 0, 0.4);
+}
+
+.tvtime-badge-icon svg {
+  width: 32px;
+  height: 32px;
+  color: #0b0c10;
+}
+
+.tvtime-auth-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 0.4rem;
+}
+
+.tvtime-auth-header h2 span {
+  color: var(--tvtime-yellow);
+}
+
+.tvtime-auth-header p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Botão Google Oficial */
+.btn-google-tvtime {
+  width: 100%;
+  background: #ffffff;
+  color: #1f2937;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.8rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-google-tvtime:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.tvtime-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.4rem 0;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.tvtime-divider::before, .tvtime-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--bg-card-border);
+}
+
+.tvtime-divider span {
+  padding: 0 0.85rem;
+}
+
+/* Tabs Estilo TV Time */
+.tvtime-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--bg-card-border);
+}
+
+.tvtime-tab-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  padding: 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tvtime-tab-btn.active {
+  background: var(--bg-surface-elevated);
+  color: var(--tvtime-yellow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Formulário e Inputs */
+.tvtime-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tvtime-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tvtime-field label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.tvtime-field input {
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 1rem;
+  font-size: 0.92rem;
+  color: #ffffff;
+  outline: none;
+  font-family: var(--font-body);
+  transition: border-color var(--transition-fast);
+}
+
+.tvtime-field input:focus {
+  border-color: var(--tvtime-yellow);
+  box-shadow: 0 0 10px rgba(255, 208, 0, 0.15);
+}
+
+.btn-tvtime-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--tvtime-yellow), #f59e0b);
+  color: #0b0c10;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 0.8rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 16px rgba(255, 208, 0, 0.3);
+}
+
+.btn-tvtime-submit:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 208, 0, 0.45);
+}
+
+.tvtime-auth-footer {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.tvtime-auth-footer a {
+  color: var(--tvtime-yellow);
+  text-decoration: none;
+  font-weight: 700;
+}

@@ -1,0 +1,307 @@
+[
+  {
+    "id": 1396,
+    "type": "tv",
+    "name": "Breaking Bad",
+    "overview": "Um professor de química do ensino médio com câncer inoperável passa a produzir metanfetamina para garantir o sustento da família.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+    "vote_average": 9.5,
+    "first_air_date": "2008-01-20",
+    "genres": ["Drama", "Crime"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Piloto", "runtime": 58, "air_date": "2008-01-20", "overview": "Walter White descobre sua doença terminal e se junta a Jesse Pinkman.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/405/1012681.jpg" },
+          { "episode_number": 2, "name": "O Gato Está no Saco...", "runtime": 48, "air_date": "2008-01-27", "overview": "A dupla lida com as consequências de seu primeiro cozinheiro rival.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/405/1012682.jpg" },
+          { "episode_number": 3, "name": "...E o Saco Está no Rio", "runtime": 48, "air_date": "2008-02-10", "overview": "Walt enfrenta uma escolha moral definitiva no porão.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/405/1012683.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 136283,
+    "type": "tv",
+    "name": "The Bear (O Urso)",
+    "overview": "Um jovem chef renomado retorna a Chicago para salvar a lanchonete de sanduíches de sua família.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/hih5aTwgmHhMuyVSbyaPBnBJftt.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/aJtG4txtmiRHwAAqENQHZvBs6kY.jpg",
+    "vote_average": 8.8,
+    "first_air_date": "2022-06-23",
+    "genres": ["Drama", "Comédia"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Sistema", "runtime": 28, "air_date": "2022-06-23", "overview": "Carmy assume o comando sob intensa resistência.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/413/1034362.jpg" },
+          { "episode_number": 2, "name": "Mãos", "runtime": 31, "air_date": "2022-06-23", "overview": "Uma vistoria inesperada obriga a equipe a se organizar.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/465/1164943.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 95396,
+    "type": "tv",
+    "name": "Ruptura (Severance)",
+    "overview": "Empregados da Lumon passam por cirurgia cerebral para separar suas memórias de trabalho das pessoais.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/pPHpeI2X1qEd1CS1SeyrdhZ4qnT.jpg",
+    "backdrop_path": "https://static.tvmaze.com/uploads/images/original_untouched/548/1371406.jpg",
+    "vote_average": 8.7,
+    "first_air_date": "2022-02-18",
+    "genres": ["Ficção Científica", "Suspense", "Drama"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Boas Notícias Sobre o Inferno", "runtime": 57, "air_date": "2022-02-18", "overview": "Mark descobre pistas sobre um colega desaparecido.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/396/991497.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 66732,
+    "type": "tv",
+    "name": "Stranger Things",
+    "overview": "Misteriosos experimentos secretos e uma garota com poderes psíquicos em uma pacata cidade americana.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2016-07-15",
+    "genres": ["Ficção Científica", "Terror", "Drama"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "O Desaparecimento de Will Byers", "runtime": 48, "air_date": "2016-07-15", "overview": "O sumiço de um garoto inicia a investigação.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/342/855786.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 94605,
+    "type": "tv",
+    "name": "Arcane",
+    "overview": "Em meio ao conflito de Piltover e Zaun, duas irmãs lutam em lados opostos de uma guerra mágica.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg",
+    "vote_average": 9.0,
+    "first_air_date": "2021-11-06",
+    "genres": ["Animação", "Ação", "Ficção Científica"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Entrando na Fila", "runtime": 43, "air_date": "2021-11-06", "overview": "Um assalto no laboratório de Jayce muda tudo.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/373/933222.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 100088,
+    "type": "tv",
+    "name": "The Last of Us",
+    "overview": "Joel recebe a missão de contrabandear Ellie, uma jovem imune a um fungo mortal.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/dmo6TYuuJgaYinXBPjrgG9mB5od.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/lY2DhbA7Hy44fAKddr06UrXWWaQ.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2023-01-15",
+    "genres": ["Drama", "Ficção Científica", "Ação"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Quando Estiver Perdido na Escuridão", "runtime": 81, "air_date": "2023-01-15", "overview": "Vinte anos após o surto, a jornada começa.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/442/1106184.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1429,
+    "type": "anime",
+    "name": "Attack on Titan (Shingeki no Kyojin)",
+    "overview": "A humanidade luta pela sobrevivência enclausurada em muralhas contra os Titãs devoradores.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/rqbCbjB19amtOtFQbb3K2lgm2zv.jpg",
+    "vote_average": 9.1,
+    "first_air_date": "2013-04-07",
+    "genres": ["Anime", "Ação", "Fantasia"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "A Queda de Shiganshina, Parte 1", "runtime": 24, "air_date": "2013-04-07", "overview": "O Titã Colossal destrói o portão da muralha Maria.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242650.jpg" },
+          { "episode_number": 2, "name": "A Queda de Shiganshina, Parte 2", "runtime": 24, "air_date": "2013-04-14", "overview": "Eren e Mikasa escapam no barco de refugiados.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242651.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 85937,
+    "type": "anime",
+    "name": "Demon Slayer (Kimetsu no Yaiba)",
+    "overview": "Tanjiro busca vingança e uma cura para sua irmã Nezuko, transformada em demônio.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/nTvM4mhqNlHIvUkI1gVnW6XP7GG.jpg",
+    "vote_average": 8.7,
+    "first_air_date": "2019-04-06",
+    "genres": ["Anime", "Ação", "Sobrenatural"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Crueldade", "runtime": 24, "air_date": "2019-04-06", "overview": "O destino trágico da família Kamado.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/538/1347450.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 95479,
+    "type": "anime",
+    "name": "Jujutsu Kaisen",
+    "overview": "Yuji Itadori engole o dedo da lendária maldição Ryomen Sukuna e ingressa no mundo dos feiticeiros jujutsu.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/aI1fm7H2rhfRxnwWIdVACR3k1fO.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/rLb2cwF3Pazuxaj0sRXQ037tGI1.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2020-10-03",
+    "genres": ["Anime", "Ação", "Fantasia"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Ryomen Sukuna", "runtime": 24, "air_date": "2020-10-03", "overview": "Itadori desperta poderes ao ingerir o talismã.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/542/1355130.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 209867,
+    "type": "anime",
+    "name": "Frieren e a Jornada para o Além",
+    "overview": "A maga elfa Frieren reflete sobre a vida, laços e o tempo após a morte do herói Himmel.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/dqZENchTd7lp5zht7BdlqM7RBhD.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg",
+    "vote_average": 8.9,
+    "first_air_date": "2023-09-29",
+    "genres": ["Anime", "Fantasia", "Aventura"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "O Fim da Aventura", "runtime": 25, "air_date": "2023-09-29", "overview": "O grupo retorna vitorioso e cinquenta anos se passam.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/616/1541670.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 13916,
+    "type": "anime",
+    "name": "Death Note",
+    "overview": "Um estudante genial encontra um caderno sobrenatural capaz de matar quem tiver o nome escrito nele.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/tCZFfYTIwrR7n94J6G14Y4hAFU6.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/z8IPicmEKXUO4I2UDdMEqw7RqOE.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2006-10-04",
+    "genres": ["Anime", "Suspense", "Mistério"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          { "episode_number": 1, "name": "Renascimento", "runtime": 23, "air_date": "2006-10-04", "overview": "Light Yagami encontra o Death Note do shinigami Ryuk.", "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/535/1338363.jpg" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 157336,
+    "type": "movie",
+    "name": "Interestelar (Interstellar)",
+    "runtime": 169,
+    "overview": "Exploradores viajam através de um buraco de minhoca no espaço para encontrar um novo lar para a humanidade.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/xJHokMbljvjADYdit5fK5VQsXEG.jpg",
+    "vote_average": 8.7,
+    "first_air_date": "2014-11-05",
+    "genres": ["Filme", "Ficção Científica", "Drama"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 872585,
+    "type": "movie",
+    "name": "Oppenheimer",
+    "runtime": 180,
+    "overview": "A criação da bomba atômica pelo físico J. Robert Oppenheimer no Projeto Manhattan.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg",
+    "vote_average": 8.1,
+    "first_air_date": "2023-07-19",
+    "genres": ["Filme", "Drama", "História"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 693134,
+    "type": "movie",
+    "name": "Duna: Parte 2",
+    "runtime": 166,
+    "overview": "Paul Atreides e os Fremen entram em guerra santa contra os tiranos que assassinaram sua família.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/uhUO7vQQKvCTfQWubOt5MAKokbL.jpg",
+    "vote_average": 8.3,
+    "first_air_date": "2024-02-27",
+    "genres": ["Filme", "Ficção Científica", "Aventura"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 324857,
+    "type": "movie",
+    "name": "Homem-Aranha: No Aranhaverso",
+    "runtime": 117,
+    "overview": "Miles Morales se torna o novo Homem-Aranha e conhece justiceiros aracnídeos de outras dimensões.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/8mnXR9rey5uQ08rZAvzojKWbDQS.jpg",
+    "vote_average": 8.4,
+    "first_air_date": "2018-12-01",
+    "genres": ["Filme", "Animação", "Ação"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 155,
+    "type": "movie",
+    "name": "Batman: O Cavaleiro das Trevas",
+    "runtime": 152,
+    "overview": "O Coringa emerge em Gotham causando caos psicológico e moral contra Batman e o promotor Dent.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
+    "vote_average": 8.5,
+    "first_air_date": "2008-07-16",
+    "genres": ["Filme", "Ação", "Crime", "Drama"],
+    "status": "Lançado",
+    "seasons": []
+  }
+]

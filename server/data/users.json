@@ -1,0 +1,19 @@
+[
+  {
+    "id": "usr_1792888813557_yggm1",
+    "createdAt": "2026-10-25T00:40:13.557Z",
+    "name": "Gabriel",
+    "email": "gabriel@teste.com",
+    "password": "123",
+    "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=gabriel%40teste.com",
+    "provider": "email"
+  },
+  {
+    "id": "usr_1792888828809_bdd13",
+    "createdAt": "2026-10-25T00:40:28.809Z",
+    "name": "Gabriel Google",
+    "email": "gabriel.google@gmail.com",
+    "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces",
+    "provider": "google"
+  }
+]
