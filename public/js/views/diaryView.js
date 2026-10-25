@@ -118,11 +118,11 @@ class DiaryView {
         day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
       });
 
-      const headerText = e.isMovie ? `${e.name} · 🎬 Filme` : `${e.name} · T${e.seasonNum}:E${e.epNum}`;
+      const headerText = e.isMovie ? `${e.name} · Filme` : `${e.name} · T${e.seasonNum}:E${e.epNum}`;
 
       return `
         <div class="diary-entry-card" style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; gap: 1.5rem; margin-bottom: 1.25rem;">
-          <img src="${e.stillPath}" alt="${e.epTitle}" style="width: 140px; height: 90px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0;" loading="lazy">
+          <img src="${e.stillPath}" alt="${this.escapeHtml(e.epTitle)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" style="width: 140px; height: 90px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0;" loading="lazy">
           
           <div style="flex: 1; display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
@@ -162,7 +162,7 @@ class DiaryView {
       if (key.includes('_movie')) {
         const id = Number(key.replace('_movie', ''));
         const media = state.getMedia(id);
-        md += `## 🎬 Filme: ${media ? media.name : 'Filme'}\n`;
+        md += `## Filme: ${media ? media.name : 'Filme'}\n`;
       } else {
         const parts = key.split('_');
         const media = state.getMedia(Number(parts[0]));

@@ -12,6 +12,16 @@ class WatchlistView {
     this.bindEvents();
   }
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   bindEvents() {
     document.querySelectorAll('#watchlist-filters .pill-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -34,8 +44,9 @@ class WatchlistView {
 
   render() {
     const state = window.appState;
-    const trackedList = state.data.trackedShows;
-    this.badge.textContent = trackedList.length;
+    if (!state || !state.data) return;
+    const trackedList = state.data.trackedShows || [];
+    if (this.badge) this.badge.textContent = trackedList.length;
 
     let countAll = 0, countWatching = 0, countCompleted = 0, countPlan = 0;
     trackedList.forEach(t => {
@@ -45,10 +56,15 @@ class WatchlistView {
       if (t.status === 'plan_to_watch') countPlan++;
     });
 
-    document.getElementById('count-all').textContent = countAll;
-    document.getElementById('count-watching').textContent = countWatching;
-    document.getElementById('count-completed').textContent = countCompleted;
-    document.getElementById('count-plan').textContent = countPlan;
+    const elAll = document.getElementById('count-all');
+    const elWatching = document.getElementById('count-watching');
+    const elCompleted = document.getElementById('count-completed');
+    const elPlan = document.getElementById('count-plan');
+
+    if (elAll) elAll.textContent = countAll;
+    if (elWatching) elWatching.textContent = countWatching;
+    if (elCompleted) elCompleted.textContent = countCompleted;
+    if (elPlan) elPlan.textContent = countPlan;
 
     const filtered = trackedList.filter(t => {
       const media = state.getMedia(t.showId);
@@ -60,75 +76,83 @@ class WatchlistView {
     });
 
     if (filtered.length === 0) {
-      this.container.innerHTML = '';
-      this.emptyState.classList.remove('hidden');
+      if (this.container) this.container.innerHTML = '';
+      if (this.emptyState) this.emptyState.classList.remove('hidden');
       return;
     }
 
-    this.emptyState.classList.add('hidden');
-    this.container.innerHTML = filtered.map(t => {
-      const media = state.getMedia(t.showId);
-      if (!media) return '';
+    if (this.emptyState) this.emptyState.classList.add('hidden');
+    const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
 
-      const isMovie = media.type === 'movie';
-      let percent = 0;
-      let progressText = '';
+    if (this.container) {
+      this.container.innerHTML = filtered.map(t => {
+        const media = state.getMedia(t.showId);
+        if (!media) return '';
 
-      if (isMovie) {
-        const watched = state.isWatched(media.id);
-        percent = watched ? 100 : 0;
-        progressText = watched ? 'Filme Assistido (100%)' : 'Não assistido';
-      } else {
-        let totalEps = 0;
-        let watchedEps = 0;
-        (media.seasons || []).forEach(s => {
-          (s.episodes || []).forEach(ep => {
-            totalEps++;
-            if (state.isWatched(media.id, s.season_number, ep.episode_number)) watchedEps++;
+        const isMovie = media.type === 'movie';
+        let percent = 0;
+        let progressText = '';
+
+        if (isMovie) {
+          const watched = state.isWatched(media.id);
+          percent = watched ? 100 : 0;
+          progressText = watched ? 'Filme Assistido (100%)' : 'Não assistido';
+        } else {
+          let totalEps = 0;
+          let watchedEps = 0;
+          (media.seasons || []).forEach(s => {
+            (s.episodes || []).forEach(ep => {
+              totalEps++;
+              if (state.isWatched(media.id, s.season_number, ep.episode_number)) watchedEps++;
+            });
           });
-        });
-        percent = totalEps > 0 ? Math.round((watchedEps / totalEps) * 100) : 0;
-        progressText = `${watchedEps}/${totalEps} eps (${percent}%)`;
-      }
+          percent = totalEps > 0 ? Math.round((watchedEps / totalEps) * 100) : 0;
+          progressText = `${watchedEps}/${totalEps} eps (${percent}%)`;
+        }
 
-      const typeBadge = media.type === 'movie' 
-        ? `<span class="badge-type-tag badge-type-movie">🎬 Filme</span>` 
-        : media.type === 'anime' 
-        ? `<span class="badge-type-tag badge-type-anime">⛩️ Anime</span>`
-        : `<span class="badge-type-tag badge-type-tv">📺 Série</span>`;
+        const typeBadge = media.type === 'movie' 
+          ? `<span class="badge-type-tag badge-type-movie">Filme</span>` 
+          : media.type === 'anime' 
+          ? `<span class="badge-type-tag badge-type-anime">Anime</span>`
+          : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
-      return `
-        <div class="show-card" onclick="window.detailModalView.open(${media.id})">
-          <div class="show-poster-wrap">
-            <img class="show-poster" src="${media.poster_path}" alt="${media.name}" loading="lazy">
-            <div class="show-rating-badge">★ ${media.vote_average.toFixed(1)}</div>
-          </div>
-          
-          <div class="show-info">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              ${typeBadge}
-              <span style="font-size: 0.72rem; color: var(--text-muted);">${media.first_air_date ? media.first_air_date.slice(0, 4) : ''}</span>
+        return `
+          <div class="show-card" onclick="window.detailModalView.open(${media.id})">
+            <div class="show-poster-wrap">
+              <img class="show-poster" 
+                   src="${this.escapeHtml(media.poster_path)}" 
+                   alt="${this.escapeHtml(media.name)}" 
+                   loading="lazy"
+                   onerror="this.onerror=null; this.src='${fallbackPoster}';">
+              <div class="show-rating-badge">★ ${media.vote_average ? media.vote_average.toFixed(1) : '8.0'}</div>
             </div>
-
-            <h4 class="show-title" title="${media.name}">${media.name}</h4>
-            <div class="show-meta-line">
-              <span>${isMovie ? `${media.runtime} min` : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
-              <span>${media.status}</span>
-            </div>
-
-            <div class="show-progress-wrap">
-              <div class="show-progress-info">
-                <span>Progresso</span>
-                <span>${progressText}</span>
+            
+            <div class="show-info">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                ${typeBadge}
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${media.first_air_date ? media.first_air_date.slice(0, 4) : ''}</span>
               </div>
-              <div class="show-progress-bar">
-                <div class="show-progress-fill ${percent === 100 ? 'complete' : ''}" style="width: ${percent}%;"></div>
+
+              <h4 class="show-title" title="${this.escapeHtml(media.name)}">${this.escapeHtml(media.name)}</h4>
+              <div class="show-meta-line">
+                <span>${isMovie ? `${media.runtime} min` : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
+                <span>${this.escapeHtml(media.status || '')}</span>
+              </div>
+
+              <div class="show-progress-wrap">
+                <div class="show-progress-info">
+                  <span>Progresso</span>
+                  <span>${progressText}</span>
+                </div>
+                <div class="show-progress-bar">
+                  <div class="show-progress-fill ${percent === 100 ? 'complete' : ''}" style="width: ${percent}%;"></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
+    }
   }
 }
 

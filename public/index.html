@@ -114,16 +114,18 @@
         </div>
 
         <div class="type-filter-row">
-          <button class="type-pill-btn active" data-type="all">🌟 Todos</button>
-          <button class="type-pill-btn" data-type="tv">📺 Séries</button>
-          <button class="type-pill-btn" data-type="anime">⛩️ Animes</button>
-          <button class="type-pill-btn" data-type="movie">🎬 Filmes na Lista</button>
+          <button class="type-pill-btn active" data-type="all">Todos</button>
+          <button class="type-pill-btn" data-type="tv">Séries</button>
+          <button class="type-pill-btn" data-type="anime">Animes</button>
+          <button class="type-pill-btn" data-type="movie">Filmes na Lista</button>
         </div>
 
         <div class="next-up-grid" id="next-up-container"></div>
 
         <div class="empty-state hidden" id="next-up-empty">
-          <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+          <div class="empty-icon" style="margin-bottom: 1rem;">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-emerald);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
           <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Você está em dia com tudo!</h3>
           <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
           <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo da API</button>
@@ -147,16 +149,18 @@
         </div>
 
         <div class="type-filter-row">
-          <button class="type-pill-btn active" data-cat="all">🌟 Todos</button>
-          <button class="type-pill-btn" data-cat="tv">📺 Séries</button>
-          <button class="type-pill-btn" data-cat="anime">⛩️ Animes</button>
-          <button class="type-pill-btn" data-cat="movie">🎬 Filmes</button>
+          <button class="type-pill-btn active" data-cat="all">Todos</button>
+          <button class="type-pill-btn" data-cat="tv">Séries</button>
+          <button class="type-pill-btn" data-cat="anime">Animes</button>
+          <button class="type-pill-btn" data-cat="movie">Filmes</button>
         </div>
 
         <div class="shows-grid" id="watchlist-container"></div>
 
         <div class="empty-state hidden" id="watchlist-empty">
-          <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">📺</div>
+          <div class="empty-icon" style="margin-bottom: 1rem;">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted);"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+          </div>
           <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Sua lista está vazia</h3>
           <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Adicione títulos para começar a registrar seu progresso e notas.</p>
           <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Títulos Agora</button>
@@ -192,7 +196,9 @@
         <div id="diary-container"></div>
 
         <div class="empty-state hidden" id="diary-empty">
-          <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">✍️</div>
+          <div class="empty-icon" style="margin-bottom: 1rem;">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted);"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
           <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Nenhuma anotação registrada ainda</h3>
           <p style="color: var(--text-secondary);">Quando você marca um episódio ou filme e escreve uma reflexão, ela é gravada imediatamente aqui.</p>
         </div>
@@ -209,7 +215,9 @@
 
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem;">
           <div style="background: linear-gradient(135deg, rgba(255, 208, 0, 0.12), rgba(245, 158, 11, 0.04)); border: 1px solid rgba(255, 208, 0, 0.25); border-radius: var(--radius-md); padding: 1.75rem; display: flex; align-items: center; gap: 1.5rem;">
-            <div style="font-size: 2.75rem;">⏳</div>
+            <div style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: var(--radius-md); background: rgba(255,208,0,0.15); color: var(--tvtime-yellow);">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
             <div>
               <span style="font-size: 0.75rem; font-weight: 800; color: var(--tvtime-yellow); text-transform: uppercase;">TEMPO TOTAL GASTO</span>
               <div style="display: flex; gap: 0.75rem; font-family: var(--font-display); font-size: 1.15rem; color: var(--text-secondary);">
@@ -223,19 +231,25 @@
           </div>
 
           <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🎬</div>
+            <div style="margin-bottom: 0.5rem; color: var(--tvtime-yellow);">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+            </div>
             <span class="stat-number" id="stat-episodes-count" style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff;">0</span>
             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Obras & Episódios</span>
           </div>
 
           <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🏆</div>
+            <div style="margin-bottom: 0.5rem; color: var(--accent-emerald);">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
             <span class="stat-number" id="stat-shows-completed" style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff;">0</span>
             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Finalizadas</span>
           </div>
 
           <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📝</div>
+            <div style="margin-bottom: 0.5rem; color: var(--accent-cyan);">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
             <span class="stat-number" id="stat-notes-count" style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff;">0</span>
             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Anotações Salvas</span>
           </div>
@@ -269,10 +283,10 @@
         </div>
 
         <div class="type-filter-row center">
-          <button class="type-pill-btn active" data-explore-type="all">🌟 Todos</button>
-          <button class="type-pill-btn" data-explore-type="tv">📺 Séries</button>
-          <button class="type-pill-btn" data-explore-type="anime">⛩️ Animes</button>
-          <button class="type-pill-btn" data-explore-type="movie">🎬 Filmes</button>
+          <button class="type-pill-btn active" data-explore-type="all">Todos</button>
+          <button class="type-pill-btn" data-explore-type="tv">Séries</button>
+          <button class="type-pill-btn" data-explore-type="anime">Animes</button>
+          <button class="type-pill-btn" data-explore-type="movie">Filmes</button>
         </div>
 
         <div class="section-title-wrap" style="margin-bottom: 1.5rem;">
@@ -424,7 +438,7 @@
                 <button type="button" class="tool-btn" data-insert="**" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;"><strong>B</strong></button>
                 <button type="button" class="tool-btn" data-insert="*" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;"><em>I</em></button>
                 <button type="button" class="tool-btn" data-insert="> " style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">❝</button>
-                <button type="button" class="tool-btn" data-insert=">!spoiler!<" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">⚠️ Spoiler</button>
+                <button type="button" class="tool-btn" data-insert=">!spoiler!<" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">Spoiler</button>
               </div>
             </div>
 

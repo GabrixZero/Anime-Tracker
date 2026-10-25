@@ -103,14 +103,15 @@ class DetailModalView {
     const movieBody = document.getElementById('movie-detail-body');
 
     const typeBadge = media.type === 'movie' 
-      ? `<span class="badge-type-tag badge-type-movie">🎬 Filme</span>` 
+      ? `<span class="badge-type-tag badge-type-movie">Filme</span>` 
       : media.type === 'anime' 
-      ? `<span class="badge-type-tag badge-type-anime">⛩️ Anime</span>`
-      : `<span class="badge-type-tag badge-type-tv">📺 Série</span>`;
+      ? `<span class="badge-type-tag badge-type-anime">Anime</span>`
+      : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
+    const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
     header.style.backgroundImage = `url('${media.backdrop_path || media.poster_path}')`;
     header.innerHTML = `
-      <img class="modal-poster" src="${media.poster_path}" alt="${media.name}" style="width: 140px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
+      <img class="modal-poster" src="${media.poster_path}" alt="${this.escapeHtml(media.name)}" onerror="this.onerror=null; this.src='${fallbackPoster}';" style="width: 140px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
       <div style="flex: 1;">
         <div style="margin-bottom: 0.4rem;">${typeBadge}</div>
         <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: #ffffff; line-height: 1.15; margin-bottom: 0.5rem;">${media.name}</h2>
@@ -147,7 +148,7 @@ class DetailModalView {
           <div>
             <h4>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h4>
             <p>Duração: ${media.runtime || 120} minutos computados nas estatísticas de vida ao marcar.</p>
-            ${hasNote ? `<p style="color: var(--tvtime-yellow); margin-top: 0.4rem; font-weight: 600;">📝 "${this.escapeHtml(note.text.slice(0, 75))}..."</p>` : ''}
+            ${hasNote ? `<p style="color: var(--tvtime-yellow); margin-top: 0.4rem; font-weight: 600;">"${this.escapeHtml(note.text.slice(0, 75))}..."</p>` : ''}
           </div>
 
           <div class="movie-btn-group">
@@ -232,13 +233,13 @@ class DetailModalView {
             ${isWatched ? '✓' : ''}
           </div>
 
-          <img src="${ep.still_path || media.backdrop_path || media.poster_path}" alt="${ep.name}" style="width: 80px; height: 50px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" loading="lazy">
+          <img src="${ep.still_path || media.backdrop_path || media.poster_path}" alt="${this.escapeHtml(ep.name)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" style="width: 80px; height: 50px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" loading="lazy">
 
           <div style="flex: 1;">
             <span style="font-size: 0.76rem; font-weight: 700; color: var(--tvtime-yellow); text-transform: uppercase;">E${ep.episode_number} · ${ep.air_date ? ep.air_date.slice(0, 10) : ''}</span>
-            <div style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">${ep.name}</div>
+            <div style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">${this.escapeHtml(ep.name)}</div>
             <span style="font-size: 0.75rem; color: var(--text-muted);">${ep.runtime || 45} min</span>
-            ${hasNote ? `<span style="font-size: 0.75rem; background: rgba(255,208,0,0.12); color: var(--tvtime-yellow); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">📝 Anotação salva</span>` : ''}
+            ${hasNote ? `<span style="font-size: 0.75rem; background: rgba(255,208,0,0.12); color: var(--tvtime-yellow); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">Anotação salva</span>` : ''}
           </div>
 
           <button class="btn btn-sm btn-outline" onclick="window.detailModalView.openNote(${media.id}, ${season.season_number}, ${ep.episode_number})">
