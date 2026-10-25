@@ -2,6 +2,26 @@
    SHOWVAULT · COMPONENTES MODULARES (CARDS, BADGES, MODAIS)
    ================================================================ */
 
+/* Utilitário Global Hidden e Estados Vazios */
+.hidden {
+  display: none !important;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--bg-card-border);
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.empty-state.hidden {
+  display: none !important;
+}
+
 /* Botões Globais */
 .btn {
   display: inline-flex;

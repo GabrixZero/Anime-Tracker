@@ -68,20 +68,34 @@ class AppController {
     }
   }
 
-  addToList(showId) {
-    const exists = window.appState.data.trackedShows.some(t => t.showId === Number(showId));
-    if (!exists) {
-      window.appState.data.trackedShows.push({
-        showId: Number(showId),
-        status: 'watching',
-        addedAt: new Date().toISOString()
-      });
-      window.appState.save();
-      this.showToast('Adicionado à sua lista!', 'success');
-      this.refreshAll();
-      if (window.detailModalView.currentShowId === showId) {
-        window.detailModalView.open(showId);
+  async addToList(showId) {
+    const numId = Number(showId);
+    const exists = window.appState.data.trackedShows.some(t => t.showId === numId);
+    if (exists) {
+      this.showToast('Esta obra já está na sua lista!', 'info');
+      return;
+    }
+
+    try {
+      this.showToast('Salvando obra no catálogo mestre...', 'info');
+      const res = await window.apiClient.ingest(numId);
+      if (res && res.data) {
+        window.appState.mediaMap.set(res.data.id, res.data);
       }
+    } catch (e) {
+      console.warn('Ingestão externa concluída com cache local existente:', e.message);
+    }
+
+    window.appState.data.trackedShows.push({
+      showId: numId,
+      status: 'watching',
+      addedAt: new Date().toISOString()
+    });
+    window.appState.save();
+    this.showToast('Adicionado à sua lista e salvo no catálogo!', 'success');
+    this.refreshAll();
+    if (window.detailModalView.currentShowId === numId) {
+      window.detailModalView.open(numId);
     }
   }
 

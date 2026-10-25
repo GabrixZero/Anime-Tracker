@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - 'develop'
+  pull_request:
+    types: [closed]
+    branches:
+      - 'develop'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,6 +17,7 @@ permissions:
 jobs:
   create-pr-to-main:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -24,7 +30,7 @@ jobs:
             const branch = 'develop';
             const base = 'main';
 
-            console.log('Detectado push na branch develop. Preparando PR para main...');
+            console.log('Verificando PR de develop para main...');
 
             try {
               const { data: existingPrs } = await github.rest.pulls.list({

@@ -45,6 +45,13 @@ class ApiClient {
     return this.request(`/media/${encodeURIComponent(id)}`);
   }
 
+  async ingest(id) {
+    return this.request('/media/ingest', {
+      method: 'POST',
+      body: JSON.stringify({ id: Number(id) })
+    });
+  }
+
   // --- AUTENTICAÇÃO ---
   async register(name, email, password) {
     return this.request('/auth/register', {

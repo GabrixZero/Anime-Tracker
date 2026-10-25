@@ -37,6 +37,20 @@ class MediaController {
       return res.status(500).json({ error: 'Erro ao buscar detalhes da obra.' });
     }
   }
+
+  async ingest(req, res) {
+    try {
+      const id = req.body.id;
+      if (!id) {
+        return res.status(400).json({ error: 'ID é obrigatório para ingestão.' });
+      }
+      const item = await mediaService.ingest(id);
+      return res.json({ success: true, data: item });
+    } catch (err) {
+      console.error('Erro ao ingerir obra:', err);
+      return res.status(500).json({ error: 'Falha ao ingerir obra no catálogo.' });
+    }
+  }
 }
 
 module.exports = new MediaController();
