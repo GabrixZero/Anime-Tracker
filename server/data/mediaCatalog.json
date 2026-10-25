@@ -995,5 +995,1432 @@
         ]
       }
     ]
+  },
+  {
+    "id": 13615,
+    "type": "anime",
+    "name": "My Hero Academia",
+    "overview": "People are not born equal, a realization that 4-year-old Midoriya Izuku faced when bullied by his classmates who had unique special powers. Izuku was one of the rare cases where he was born with absolutely no unique powers. This did not stop Izuku from pursuing his dream, a dream of becoming a great hero like the legendary All-Might. To become the great hero he hopelessly wants to become, he now will join the ranks of one of the highest rated \"Hero Academies\" in the country: Yueiko. With the help of his idol All-Might, will he be able to claim the ranks and become a true hero?",
+    "poster_path": "https://static.tvmaze.com/uploads/images/original_untouched/599/1499141.jpg",
+    "backdrop_path": "https://static.tvmaze.com/uploads/images/original_untouched/599/1499141.jpg",
+    "vote_average": 7.5,
+    "first_air_date": "2016-04-03",
+    "genres": [
+      "Comedy",
+      "Action",
+      "Adventure",
+      "Anime"
+    ],
+    "status": "Ended",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Izuku Midoriya: Origin",
+            "runtime": 25,
+            "air_date": "2016-04-03",
+            "overview": "Izuku Midoriya desperately wants to be a hero, but he is one of the few in his generation born without a Quirk. Will meeting the number one hero, All Might, change his fate?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242673.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "What It Takes to Be a Hero",
+            "runtime": 25,
+            "air_date": "2016-04-10",
+            "overview": "Izuku accidentally learns of All Might's secret, but there's trouble in town again before Izuku has time to process it. Will All Might be able to save the day again?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242674.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Roaring Muscles",
+            "runtime": 25,
+            "air_date": "2016-04-17",
+            "overview": "All Might reveals Izuku's quirk can transfer strength from person to person, then he designs a training course to prepare for the transfer.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242684.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Start Line",
+            "runtime": 25,
+            "air_date": "2016-04-24",
+            "overview": "After obtaining All Might's Quirk, the time has come for Izuku to attend the exams for the prestigious U.A's entrance exam.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/420/1051285.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "What I Can Do for Now",
+            "runtime": 25,
+            "air_date": "2016-05-01",
+            "overview": "It is the first day at the U.A. High School and Izuku faces possible expulsion as his teacher decides to hold a physical test to see how students use their quirks.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242686.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Rage, You Damn Nerd",
+            "runtime": 25,
+            "air_date": "2016-05-08",
+            "overview": "The Quirk students form teams of good and bad to test their quirks and Izuku faces a challenge.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242687.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Deku vs. Kacchan",
+            "runtime": 25,
+            "air_date": "2016-05-15",
+            "overview": "Izuku and Bakugo continue their mock battle with Izuku trying to figure out how to deal with giving his body time to adjust to the strength of the Quirk.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/420/1051403.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Bakugo's Start Line",
+            "runtime": 25,
+            "air_date": "2016-05-22",
+            "overview": "After loosing to Izuku, Bakugo watches the rest of his classmates and broods about what he should have done during the training battle.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/420/1051404.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Yeah, Just Do Your Best, lida!",
+            "runtime": 25,
+            "air_date": "2016-05-29",
+            "overview": "Izuku gives away his position as class president to Iida after Iida preforms a selfless act, the students go to a new training ground.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/420/1051466.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Encounter with the Unknown",
+            "runtime": 25,
+            "air_date": "2016-06-05",
+            "overview": "Izuku Midoriya gets the superpower 'quirk' after he rescues his childhood bully from a villain.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/420/1051467.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Game Over",
+            "runtime": 25,
+            "air_date": "2016-06-12",
+            "overview": "The students combat the villains and Lida manages to escape with the help of his friend.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242692.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "All Might",
+            "runtime": 25,
+            "air_date": "2016-06-19",
+            "overview": "All Might has finally shown up, but will he be able to defeat Nomu and save the day?!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/420/1051470.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "In Each of Our Hearts",
+            "runtime": 25,
+            "air_date": "2016-06-26",
+            "overview": "The battle as USJ begins to wind down, raising questions about repercussions.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242694.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 2,
+        "name": "Temporada 2",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "That's the Idea, Ochako",
+            "runtime": 25,
+            "air_date": "2017-04-01",
+            "overview": "After their face-off, Deku and the rest of his classmates are informed about the much awaited sports tournament.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/104/262281.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Roaring Sports Festival",
+            "runtime": 25,
+            "air_date": "2017-04-07",
+            "overview": "Deku is under pressure because of expectations on him during the sports festival.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056479.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "In Their Own Quirky Ways",
+            "runtime": 25,
+            "air_date": "2017-04-14",
+            "overview": "The sports festival takes off with the first event. Deku is in the lead in spite of not using his quirk.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/107/268121.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Strategy, Strategy, Strategy",
+            "runtime": 25,
+            "air_date": "2017-04-21",
+            "overview": "Deku. Ochaco, Mei and Fumikage team up together as the second event of the sports festival is about to start.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/108/270504.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Cavalry Battle Finale",
+            "runtime": 25,
+            "air_date": "2017-04-29",
+            "overview": "Thanks to his great observations skills, Deku's team manages to sail through the challenge.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/109/273531.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "The Boy Born with Everything",
+            "runtime": 25,
+            "air_date": "2017-05-06",
+            "overview": "Shoto has a talk with Deku regarding his own situation after he suspects that Deku and All Might may have a connection.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/110/276570.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Victory or Defeat",
+            "runtime": 25,
+            "air_date": "2017-05-13",
+            "overview": "The face off between Deku and Shinso starts. Deku manages to tame Shinso and begins to walk toward the periphery.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056529.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Battle On, Challengers!",
+            "runtime": 25,
+            "air_date": "2017-05-20",
+            "overview": "The tournament goes on. Shoto's hatred for his father helps him beat his rival and he moves on to the next round.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056540.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Bakugo vs. Uraraka",
+            "runtime": 25,
+            "air_date": "2017-05-27",
+            "overview": "The battle between Bakugo and Ochaco begins, but Ochaco is not able to use her quirk on Bakugo.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056546.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Shoto Todoroki: Origin",
+            "runtime": 25,
+            "air_date": "2017-06-03",
+            "overview": "The Deku and Shoto fight begins. Deku throws safety to the winds by using his quirk on Shoto who in turn uses his ice quirk.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056557.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Fight On, Iida",
+            "runtime": 25,
+            "air_date": "2017-06-10",
+            "overview": "Shoto is struggling with the decision of whether or not to use the quirk from his fathers side.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/116/290470.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Todoroki vs. Bakugo",
+            "runtime": 25,
+            "air_date": "2017-06-17",
+            "overview": "The final between Shoto and Bakugo begins. Shoto has had a dilemma ever since the end of his fight with Deku.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056598.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Time to Pick Some Names",
+            "runtime": 25,
+            "air_date": "2017-06-24",
+            "overview": "With the sports event finished, the students are asked to pick their Hero names once they attend their class.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/118/295215.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Bizarre! Gran Torino Appears",
+            "runtime": 25,
+            "air_date": "2017-07-08",
+            "overview": "While everyone adjusts to their new tasks, Izuku starts training with Gran Torino, the same man who taught All Might.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056673.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Midoriya and Shigaraki",
+            "runtime": 25,
+            "air_date": "2017-07-15",
+            "overview": "The U.A. students are finally starting to get the hang of their internships, but Izuku has much more to learn about One For All.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/120/301544.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Hero Killer: Stain vs U.A. Students",
+            "runtime": 25,
+            "air_date": "2017-07-22",
+            "overview": "Stain strikes again, and this time some U.A. students are around when it happens. Will they be able to hold him off until the pros come?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/121/304133.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Climax",
+            "runtime": 25,
+            "air_date": "2017-07-29",
+            "overview": "It all comes to a head as Izuku, Iida, and Todoroki face off against Stain while the pro heroes in Hosu City fight against the Nomus.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/122/306285.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "The Aftermath of Hero Killer: Stain",
+            "runtime": 25,
+            "air_date": "2017-08-05",
+            "overview": "Stain is finally captured, but now the hero community must deal with the consequences of their actions.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056676.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Everyone's Internships",
+            "runtime": 25,
+            "air_date": "2017-08-12",
+            "overview": "As Izuku, Iida, and Todoroki recover from their fight with Stain, the other members of Class 1-A work hard at their own internships.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/124/310302.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Listen Up!! A Tale from the Past",
+            "runtime": 25,
+            "air_date": "2017-08-19",
+            "overview": "The students return to their daily lives while All Might has a special history lesson for Izuku. It's time to learn about One For All!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056678.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "Gear Up for Final Exams",
+            "runtime": 25,
+            "air_date": "2017-09-02",
+            "overview": "Finals are coming up, and Class 1-A is going to need more than a cram session. This year, the teachers are changing the practical exams.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/126/315784.jpg"
+          },
+          {
+            "episode_number": 22,
+            "name": "Yaoyorozu: Rising",
+            "runtime": 25,
+            "air_date": "2017-09-09",
+            "overview": "The exams are turning out to be much more challenging than the students expected. Can any of the teams hold their own against a teacher?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/127/318108.jpg"
+          },
+          {
+            "episode_number": 23,
+            "name": "Stripping the Varnish",
+            "runtime": 25,
+            "air_date": "2017-09-16",
+            "overview": "As the students of Class 1-A fight in their practical exams, their resolve to become heroes is put to the test.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/128/320227.jpg"
+          },
+          {
+            "episode_number": 24,
+            "name": "Katsuki Bakugo: Origin",
+            "runtime": 25,
+            "air_date": "2017-09-23",
+            "overview": "Midoriya and Bakugo begin their match with All Might but the two of them have different plans.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/128/321794.jpg"
+          },
+          {
+            "episode_number": 25,
+            "name": "Encounter",
+            "runtime": 25,
+            "air_date": "2017-09-30",
+            "overview": "The league of villains has two people wanting to join them. UA students go to the mall. When they're at the mall everyone goes off on their own leaving Midoriya by himself where he encounters Tomura Shigaraki.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/129/324072.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 3,
+        "name": "Temporada 3",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Game Start",
+            "runtime": 25,
+            "air_date": "2018-04-07",
+            "overview": "A recap episode highlighting the first 2 seasons as Class-1A and Class-1B prepare to start summer camp.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484332.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Wild, Wild Pussycats",
+            "runtime": 25,
+            "air_date": "2018-04-14",
+            "overview": "The kids arrive at camp, where they will be subjected to hard work like they've never experienced before.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484333.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Kota",
+            "runtime": 25,
+            "air_date": "2018-04-21",
+            "overview": "Midoriya finds out more about Kota and why he feels so strongly about heroes as a small but competent group of villains threaten to endanger the lives of everyone in the camp.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484334.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "My Hero",
+            "runtime": 25,
+            "air_date": "2018-04-28",
+            "overview": "The villains launch their attack, and only Izuku knows where Kota is. Can he get to him in time?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484335.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Drive It Home, Iron Fist!!!",
+            "runtime": 25,
+            "air_date": "2018-05-05",
+            "overview": "As the students and teachers retaliate against the villains, two students take it into their own hands to handle the unknown gas swirling across the forest.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484336.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Roaring Upheaval",
+            "runtime": 25,
+            "air_date": "2018-05-12",
+            "overview": "The students and teachers of U.A. are still fighting in the woods, but has the Vanguard Action Squad accomplished its mission already?.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484337.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "What a Twist!",
+            "runtime": 25,
+            "air_date": "2018-05-19",
+            "overview": "The battle at the training camp concludes, and now the students and teachers of U.A. have to deal with the aftermath.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484338.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "From Iida to Midoriya",
+            "runtime": 25,
+            "air_date": "2018-05-26",
+            "overview": "Todoroki, Kirishima, and Midoriya want to go after Bakugo, but the class rep is standing in their way. Meanwhile, Shigaraki makes Bakugo an offer",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484339.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "All for One",
+            "runtime": 25,
+            "air_date": "2018-06-02",
+            "overview": "The heroes and U.A. students close in on the League of Villains' hideouts, but the League still has an ace up its sleeve.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056839.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Symbol of Peace",
+            "runtime": 25,
+            "air_date": "2018-06-09",
+            "overview": "As the fight against the League of Villains escalates, can the U.A. students get Bakugo out in time for All Might to make a big comeback?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484341.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "One for All",
+            "runtime": 25,
+            "air_date": "2018-06-16",
+            "overview": "All Might's time is running out as he faces his ultimate nemesis head on. Will he finally be able to defeat All For One once and for all?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1056857.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "End of the Beginning, Beginning of the End",
+            "runtime": 25,
+            "air_date": "2018-06-23",
+            "overview": "All Might has finally retired and is counting on someone to take his place, but this is only the beginning.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484344.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Moving Into Dorms",
+            "runtime": 25,
+            "air_date": "2018-06-30",
+            "overview": "The students of Class 1-A move into the dorms and have a competition to determine who has the best room as they settle in.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484345.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Create Those Ultimate Moves",
+            "runtime": 25,
+            "air_date": "2018-07-14",
+            "overview": "Class 1-A works on developing their Quirks and creating ultimate moves in order to get ready for the provisional hero licensing exam.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1057189.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "The Test",
+            "runtime": 25,
+            "air_date": "2018-07-21",
+            "overview": "Izuku and his classmates make some final adjustments to their ultimate moves and then head off to the provisional licensing exam.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1057190.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Shiketsu High Lurking",
+            "runtime": 25,
+            "air_date": "2018-07-28",
+            "overview": "The provisional licensing exam has begun, and everyone's after Class 1-A. Can they last long enough to pass this first test?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484348.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Class 1-A",
+            "runtime": 25,
+            "air_date": "2018-08-04",
+            "overview": "Todoroki's on his own against Seijin High, and Yaoyorozu's group is pitted against Seiai Academy as they and the rest of Class 1-A fight to pass the first test.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484350.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "RUSH!",
+            "runtime": 25,
+            "air_date": "2018-08-11",
+            "overview": "It's down to the final minutes of the first test of the provisional licensing exam and almost half of Class A is still left.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484356.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Rescue Exercises",
+            "runtime": 25,
+            "air_date": "2018-08-18",
+            "overview": "The second test of the provisional licensing exam has begun, and the hero candidates are suddenly thrust into a rescue operation.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484360.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Save the World with Love!",
+            "runtime": 25,
+            "air_date": "2018-08-25",
+            "overview": "We take a break from the provisional licensing exam to visit a class held before the summer training camp.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484361.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "What's the Big Idea?",
+            "runtime": 25,
+            "air_date": "2018-09-01",
+            "overview": "The exam nears its end, but Izuku and the other hero candidates must fend off Gang Orca to finish the rescue mission.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484363.jpg"
+          },
+          {
+            "episode_number": 22,
+            "name": "A Talk About Your Quirk",
+            "runtime": 25,
+            "air_date": "2018-09-08",
+            "overview": "While the U.A. students finish up the provisional licensing exam and get their results, All Might has a talk with All For One.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484365.jpg"
+          },
+          {
+            "episode_number": 23,
+            "name": "Deku vs. Kacchan, Part 2",
+            "runtime": 25,
+            "air_date": "2018-09-15",
+            "overview": "Following the provisional licensing exam, Izuku tries out his Shoot Style on Bakugo as they have a heart-to-heart through their fight.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484366.jpg"
+          },
+          {
+            "episode_number": 24,
+            "name": "A Season for Encounters",
+            "runtime": 25,
+            "air_date": "2018-09-22",
+            "overview": "The world has changed for villains and heroes alike in the weeks after All Might's fight with All For One, and the U.A. students start their second semester.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/422/1057314.jpg"
+          },
+          {
+            "episode_number": 25,
+            "name": "Unrivaled",
+            "runtime": 25,
+            "air_date": "2018-09-29",
+            "overview": "The students of Class 1-A learn about work studies from the Big Three. Meanwhile, the villains also prepare their next steps.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/193/484369.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 4,
+        "name": "Temporada 4",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "The Scoop on U.A. Class 1-A",
+            "runtime": 25,
+            "air_date": "2019-10-12",
+            "overview": "After All Might announces his retirement, freelance reporter Taneo Tokuda goes to the dorms to investigate U.A. Class 1-A.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/216/541940.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Overhaul",
+            "runtime": 25,
+            "air_date": "2019-10-19",
+            "overview": "The villain known as Overhaul meets with Shigaraki in order to propose an alliance that ends badly for the two sides. Meanwhile, Izuku continues to think about where he wants to intern and gets a tip from Togata.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/216/541941.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Boy Meets...",
+            "runtime": 25,
+            "air_date": "2019-10-26",
+            "overview": "Izuku battles Sir Nighteye to get his stamp and approval to join his agency. However, midway through battle, Nighteye reveals a secret about All Might that shakes Izuku's confidence greatly.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/218/546476.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Fighting Fate",
+            "runtime": 25,
+            "air_date": "2019-11-09",
+            "overview": "Izuku's first day on patrol takes a shocking turn where he meets Chisaki and a mysterious girl. Later, he decides to confront All Might about the truth surrounding One for All's successor.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/222/555511.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Let's Go, Gutsy Red Riot",
+            "runtime": 25,
+            "air_date": "2019-11-16",
+            "overview": "Kirishima begins his work study with Fat Gum and Amajiki and runs into a criminal situation. Meanwhile, Shigaraki and Chisaki meet up in order to discuss an alliance.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/224/562357.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "An Unpleasant Talk",
+            "runtime": 25,
+            "air_date": "2019-11-23",
+            "overview": "Pro heroes from all across the country meet up to discuss the situation with the Shie Hassaikai, including the U.A students. The discussion takes a shocking turn when a horrible truth is revealed about the girl named Eri.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/227/568447.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "GO!!",
+            "runtime": 25,
+            "air_date": "2019-11-30",
+            "overview": "To save Eri and to stop the machinations of the Hassaikai Group, the pro heroes prepare to mount an all out attack on the bad guys' stronghold. Deku and Togata steel themselves for the battle ahead.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/229/572696.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Suneater of the Big Three",
+            "runtime": 25,
+            "air_date": "2019-12-07",
+            "overview": "The Shie Hassaikai is going all out to stop the heroes, and Suneater volunteers to take out the first batch of Eight Bullets members in their way.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/230/576234.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Red Riot",
+            "runtime": 25,
+            "air_date": "2019-12-14",
+            "overview": "As the fight with the Shie Hassaikai continues, Kirishima has to face his past when he and Fat Gum get separated from the others.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/231/579865.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Temp Squad",
+            "runtime": 25,
+            "air_date": "2019-12-21",
+            "overview": "Still fused with the walls and floors, Irinaka continues to separate the heroes and police attacking the Hassaikai. Toga and Twice continue to assist the yakuza as part of a deal with Shigaraki",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/232/582432.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Lemillion",
+            "runtime": 25,
+            "air_date": "2019-12-28",
+            "overview": "Twice and Toga betray the Shie Hassasaki meanwhile Mirio finally catches up to Overhaul and Chrono.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/235/587763.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Unforeseen Hope",
+            "runtime": 25,
+            "air_date": "2020-01-04",
+            "overview": "Izuku, Eraser Head, and Sir Nighteye finally reach the area where Chisaki and the others are and find Togata past his limit.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/235/587765.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Infinite 100%",
+            "runtime": 25,
+            "air_date": "2020-01-11",
+            "overview": "Despite their efforts, Overhaul has only grown stronger. Nighteye and Mirio are too injured to continue fighting. Aizawa has been incapacitated by Chrono. The raid team is in shambles, with few left standing. But Eri is crying, and this time, Deku will not let go.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/235/589188.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Bright Future",
+            "runtime": 25,
+            "air_date": "2020-01-18",
+            "overview": "As the heroes deal with the aftermath of the fight with the Shie Hassaikai, the vehicle transporting Chisaki has an encounter with the League of Villains.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/236/591939.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Smoldering Flames",
+            "runtime": 25,
+            "air_date": "2020-01-25",
+            "overview": "Our fight with the Shie Hassaikai has ended and we were able to change the future. But it wasn't completely over yet. As we overcome, with grief at the loss of Sir Nighteye, the league of Villains started to move towards a new stage.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/238/596496.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Win Those Kids' Hearts",
+            "runtime": 25,
+            "air_date": "2020-02-01",
+            "overview": "Camie joins the provisional license training course and is added to the team working with the kids from Masegaki. Meanwhile, Endeavor has a serious talk with All Might.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/239/598881.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Relief for License Trainees",
+            "runtime": 25,
+            "air_date": "2020-02-08",
+            "overview": "The trainees bond with the precocious Masegaki kids and life at U.A. goes back to normal as autumn approaches, but Aoyama has been acting strangely.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/241/603121.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "School Festival",
+            "runtime": 25,
+            "air_date": "2020-02-15",
+            "overview": "As the students of U.A prepare for their school festival, Deku and Togata visit Eri in the hospital. Meanwhile, a new villain named Gentle Criminal begins his reign of crime.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/242/605209.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Prepping for the School Festival Is the Funnest Part",
+            "runtime": 25,
+            "air_date": "2020-02-22",
+            "overview": "As the date of the school festival draws nearer, Deku and the rest of Class 1-A decide who is going to do what in order to put on the greatest school festival ever.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/243/607849.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Golden Tips Imperial",
+            "runtime": 25,
+            "air_date": "2020-02-29",
+            "overview": "The day of the festival is at hand and Class 1-A is ready. As they relax on the night before, Gentle Criminal hatches his plan to infiltrate the festival, starting with a very special tea.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/245/614118.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "Deku vs. Gentle Criminal",
+            "runtime": 25,
+            "air_date": "2020-03-07",
+            "overview": "While getting something for the festival, Deku runs into Gentle Criminal. Learning that he plans to infiltrate the festival, Deku begins to fight the mysterious villain and his partner La Brava.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/245/614119.jpg"
+          },
+          {
+            "episode_number": 22,
+            "name": "School Festival Start!!",
+            "runtime": 25,
+            "air_date": "2020-03-14",
+            "overview": "Deku scrambles to stop Gentle Criminal from infiltrating U.A's school festival using his Shoot Style technique. As La Brava uses her Quirk to power up Gentle, his resolve hardens as he fights against Deku.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/246/617448.jpg"
+          },
+          {
+            "episode_number": 23,
+            "name": "Let It Flow! School Festival!",
+            "runtime": 25,
+            "air_date": "2020-03-21",
+            "overview": "Izuku rushes back to the school festival after his encounter with Gentleman and La Brava, but will he make it in time for his performance?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/248/620420.jpg"
+          },
+          {
+            "episode_number": 24,
+            "name": "Japanese Hero Billboard Chart",
+            "runtime": 25,
+            "air_date": "2020-03-28",
+            "overview": "It's time for the next Japanese Hero Billboard Chart rankings to be announced, and this time, all the top ten heroes make an appearance.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/248/622459.jpg"
+          },
+          {
+            "episode_number": 25,
+            "name": "His Start",
+            "runtime": 25,
+            "air_date": "2020-04-04",
+            "overview": "Endeavor and Hawks continue to battle the mysterious Nomu enemy that attacked them. The whole world watches what the new \"Symbol of Peace\" is capable of.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/250/625365.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 5,
+        "name": "Temporada 5",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "All Hands on Deck! Class 1-A",
+            "runtime": 25,
+            "air_date": "2021-03-27",
+            "overview": "The day after Endeavor's climatic battle, Izuku and his classmate take part in a combat training exercise.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/305/762586.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Vestiges",
+            "runtime": 25,
+            "air_date": "2021-04-03",
+            "overview": "Hawks reveals where his morals lie and Endeavour begins his journey to mend his relationship with his family.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/305/762587.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Clash! Class A vs. Class B!",
+            "runtime": 25,
+            "air_date": "2021-04-10",
+            "overview": "Class A and Class B are joined by a special guest as they battle it out during their joint combat training.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/308/772266.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Make It Happen, Shinso!",
+            "runtime": 25,
+            "air_date": "2021-04-17",
+            "overview": "The Class A team tries to put Shinso and his new equipment to good use in the first match against Class B.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/309/774016.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Operation New Improv Moves",
+            "runtime": 25,
+            "air_date": "2021-04-24",
+            "overview": "It's darkness versus darkness as Tokoyami and Kuroiro face off in the second match of the class battles!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/310/776793.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Foresight",
+            "runtime": 25,
+            "air_date": "2021-05-01",
+            "overview": "Separated from her team, Yaoyorozu's leadership skills are put to the test in the second match of the class battles.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/312/780222.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Match 3",
+            "runtime": 25,
+            "air_date": "2021-05-08",
+            "overview": "In the third match of the class battles, Honenuki leads the Class B team against a well-balanced Class A team.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/314/786958.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Match 3 Conclusion",
+            "runtime": 25,
+            "air_date": "2021-05-15",
+            "overview": "It's still anybody's game as the the third match continues with an endurance battle between Todoroki and Tetsutetsu.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/317/793917.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Early Bird!",
+            "runtime": 25,
+            "air_date": "2021-05-22",
+            "overview": "Bakugo shows a different side of himself in the fourth team match as the class battles continue.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/320/801828.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "That Which Is Inherited",
+            "runtime": 25,
+            "air_date": "2021-05-29",
+            "overview": "Midoriya and Shinso face off for the first time since the sports festival in the last fight of the class battles.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/323/807894.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Our Brawl",
+            "runtime": 25,
+            "air_date": "2021-06-05",
+            "overview": "It's an all-out brawl as the last two teams from Class A and Class B fight it out to the finish!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/325/814904.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "The New Power and All For One",
+            "runtime": 25,
+            "air_date": "2021-06-12",
+            "overview": "As the class battles conclude, Midoriya works with All Might and Bakugo on learning more about his new power.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/423/1058877.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Have a Merry Christmas!",
+            "runtime": 25,
+            "air_date": "2021-06-19",
+            "overview": "It's Christmas at U.A. and the Class 1-A students celebrate with a Christmas party.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/423/1059032.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Off to Endeavor's Agency!",
+            "runtime": 25,
+            "air_date": "2021-06-26",
+            "overview": "Hawks acts strange when he meets Endeavor and his work study students on their way to Endeavor Agency.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/333/834982.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "One Thing at a Time",
+            "runtime": 25,
+            "air_date": "2021-07-10",
+            "overview": "As the villains continue to move behind the scenes, Endeavor helps his work-study students with the next steps in their training.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/338/847402.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Long Time No See, Selkie",
+            "runtime": 25,
+            "air_date": "2021-07-17",
+            "overview": "Ryukyu brings her work study students with her when Selkie asks her to team up with him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/341/853858.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "The Hellish Todoroki Family",
+            "runtime": 25,
+            "air_date": "2021-07-24",
+            "overview": "Endeavor brings his work study students over for dinner at Fuyumi's request but faces awkward conversations at home.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/343/858087.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "The Unforgiven",
+            "runtime": 25,
+            "air_date": "2021-07-31",
+            "overview": "One of Endeavor's biggest fans shows up to settle some unfinished business, and he expects far more than an autograph.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/345/863869.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "More of a Hero Than Anyone",
+            "runtime": 25,
+            "air_date": "2021-08-14",
+            "overview": "When an unsettling discovery is made regarding Kurogiri, Aizawa and Present Mic are summoned to interrogate him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/348/871970.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "My Villain Academia",
+            "runtime": 25,
+            "air_date": "2021-08-21",
+            "overview": "A series of surprise encounters helps give Shigaraki a new sense of direction for the League of Villains.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/350/877190.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "Revival Party",
+            "runtime": 25,
+            "air_date": "2021-08-28",
+            "overview": "The League of Villains waits for Gigantomachia to wake up as they clash with the Meta Liberation Army.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/353/882689.jpg"
+          },
+          {
+            "episode_number": 22,
+            "name": "Sad Man's Parade",
+            "runtime": 25,
+            "air_date": "2021-09-04",
+            "overview": "As Twice tries to save Toga, he thinks back on his past and makes a realization that helps him overcome it.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/354/886337.jpg"
+          },
+          {
+            "episode_number": 23,
+            "name": "Tenko Shimura: Origin",
+            "runtime": 25,
+            "air_date": "2021-09-11",
+            "overview": "Memories from Shigaraki's past as Tenko Shimura resurface as he confronts Re-Destro.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/356/891420.jpg"
+          },
+          {
+            "episode_number": 24,
+            "name": "Tomura Shigaraki: Origin",
+            "runtime": 25,
+            "air_date": "2021-09-18",
+            "overview": "Shigaraki remembers his first encounter with All For One during the climax of his battle with Re-Destro.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/358/895811.jpg"
+          },
+          {
+            "episode_number": 25,
+            "name": "The High, Deep Blue Sky",
+            "runtime": 25,
+            "air_date": "2021-09-25",
+            "overview": "Both sides prepare for the confrontation between the heroes and the Paranormal Liberation Front as Class 1-A finishes their first year of high school.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/360/901022.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 6,
+        "name": "Temporada 6",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "A Quiet Beginning",
+            "runtime": 25,
+            "air_date": "2022-10-01",
+            "overview": "Using the information Hawks gathered, the heroes and their work study students get ready for an attack on the Paranormal Liberation Front led by Shigaraki.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/424/1060768.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Mirko, the No. 5 Hero",
+            "runtime": 25,
+            "air_date": "2022-10-08",
+            "overview": "Mirko chases after Garaki while the rest of Team Endeavor deals with Nomus at Jaku Hospital. Meanwhile, Team Edge Shot charges in for a surprise attack at Gunga Villa.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/425/1063913.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "One's Justice",
+            "runtime": 25,
+            "air_date": "2022-10-15",
+            "overview": "The heores overrun the Mountain Villa and block the villains' escape routes. Shielded from all the commotion, Hawks has set a trap for the biggest threat to the operation's success - Twice.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/426/1066079.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Inheritance",
+            "runtime": 25,
+            "air_date": "2022-10-22",
+            "overview": "The battle between Hawks and Dabi continues. Meanwhile, Mirko fights bravely against the Nomus in the underground, but what she discovers in Garaki's laboratory makes her shudder.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/427/1068979.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "The Thrill of Destruction",
+            "runtime": 25,
+            "air_date": "2022-10-29",
+            "overview": "The heroes' fight against the Nomus continues. They were able to catch Garaki, but the worst case occurs. The fight in the Gunga Mountain Villa also continues but Hawks is unable to fight. Can he escape death?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/428/1071090.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Encounter, Part 2",
+            "runtime": 25,
+            "air_date": "2022-11-05",
+            "overview": "At the Villa, Tokoyami takes Hawks to safety while the Pro Heroes and the Liberation Front continue their battle. Toga uses her Quirk to transform into another hero, going on a killing spree enraged over Twice's death, with Mr. Compress and Dabi watching on from the side, just as Gigantomachia's hand emerges from beneath. Meanwhile in Jaku City, the Police HQ scramble to keep up with the chaos caused by Shigaraki's Decay. Endeavor faces the villain head-on, who is able to easily rebuff the flame hero with his new Super Regeneration, as well as the extra Quirks from All For One. Despite this, a voice continues to call out to Shigaraki from within, telling him to get \"One For All\". Endeavor overhears this, which is promptly overheard by the others on the comms, including Deku. Realizing that Shigaraki is now after him, which he is able to thanks to the Search Quirk stolen from Ragdoll, Deku makes his way back into the city away from the evacuees, accompanied by Bakugo, who intends to use this opportunity to get revenge on Shigaraki for his previous kidnapping. Deku informs Endeavor that he is Shigaraki's target, causing the villain to use his Quirks to destroy their communication devices. Shigaraki suddenly appears before Deku and Bakugo, ready to steal One For All, but they are saved by Gran Torino. Endeavor and Ryukyuproceed to physically attack Shigaraki, which they now can do thanks to Eraser Head using his Erasure on him, however they are shocked to find that his new All Might-level physical strength isn't a Quirk but his actual body physically enhanced, just like the Nomu. Gran Torino tells Deku and Bakugo to remain on the sidelines while the Heroes handle things, however everyone is stunned when suddenly a group of Nomu appear from underground.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/439/1099503.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Disaster Walker",
+            "runtime": 25,
+            "air_date": "2022-11-12",
+            "overview": "A news helicopter reports in on the devastating destruction of Jaku City, with All Might watching on nervously. In the city, Shigaraki is able to efficiently deal with Endeavor and Ryukyu's attacks, while the Heroes attempting to assist are forced to face against the newly awakened \"Near High-End Nomu\"; Nomu with the strength of a High-End but lacking coherent thoughts. Shigaraki tries to use this opportunity to kill Eraser Head, but Deku suddenly arrives and tackles him, declaring his and Bakugo's intentions to save their teacher. As Endeavor returns to the battle, he agrees to let the two students join in the fight. Shigaraki hopes to try and capture Deku and escape, but in the process, he ends up calling him his \"little brother\", surprising the two. He realizes that the will of his master still persists within the Quirk, rejecting it and declaring his desire to be better than All For One. The Heroes proceed to overwhelm Shigaraki with their coordinated attacks. Meanwhile at the Villa, Gigantomachia carries the League of Villains members on his back in an attempt to reach Shigaraki; right before he does Dabi nabs Skeptic to take with them, planning to use him for a specific purpose. Mt. Lady is able to barely hold Gigantomachia off, slowing him down while being pushed backward. Midnight attempts to use her Quirk to send the villain back to sleep but is thwarted by the attacks of Dabi and Mr. Compress, which knocks her to the ground, injuring her. She calls on Yaoyorozu and tells her to create anesthetics in order to put the beast to sleep, just as their call is cut off. With the Heroes busy fighting the villains and only the U.A. students remaining, Yaoyorozu takes charge, issuing orders to her classmates as they prepare to intercept Gigantomachia.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/439/1099507.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "League of Villains vs. U.A. Students",
+            "runtime": 25,
+            "air_date": "2022-11-19",
+            "overview": "The Class 1-A and 1-B students led by Yaoyorozu work together to set up their trap, successfully getting Gigantomachia stuck in the ground, with the plan of forcing his mouth open and injecting a sedative into him to knock him out. They attempt to get in close to the League still on his back, but are pushed back by the villains, and literally blown away by the beast as they try to throw the sedatives inside. Dabi's fire prevents most of them from getting any closer, but using her Quirk, Mina is able to rush through to reach the beast. However, she ends up recognizing Gigantomachia from their encounter during middle school, and hesitates just long enough to miss her shot. He nearly crushes her, but is saved by Kirishima, who manages to hold onto his leg and successfully throws Mina's sedative canister into his mouth. The Pro Heroes return to battle, however everyone is stunned as Gigantomachia starts to transform his body. Meanwhile in Jaku, Shigaraki declares his conviction how heroes save people while abandoning their families, and that he is the result of them all ignoring the true problems of their society. He refuses to let up the assault, and ends up critically injuring Gran Torino, who at this time remembers back to the incident when Nana abandoned her son to save him, wondering if what they did was right. Shigaraki attempts to go after Eraser Head, but is held back by Deku and Ryukyu using all of their strength. Unbeknownst to them however, Shigaraki is in possession of a Quirk-Destroying Bullet, and uses his fingers to shoot it toward Eraser Head, hitting him in the leg.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/439/1099527.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Katsuki Bakugo: Rising",
+            "runtime": 25,
+            "air_date": "2022-11-26",
+            "overview": "To desperately halt the effects of the Quirk-Destroying Drug, Eraser Head cuts his leg off. Despite this, Shigaraki manages to reach his face, slicing one of his eyes, just as Shoto appears, who had been following Deku and Bakugo, blasting him with a mountain of ice, and further knocked back by Deku. With Eraser unconscious, his Quirk is undone, and Shigaraki begins to regenerate all of his injuries. Meanwhile, the evacuation team overhear of the mass destruction caused by Gigantomachia as he makes a reckless beeline directly toward his master; the rest of the U.A. students in Gunga can only look on in fear at the devastation left in his wake. Shigaraki prepares to finish everyone off, only for his body to suddenly split open, realizing that he was awakened too early. Deku figures out that, just like him, his body can't withstand the power of All For One. At this moment, Deku unlocks the Quirk of the 7th user: Nana Shimura's Float, and combined with Blackwhip pulls Shigaraki into the air and rescues his companions. He proceeds to duel Shigaraki in the air alone while the Heroes recover on the ground, causing Bakugo to get anxious. He recalls a conversation with All Might during their training prior where Bakugo voiced his worries regarding a mystery of one of the One For All users, and admitting his bullying of Deku came from not understanding his unselfish and self-sacrifical attitude. While Deku unleashes the full power of One For All to overwhelm Shigaraki, even despite the damage on his body, Bakugo and Shoto get Endeavor into the air, so he can finish him off for good with a Prominence Burn. As he burns alive, All For One's voice calls out to Shigaraki, his body suddenly releasing an array of Rivet Stabs to knock Endeavor away. \"Shigaraki\" shoots several Rivets out toward Deku, but with no hesitation, just like Deku did for him before, Bakugo blasts forward, pushing him out of the way and getting stabbed instead.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/439/1099547.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "The Ones Within Us",
+            "runtime": 25,
+            "air_date": "2022-12-03",
+            "overview": "Upon seeing Bakugo getting stabbed, Deku snaps and in an enraged haze attacks \"Shigaraki\", who uses the opportunity to catch him off guard and touch his face, starting to steal One For All. Deku suddenly appears in the vestige world of One For All where he's faced against Shigaraki and All For One, who has begun to merge into the former's body despite his resistance; due to being unable to move in the world, Deku is supported by Nana Shimura. All For One introduces Shigaraki to his grandmother and reveals that a part of a person's consciousness resides within the Quirk Factors, explaining how the One For All predecessors still reside within the Quirk. Shigaraki begins to try and erode all of One For All, as well as All For One himself, but they are repelled away by All For One's younger brother. All For One attempts to discredit Deku for his failures, but his brother defends him for all the qualities he has in a hero. The two re-emerge in the real world, as All For One tells Shigaraki to flee so his body can adapt to the Quirk. Meanwhile, the evacuation team splits up to aid the team fighting Shigaraki and continue the evacuation in Gigantomachia's wake; Nejire and Iida go with the former and Ochaco and Tsuyu with the latter. The League on Gigantomachia's back observe the incoming heroes, and when she spots Ochaco and Tsuyu, Toga leaves to confront them, wanting to ask them a question still distraught over Twice's death. Disguised as an old woman, Toga lures Ochaco into an abandoned building where at knife point she asks what she plans to do with her; Ochaco responds she will do whatever she can to help the people in trouble. As she pushes Toga off, Ochaco plans to apprehend her.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/439/1099621.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Dabi's Dance",
+            "runtime": 25,
+            "air_date": "2022-12-10",
+            "overview": "A Hero rides on a plane making his way toward the battlefield. Shoto rescues Deku, Bakugo, and Endeavor from falling, who are all shocked to see Shigaraki still standing, refusing to listen to All For One's words to retreat. Nejire and Iida arrive to warn the others of Gigantomachia's incoming rampage, with the former assisting Shoto in fighting Shigaraki, while the latter helps escort the injured heroes away. Meanwhile, Ochaco and Toga continue to fight in the abandoned house. Toga reveals she was able to use Ochaco's Quirk and was able to kill someone using it, which horrifies her. She also realizes that Ochaco also likes Deku, leading to a scuffle over his Christmas gift to her. Ochaco tells Toga that if she keeps disrupting people's lives she will have to face the consequences, which she responds with tears in her eyes. Tsuyu appears to help Ochaco, but Toga is able to escape, with Ochaco wondering why she started crying; with her answer, Toga prepares to reunite with the League. Gigantomachia finally arrives to Shigaraki's location, and reclaims him just as he's knocked unconscious by Shoto and Nejire's attacks. Dabi then unveils himself on the beast's back, washing the dye out of his hair and revealing his real name: Toya Todoroki. At this same time, Skeptic hacks into all the televisions across the country broadcasting a confessional from Dabi, revealing his lineage as Endeavor's oldest son, and his abusive past all in the pursuit of power. Endeavor and Shoto are horrified by the revelation, as Dabi gleefully takes joy in the airing out of all the dirty laundry, including Hawks' murders of Twice and Best Jeanist, and his father being a criminal who Endeavor had locked away. Endeavor is left absolutely speechless, thinking about his past raising Toya to be his successor and his supposed death, and Dabi prepares to finish everyone off with his own Prominence Burn. But suddenly, he and the other villains are restrained by metal cables from the sky, as an alive Best Jeanist enters the battle.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/440/1101420.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Threads of Hope",
+            "runtime": 25,
+            "air_date": "2022-12-17",
+            "overview": "Best Jeanist uses his metal fibers to restrain Gigantomachia and the League, with Dabi surprised that he is alive. Spinner attempts to wake Shigaraki up to give Gigantomachia an order, and before Nejire can blast them, Dabi burns her with his fire, escaping from his restraints by covering his whole body in flames. Thinking about his past, Shigaraki manages to barely let out a \"destroy\", re-inciting Machia and forcing Jeanist to keep his hold on the giant. At this moment, several of the Near High-Ends the Heroes have been fighting break off from the group to attack Jeanist. Deku laments unable to do anything due to his broken body when suddenly Mirio returns, saving Jeanist by punching the Nomu away; the previous day he had asked Eri to use her Rewind Quirk on him so he could get his Quirk back and rejoin the battle, which she happily agrees too. He receives assistance from Iida, Nejire, and Bakugo, with the latter revealing to his old mentor his hero name: \"Great Explosion Murder God Dynamight\"; the name is met with disdain from everyone other than Mirio. Meanwhile, Shoto attempts to fight his brother but finds himself overwhelmed by his fire and his insanity, all the while their father stands motionless on the ground. Deku intervenes in their fight using Blackwhip from his mouth, telling Dabi that he is not Endeavor. After a sudden ping in his head, Gigantomachia breaks free from the fibers, but spurred on by Deku's words, Endeavor uses his last remaining strength to knock into Machia, who suddenly falls unconscious due to the anaesthetic the U.A. students inserted into him finally taking into effect. As the War reaches its climax, Mr. Compress declares that he and his teammates haven't accomplished their goals, and aren't done yet.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/444/1110693.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Final Performance",
+            "runtime": 25,
+            "air_date": "2022-12-24",
+            "overview": "Mr. Compress recalls back to before the League's encounter with the Meta Liberation Army, when they faced against the Creature Rejection Clan, and Spinner voiced his doubts on Shigaraki's plan for their future. In the present, Mr. Compress uses his Quirk on himself, mutilating his body but being freed from Best Jeanist's grasp, allowing him to compress Spinner and Shigaraki and escape up Gigantomachia's back. He also compresses Skeptic as well as Dabi, who retreated upon defeating Shoto, due to Endeavor being unconscious. Revealing himself to be the great-grandson of the Peerless Thief Oji Harima, Compress frees Spinner and Shigaraki, sacrificing himself to let them flee. At this same time, Deku's head continues to pound away, which he realizes is the Quirk of the fourth user of One For All: Danger Sense. Recalling Shigaraki's words about his stuffed hands giving him disgust and peace, Spinner puts his remaining one on his face, causing him to re-awaken, unleashing a Radio Waves blast that knocks the Heroes away. However, Spinner discovers that All For One has taken control of Shigaraki's body, due to it being on the verge of breaking, and had commanded the Near High-End Nomu to help them escape, leaving behind Compress, Toga, and Machia as punishment for Shigaraki's failure. The remaining Heroes try to attack \"Shigaraki\" but are all blasted away as the Nomu pick him up and escape. As Deku attempts one last chance to stop him, he too is blasted away, told they will meet again when his body is repaired. With destruction and chaos all over the battlefield, Deku thinks about even after all the terrible things Shigaraki did, when he saw him being overpowered and taken over by All For One, he looked like someone who needed help.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/444/1110695.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Hellish Hell",
+            "runtime": 25,
+            "air_date": "2023-01-07",
+            "overview": "Prior to the start of the War, a Re-Destro Double created by Twice is invited to the Hero Public Safety Commission for a joint operation, which turns out to be an ambush for his arrest. The Double proceeds to rampage about before dissolving, killing several Heroes including the President. In the aftermath of the War, all the wounded Heroes are taken to hospitals to recover. Among the villains who are arrested are Dr. Garaki, who is promptly interrogated by the Police, Mr. Compress who is taken to the hospital for his injuries, Gigantomachia who is air-lifted away, Re-Destro and Geten who are defeated in battle, as well as 16,000+ members of the Paranormal Liberation Front. However, \"Shigaraki\", most of his Nomu, Spinner, Dabi, Skeptic, and 132 other Liberation soldiers manage to escape, as well as Toga also being missing in action. In the remains of the city left behind by Gigantomachia's destruction, Ochaco and Tsuyu help the remaining Heroes and Police help and save as many injured and trouble civilians as they can. However, the casualties prove too overwhelming to the point that some Heroes contemplate retiring, believing the work no longer worth it. At the same time, the U.A. students discover the corpse of Midnight, tearfully mourning their teacher and the other fallen Heroes. Meanwhile, many other civilians continue to react over Dabi's confessional, wondering how Endeavor will respond. That night, All For One within Shigaraki commands the Nomu to storm Tartarus to free his main body.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/445/1114939.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Tartarus",
+            "runtime": 25,
+            "air_date": "2023-01-14",
+            "overview": "The All For One possessed Shigaraki and his army of Near High-Ends raid Tartarus, the maximum security prison in which the \"dregs of society\" are thrown in to never be released. They successfully destroy the main gate, killing the guards, and make their way toward the main facility on an island. While flying on a Nomu, Shigaraki attempts to regain control of his body, but his master's will remains stronger, telling him to rest and that he is to become \"the next me\". Using their shared consciousness, both All For Ones execute dual EMP attacks, shutting down the power in the prison from the inside and out. This results in all the prisoners being let free and proceeding to go on a rampage, which includes Muscular, Moonfish, and Stain; a female prisoner releases Overhaul out of his cell. \"Shigaraki\" reunites with All For One, declaring to the prisoners to follow him if they want to escape, as it is the start of how he became the greatest \"Demon Lord\". All For One proceeds to commandeer several air crafts, sending the Nomu and inmates to attack seven other prisons around the country, freeing the prisoners from six of them. \"Shigaraki\" returns to the League to rest his body, leading Spinner to argue that he intends to follow Shigaraki, not whoever's controlling him, despite his claims that he has the best interests in mind. Two days later, Bakugo awakens at Central Hospital where he learns from his classmates the state of everyone after the War. Gran Torino and Eraser Head are still alive, but in critical condition. Endeavor is taking part in surgery, while the hospital is surrounded by protesters. Shoto recovers from his injuries, resolving that he is the one who has to stop his brother, just as his siblings and mother appear to greet him. While everyone else has regained consciousness, Midoriya still remains in a comatose state, watched over by All Might.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/447/1117988.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "The Hellish Todoroki Family, Part 2",
+            "runtime": 25,
+            "air_date": "2023-01-21",
+            "overview": "When he was a child, Keigo Takami lived in a poor and abusive household. His father was a villain who went on the run with his mother after killing someone, inadvertently having a child, who he would treat terribly. Keigo would watch news broadcasts of Heroes, but never believed in them beyond fantasy, clinging to his Endeavor doll as his only source of happiness. One day, his father is arrested by Endeavor, reinvigorating hope in the boy that Heroes are real. He and his mother are left on the streets, as she begs him to use his wings to do something. After Keigo saves some civilians from an incident, they are approached by the Hero Public Safety Commission, recruiting Keigo to be a hero while also cutting all ties of the \"Takami\" name for them both. In the present, Best Jeanist and Hawks drive through the city, where they explain how they were able to put Best Jeanist into a \"death-like state\" to fool Dabi before he was revived. Best Jeanist stops a group of thugs on the street, where he learns the police are too busy rounding up the escaped convicts, and the hero offices nearby have shut down, causing them to notice how much the faith in heroes has dwindled. They arrive at Hawks' mother's home where he finds a letter from her explaining how Dabi had sent men to force her into revealing his past, and that she has fled to not cause him anymore trouble. Hawks laments on his failure to save his mother and instead run from his past, and declares his intention to do what he wants to do now and help Endeavor. Meanwhile, civilians have started to take matters into their own hands using support items to fight villains, but their inexperience only leads to more damage and more decrying for the Heroes being late. Endeavor regains consciousness in the hospital, breaking down over Dabi and his past sins coming back to haunt him. Shoto and his siblings awkwardly walk in on him as he tearfully attempts to apologize for his guilt and actions. He is then confronted by Rei regarding his current state, telling him they need to talk about Toya.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/448/1120411.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "The Wrong Way to Put Out a Fire",
+            "runtime": 25,
+            "air_date": "2023-01-28",
+            "overview": "The Todorokis reminisce on their past history that led them to this moment. Enji and Rei had discovered that while Toya possessed a fire Quirk greater than his father's, he had his mother's constitution, making him resistant to ice but weak to his own fire. In an attempt to protect him, Enji ceased all training with Toya, but when that refused to deter him, he decided to have more kids to make him lose his resolve. After Natsuo's birth, Shoto is born with the Quirk combination Enji desired, to his joy and Toya's devastation. After an incident where Toya had a breakdown and nearly attacked Shoto, Enji banned all interaction between Shoto and the other siblings. By the time he was 13, Toya continued to grow more emotionally distraught with his siblings and mothers, while also training his Quirk to the point his fire grew from red to blue. He wanted to show his father his progress, but upon the realization he had continued his training, a furious Enji took his anger out on Rei. This reached her breaking point, resulting in the incident of Shoto's burning and her hospitalization, followed shortly after by Toya's supposed death as his Quirk went overload and burned the entire mountain down. In the present, Rei declares to Endeavor that he isn't the one suffering the most, and they all carry a small weight in Toya's downfall, so they will help deal with him together. Hawks and Best Jeanist then arrive, telling Endeavor about the current state of the world and requesting a team-up to help solve their problems together. Hawks then asks him about \"One For All\", as Endeavor's mention of it during the battle with Shigaraki has spread to the public asking questions, leading him to tell them about Midoriya. Meanwhile, All Might continues to watch over Midoriya alone, knowing he is currently having a conversation with the predecessors of One For All.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/449/1123876.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "Izuku Midoriya and Tomura Shigaraki",
+            "runtime": 25,
+            "air_date": "2023-02-04",
+            "overview": "Izuku awakens in the vestige world of One For All, where he encounters all eight predecessors of One For All (with the second and third users facing away from him). The first user reveals that between One For All's increased growth in power and All For One's intervention, they are now freely able to communicate with each other and Izuku. The fourth user and the user of Danger Sense, Hikage Shinomori, introduces himself to Izuku, as they discuss with him about the true nature of One For All. He reveals that he died at the age of 40 due to \"old age\", after holding One For All for 18 years. Aware that All Might held the power for 40 years, they determine that One For All greatly diminishes the lifespan of those who already possess a Quirk, and because All Might was Quirkless, he was saved from this burden. Due to this revelation, they surmise that due to the increased power in the Quirk and the decreasing Quirkless population, Izuku may be the last wielder of One For All. Nana then confronts Izuku, asking if he is resolved to kill Shigaraki, stating that All For One intends to use his intense rage to overwhelm and finally steal One For All, which he has failed to do in the past. They are aware that Izuku felt like he needed saving, but warn him that he could be beyond saving and turn into an unstoppable monster. Izuku stands firm that he saw a little boy crying within Shigaraki during their encounter, and that All Might showed him One For All is a power meant to save not kill, so while he is resolved to do so if he has to, he wants to try and save him first. The users accept his hand as Nana breaks down in tears, apologizing for testing him. Back outside, Hawks and Best Jeanist confront All Might about One For All and realizing he can't keep the secret anymore, reveals everything to them. Several days later, Endeavor, Hawks, and Best Jeanist put on a press conference to address the public of Dabi's accusations, and their plan to turn U.A. into an evacuation facility to protect the civilians. At the same time, Izuku gives letters to all of his classmates, revealing the truth about One For All and All For One, and leaves the school.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/450/1126435.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Full Power!!",
+            "runtime": 25,
+            "air_date": "2023-02-11",
+            "overview": "Ketsubutsu Academy third-years Yo and Tatami enter a nearly abandoned city in order to evacuate the remaining civilians, having received reports of a jailbreaker causing destruction nearby. Yo attempts to convince them, but they refuse, no longer trusting in Heroes and believing they can fend off danger and protect themselves. Shortly after they encounter the aforementioned jailbreaker, Muscular, who Yo attempts to fight off while Tatami goes to protect the civilians. Yo is pinned down, but even after using his Quirk at full power, Muscular has the upper hand and nearly kills him, until a hooded Deku, covered in purple smoke, appears to save him. Muscular recognizes him from their fight in the forest and excitingly prepares to fight him. Deku hands the unconscious Yo to Tatami and re-enters the fight. The sixth user, En, warns him to not overuse his Quirk, Smokescreen, as Deku uses his new arsenal of abilities and experience to get the upper hand on Muscular. He attempts to reason with him, asking him why he causes trouble and even referring to him by his real name, but Muscular declares all he cares for is wanton destruction. Taking advantage of his muscle fibres being damaged by Yo, Deku punches him with a Detroit Smash, knocking him unconscious. While Deku brings Muscular to prison, the civilians agree to evacuate with the Ketsubutsu students, not wanting anyone else to get hurt. Deku temporarily reunites with All Might before heading off to deal with the next threat. Several days prior at the hospital, Izuku awoke to learn the injuries on his body were not as fatal as they initially believed due to his increased in strength in his body. He and All Might then tell Inko the truth behind One For All, with Izuku saying he won't be returning to U.A. in order to protect everyone with Shigaraki targeting him. He comforts his tearful mother telling her he will return to her, with All Might saying he will stay by his side. They decide to team up with Endeavor, Hawks, and Best Jeanist, using Izuku as bait to lure the villains out of hiding. Before leaving the hospital, Izuku visits Gran Torino who tells him killing can be a way to save, and hands him his scarf to wear.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/451/1129047.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Hired Gun",
+            "runtime": 25,
+            "air_date": "2023-02-18",
+            "overview": "Deku saves a tall mutant woman being attacked by panicking civilians who believe she's a villain, having All Might escort her to safety. While surveying the city with the One For All users, he thinks back to during the conversation with the vestiges when the first user, Yoichi, requests the Second and Third users' help in assisting Deku. They reveal they were from the era when All For One was at the peak of his power and part of a resistance fighting against him, unable to agree with Deku's idealistic beliefs. However, Yoichi reminds them how they had saved him from All For One's capture, rather than killing him like they were originally going to, and that was what allowed One For All to grow in the first place. They eventually are convinced to follow alongside him. Later after taking care of some thieves, Endeavor is lambasted by protesting civilians over his failures and for continuing to keep secrets. Endeavor, Hawks, and Best Jeanist proceed to discuss All For One's plans, believing he intends to completely hijack Shigaraki's body before pursing Deku, and surmising he requires Shigaraki's hatred to steal One For All because he lacks any. Just then, Deku's GPS goes out, while All Might's car is attacked by a smoke bomb. It turns out his phone was sniped by former Public Safety Commission Pro Hero, Lady Nagant, one of the Tartarus escapees sent by All For One to capture Deku. She uses her Quirk, Rifle, to shoot at him from afar, causing him to swing around the city and attempt to evade and defend. Lady Nagant is accompanied by Overhaul, who she had rescued from Tartarus, telling him to hide. A flashback shows that Nagant reluctantly agreed to All For One's request learning about Deku's overt idealism about hero society and accepted payment in the form of a second Quirk, Air Walk.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/451/1129046.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "The Lovely Lady Nagant",
+            "runtime": 25,
+            "air_date": "2023-02-25",
+            "overview": "All Might is cornered by two thugs, they are scared away by his sheer tenacity refusing to leave Deku behind. Deku swings through the city to reach Lady Nagant's location, only to be caught off guard by more bullets coming from behind him, realizing she was given an extra Quirk by All For One to lure him closer to her. With no other option, Deku unleashes Smokescreen on the ground and begins to build up energy in his legs, which the third user recognizes as him using his Quirk, Fa Jin. He warns him about using it since he has no experience, but he's successfully able to feint out Nagant in the smoke and use the energy boost to blast through a building and grab her. He demands to know why she follows All For One despite originally being a Pro Hero, and as she continues to shoot away at him, she explains her history. She was an assassin sent out by the Commission to kill corrupt heroes taking advantage of the system, as well as villains before they committed any crimes. All of the blood on her hands began to eat away at her mentally, considering everything about their society to be a sham. When she confronted her superior about this, he threatened her with silence, so she killed him in retaliation; this incident was covered up by saying she killed a fellow hero in a dispute. In response, Deku admits that everything isn't as black-and-white as he initially believed, but that's why he still intends to land a hand. To catch him off guard, Nagant suddenly aims her rifle at the nearby Overhaul; he had provided her information on who Deku was in order for her to take him to his Boss. She shoots at Overhaul, but with no hesitation, Deku uses the power of Fa Jin to become faster than a speeding bullet, knocking him out of the way, and uses his remaining strength to defeat Nagant. He saves her from falling, asking her to join their fight, believing she still has the heart of a hero within her. But before she can respond, her body suddenly explodes from within, due to a failsafe All For One left inside her. Hawks arrives just in time to rescue her, and with her last remaining strength, tells the Heroes of All For One's location. Endeavor apprehends Overhaul, and after hearing him rant about apologizing to his Boss, Deku says he will follow Nagant's promise if he shows that same regret to Eri as well. As he sees Nagant's charred body, rage towards All For One begins to swell up within Deku.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/451/1129044.jpg"
+          },
+          {
+            "episode_number": 22,
+            "name": "Friend",
+            "runtime": 25,
+            "air_date": "2023-03-04",
+            "overview": "Deku and the Top Three Heroes, plus The Lurkers, confront All For One at his hideout in Haibori Woods, only to find it abandoned. A recording left by All For One taunts Deku for his failures, telling him it's \"his turn\", before setting the mansion to explode. The Heroes escape and reconvene to discuss their options, due to the dwindling amount of Heroes left available. Meanwhile, Deku swiftly deals with the second hitman, while All Might desperately attempts to convince him to rest. Deku believes that since he can use practically use One For All at 100% without backlash, he doesn't have to watch over him anymore, and All Might can only look on devastatingly as Deku flies away, leaving him behind. Over the next several days, Deku proceeds to tirelessly travel through the city, saving whoever he can, ignoring the Heroes and the One For All predecessors' advice to take it easy. Because of this, Deku starts taking on a more monstrous appearance, with civilians scared of him and rumours going around that he is a Nomu, yet he refuses to stop, all so that he and everyone he cares about can smile again. He begins to collapse in Kamino where he confronts another hitman, Dictator, who uses his Quirk to attack Deku using nearby civilians. Due to being too tired, Deku is unable to fight and is swarmed by the mob, until he is saved by Bakugo who knocks Dictator out. After having received Deku's letters, Class 1-A figured out that Deku and All Might were working with Endeavor, and use Nezu to summon him to the school to confirm this. They state their desire to help their classmate in his moment of need and Nezu approves of them going out onto the streets to bring him back. Class 1-A confront Deku, who refuses to give in and demands they get out of his way, preparing to fight.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/451/1129043.jpg"
+          },
+          {
+            "episode_number": 23,
+            "name": "Deku vs. Class A",
+            "runtime": 25,
+            "air_date": "2023-03-11",
+            "overview": "Deku attempts to escape from his classmates, so they all try to restrain him. During their struggles, each Class 1-A student reminds Deku of something he had done for or said to them in the past, and how much their friendship means to them, but Deku refuses to listen, not wanting them to be caught up in his battle against All For One and get hurt, as his way of \"protecting\" them. After almost every one of their attempts to talk or pin him down fail, Deku prepares to execute Faux 100 Percent to blast himself away for good, but Class 1-A combine all of their abilities to create a massive ramp which they use to blast Iida into the sky at blistering speeds, catching up to Deku and grabbing his hand. Iida repeats what Deku had said to him in the past when he saved him, that helping without being asked is the essence of a hero, causing Deku to start to give into his exhaustion. On the ground, he once again tries to keep his distance from everyone, but Bakugo confronts him, admitting the reason behind why he bullied him in the past. He sincerely apologizes for everything he said and done, telling him the class doesn't want to reject who he is, but support him to help save everyone. Deku finally gives in and apologizes himself before passing out. He wakes up in front of the now heavily fortified U.A., only to be met by a mob of angry civilians demanding Deku not enter, aware that he is the boy Shigaraki is after. Deku is about to leave, but is stopped by Ochaco.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/451/1129048.jpg"
+          },
+          {
+            "episode_number": 24,
+            "name": "A Young Woman's Declaration",
+            "runtime": 25,
+            "air_date": "2023-03-18",
+            "overview": "Prior to rescuing Izuku, Nezu explained to Class 1-A the intricacies designed into the U.A. Barrier to keep it fortified from villains and to protect the civilians inside. In the present, the civilians protest Izuku's entry, believing his presence will put everyone in the school in danger. Best Jeanist tries to explain everything to get them to understand, but his words only make the crowd even more anxious over the Heroes' failures, stressing Izuku out. Ochaco then grabs the megaphone and floats on top of U.A., giving a speech pleading to the civilians to let Izuku rest because Heroes deserved to be saved too. As a result, the civilians start to see how battered and tired Izuku is, and by the end of her speech, Izuku breaks down on his knees in tears. He is comforted by Kota and the mutant woman he saved earlier. One of the civilians speaks out to the rest of the crowd, admitting how much like bystanders they have been in their treatment towards the Heroes and that they should be doing their part to help in some way. After Izuku declares he will bring the world back to the way it was, the civilians accept him as he is escorted inside. Meanwhile, Nezu speaks to a recovering Aizawa in the Central Hospital, revealing that they had transferred Kurogiri to the location after the discovery of him being Shirakumo's Nomu, attempting to re-awaken him. Outside U.A., All Might leaves to find more civilians, thinking about his influence Izuku's current state, all the while Stain continues to follow him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/452/1131849.jpg"
+          },
+          {
+            "episode_number": 25,
+            "name": "No Man Is An Island",
+            "runtime": 25,
+            "air_date": "2023-03-25",
+            "overview": "All Might arrives at the site of his final battle in Kamino, lamenting his failure as a teacher and a hero, when he is confronted by Stain. Even after briefly revealing to him his muscle form to confirm his identity, Stain refuses to believe he is the \"real All Might\", and to take back his criticisms towards the hero. All Might explains his feelings on unable to make a difference due to the state of the world, only for Stain to show him a young girl who has been going out everyday to clean the All Might statue from its vandalism; the last person All Might saved during said battle. Stain tells him it wasn't power that made All Might great but his ability to inspire others and their wills to keep his flame burning, these words which start to move All Might. Stain promptly leaves, handing All Might a data disk he had retrieved from Tartarus, telling him to kill him when the time is right. At U.A., the boys give Izuku a swift soak in the bath, where Bakugo re-declares even after his apology, he still sees everyone has his rivals. After their clean-up, All Might arrives to apologize to Izuku, telling everyone they received information indicating the final battle is soon, heading back out to prepare. Izuku finally falls asleep and the rest of his classmates declare they will do everything to bring the world back. All Might meets up with Tsukauchi and the Police Force where they decode the information from Tartarus. They discover that All For One's consciousness within Shigaraki was able to communicate with his real self through Radio Waves, with the conversation revealing that Shigaraki's body will be complete in just three days. All Might requests immediate aid from the foreign heroes, with the world governments unsure how to respond due to their own issues. Despite this, America's Number 1 Hero, Star and Stripe, heads to Japan on her own with an army of fighter jets, intending to assist her \"master\". Shortly afterwards, Izuku wakes up from a nightmare, greeted by his classmates, whose presence helps relieve him of his stress, intending to save the day together.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/454/1135032.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 7,
+        "name": "Temporada 7",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "In the Nick of Time! A Big-Time Maverick from the West!",
+            "runtime": 25,
+            "air_date": "2024-05-04",
+            "overview": "As jailbreakers run rampant in Japan, Star and Stripe flies from the U.S. to Japan to help and finds Shigaraki waiting for her in the middle of her flight path.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612761.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Specter",
+            "runtime": 25,
+            "air_date": "2024-05-11",
+            "overview": "The fight between Star and Stripe and Shigaraki is coming to an end, but Star has one more trick up her sleeve with New Order.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612760.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Villain",
+            "runtime": 25,
+            "air_date": "2024-05-18",
+            "overview": "After failing to steal Star's Quirk, New Order, and losing many other Quirks, Shigaraki and All For One prepare for their next move. Who is the traitor at U.A.?!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612762.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "The Story of How We All Became Heroes",
+            "runtime": 25,
+            "air_date": "2024-05-25",
+            "overview": "Due to his relationship with All For One, Yuga Aoyama calls himself a villain, but Deku tells him that he can still be a hero and reaches a hand out to him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612770.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Let You Down",
+            "runtime": 25,
+            "air_date": "2024-06-01",
+            "overview": "As heroes and villains get ready for the coming battle, Deku and the others leave U.A., and Deku is called out by Aoyama, who is supposed to be in a police cell. What does Aoyama want?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612771.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Division",
+            "runtime": 25,
+            "air_date": "2024-06-08",
+            "overview": "It's finally time for the decisive battle between heroes and villains! The plan by All Might, Aizawa, and the others has them start their fights in various places around Japan!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612782.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Inflation",
+            "runtime": 25,
+            "air_date": "2024-06-15",
+            "overview": "Even though Shigaraki's Quirks are sealed, he attacks Bakugo and the others with a strange new appearance and power. Meanwhile, Deku is pulled to where Toga was warped and Todoroki and Dabi face off!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612783.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Two Flashfires",
+            "runtime": 25,
+            "air_date": "2024-06-22",
+            "overview": "Eleven years ago, Toya Todoroki was burned by his own flames and became Dabi. Todoroki faces Dabi's blue flames with a new move of his own. Will he be able to stop his brother...?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612784.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Extras",
+            "runtime": 25,
+            "air_date": "2024-06-29",
+            "overview": "Shoto Todoroki stopped Dabi with his Great Glacial Aegir, and reports of that bolstered the spirits of the heroes fighting in other locations. And Shoto and Dabi's father, Endeavor, is facing the greatest evil, All For One, with Hawks!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612785.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Wounded Hero, Burning Bright and True!!",
+            "runtime": 25,
+            "air_date": "2024-07-13",
+            "overview": "Before the threat of All For One, Endeavor falls, and Hawks, Jiro, and Tokoyami are also cornered. Even so, Jiro acts like a hero! Endeavor is also encouraged after looking back at his own life.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612787.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Light Fades To Rain",
+            "runtime": 25,
+            "air_date": "2024-07-20",
+            "overview": "Bakugo's Howitzer Impact didn't work against Shigaraki/All For One, either, and Bakugo is pushed into a corner by Shigaraki's power and words. In order to get him out of that predicament, U.A.'s Big Three take a stand!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612788.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Those Who Defend, Those Who Violate",
+            "runtime": 25,
+            "air_date": "2024-08-03",
+            "overview": "Bakugo surprised Shigaraki/All For One with Cluster but was then cruelly pierced through. The heroes in all the different locations are getting pushed back... But even so, they will not give up!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612789.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "A Chain of Events, Across the Ages",
+            "runtime": 25,
+            "air_date": "2024-08-17",
+            "overview": "Deku finally arrives at the Coffin in the Sky! Seeing Bakugo and the others defeated by Shigaraki/All For One, Deku shakes with anger. Can he control his feelings and win against Shigaraki? It's finally time for a showdown!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612801.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Together with Shoji",
+            "runtime": 25,
+            "air_date": "2024-08-24",
+            "overview": "Spinner takes heteromorphs who are exploding with resentment from being persecuted to Central Hospital to get Kurogiri back. Shoji, whose Quirk also makes him a heteromorph, shouts his feelings to them.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612802.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Butterfly Effect",
+            "runtime": 25,
+            "air_date": "2024-08-31",
+            "overview": "Spinner and Present Mic both yell their hearts out. Will the one waking up to their voices be Kurogiri, or Shirakumo? Meanwhile, fighting Ochaco and the others on Okuto Island, Toga is finally going to use her secret weapon...!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612803.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "The Chain Thus Far",
+            "runtime": 25,
+            "air_date": "2024-09-07",
+            "overview": "Toga consumed Twice's blood, and with Kurogiri's Warp, infinite doubles of Twice appear. Shigaraki's Decay is also released, and the heroes seem to be in a state of despair. But then, help comes from an unexpected quarter...",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612804.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Hopes",
+            "runtime": 25,
+            "air_date": "2024-09-14",
+            "overview": "With the addition of Gentle, La Brava, and Lady Nagant, Deku is able to restrain Shigaraki's hands and confront him on the ground. Meanwhile, at the Gunga Villa site, the rewound All For One shows off his awful power...",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612805.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "It's a Small World",
+            "runtime": 25,
+            "air_date": "2024-09-21",
+            "overview": "Shishikura and the other members of Shiketsu High join the fight at the Gunga Villa site, and it's do-or-die as the heroes unite to fight back! But as All For One gets younger, he gets stronger. That's when unexpected backup arrives...!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612806.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "I Am Here",
+            "runtime": 25,
+            "air_date": "2024-09-28",
+            "overview": "Trampling the heroes, All For One flies to become one with Shigaraki, and Dabi is about to explode with the heat he's been storing up in his body. Will the Symbol be able change this hopeless situation?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612807.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "A Girl's Ego",
+            "runtime": 25,
+            "air_date": "2024-10-05",
+            "overview": "Toga transforms into Twice and backs the heroes into a corner with Infinite Doubles. In the midst of that, Ochaco does her best to get close to Toga to talk to her. How does Toga respond...?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612808.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "Battle Without a Quirk",
+            "runtime": 25,
+            "air_date": "2024-10-12",
+            "overview": "Toga returns the smile of Ochaco, who tried to be friends with her. What does Toga do to the seriously-injured Ochaco? Meanwhile, All Might uses \"power\" developed by a friend to face All For One!",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/645/1612809.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 8,
+        "name": "Temporada 8",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Toshinori Yagi: Rising Origin",
+            "runtime": 25,
+            "air_date": "2025-10-04",
+            "overview": "The fierce battle continues between Armored All Might and All For One. Can All Might possibly win?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/590/1476988.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "The End of an Era, and the Beginning",
+            "runtime": 25,
+            "air_date": "2025-10-11",
+            "overview": "All Might receives help from an unexpected source when Stain joins him in the battle against All For One.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/591/1479737.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "The Final Boss",
+            "runtime": 25,
+            "air_date": "2025-10-18",
+            "overview": "Bakugo is back on his feet! Can he rescue All Might from All For One, and defeat the villain in battle?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/593/1483437.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Quirk: Explosion!!",
+            "runtime": 25,
+            "air_date": "2025-10-25",
+            "overview": "The fierce battle with Bakugo reminds All For One of his and his brother Yoichi's origins.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/594/1486400.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "History's Greatest Villain",
+            "runtime": 25,
+            "air_date": "2025-11-01",
+            "overview": "The balance of power shifts between Izuku and Shigaraki when the latter steals a Quirk from One For All.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/595/1489367.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Wrench It Open, Izuku Midoriya!",
+            "runtime": 25,
+            "air_date": "2025-11-08",
+            "overview": "Izuku attempts to forcefully transfer One For All to Shigaraki, as this might prove to be the key to victory.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/597/1492591.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "From Aizawa",
+            "runtime": 25,
+            "air_date": "2025-11-15",
+            "overview": "Izuku dives deep into Shigaraki's mind, in search of the villain's origin: the tragic Tenko Shimura.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/598/1495892.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Izuku Midoriya: Rising",
+            "runtime": 25,
+            "air_date": "2025-11-22",
+            "overview": "After All For One takes over Shigaraki's body, the heroes must fight as one big team to defeat him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/599/1499197.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Epilogue / The Hellish Todoroki Family: Final",
+            "runtime": 25,
+            "air_date": "2025-11-29",
+            "overview": "With the long conflict over at last, the time has come to rebuild. Both on a societal and personal level.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/600/1502189.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "The Girl Who Loves Smiles",
+            "runtime": 25,
+            "air_date": "2025-12-06",
+            "overview": "The struggle against the villains may be over, but Izuku and Ochaco both still have internal demons to face.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/602/1505570.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "My Hero Academia",
+            "runtime": 25,
+            "air_date": "2025-12-13",
+            "overview": "How has the world changed in the eight years since Izuku and the heroes defeated All For One and Shigaraki?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/603/1508465.jpg"
+          }
+        ]
+      }
+    ]
   }
 ]

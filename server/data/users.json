@@ -15,5 +15,14 @@
     "email": "gabriel.google@gmail.com",
     "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces",
     "provider": "google"
+  },
+  {
+    "id": "usr_1792907834410_wkg0t",
+    "createdAt": "2026-10-25T05:57:14.410Z",
+    "name": "Gabrix",
+    "email": "gomesgabriel329@gmail.com",
+    "password": "Gab123",
+    "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=gomesgabriel329%40gmail.com",
+    "provider": "email"
   }
 ]
