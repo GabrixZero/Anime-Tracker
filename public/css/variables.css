@@ -1,0 +1,82 @@
+/* ================================================================
+   SHOWVAULT · DESIGN TOKENS & VARIÁVEIS (PADRÃO TV SHOW TIME)
+   ================================================================ */
+
+:root {
+  /* Cores Base e Superfícies */
+  --bg-app: #0a0b10;
+  --bg-surface: #12141c;
+  --bg-surface-elevated: #1a1d28;
+  --bg-surface-hover: #222636;
+  --bg-card: rgba(20, 23, 34, 0.88);
+  --bg-card-border: rgba(255, 255, 255, 0.08);
+  --bg-card-border-hover: rgba(255, 208, 0, 0.4);
+
+  /* Acentos de Marca TV Show Time (Amarelo Ouro Elétrico) */
+  --tvtime-yellow: #ffd000;
+  --tvtime-yellow-hover: #ffe04d;
+  --tvtime-yellow-glow: rgba(255, 208, 0, 0.28);
+  --tvtime-dark: #0e0f14;
+
+  /* Cores Auxiliares */
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+  --accent-purple: #a855f7;
+
+  /* Tipografia */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Bordas e Sombras */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 9999px;
+
+  --shadow-subtle: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-elevated: 0 12px 36px rgba(0, 0, 0, 0.65);
+  --shadow-gold: 0 0 24px var(--tvtime-yellow-glow);
+
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 208, 0, 0.08), transparent 70%),
+    radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.04), transparent 50%),
+    radial-gradient(circle at 10% 40%, rgba(168, 85, 247, 0.03), transparent 40%);
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+::-webkit-scrollbar-thumb {
+  background: #272c3d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #394058;
+}

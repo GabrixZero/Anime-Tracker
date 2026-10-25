@@ -1,0 +1,999 @@
+[
+  {
+    "id": 1396,
+    "type": "tv",
+    "name": "Breaking Bad",
+    "overview": "Um professor de química do ensino médio com câncer inoperável passa a produzir metanfetamina para garantir o sustento da família.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+    "vote_average": 9.5,
+    "first_air_date": "2008-01-20",
+    "genres": [
+      "Drama",
+      "Crime"
+    ],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Piloto",
+            "runtime": 58,
+            "air_date": "2008-01-20",
+            "overview": "Walter White descobre sua doença terminal e se junta a Jesse Pinkman.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/405/1012681.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "O Gato Está no Saco...",
+            "runtime": 48,
+            "air_date": "2008-01-27",
+            "overview": "A dupla lida com as consequências de seu primeiro cozinheiro rival.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/405/1012682.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "...E o Saco Está no Rio",
+            "runtime": 48,
+            "air_date": "2008-02-10",
+            "overview": "Walt enfrenta uma escolha moral definitiva no porão.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/405/1012683.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 136283,
+    "type": "tv",
+    "name": "The Bear (O Urso)",
+    "overview": "Um jovem chef renomado retorna a Chicago para salvar a lanchonete de sanduíches de sua família.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/hih5aTwgmHhMuyVSbyaPBnBJftt.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/aJtG4txtmiRHwAAqENQHZvBs6kY.jpg",
+    "vote_average": 8.8,
+    "first_air_date": "2022-06-23",
+    "genres": [
+      "Drama",
+      "Comédia"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Sistema",
+            "runtime": 28,
+            "air_date": "2022-06-23",
+            "overview": "Carmy assume o comando sob intensa resistência.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/413/1034362.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Mãos",
+            "runtime": 31,
+            "air_date": "2022-06-23",
+            "overview": "Uma vistoria inesperada obriga a equipe a se organizar.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/465/1164943.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 95396,
+    "type": "tv",
+    "name": "Ruptura (Severance)",
+    "overview": "Empregados da Lumon passam por cirurgia cerebral para separar suas memórias de trabalho das pessoais.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/pPHpeI2X1qEd1CS1SeyrdhZ4qnT.jpg",
+    "backdrop_path": "https://static.tvmaze.com/uploads/images/original_untouched/548/1371406.jpg",
+    "vote_average": 8.7,
+    "first_air_date": "2022-02-18",
+    "genres": [
+      "Ficção Científica",
+      "Suspense",
+      "Drama"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Boas Notícias Sobre o Inferno",
+            "runtime": 57,
+            "air_date": "2022-02-18",
+            "overview": "Mark descobre pistas sobre um colega desaparecido.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/396/991497.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 66732,
+    "type": "tv",
+    "name": "Stranger Things",
+    "overview": "Misteriosos experimentos secretos e uma garota com poderes psíquicos em uma pacata cidade americana.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2016-07-15",
+    "genres": [
+      "Ficção Científica",
+      "Terror",
+      "Drama"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "O Desaparecimento de Will Byers",
+            "runtime": 48,
+            "air_date": "2016-07-15",
+            "overview": "O sumiço de um garoto inicia a investigação.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/342/855786.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 94605,
+    "type": "tv",
+    "name": "Arcane",
+    "overview": "Em meio ao conflito de Piltover e Zaun, duas irmãs lutam em lados opostos de uma guerra mágica.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg",
+    "vote_average": 9,
+    "first_air_date": "2021-11-06",
+    "genres": [
+      "Animação",
+      "Ação",
+      "Ficção Científica"
+    ],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Entrando na Fila",
+            "runtime": 43,
+            "air_date": "2021-11-06",
+            "overview": "Um assalto no laboratório de Jayce muda tudo.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/373/933222.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 100088,
+    "type": "tv",
+    "name": "The Last of Us",
+    "overview": "Joel recebe a missão de contrabandear Ellie, uma jovem imune a um fungo mortal.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/dmo6TYuuJgaYinXBPjrgG9mB5od.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/lY2DhbA7Hy44fAKddr06UrXWWaQ.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2023-01-15",
+    "genres": [
+      "Drama",
+      "Ficção Científica",
+      "Ação"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Quando Estiver Perdido na Escuridão",
+            "runtime": 81,
+            "air_date": "2023-01-15",
+            "overview": "Vinte anos após o surto, a jornada começa.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/442/1106184.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1429,
+    "type": "anime",
+    "name": "Attack on Titan (Shingeki no Kyojin)",
+    "overview": "A humanidade luta pela sobrevivência enclausurada em muralhas contra os Titãs devoradores.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/rqbCbjB19amtOtFQbb3K2lgm2zv.jpg",
+    "vote_average": 9.1,
+    "first_air_date": "2013-04-07",
+    "genres": [
+      "Anime",
+      "Ação",
+      "Fantasia"
+    ],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "A Queda de Shiganshina, Parte 1",
+            "runtime": 24,
+            "air_date": "2013-04-07",
+            "overview": "O Titã Colossal destrói o portão da muralha Maria.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242650.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "A Queda de Shiganshina, Parte 2",
+            "runtime": 24,
+            "air_date": "2013-04-14",
+            "overview": "Eren e Mikasa escapam no barco de refugiados.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/97/242651.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 85937,
+    "type": "anime",
+    "name": "Demon Slayer (Kimetsu no Yaiba)",
+    "overview": "Tanjiro busca vingança e uma cura para sua irmã Nezuko, transformada em demônio.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/nTvM4mhqNlHIvUkI1gVnW6XP7GG.jpg",
+    "vote_average": 8.7,
+    "first_air_date": "2019-04-06",
+    "genres": [
+      "Anime",
+      "Ação",
+      "Sobrenatural"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Crueldade",
+            "runtime": 24,
+            "air_date": "2019-04-06",
+            "overview": "O destino trágico da família Kamado.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/538/1347450.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 95479,
+    "type": "anime",
+    "name": "Jujutsu Kaisen",
+    "overview": "Yuji Itadori engole o dedo da lendária maldição Ryomen Sukuna e ingressa no mundo dos feiticeiros jujutsu.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/aI1fm7H2rhfRxnwWIdVACR3k1fO.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/rLb2cwF3Pazuxaj0sRXQ037tGI1.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2020-10-03",
+    "genres": [
+      "Anime",
+      "Ação",
+      "Fantasia"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Ryomen Sukuna",
+            "runtime": 24,
+            "air_date": "2020-10-03",
+            "overview": "Itadori desperta poderes ao ingerir o talismã.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/542/1355130.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 209867,
+    "type": "anime",
+    "name": "Frieren e a Jornada para o Além",
+    "overview": "A maga elfa Frieren reflete sobre a vida, laços e o tempo após a morte do herói Himmel.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/dqZENchTd7lp5zht7BdlqM7RBhD.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/rBOnrVlck7BIlGeWVlzYiZeg4l2.jpg",
+    "vote_average": 8.9,
+    "first_air_date": "2023-09-29",
+    "genres": [
+      "Anime",
+      "Fantasia",
+      "Aventura"
+    ],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "O Fim da Aventura",
+            "runtime": 25,
+            "air_date": "2023-09-29",
+            "overview": "O grupo retorna vitorioso e cinquenta anos se passam.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/616/1541670.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 13916,
+    "type": "anime",
+    "name": "Death Note",
+    "overview": "Um estudante genial encontra um caderno sobrenatural capaz de matar quem tiver o nome escrito nele.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/tCZFfYTIwrR7n94J6G14Y4hAFU6.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/z8IPicmEKXUO4I2UDdMEqw7RqOE.jpg",
+    "vote_average": 8.6,
+    "first_air_date": "2006-10-04",
+    "genres": [
+      "Anime",
+      "Suspense",
+      "Mistério"
+    ],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Renascimento",
+            "runtime": 23,
+            "air_date": "2006-10-04",
+            "overview": "Light Yagami encontra o Death Note do shinigami Ryuk.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/535/1338363.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 157336,
+    "type": "movie",
+    "name": "Interestelar (Interstellar)",
+    "runtime": 169,
+    "overview": "Exploradores viajam através de um buraco de minhoca no espaço para encontrar um novo lar para a humanidade.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/xJHokMbljvjADYdit5fK5VQsXEG.jpg",
+    "vote_average": 8.7,
+    "first_air_date": "2014-11-05",
+    "genres": [
+      "Filme",
+      "Ficção Científica",
+      "Drama"
+    ],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 872585,
+    "type": "movie",
+    "name": "Oppenheimer",
+    "runtime": 180,
+    "overview": "A criação da bomba atômica pelo físico J. Robert Oppenheimer no Projeto Manhattan.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg",
+    "vote_average": 8.1,
+    "first_air_date": "2023-07-19",
+    "genres": [
+      "Filme",
+      "Drama",
+      "História"
+    ],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 693134,
+    "type": "movie",
+    "name": "Duna: Parte 2",
+    "runtime": 166,
+    "overview": "Paul Atreides e os Fremen entram em guerra santa contra os tiranos que assassinaram sua família.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/uhUO7vQQKvCTfQWubOt5MAKokbL.jpg",
+    "vote_average": 8.3,
+    "first_air_date": "2024-02-27",
+    "genres": [
+      "Filme",
+      "Ficção Científica",
+      "Aventura"
+    ],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 324857,
+    "type": "movie",
+    "name": "Homem-Aranha: No Aranhaverso",
+    "runtime": 117,
+    "overview": "Miles Morales se torna o novo Homem-Aranha e conhece justiceiros aracnídeos de outras dimensões.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/8mnXR9rey5uQ08rZAvzojKWbDQS.jpg",
+    "vote_average": 8.4,
+    "first_air_date": "2018-12-01",
+    "genres": [
+      "Filme",
+      "Animação",
+      "Ação"
+    ],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 155,
+    "type": "movie",
+    "name": "Batman: O Cavaleiro das Trevas",
+    "runtime": 152,
+    "overview": "O Coringa emerge em Gotham causando caos psicológico e moral contra Batman e o promotor Dent.",
+    "poster_path": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    "backdrop_path": "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
+    "vote_average": 8.5,
+    "first_air_date": "2008-07-16",
+    "genres": [
+      "Filme",
+      "Ação",
+      "Crime",
+      "Drama"
+    ],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 555,
+    "type": "anime",
+    "name": "Avatar: The Last Airbender",
+    "overview": "Water. Earth. Fire. Air. Only the Avatar was the master of all four elements. Only he could stop the ruthless Fire Nation from conquering the world. But when the world needed him most, he disappeared. Until now... On the South Pole, a lone Water Tribe village struggles to survive. It's here that a young Waterbender named Katara and her warrior brother Sokka rescue a strange boy named Aang from a cavernous iceberg. Not only is Aang an Airbender--a race of people no one has seen in a century--but they soon discover that Aang is also the long lost Avatar. Now it's up to Katara and Sokka to make sure Aang faces his destiny to save the tribe--and himself. Did we mention he's only 12?",
+    "poster_path": "https://static.tvmaze.com/uploads/images/original_untouched/79/199224.jpg",
+    "backdrop_path": "https://static.tvmaze.com/uploads/images/original_untouched/79/199224.jpg",
+    "vote_average": 8.8,
+    "first_air_date": "2005-02-21",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "status": "Ended",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Book One: Water - Chapter One: The Boy in the Iceberg",
+            "runtime": 30,
+            "air_date": "2005-02-21",
+            "overview": "When a young waterbender, named Katara, and her brother, Sokka, discover a giant iceberg while fishing for food around their homestead at the South Pole, they discover that there is a boy, named Aang, inside. Aang, they discover, is an airbender, (a group of people which were thought to be extinct). However, after a string of unfortunate events which puts the village in harm's way, they soon learn that there is more to him than meets the eye. Will Aang prove his hidden abilities, or will he be thought as just a child?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/570/1427274.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Book One: Water - Chapter Two: The Avatar Returns",
+            "runtime": 30,
+            "air_date": "2005-02-21",
+            "overview": "After Aang accidentally sets off a Fire Nation trap, he is banished from the South Pole. Soon after Prince Zuko attacks the Southern Water Tribe seeking to capture the Avatar. Aang returns and surrenders to save the Water Tribe. But can Sokka and Katara save the world's only chance at peace, or will Zuko keep his ultimate prize?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/570/1427281.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Book One: Water - Chapter Three: The Southern Air Temple",
+            "runtime": 30,
+            "air_date": "2005-02-25",
+            "overview": "Aang is excited about finally going home again for the first time in one hundred years, but he is shocked to find out that the temple is deserted. Aang tells Sokka and Katara about his childhood as they explore the temple, but they soon discover something that Aang never expected, also Aang discovers a new friend that joins them throughout their journey. Meanwhile, Prince Zuko must make repairs to his ship, and the only way he can do it is to dock his ship at his rival's naval base",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/574/1435708.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Book One: Water - Chapter Four: The Warriors of Kyoshi",
+            "runtime": 30,
+            "air_date": "2005-03-04",
+            "overview": "As one of Aang's little detours, the group heads toward the island of Kyoshi. But soon they learn that the townspeople don't trust foreigners at all; however, when Aang proves to them that he is the Avatar they are treated as guests of honor. Katara wants to get some supplies and leave as soon as possible, while Aang is enjoying his time as a celebrity. Little do they know, though, that the Fire Nation has tracked them down. Also, Sokka meets and trains with a female warrior named Suki. Will Aang be able to save the village from the wrath of the Fire Nation?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499565.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Book One: Water - Chapter Five: The King of Omashu",
+            "runtime": 30,
+            "air_date": "2005-03-18",
+            "overview": "Aang takes Katara and Sokka back to a favorite place he used to go to when he was younger, the Earth Kingdom City of Omashu. But when they break the law they are taken to the King to get their punishment. The eccentric King of Omashu puts Aang through a series of challenges and if he fails Katara and Sokka will be engulfed in a crystal cocoon.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499572.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Book One: Water - Chapter Six: Imprisoned",
+            "runtime": 30,
+            "air_date": "2005-03-25",
+            "overview": "When the group arrives at a small Earth Kingdom mining town, they see an earthbender, named Haru, who is practicing his ability, but he runs away when Katara tries to confront him about it. They soon learn that the Fire Nation has taken over the town, that earthbending is forbidden and all earthbenders are taken away to an offshore prison. However, when an elderly man is trapped in a collapsed mine, Katara urges Haru to use his powers to save the man's life, but then, the old man reports Haru to the authorities. Katara blames herself for his predicament and she vows to rescue him, but will she succeed?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499579.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Book One: Water - Chapter Seven: The Spirit World (Winter Solstice, Part 1)",
+            "runtime": 30,
+            "air_date": "2005-04-08",
+            "overview": "When Aang is assigned to help defend a town from a monster that has been plaguing the town, his lack of ability and knowledge becomes obvious, as he doesn't know what to do. However, when Sokka tries to rush to Aang's rescue during the fight, he himself becomes captured and is taken away by the monster, which turns out to be from the spirit world. Aang promises Katara that he'll find Sokka and bring him back, but with Aang even doubting himself, will he be capable of finding where the monster went?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/597/1493450.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Book One: Water - Chapter Eight: Avatar Roku (Winter Solstice, Part 2)",
+            "runtime": 30,
+            "air_date": "2005-04-15",
+            "overview": "Aang learns that he must go to the Fire Nation temple during the winter solstice if he wishes to speak with Avatar Roku to see what he must do. However, with Prince Zuko on his trail while he heads straight into the heart of the nation who wants him captured, he realizes that this isn't going to be an easy task. Will Aang be able to talk to Avatar Roku before Zuko finds him?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499720.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Book One: Water - Chapter Nine: The Waterbending Scroll",
+            "runtime": 30,
+            "air_date": "2005-04-29",
+            "overview": "After Katara attempts to teach Aang waterbending, she is desperate to improve her abilities. When Katara inadvertently stumbles across a waterbending scroll that can help improve her ability while Aang is looking at a pirate's store, she decides to steal it after she realizes that she couldn't hope to afford it; but will she be capable of stealing from the pirates without causing herself and her friends trouble?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499726.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Book One: Water - Chapter Ten: Jet",
+            "runtime": 30,
+            "air_date": "2005-05-06",
+            "overview": "While traveling towards the North Pole, the group almost gets captured by the Fire Nation. However, when a charismatic young man and his band of rebels attack the Fire Nation's camp and rescue them, the gang learns that the rebels are trying to resist the Fire Nation's motives to expand their territory. Katara and Aang really enjoy their time with the band of rebels, but Sokka soon discovers that they aren't as noble as meets the eye",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499732.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Book One: Water - Chapter Eleven: The Great Divide",
+            "runtime": 30,
+            "air_date": "2005-05-20",
+            "overview": "While on their way to the North Pole, Aang and his friends arrive at a giant canyon where two groups of refugees are bickering over who should get to go across. Aang decides to walk across with the two groups to ensure they don't fight one another. However, he soon learns that the two tribes have been feuding for one hundred years and they both believe their actions are justified. But when the predators inside the canyon start to come out, Aang is stuck trying to defend both tribes from each other and the vicious wildlife.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499739.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Book One: Water - Chapter Twelve: The Storm",
+            "runtime": 30,
+            "air_date": "2005-06-03",
+            "overview": "Aang, Katara and Sokka have run out of money. Katara suggests Sokka get a job, and coincidentally, they meet a fisherman who is looking for someone to help him out with his fishing. But when the fisherman recognizes Aang as the Avatar, he blames Aang's absence for all of the troubles of the last 100 years, and Aang runs away on his glider. Katara follows on Appa, and when she finds him, Aang begins to reveal life before he was frozen in the iceberg. Meanwhile, Prince Zuko and Lieutenant Jee get into a fight, but Iroh breaks it up. Soon thereafter, the Lieutenant and the rest of the crew gain a newfound respect for their leader after learning of his past.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499742.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Book One: Water - Chapter Thirteen: The Blue Spirit",
+            "runtime": 30,
+            "air_date": "2005-06-17",
+            "overview": "After Sokka and Katara get sick due to being in the storm, Aang seeks out a cure and discovers he needs some frozen frogs in order to get them cured. Meanwhile, Zhao has been promoted to Admiral and he is using the Fire Nation's best men to capture Aang, and he eventually succeeds. All hope seems lost for Aang and his friends, but there may just be a glimmer of hope when a strange blue spirit masked figure comes to Aang's rescue, but who could it possibly be?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499746.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Book One: Water - Chapter Fourteen: The Fortuneteller",
+            "runtime": 30,
+            "air_date": "2005-09-23",
+            "overview": "When the group tries to help a man who is being attacked by a platypus-bear, they discover that the local town has a fortuneteller named Aunt Wu in it, who has been forecasting the town's fate for years, but when Sokka and Aang discover one of the fortuneteller's most vital predictions is dead wrong, they have to develop a plan to convince the stubborn townspeople that their beloved Aunt Wu was wrong. Will they manage to save the village in time, or will Aang fail in his duty as the avatar?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499750.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Book One: Water - Chapter Fifteen: Bato of the Water Tribe",
+            "runtime": 30,
+            "air_date": "2005-10-07",
+            "overview": "Aang feels neglected as Katara and Sokka reunite with Bato, an old friend of their father's from the South Pole. They begin to reminisce on their times in the past while they wait for a message to arrive from their father; in which Aang believes Katara and Sokka will abandon him and go out to find their father should the message arrive. However, when the messenger gives Aang the message to give to Bato, Aang betrays his friends in a way Katara or Sokka could never imagine. However, when Zuko recruits a bounty hunter named June to track Aang down. His friendship is put to the test, as he must deal with the fact that he betrayed his friends while defending himself from yet another fight.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499755.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Book One: Water - Chapter Sixteen: The Deserter",
+            "runtime": 30,
+            "air_date": "2005-10-21",
+            "overview": "When Aang and his friends go to a Fire Nation town so that Aang can witness some firebending, their plan soon goes awry when it's discovered that he is the Avatar. Fortunately, he's rescued by an individual who serves a firebending master named Jeong Jeong who has abandoned the Fire Nation, so Aang attempts to use this time to attempt to learn how to firebend. However, when the firebending master refuses to even see Aang, will Aang be able to prove he's ready to learn how to firebend despite the fact that he lacks discipline?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499760.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Book One: Water - Chapter Seventeen: The Northern Air Temple",
+            "runtime": 30,
+            "air_date": "2005-11-04",
+            "overview": "When Aang and his friends hear rumors about surviving airbenders, they decide to stop by the Northern Air Temple on their way to the North Pole to see for themselves. What they find is a bunch of people who aren't airbenders, but have mastered the art of gliding. This upsets Aang because they have been defacing the temple. However, there was one part of the temple, where nobody has been able to enter and what Aang and his friends discover inside spells oncoming conflict.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499764.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "Book One: Water - Chapter Eighteen: The Waterbending Master",
+            "runtime": 30,
+            "air_date": "2005-11-18",
+            "overview": "When Aang tries to find the north pole, he is found by the north pole waterbenders instead. When they are taken there, Aang and Katara are eager to find a waterbending master, only to find that girls are not allowed to learn waterbending. Katara decides to show everyone what she can do. Meanwhile, Sokka falls in love with the tribe's princess.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499768.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Book One: Water - Chapter Nineteen: The Siege of the North, Part 1",
+            "runtime": 30,
+            "air_date": "2005-12-02",
+            "overview": "Zhao begins to launch his attack against the Northern Water Tribe. As the walls of the besieged city begin to fall, the Avatar taps into the spirit world and seeks the help of one of the oldest spirits, in hopes of saving one of the most prominent areas of the world. Can Aang combine forces with the spirits and save the Northern Water Tribe?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499773.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Book One: Water - Chapter Twenty: The Siege of the North, Part 2",
+            "runtime": 30,
+            "air_date": "2005-12-02",
+            "overview": "Aang returns from the spirit world to a big surprise. Meanwhile, Zhao and his forces continue to press deeper into the Northern Water Tribe. Iroh makes a powerful stand and Zuko struggles to keep his plan intact. What could possibly stop the Fire Nation from destroying this tranquil region?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/199/499775.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 2,
+        "name": "Temporada 2",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Book Two: Earth - Chapter One: The Avatar State",
+            "runtime": 30,
+            "air_date": "2006-03-17",
+            "overview": "Plagued with nightmares featuring the devastating power of his Avatar State, Aang and the gang meet an Earth Kingdom general who has big plans for defeating the Fire Nation. Meanwhile Prince Zuko and Uncle Iroh, having survived the failed attack on the North Water Tribe, have a surprise visit from the Prince's sister with seemingly good news.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501174.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Book Two: Earth - Chapter Two: The Cave of Two Lovers",
+            "runtime": 30,
+            "air_date": "2006-03-24",
+            "overview": "On their way to Omashu, Aang, Katara, and Sokka meet a group of nomads who show them a shortcut through the \"Cave of Two Lovers.\" But when the group becomes trapped in the cave, it's up to Aang and Katara to save the group by trusting in love and possibly questioning their relationship. Meanwhile Iroh gets a lethal rash so Zuko and Iroh head to a small Earth Kingdom town for help, hoping their real identities will not be discovered.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501179.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Book Two: Earth - Chapter Three: Return to Omashu",
+            "runtime": 30,
+            "air_date": "2006-04-07",
+            "overview": "Despite finding out that Omashu has been captured by the Fire Nation, Aang insists on trying to find King Bumi within Omashu's borders, even with the dangers that will await him and his friends if his real identity is discovered. Meanwhile Azula goes in search of old friends to help her with her mission. Can Aang locate his friend Bumi or will Azula succeed in capturing the avatar?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501184.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Book Two: Earth - Chapter Four: The Swamp",
+            "runtime": 30,
+            "air_date": "2006-04-14",
+            "overview": "A mysterious tornado pulls the kids into a supernatural swamp where Katara, Sokka, and Aang have mysterious visions. Meanwhile, Momo and Appa are chased by rogue swamp dwellers. What mysterious forces hide in this swamp, and will Aang get there in time to save Momo and Appa?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501188.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Book Two: Earth - Chapter Five: Avatar Day",
+            "runtime": 30,
+            "air_date": "2006-04-28",
+            "overview": "Aang and the gang discover an Earth Kingdom town that celebrates something called \"Avatar Day.\" But when they get there and learn the festival is of \"anti-Avatar\" sentiment and Aang is put on trial for a crime a past incarnation allegedly committed. Looking to clear the Avatar's good name, Katara and Sokka venture back to a familiar place to gather evidence and discover the truth. Can Aang redeem himself in the eyes of the people of the town?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501192.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Book Two: Earth - Chapter Six: The Blind Bandit",
+            "runtime": 30,
+            "air_date": "2006-05-05",
+            "overview": "In search for an earthbending teacher for Aang, the kids go to an underground earthbending tournament called Earth Rumble 6. There they meet Toph (aka the Blind Bandit), a blind, but powerful earthbending girl. After seeing her unique style of earthbending, Aang wants Toph to become his teacher, but they find out Toph has hardships of her own. Will Aang manage to convince Toph, or will he be left without an earthbending teacher?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501198.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Book Two: Earth - Chapter Seven: Zuko Alone",
+            "runtime": 30,
+            "air_date": "2006-05-12",
+            "overview": "Following a fight with Uncle Iroh, Zuko travels by himself to an Earth Kingdom town were he meets a local boy. The two almost become friends. Meanwhile Zuko suffers from flashbacks of his past. Can Zuko save his friends and remember who he is?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/162/407249.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Book Two: Earth - Chapter Eight: The Chase",
+            "runtime": 30,
+            "air_date": "2006-05-26",
+            "overview": "When a mysterious vehicle follows Aang's group they try to escape but it appears every time they try to rest. They confront it, but Azula emerges and attacks and they are forced to run again. The tension grows among them and Toph leaves the group and finds help from an unlikely source. Meanwhile, Aang tries to draw their pursuers away and finally faces off against Azula. Zuko also arrives determined to claim his prize.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501210.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Book Two: Earth - Chapter Nine: Bitter Work",
+            "runtime": 30,
+            "air_date": "2006-06-02",
+            "overview": "Toph's instructing abilities come into question when Aang cannot seem to overcome a block that keeps him from earthbending. Sokka gets himself in a jam while befriending what was, moments before, his next meal, and Iroh and Zuko begin training utilizing new philosophies and methods that originate from the other elements. Can Aang learn earthbending or did the world get an avatar who cannot master the four elements?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501213.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Book Two: Earth - Chapter Ten: The Library",
+            "runtime": 30,
+            "air_date": "2006-07-14",
+            "overview": "When Aang and his friends meet a professor who knows of a library that contains information about the world, Sokka decides to go there to try and find some information to use against the Fire Nation. The library is guarded by the knowledge spirit, Wan Shi Tong, who doesn't welcome humans into his library, because he believes they only seek information for evil purposes. When Wan Shi Tong discovers Sokka wasn't being truthful with him, he begins to sink the library, bringing the kids down with it. Will everyone be able to escape the library in time? And who are the strange benders who are trying to kidnap Appa?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501216.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Book Two: Earth - Chapter Eleven: The Desert",
+            "runtime": 30,
+            "air_date": "2006-07-14",
+            "overview": "Aang searches for Appa, while Katara struggles to keep everyone together so they can survive in the vast desert while Sokka begins acting crazy because of Cactus juice in the desert. Meanwhile, Iroh and Zuko seek help from an ancient secret society. Will Aang find his furry friend, and will they all be able to make it out of the desert?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501221.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Book Two: Earth - Chapter Twelve: The Serpent's Pass",
+            "runtime": 30,
+            "air_date": "2006-09-15",
+            "overview": "When Aang and the gang meet up with a group of refugees, they tell them where they can get on a ferry to Ba Sing Se. But after a series of events they have to take a deadly route called the serpent's pass with the help of an old friend, Suki. Meanwhile Zuko and Iroh meet up with Jet and the Freedom Fighters. Will Aang and the others be able to make it through the Serpent's Pass and ultimately to Ba Sing Se?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501224.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Book Two: Earth - Chapter Thirteen: The Drill",
+            "runtime": 30,
+            "air_date": "2006-09-15",
+            "overview": "Having made it to the outer wall of Ba Sing Se, the kids confront a Fire Nation army that is driving a massive Fire Nation drill, which poses an imminent threat to the last Earth Kingdom stronghold. Meanwhile Zuko and Iroh make crucial mistakes which begin to attract Jet's suspicions. Can Zuko and Iroh keep their cover? Will Aang manage to save Ba Sing Se from the Fire Nation?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501229.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Book Two: Earth - Chapter Fourteen: City of Walls and Secrets",
+            "runtime": 30,
+            "air_date": "2006-09-22",
+            "overview": "Having finally made it into Ba Sing Se, the kids are given a house in the upper ring. The kids are anxious to tell the Earth King their plan, but there are complications. Meanwhile, still convinced that Iroh and Zuko may be from the Fire Nation, Jet decides to take matters into his own hands and do whatever it takes to get the refugees to reveal their true nature.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501235.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Book Two: Earth - Chapter Fifteen: The Tales of Ba Sing Se",
+            "runtime": 30,
+            "air_date": "2006-09-29",
+            "overview": "In this special episode, a series of short stories highlighting different characters and their individual adventures in Ba Sing Se play featuring the Tales of Katara and Toph, Iroh, Sokka, Aang, Zuko, and Momo.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501237.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Book Two: Earth - Chapter Sixteen: Appa's Lost Days",
+            "runtime": 30,
+            "air_date": "2006-10-13",
+            "overview": "We go back in time to the moment Appa was kidnapped by the Sandbenders while Aang and the others were inside Wan Shi Tong's Library to see all of the adventures the poor bison has had, including his adventures with some special friends.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501241.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Book Two: Earth - Chapter Seventeen: Lake Laogai",
+            "runtime": 30,
+            "air_date": "2006-11-03",
+            "overview": "Aang and his friends continue to search for Appa and, unbeknown to them, they aren't the only ones looking for him. During their search, the kid's meet up with Jet, whom they are understandably reluctant to trust. The kids soon realize that the Dai Li are doing their best to thwart the kids efforts to find Appa. Meanwhile, Uncle Iroh is offered his own tea shop in the upper ring, and Zuko discovers the Avatar is in the city.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501244.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "Book Two: Earth - Chapter Eighteen: The Earth King",
+            "runtime": 30,
+            "air_date": "2006-11-17",
+            "overview": "Tired of all the interruptions, Aang and the other force their way into the Earth King's palace. Once in they try to prove they are his allies and there is indeed a war taking place and they need his help. In order to convince him, they take him to various sites around Ba Sing Se to prove themselves. Meanwhile, Zuko is going through a horrible sickness.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501247.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Book Two: Earth - Chapter Nineteen: The Guru",
+            "runtime": 30,
+            "air_date": "2006-12-01",
+            "overview": "With the plans to invade the Fire Nation finally underway, everyone begins their own respective missions. Aang receives guidance from Guru Pathik at the Eastern Air Temple, Sokka is reunited with his father, Katara begins to help the Council of Five plan the invasion, and Zuko and Iroh begin to settle into the new lives of owning a tea shop. However, things are not what they seem. Toph has been captured and is being brought back to her parents, and Azula has infiltrated the city and is planning on finally conquering Ba Sing Se for the Fire Nation. Will Azula succeed? Will Toph escape, and will Aang finally master the Avatar State?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501249.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Book Two: Earth - Chapter Twenty: The Crossroads of Destiny",
+            "runtime": 30,
+            "air_date": "2006-12-01",
+            "overview": "Everyone races against time to stop Azula's sinister plan. Zuko finds companionship in an unlikely source. Aang's destiny hangs in the balance and so does Zuko's, as Iroh tells him \"it is time to choose.\" Can Zuko choose the right path during his crossroads of destiny or will the Fire Nation finally win?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/501257.jpg"
+          }
+        ]
+      },
+      {
+        "season_number": 3,
+        "name": "Temporada 3",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Book Three: Fire - Chapter One: The Awakening",
+            "runtime": 30,
+            "air_date": "2007-09-21",
+            "overview": "Aang awakens to find himself aboard a captured Fire Nation ship with a full head of hair and with serious injuries from the battle in Ba Sing Se. At his side are Toph, Katara, Sokka, and their father Hakoda who recount the events that led the four to the ship and together they contemplate their next move. Aang struggles with the fact that the world thinks he is dead and his own desire to face the Fire Lord before he is ready. Meanwhile, the once exiled Prince Zuko deals with his own issues as he makes his long-awaited journey back to the Fire Nation, and wonders what is now in store for him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502451.jpg"
+          },
+          {
+            "episode_number": 2,
+            "name": "Book Three: Fire - Chapter Two: The Headband",
+            "runtime": 30,
+            "air_date": "2007-09-28",
+            "overview": "To better blend in as Fire Nation citizens, Aang enrolls in a Fire Nation school, giving himself an opportunity to learn more about the Nation while at the same enjoy life as a normal kid for the first time since he discovered he was the Avatar. Meanwhile Zuko, growing more and more paranoid about the Avatar's false demise, brings himself to confront his imprisoned uncle.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502455.jpg"
+          },
+          {
+            "episode_number": 3,
+            "name": "Book Three: Fire - Chapter Three: The Painted Lady",
+            "runtime": 30,
+            "air_date": "2007-10-05",
+            "overview": "When the gang arrives at a suffering fishing village, a mysterious spirit appears to help the villagers. Aang decides to seek out the spirit for her help, but she may be more familiar then he thought. Can Aang solve the mystery of this cryptic spirit and help the town from the Fire Nation?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502461.jpg"
+          },
+          {
+            "episode_number": 4,
+            "name": "Book Three: Fire - Chapter Four: Sokka's Master",
+            "runtime": 30,
+            "air_date": "2007-10-12",
+            "overview": "Feeling as though he isn't contributing enough to the group, Sokka seeks out an elusive swords master from whom he can learn the ways of the blade. But, Sokka soon has doubts whether or not he is worthy. Can Sokka pull himself together or will the gang lose an important team member and friend?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502467.jpg"
+          },
+          {
+            "episode_number": 5,
+            "name": "Book Three: Fire - Chapter Five: The Beach",
+            "runtime": 30,
+            "air_date": "2007-10-19",
+            "overview": "Zuko, Azula, Mai, and Ty Lee take a vacation to Ember Island. In the process, they come to learn more about themselves and each other, as well as their desires for the future. Arguments rise and fall. Will the group learn to become friends and trust each other? Elsewhere, Aang and others face off against a new adversary. What will this lead to?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502468.jpg"
+          },
+          {
+            "episode_number": 6,
+            "name": "Book Three: Fire - Chapter Six: The Avatar and the Firelord",
+            "runtime": 30,
+            "air_date": "2007-10-26",
+            "overview": "The tale of Avatar Roku and Fire Lord Sozin is revealed to Aang and Zuko by different sources. Both learn about themselves and are shown the origins of the war. But will Zuko and Aang learn anything from this?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502474.jpg"
+          },
+          {
+            "episode_number": 7,
+            "name": "Book Three: Fire - Chapter Seven: The Runaway",
+            "runtime": 30,
+            "air_date": "2007-11-02",
+            "overview": "When Katara expresses her disapproval to Toph's new way to make quick cash, the group finds her too motherly, and tension grows between Katara and Toph. When Katara finally decides to participate in this scam to disprove Toph's accusations, the gang is left vulnerable and are forced to face dire consequences.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502478.jpg"
+          },
+          {
+            "episode_number": 8,
+            "name": "Book Three: Fire - Chapter Eighth: The Puppetmaster",
+            "runtime": 30,
+            "air_date": "2007-11-09",
+            "overview": "The gang meet a waterbender who lives in the Fire Nation after being captured years ago. Katara becomes her pupil to further develop her waterbending, while Aang, Sokka, and Toph discover she might be connected to a bunch of disappearances. So can this mysterious waterbender be trusted?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502481.jpg"
+          },
+          {
+            "episode_number": 9,
+            "name": "Book Three: Fire - Chapter Nine: Nightmares and Daydreams",
+            "runtime": 30,
+            "air_date": "2007-11-16",
+            "overview": "Four days prior the invasion, Aang becomes nervous over his soon-to-come confrontation with the Fire Lord. His anxiety gets the better of him as he begins to suffer from outrageous nightmares and hallucinations. Meanwhile, Zuko becomes upset to learn that he was not informed about a war meeting.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502486.jpg"
+          },
+          {
+            "episode_number": 10,
+            "name": "Book Three: Fire - Chapter Ten: The Day of Black Sun, Part 1: The Invasion",
+            "runtime": 30,
+            "air_date": "2007-11-30",
+            "overview": "The day of the eclipse has arrived, and the invasion force gathers together to make last preparations. As the eclipse draws near, they launch their assault on the Fire Nation Capital and begin their long struggle with the Fire Nation Army. Will they be able to survive the battle with the Fire Nation? Meanwhile, Aang enters the Royal Palace and searches for Fire Lord Ozai.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/200/502491.jpg"
+          },
+          {
+            "episode_number": 11,
+            "name": "Book Three: Fire - Chapter Eleven: The Day of Black Sun, Part 2: The Eclipse",
+            "runtime": 30,
+            "air_date": "2007-11-30",
+            "overview": "As the invasion force fights their way to the Fire Nation capital, the kids help Aang to find the Fire Lord in time for the eclipse, but there are a few surprises waiting ahead. Will Aang finally complete his mission or will he lose the battle against the forces of the Fire Nation?",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502874.jpg"
+          },
+          {
+            "episode_number": 12,
+            "name": "Book Three: Fire - Chapter Twelve: The Western Air Temple",
+            "runtime": 30,
+            "air_date": "2008-07-14",
+            "overview": "Aang and his group finally arrive at the Western Air Temple. There, they meet a repented Zuko, who offers to join their ranks. But acceptance of their former enemy's intention is not in their plans. Zuko has a hard time trying to earn everyone's trust, however, another unexpected encounter might change his chances.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/162/407254.jpg"
+          },
+          {
+            "episode_number": 13,
+            "name": "Book Three: Fire - Chapter Thirteen: The Firebending Masters",
+            "runtime": 30,
+            "air_date": "2008-07-15",
+            "overview": "While teaching Aang Firebending, Zuko finds that he has lost all of his Firebending skills. Now, to regain his powers, Zuko and Aang must seek the original source of Firebending within the ruins of a lost civilization.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/162/407258.jpg"
+          },
+          {
+            "episode_number": 14,
+            "name": "Book Three: Fire - Chapter Fourteen: The Boiling Rock, Part 1",
+            "runtime": 30,
+            "air_date": "2008-07-16",
+            "overview": "Sokka is haunted by the decisions he made during the invasion plan, and feels the need to regain his honor. With the help of Zuko, Sokka travels to the highest security prison in the Fire Nation, The Boiling Rock. Disguised as guards, they search the prison, until one of them is revealed. With time running out, Sokka needs to decide if he should cut his losses and leave, or try to finish what he started.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502885.jpg"
+          },
+          {
+            "episode_number": 15,
+            "name": "Book Three: Fire - Chapter Fifteen: The Boiling Rock, Part 2",
+            "runtime": 30,
+            "air_date": "2008-07-16",
+            "overview": "Sokka has found his father, but with one escape plan failure, he doesn't know if there's another way off the island. Luckily, with his father, Suki, and Chit Sang at his side their new plan soon comes together, but will they be able to execute if before Azula arrives? Meanwhile, Mai arrives at the prison and confronts Zuko about what happened on the day of the invasion.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502888.jpg"
+          },
+          {
+            "episode_number": 16,
+            "name": "Book Three: Fire - Chapter Sixteen: The Southern Raiders",
+            "runtime": 30,
+            "air_date": "2008-07-17",
+            "overview": "Azula attacks the Western Air Temple, forcing everyone to flee. At the next campground, Zuko asks Sokka about the day his and Katara's mom was killed. He reveals that he knows who killed their mother. He tells Katara, and the two set out to find him. But will Katara be able to keep her cool when she meets him or will she go too far",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502893.jpg"
+          },
+          {
+            "episode_number": 17,
+            "name": "Book Three: Fire - Chapter Seventeen: The Ember Island Players",
+            "runtime": 30,
+            "air_date": "2008-07-18",
+            "overview": "With only a few days until the arrive of Sozin's Comet, the gang decides to stay at Zuko's family's summer home on Ember Island. They find out that there is a play about them and all their past adventures, and decide to atttend. Meanwhile, Aang tells Katara how he feels about her, but the response is ambiguous.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502896.jpg"
+          },
+          {
+            "episode_number": 18,
+            "name": "Book Three: Fire - Chapter Eighteen: Sozin's Comet, Part 1: The Phoenix King",
+            "runtime": 30,
+            "air_date": "2008-07-19",
+            "overview": "Sozin's Comet is only three days away. Zuko tells the others what the Fire Lord plans on the day of the comet and the gang realizes that they must stop him before then. But Aang doubts that he can do what is expected of him.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502903.jpg"
+          },
+          {
+            "episode_number": 19,
+            "name": "Book Three: Fire - Chapter Nineteen: Sozin's Comet, Part 2: The Old Masters",
+            "runtime": 30,
+            "air_date": "2008-07-19",
+            "overview": "Aang awakes on a mysterious island and confronts his past lives for advice on how to stop the Fire Lord without killing him. The rest of the group searches for Aang.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502906.jpg"
+          },
+          {
+            "episode_number": 20,
+            "name": "Book Three: Fire - Chapter Twenty: Sozin's Comet, Part 3: Into the Inferno",
+            "runtime": 30,
+            "air_date": "2008-07-19",
+            "overview": "Zuko battles his sister with Katara's help for the right to be named Fire Lord. Elsewhere, Aang meets Ozai just as the comet arrives.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502909.jpg"
+          },
+          {
+            "episode_number": 21,
+            "name": "Book Three: Fire - Chapter Twenty One: Sozin's Comet, Part 4: Avatar Aang",
+            "runtime": 30,
+            "air_date": "2008-07-19",
+            "overview": "Aang's moment of truth arrives. Can he defeat Ozai, the Phoenix King? Will he be forced to take a human life? All the characters face their greatest challenges.",
+            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/201/502915.jpg"
+          }
+        ]
+      }
+    ]
+  }
+]

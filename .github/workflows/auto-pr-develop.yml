@@ -1,0 +1,66 @@
+name: Auto PR Develop to Main
+
+on:
+  push:
+    branches:
+      - 'develop'
+  pull_request:
+    types: [closed]
+    branches:
+      - 'develop'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pr-to-main:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request to main
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch = 'develop';
+            const base = 'main';
+
+            console.log('Verificando PR de develop para main...');
+
+            try {
+              const { data: existingPrs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${branch}`,
+                base: base,
+                state: 'open'
+              });
+
+              if (existingPrs.length > 0) {
+                console.log(`PR para main já existe e está aberta: #${existingPrs[0].number}`);
+                return;
+              }
+
+              const { data: newPr } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'Release: Merge develop into main',
+                head: branch,
+                base: base,
+                body: `### Pull Request Automática de Release\n\nBranch **\`develop\`** consolidada e pronta para produção.\n\nBasta clicar em **Merge pull request** para subir as novidades na branch principal **\`main\`**.`
+              });
+
+              console.log(`Pull Request de release criada com sucesso: #${newPr.number}`);
+            } catch (err) {
+              if (err.message && (err.message.includes('No commits between') || err.status === 422)) {
+                console.log('Nenhum commit pendente entre develop e main. PR não necessária.');
+              } else {
+                console.error('Erro na criação automática da PR para main:', err.message);
+                throw err;
+              }
+            }
