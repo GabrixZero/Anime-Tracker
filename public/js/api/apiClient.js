@@ -90,7 +90,8 @@ class ApiClient {
   async putLibrary(data) {
     return this.request('/user/library', {
       method: 'PUT',
-      body: JSON.stringify({ data })
+      // stateVersion: o servidor migra snapshots de clientes antigos (ver utils/migrations.js)
+      body: JSON.stringify({ data, stateVersion: window.STATE_VERSION })
     });
   }
 }

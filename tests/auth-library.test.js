@@ -5,6 +5,10 @@ const os = require('os');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 
+// Os modelos-singleton leem config.DATA_DIR ao carregar: aponte para um diretório temporário antes (nunca escrever em server/data real).
+process.env.SHOWVAULT_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-auth-'));
+process.on('exit', () => fs.rmSync(process.env.SHOWVAULT_DATA_DIR, { recursive: true, force: true }));
+
 const config = require('../server/config/config');
 const { issueToken, requireAuth } = require('../server/middleware/auth');
 const LibraryModel = require('../server/models/LibraryModel');

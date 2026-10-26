@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config/config');
+const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
+const { STATE_VERSION, migrateLibrary } = require('../../public/js/utils/migrations');
 
 const USER_ID_RE = /^usr_[A-Za-z0-9_]+$/;
 const EPISODE_KEY_RE = /^\d+_(movie|s\d+_e\d+)$/;
@@ -13,8 +15,8 @@ const isPlainObject = v => v !== null && typeof v === 'object' && !Array.isArray
 const str = (v, max = 200) => (typeof v === 'string' ? v.slice(0, max) : '');
 
 class LibraryModel {
-  constructor() {
-    this.dir = path.join(config.DATA_DIR, 'libraries');
+  constructor(dataDir = config.DATA_DIR) {
+    this.dir = path.join(dataDir, 'libraries');
   }
 
   emptyLibrary() {
@@ -80,28 +82,69 @@ class LibraryModel {
     return { trackedShows: cleanShows, watchedEpisodes: cleanWatched, episodeNotes: cleanNotes };
   }
 
+  // Lê a biblioteca (migrando versões antigas do estado). Arquivo ilegível lança DataCorruptionError:
+  // nunca vira biblioteca vazia.
   get(userId) {
     const file = this.filePathFor(userId);
+    const result = readJson(file);
+    if (result === null) return this.emptyLibrary();
+
+    const stored = result.data;
+    const migrated = migrateLibrary(stored, stored.schemaVersion);
+    if (!migrated.changed && stored.schemaVersion === STATE_VERSION && !result.recovered) return stored;
+
+    const library = { ...migrated.data, schemaVersion: STATE_VERSION };
     try {
-      return JSON.parse(fs.readFileSync(file, 'utf-8'));
+      writeJsonAtomic(file, library, { pretty: false });
     } catch (err) {
-      if (err.code === 'ENOENT') return this.emptyLibrary();
-      console.error(`[LibraryModel] Biblioteca ilegível para ${userId}:`, err.message);
-      return this.emptyLibrary();
+      console.error(`[LibraryModel] Não foi possível gravar a migração de ${userId}:`, err.message);
     }
+    return library;
   }
 
-  // Grava o snapshot completo (last-write-wins) de forma atômica.
-  save(userId, payload) {
+  // Grava o snapshot completo (last-write-wins) de forma atômica, com .bak da versão anterior.
+  // stateVersion = versão do estado do cliente: clientes antigos (ou sem versão) passam pela migração antes de gravar,
+  // para não ressuscitar referências já removidas.
+  save(userId, payload, { stateVersion } = {}) {
     const file = this.filePathFor(userId);
-    const library = { ...this.validate(payload), updatedAt: new Date().toISOString() };
+    const clean = migrateLibrary(this.validate(payload), stateVersion).data;
+    const library = { ...clean, schemaVersion: STATE_VERSION, updatedAt: new Date().toISOString() };
 
-    fs.mkdirSync(this.dir, { recursive: true });
-    const tmp = `${file}.${process.pid}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(library), 'utf-8');
-    fs.renameSync(tmp, file);
+    // Se o arquivo atual estiver quebrado, a leitura preserva uma cópia ".corrupt-*" antes de ele ser substituído
+    // pelo snapshot do cliente (que é a fonte primária local-first).
+    try { readJson(file); } catch { /* cópia já preservada */ }
+
+    writeJsonAtomic(file, library, { pretty: false });
     return library;
+  }
+
+  // Migra todas as bibliotecas existentes (chamado na inicialização). Arquivos ilegíveis são pulados e reportados.
+  migrateAll() {
+    const summary = { migrated: 0, skipped: 0, failed: 0 };
+    let files = [];
+    try {
+      files = fs.readdirSync(this.dir).filter(f => /^usr_[A-Za-z0-9_]+\.json$/.test(f));
+    } catch {
+      return summary; // pasta ainda não existe
+    }
+    for (const f of files) {
+      try {
+        const id = f.replace(/\.json$/, '');
+        const result = readJson(path.join(this.dir, f));
+        if (result && result.data.schemaVersion !== STATE_VERSION) {
+          this.get(id);
+          summary.migrated++;
+        } else {
+          summary.skipped++;
+        }
+      } catch (err) {
+        summary.failed++;
+        console.error(`[LibraryModel] Migração ignorou ${f}: ${err.message}`);
+      }
+    }
+    return summary;
   }
 }
 
 module.exports = new LibraryModel();
+module.exports.LibraryModel = LibraryModel;

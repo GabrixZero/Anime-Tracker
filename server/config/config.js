@@ -13,7 +13,8 @@ if (!process.env.JWT_SECRET) {
 module.exports = {
   PORT: process.env.PORT || 3000,
   IS_PRODUCTION,
-  DATA_DIR: path.join(__dirname, '..', 'data'),
+  // SHOWVAULT_DATA_DIR permite apontar os dados para outra pasta (os testes usam um diretório temporário).
+  DATA_DIR: process.env.SHOWVAULT_DATA_DIR ? path.resolve(process.env.SHOWVAULT_DATA_DIR) : path.join(__dirname, '..', 'data'),
   TMDB_API_KEY: process.env.TMDB_API_KEY || '',
   DEFAULT_LANGUAGE: 'pt-BR',
   JWT_SECRET: process.env.JWT_SECRET || DEV_JWT_SECRET,

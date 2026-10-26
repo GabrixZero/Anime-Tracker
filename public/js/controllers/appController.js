@@ -79,14 +79,21 @@ class AppController {
       return;
     }
 
-    try {
-      this.showToast('Salvando obra no catálogo mestre...', 'info');
-      const res = await window.apiClient.ingest(numId);
-      if (res && res.data) {
-        window.appState.mediaMap.set(res.data.id, res.data);
+    // Obra já completa no cache (filme ou com temporadas): não precisa ingerir. Senão a ingestão exige login (S02).
+    const known = window.appState.getMedia(numId);
+    const complete = known && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
+    if (!complete) {
+      try {
+        this.showToast('Salvando obra no catálogo mestre...', 'info');
+        const res = await window.apiClient.ingest(numId);
+        if (res && res.data) {
+          window.appState.mediaMap.set(res.data.id, res.data);
+        }
+      } catch (e) {
+        console.warn('Não foi possível ingerir a obra:', e.message);
+        this.showToast(e.message || 'Não foi possível adicionar esta obra agora.', 'error');
+        return;
       }
-    } catch (e) {
-      console.warn('Ingestão externa concluída com cache local existente:', e.message);
     }
 
     window.appState.data.trackedShows.push({
@@ -128,6 +135,7 @@ class AppController {
       const fullData = {
         exportDate: new Date().toISOString(),
         version: 4,
+        stateVersion: window.STATE_VERSION,
         database: window.appState.data
       };
       const blob = new Blob([JSON.stringify(fullData, null, 2)], { type: 'application/json' });
@@ -148,7 +156,8 @@ class AppController {
         reader.onload = (ev) => {
           try {
             const parsed = JSON.parse(ev.target.result);
-            const data = window.validateBackup(parsed.database || parsed);
+            // Backups antigos podem conter obras aposentadas (D-11): migra antes de aplicar. Sem versão = versão 1.
+            const data = window.migrateLibrary(window.validateBackup(parsed.database || parsed), parsed.stateVersion).data;
             window.appState.data = data;
             window.appState.save();
             this.refreshAll();
