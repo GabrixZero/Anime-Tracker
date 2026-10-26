@@ -2,8 +2,8 @@
   "secao": "S08",
   "titulo": "Funções prometidas e falsas",
   "arquivo": "Documentacao/secoes/S08-funcoes-falsas.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s08-funcoes-falsas",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
