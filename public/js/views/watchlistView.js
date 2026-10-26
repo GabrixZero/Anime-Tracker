@@ -129,9 +129,9 @@ class WatchlistView {
             </div>
             
             <div class="show-info">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <div class="show-info-top">
                 ${typeBadge}
-                <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(media.first_air_date ? String(media.first_air_date).slice(0, 4) : '')}</span>
+                <span class="show-year">${escapeHtml(media.first_air_date ? String(media.first_air_date).slice(0, 4) : '')}</span>
               </div>
 
               <h4 class="show-title" title="${escapeHtml(media.name)}">${escapeHtml(media.name)}</h4>

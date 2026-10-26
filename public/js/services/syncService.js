@@ -70,6 +70,12 @@ class SyncService {
     if (box) {
       box.dataset.syncState = state;
       box.classList.toggle('sync-indicator--retry', state === 'offline' || state === 'error');
+      // classes de estado no ponto (sugestão da S05): .is-syncing e .is-offline (offline, erro e sessão expirada)
+      const dot = box.querySelector ? box.querySelector('.status-dot') : null;
+      if (dot) {
+        dot.classList.toggle('is-syncing', state === 'syncing');
+        dot.classList.toggle('is-offline', state === 'offline' || state === 'error' || state === 'auth');
+      }
     }
     const el = document.getElementById('sync-label');
     if (el) el.textContent = labels[state];

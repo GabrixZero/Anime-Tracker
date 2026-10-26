@@ -88,13 +88,13 @@ class StatsView {
       const count = emotionsCount[emo.key] || 0;
       const pct = Math.round((count / maxEmotion) * 100);
       return `
-        <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.85rem;">
-          <span style="font-size: 1.2rem; width: 28px;">${emo.icon}</span>
-          <span style="font-size: 0.84rem; font-weight: 600; width: 100px; color: var(--text-secondary);">${emo.label}</span>
-          <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;">
-            <div style="height: 100%; border-radius: 99px; background: var(--tvtime-yellow); width: ${pct}%;"></div>
+        <div class="stat-bar-row">
+          <span class="stat-bar-icon">${emo.icon}</span>
+          <span class="stat-bar-label">${emo.label}</span>
+          <div class="stat-bar-track">
+            <div class="stat-bar-fill" style="width: ${pct}%;"></div>
           </div>
-          <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff; width: 30px; text-align: right;">${count}</span>
+          <span class="stat-bar-count">${count}</span>
         </div>
       `;
     }).join('');
@@ -108,12 +108,12 @@ class StatsView {
       document.getElementById('stats-genres-list').innerHTML = sortedGenres.map(([genre, count]) => {
         const pct = Math.round((count / maxGenre) * 100);
         return `
-          <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.85rem;">
-            <span style="font-size: 0.84rem; font-weight: 600; width: 120px; color: var(--text-secondary);">${escapeHtml(genre)}</span>
-            <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;">
-              <div style="height: 100%; border-radius: 99px; background: var(--accent-cyan); width: ${pct}%;"></div>
+          <div class="stat-bar-row">
+            <span class="stat-bar-label stat-bar-label--wide">${escapeHtml(genre)}</span>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill stat-bar-fill--cyan" style="width: ${pct}%;"></div>
             </div>
-            <span style="font-size: 0.8rem; font-weight: 700; color: #ffffff; width: 30px; text-align: right;">${count}</span>
+            <span class="stat-bar-count">${count}</span>
           </div>
         `;
       }).join('');

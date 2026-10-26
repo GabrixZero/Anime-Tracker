@@ -45,7 +45,7 @@ class ExploreView {
   async loadMedia() {
     if (!this.container) return;
     try {
-      this.container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-muted);">Carregando catálogo da API...</div>`;
+      this.container.innerHTML = `<div class="grid-message">Carregando catálogo da API...</div>`;
 
       let response;
       if (this.searchQuery) {
@@ -60,13 +60,13 @@ class ExploreView {
       if (window.appState) window.appState.cacheMediaList(items);
 
       if (items.length === 0) {
-        this.container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">Nenhuma obra encontrada.</div>`;
+        this.container.innerHTML = `<div class="grid-message">Nenhuma obra encontrada.</div>`;
         return;
       }
 
       this.render(items);
     } catch (err) {
-      this.container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--accent-rose);">Erro ao carregar dados da API: ${escapeHtml(err.message)}</div>`;
+      this.container.innerHTML = `<div class="grid-message grid-message--error">Erro ao carregar dados da API: ${escapeHtml(err.message)}</div>`;
     }
   }
 
@@ -95,9 +95,9 @@ class ExploreView {
           </div>
 
           <div class="show-info">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <div class="show-info-top">
               ${typeBadge}
-              <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(item.first_air_date ? String(item.first_air_date).slice(0, 4) : '')}</span>
+              <span class="show-year">${escapeHtml(item.first_air_date ? String(item.first_air_date).slice(0, 4) : '')}</span>
             </div>
 
             <h4 class="show-title" title="${escapeHtml(item.name)}" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</h4>
@@ -106,13 +106,13 @@ class ExploreView {
               <span>${escapeHtml((item.genres || []).slice(0, 2).join(', '))}</span>
             </div>
 
-            <div style="margin-top: auto; padding-top: 0.5rem;">
+            <div class="show-card-actions">
               ${isTracked ? `
-                <button class="btn btn-sm btn-secondary" style="width: 100%;" onclick="window.detailModalView.open(${toInt(item.id)})">
+                <button class="btn btn-sm btn-secondary" onclick="window.detailModalView.open(${toInt(item.id)})">
                   Ver no Cofre
                 </button>
               ` : `
-                <button class="btn btn-sm btn-primary" style="width: 100%;" onclick="window.appController.addToList(${toInt(item.id)})">
+                <button class="btn btn-sm btn-primary" onclick="window.appController.addToList(${toInt(item.id)})">
                   + Adicionar à Lista
                 </button>
               `}

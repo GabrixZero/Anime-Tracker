@@ -20,7 +20,25 @@ Este projeto foi construído para resolver definitivamente os problemas históri
 
 ### Configuração e testes
 
-* **Variáveis de ambiente** (veja `.env.example`): `JWT_SECRET` assina os tokens de login. Sem ele o servidor usa um segredo de desenvolvimento (com aviso); com `NODE_ENV=production` ele é obrigatório. Para carregar um `.env`: `node --env-file=.env server.js`.
+* **Variáveis de ambiente** (veja `.env.example`; para carregar um `.env`: `node --env-file=.env server.js`):
+  * `JWT_SECRET` assina os tokens de login. Em desenvolvimento pode ficar vazio: o servidor gera um segredo único na primeira execução e o guarda em `server/data/jwt.secret` (ignorado pelo Git; não apague, ou todo mundo precisará entrar de novo). Com `NODE_ENV=production` ele é **obrigatório** (mínimo 32 caracteres aleatórios) e o servidor não sobe sem ele.
+  * `GOOGLE_CLIENT_ID` liga o login com Google (veja abaixo). Sem ele o botão do Google não aparece.
+  * `CORS_ORIGINS` (lista separada por vírgula) libera outros sites para chamar a API; vazio = só o próprio site. `TRUST_PROXY` (ex.: `1`) é necessário atrás de proxy/hospedagem para o limite de tentativas enxergar o IP real.
+  * `SEED_DEMO_USER=1` cria a conta de demonstração do `users.example.json` (ignorado em produção). Por padrão **ninguém** vem cadastrado.
+* **Contas:** cadastro e login por e-mail e senha (senha de 8 a 128 caracteres, guardada só como hash scrypt). Tentativas erradas de login são limitadas (10 por e-mail/IP em 15 min) e o cadastro também (20 por hora por IP). A API tem rotas para trocar a senha (`POST /api/auth/change-password`) e excluir a conta e a biblioteca (`DELETE /api/auth/account`), ambas pedindo a senha.
+
+#### Login com Google (opcional) — passo a passo para criar o Client ID
+
+O app já traz o login com Google pronto (Google Identity Services no navegador + validação do token no servidor). Falta só você criar o "Client ID" gratuito:
+
+1. Acesse https://console.cloud.google.com/ e crie um projeto (ex.: "ShowVault").
+2. Menu **APIs e serviços → Tela de permissão OAuth**: escolha "Externo", preencha nome do app e seu e-mail, salve (o modo "Teste" basta; adicione seu e-mail como usuário de teste).
+3. Menu **APIs e serviços → Credenciais → Criar credenciais → ID do cliente OAuth**, tipo **Aplicativo da Web**.
+4. Em **Origens JavaScript autorizadas** adicione `http://localhost:3000` (e, quando publicar, o endereço do site). Não precisa de "URI de redirecionamento".
+5. Copie o **ID do cliente** (termina em `.apps.googleusercontent.com`) e coloque no `.env`: `GOOGLE_CLIENT_ID=...`. O ID do cliente **não é segredo**; nunca é preciso o "segredo do cliente".
+6. Reinicie o servidor (`node --env-file=.env server.js`): o botão "Continuar com Google" aparece no cadastro/login.
+
+Observação: contas Google nunca são fundidas automaticamente com uma conta de e-mail/senha que já use o mesmo e-mail.
 * **Sincronização:** com a conta logada, sua lista, episódios assistidos e anotações são enviados ao servidor (`server/data/libraries/<usuario>.json`, ignorado pelo Git) e mesclados no próximo login. O navegador continua sendo a fonte primária (local-first).
 * **Testes:** `npm test`
 

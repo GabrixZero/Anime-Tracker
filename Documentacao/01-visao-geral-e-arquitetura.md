@@ -8,7 +8,7 @@ progresso episódio por episódio, tempo total assistido, diário de anotações
 - Repositório: https://github.com/GabrixZero/Anime-Tracker (público)
 - Pasta local: `C:\Users\Gabri\OneDrive\Documentos\Antigravity Projeto` (dentro do OneDrive; pode causar lock/conflito em escrita de arquivos)
 - Stack: Node 20+ (máquina usa v26) + Express 5 (backend REST) + HTML/CSS/JS vanilla no frontend (sem build, sem framework, sem Tailwind).
-- Dependências: `express`, `cors`, `jsonwebtoken`. Testes: `node --test` (`npm test`).
+- Dependências: `express`, `cors`, `jsonwebtoken`, `helmet`, `express-rate-limit`, `google-auth-library`. Testes: `node --test` (`npm test`).
 - Idioma da interface e do código de domínio: português (pt-BR).
 
 ## Como rodar
@@ -20,19 +20,22 @@ PORT=3055 node server.js   # porta alternativa (útil para testes em paralelo)
 npm test
 ```
 
-`JWT_SECRET` vem do ambiente (veja `.env.example`). Sem ele, fora de produção, usa um segredo de desenvolvimento e avisa.
-Com `NODE_ENV=production` sem `JWT_SECRET` o servidor se recusa a iniciar.
+`JWT_SECRET` vem do ambiente (veja `.env.example`). Sem ele, fora de produção, o servidor **gera um segredo único por instalação** em `server/data/jwt.secret` (ignorado pelo git) e o reaproveita nas próximas partidas (não existe mais segredo padrão público).
+Com `NODE_ENV=production` o servidor se recusa a iniciar sem `JWT_SECRET` (mín. 32 caracteres, e nunca o valor do exemplo). Outras variáveis (CORS, proxy, Google, conta demo): README e `.env.example`.
 
 ## Mapa do backend (`server.js` + `server/`)
 
 | Arquivo | Papel |
 |---|---|
 | `server.js` | só abre a porta (`PORT`) e roda `LibraryModel.migrateAll()` na partida |
-| `server/app.js` | monta o Express: `/api/auth`, `/api/media`, `/api/user`, 404 JSON em `/api/*`, handler de erro JSON, estáticos de `public/`, fallback SPA (sem `listen`: os testes de rotas usam este arquivo) |
-| `server/config/config.js` | `PORT`, `DATA_DIR` (padrão `server/data`; **`SHOWVAULT_DATA_DIR`** aponta para outra pasta, usada pelos testes), `JWT_SECRET`, `JWT_EXPIRES_IN`, `IS_PRODUCTION` |
-| `server/middleware/auth.js` | `issueToken(user)` (JWT HS256, claim `sub`), `requireAuth` (401 sem token válido; define `req.userId`) e `optionalAuth` (define `req.userId` se houver token válido, senão segue como visitante) |
-| `server/controllers/authController.js` + `routes/authRoutes.js` | `register`, `login`, `googleAuth` (**simulado**), `me` |
-| `server/models/UserModel.js` | usuários em `server/data/users.json` (scrypt `salt:hash`, migra senha legada no login); leitura/escrita via `jsonStore` (arquivo ilegível = `DataCorruptionError`, nunca lista vazia) |
+| `server/app.js` | monta o Express: `helmet` (sem CSP até a S10; HSTS só em produção; COOP `same-origin-allow-popups` por causa do popup do Google), sem `x-powered-by`, CORS por lista (`CORS_ORIGINS`), `/api/auth` (corpo máx. 16 KB), `/api/media`, `/api/user` (atrás de `requireActiveUser`), 404 JSON em `/api/*`, handler de erro JSON, estáticos de `public/`, fallback SPA (sem `listen`: os testes de rotas usam este arquivo) |
+| `server/config/config.js` + `jwtSecret.js` | `PORT`, `DATA_DIR` (padrão `server/data`; **`SHOWVAULT_DATA_DIR`** aponta para outra pasta, usada pelos testes), `JWT_SECRET` (lido sob demanda: env > `jwt.secret` local gerado > memória), `JWT_EXPIRES_IN`, `IS_PRODUCTION`, `GOOGLE_CLIENT_ID`, `CORS_ORIGINS`, `TRUST_PROXY`, `SEED_DEMO_USER`, `RATE_LIMITS` |
+| `server/middleware/auth.js` | `issueToken(user)` (JWT HS256, claim `sub`), `requireAuth` (só confere assinatura/validade; define `req.userId`), `requireActiveUser` (= `requireAuth` + a conta ainda existe + token posterior à última troca de senha; usado em `/me`, trocar senha, excluir conta e em todo `/api/user`) e `optionalAuth` (visitante passa) |
+| `server/middleware/rateLimit.js` | limites de tentativas (`express-rate-limit`): login por IP+e-mail e por IP (só falhas contam), cadastro por IP, Google por IP, trocar senha/excluir conta por usuário |
+| `server/controllers/authController.js` + `routes/authRoutes.js` | `GET /config` (Client ID público do Google ou `null`), `POST /register`, `POST /login`, `POST /google` (ID token validado no servidor; 501 sem `GOOGLE_CLIENT_ID`), `GET /me`, `POST /change-password`, `DELETE /account` (exige a senha ou, em conta Google, credencial recente) |
+| `server/utils/validators.js` | validação centralizada das entradas de conta (400 `{error, fields, code:"INVALID_INPUT"}`; nunca 500 por entrada inválida) |
+| `server/services/googleAuth.js`, `accountService.js` | verificação do ID token (`google-auth-library`; `__setVerifierForTests` nos testes) · exclusão de conta + arquivos da biblioteca (`libraries/<id>.json*`) |
+| `server/models/UserModel.js` | usuários em `server/data/users.json` (scrypt **assíncrono** `salt:hash`, migra senha legada no login; `create`/`updatePassword`/`verifyPassword` são `async`; e-mail único checado na gravação; `passwordChangedAt`; `authInfo` em cache por mtime; conta demo só com `SEED_DEMO_USER=1`); leitura/escrita via `jsonStore` (arquivo ilegível = `DataCorruptionError`, nunca lista vazia) |
 | `server/models/LibraryModel.js` | biblioteca por usuário em `server/data/libraries/<userId>.json`; valida, grava de forma atômica (com `.bak`) e aplica a migração de versão do estado (`schemaVersion`) no `get`, no `save` (cliente sem `stateVersion`) e em `migrateAll()` |
 | `server/controllers/userController.js` + `routes/userRoutes.js` | `GET/PUT /api/user/library` (exigem login) |
 | `server/services/mediaService.js` | catálogo = seed versionado + runtime (`mediaCatalog.runtime.json`); busca TVMaze com cache TTL (10 min); `ingest(id)` com trava por id (promessas em andamento), validação da resposta e gravação atômica; `fetchJson` com timeout, limite de tamanho, erros tipados e 1 nova tentativa em 429 (dados externos passam por `utils/sanitize.js`) |
@@ -49,7 +52,8 @@ Dados em disco (`server/data/`):
 |---|---|---|
 | `mediaCatalog.seed.json` | sim (somente leitura) | 16 obras iniciais (ids do TMDB, incluindo o filme Batman 155) |
 | `mediaCatalog.runtime.json` (+ `.bak`) | **não** (ignorado) | catálogo vivo: criado a partir do seed na primeira execução; obras novas do seed são acrescentadas depois (nunca sobrescrevem); recebe as ingestões. Se estiver ilegível (sem `.bak` válido) o servidor serve só o seed e **bloqueia gravações** (ingestão responde 503) até alguém corrigir |
-| `users.example.json` | sim | modelo copiado para `users.json` se este não existir |
+| `users.example.json` | sim | só contém a conta de demonstração; é copiado para `users.json` **apenas** com `SEED_DEMO_USER=1` (fora de produção); sem isso `users.json` nasce vazio |
+| `jwt.secret` | **não** (ignorado) | segredo JWT local gerado na primeira execução sem `JWT_SECRET` (apagar = todos precisam entrar de novo) |
 | `users.json`, `libraries/` | **não** | contas e bibliotecas (nunca commitar) |
 | `*.bak`, `*.corrupt-*`, `*.tmp` | **não** | cópias de segurança/erro geradas pelo `jsonStore` |
 
@@ -93,7 +97,7 @@ Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
 | `js/services/syncService.js` | push com debounce (1,5 s) e `pullAndMerge()` no login; merge por união |
 | `js/views/*View.js` | telas: A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar, modal de detalhes, login |
 | `js/controllers/appController.js` | abas, toasts, backup/import/reset, `addToList`/`removeFromList`, `refreshAll()` (re-render geral) |
-| `css/` | `variables`, `components`, `layout`, `auth-tvtime` (~1.250 linhas; boa parte do estilo está **inline** no HTML) |
+| `css/` | `variables` (tokens, `--fs-meta`, reduced-motion), `components` (botões, cartões, modais base), **`views`** (telas e modais: diário, estatísticas, explorar, detalhes, anotação, backup — S05), `layout` (cabeçalho, navegação e **todos os breakpoints**; abas viram barra inferior ≤1024 px), `auth-tvtime` (login). O HTML quase não tem `style=` inline (só larguras dinâmicas); ver D-S05-1..4 |
 
 Formato do estado (ids de obra: ver "Esquema de ids"): chaves de episódio `"<id>_s<T>_e<E>"` e filmes `"<id>_movie"`. Ids de obra são **números** e o código usa `Number(id)` e
 injeta ids sem aspas em `onclick` em ~10 lugares (por isso ids de texto como `mal-123` quebrariam o app).
@@ -119,4 +123,5 @@ first_air_date, genres[], status, runtime? (filmes), seasons: [{season_number, n
 
 Funciona: cadastro/login com JWT, 5 abas (A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar), marcar episódios, anotações com emoção,
 estatísticas, busca em catálogo local + TVMaze, ingestão de temporadas, backup JSON, sincronização da biblioteca com o servidor.
+Contas (S04): cadastro/login validados, limite de tentativas, trocar senha e excluir conta na API (ainda **sem tela** no app), login com Google real mas só ativo com `GOOGLE_CLIENT_ID`.
 Frágil/falso/incompleto: veja as 10 seções em [04-roadmap.md](04-roadmap.md).

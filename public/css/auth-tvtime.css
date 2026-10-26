@@ -162,7 +162,7 @@
   align-items: center;
   margin: 1.4rem 0;
   color: var(--text-muted);
-  font-size: 0.76rem;
+  font-size: var(--fs-meta);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
@@ -278,4 +278,38 @@
   color: var(--tvtime-yellow);
   text-decoration: none;
   font-weight: 700;
+}
+
+/* Celular (S05): o cartao de login rola dentro da tela quando o teclado ocupa espaco */
+@media (max-width: 768px) {
+  .tvtime-auth-overlay { padding: 0.75rem; align-items: flex-start; overflow-y: auto; }
+  .tvtime-auth-card { margin: auto; }
+  .tvtime-auth-content { padding: 2rem 1.25rem 1.5rem; }
+  .tvtime-auth-header h2 { font-size: 1.45rem; }
+  .tvtime-field input, .btn-tvtime-submit, .btn-google-tvtime { min-height: 46px; }
+}
+
+/* Elementos do formulário de login adicionados na S04 (antes eram estilos inline) */
+.google-signin-slot {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.auth-field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: var(--fs-meta, 0.8rem);
+  color: var(--text-muted);
+}
+
+.auth-form-error {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fda4af;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
