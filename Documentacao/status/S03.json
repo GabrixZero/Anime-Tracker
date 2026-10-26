@@ -2,8 +2,8 @@
   "secao": "S03",
   "titulo": "Biblioteca e sincronização",
   "arquivo": "Documentacao/secoes/S03-biblioteca-e-sync.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s03-biblioteca-e-sync",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
