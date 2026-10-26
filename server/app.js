@@ -22,6 +22,7 @@ if (config.TRUST_PROXY !== false) app.set('trust proxy', config.TRUST_PROXY);
 // COOP "same-origin-allow-popups" é o que o popup do Login com Google exige.
 app.use(helmet({
   contentSecurityPolicy: false,
+  strictTransportSecurity: config.IS_PRODUCTION ? undefined : false, // HSTS só em produção (HTTPS)
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
 }));
 

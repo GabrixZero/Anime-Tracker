@@ -2,9 +2,9 @@
   "secao": "S04",
   "titulo": "Contas e autenticação",
   "arquivo": "Documentacao/secoes/S04-contas-e-auth.md",
-  "status": "em-andamento",
+  "status": "concluida",
   "branch": "feature/s04-contas-e-auth",
-  "concluidaEm": "",
+  "concluidaEm": "2026-10-26",
   "commit": "",
-  "notas": ""
+  "notas": "Validação centralizada, scrypt assíncrono, rate limit, segredo JWT local, helmet/CORS, trocar senha e excluir conta (API), Google real atrás de GOOGLE_CLIENT_ID (botão escondido sem ele), conta demo removida do fluxo padrão. 95 testes passando."
 }
