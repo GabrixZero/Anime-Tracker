@@ -25,3 +25,7 @@ Mais recente no topo. Modelo de entrada:
   no modal de detalhes o título e a sinopse ficam ilegíveis sobre a imagem de fundo.
 - **Falha minha a corrigir na S03:** logout não limpa o estado local; outro usuário no mesmo navegador mescla a biblioteca do anterior.
 - **Próxima sessão:** S01 (XSS no frontend).
+
+## 2026-10-26 · Sessão 0b (refinamento) · branch `feature/refinamento-decisoes`
+- Todas as pendências P-01…P-09 foram respondidas pelo Gabriel (D-11…D-21); padrões assumidos em D-22; execução por subagentes em D-23.
+- Próximo passo: Onda 1 (S01 + S02) por subagentes em worktrees.

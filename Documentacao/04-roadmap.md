@@ -25,8 +25,8 @@ Cada seção deve deixar testes para o que alterou (não esperar a S10).
 - Calendário semanal de próximos lançamentos (agenda de episódios, como no TV Time).
 - Importar histórico do TV Time (CSV) e da MyAnimeList; exportação mais completa.
 - Google OAuth real (se não for feito na S04).
-- Nota do usuário de 1 a 5 por obra/episódio (se aprovado em P-04).
-- PWA / modo offline real (service worker).
+- Nota do usuário de 1 a 5 por obra/episódio (D-14: adiado).
+- PWA / modo offline real (service worker) — D-20: adiado.
 - Deploy em produção (Render/Railway/Fly) com variáveis de ambiente e armazenamento persistente.
 
 ## Como atualizar

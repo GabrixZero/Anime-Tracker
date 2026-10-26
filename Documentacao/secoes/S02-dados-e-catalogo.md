@@ -33,8 +33,9 @@ Há risco real de **perder todos os usuários ou todo o catálogo**, o catálogo
 - [ ] Cache em memória com TTL para buscas externas (usar o `this.cache`).
 - [ ] Testes com `fetchJson` simulado: ingestão válida, 404, 429, id inválido, escrita atômica, leitura corrompida (não apaga dados).
 
-## Decisões pendentes
-P-01 (esquema de ids e migração) e P-02 (catálogo seed × runtime). Levar a recomendação do `02-decisoes.md` ao Gabriel antes de implementar.
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvidas:** D-11 (catálogo recomeça do zero, ids por fonte, Batman restaurado, migração só das referências às 4 obras), D-12 (seed × runtime), D-22 (testes não tocam `server/data`).
+Definir e documentar a faixa de ids de cada fonte em `01-visao-geral-e-arquitetura.md` (a S06 depende disso). Incrementar a versão do estado local (`showvault_state_mvc_v1`) para disparar a migração no navegador.
 
 ## Critério de pronto
 Corromper `users.json`/`mediaCatalog.json` de propósito não apaga nada (erro claro, `.bak` usado); ingestão de id inexistente não grava nada; visitante sem login não escreve no catálogo;

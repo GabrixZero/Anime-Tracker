@@ -25,7 +25,7 @@ Hoje quem usa teclado ou leitor de tela não consegue usar o app: não existe ne
 - [ ] Respeitar `prefers-reduced-motion` (se não feito na S05).
 - [ ] Verificação: percorrer tudo só com teclado (Tab/Shift+Tab/Enter/Espaço/Esc); auditoria automática (Lighthouse/axe no navegador do app) sem erros graves.
 
-## Decisões pendentes
+## Decisões (já resolvidas — não pergunte de novo)
 Nenhuma.
 
 ## Critério de pronto

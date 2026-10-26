@@ -27,8 +27,8 @@ O sync foi entregue em 2026-10-26 com limitações conhecidas, e a regra de stat
 - [ ] Avaliar nota do usuário 1–5 (decisão P-04) — só implementar se aprovada.
 - [ ] Testes de integração da rota `/api/user/library` (precisa de `app` exportável — ver S10/S04) ou, no mínimo, testes do `LibraryModel` com campos novos.
 
-## Decisões pendentes
-P-03 (como propagar remoções) e P-04 (nota 1–5).
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvidas:** D-13 (tombstones; `LibraryModel.validate` aceita marcas de exclusão), D-14 (sem nota 1–5 agora).
 
 ## Critério de pronto
 Duas contas no mesmo navegador não veem dados uma da outra; desmarcar/remover num aparelho se reflete no outro; o usuário muda o status de qualquer obra e as telas concordam;

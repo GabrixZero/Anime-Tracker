@@ -26,8 +26,8 @@ Há textos no README e elementos na interface que prometem algo que não existe,
 - [ ] Tradução do que for possível (status "Running" → "Em exibição" etc.).
 - [ ] Atualizar README para refletir exatamente o que existe.
 
-## Decisões pendentes
-Para cada função prometida (versões da nota, Markdown/spoiler): implementar ou remover? Pergunte ao Gabriel com a estimativa de esforço de cada uma.
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvidas:** D-19 (implementar histórico de versões da nota e Markdown simples com spoiler), D-22 (estado inicial vazio com “Carregar exemplo”; sem dados inventados).
 
 ## Critério de pronto
 Nada na interface/README promete o que não existe; nenhum dado inventado é exibido como real; emoções consistentes em todas as telas.

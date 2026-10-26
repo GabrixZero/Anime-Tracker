@@ -25,8 +25,8 @@ O login já usa JWT real, mas o cadastro aceita qualquer coisa, não há limite 
 - [ ] Refatorar `server.js` em `app.js` (exporta o app, sem `listen`) + `server.js` (só `listen`) para permitir testes HTTP.
 - [ ] Testes HTTP de `register/login/me`: validações, 401, rate limit, token expirado/forjado; sem escrever em `server/data` real.
 
-## Decisões pendentes
-P-05 (estratégia do segredo local) e P-06 (Google real ou esconder). Para Google real o Gabriel precisa criar o OAuth Client ID no Google Cloud — não peça credenciais no chat; use `.env`.
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvidas:** D-15 (segredo local gerado e persistido fora de produção), D-16 (botão Google escondido; integração real pronta atrás de `GOOGLE_CLIENT_ID`), D-22 (remover conta demo).
 
 ## Critério de pronto
 Entradas inválidas retornam 400; força bruta é limitada; app não sobe com segredo público em produção e localmente usa segredo único por instalação; botão Google funciona de verdade ou não aparece;

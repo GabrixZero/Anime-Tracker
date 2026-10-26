@@ -23,8 +23,8 @@ Funciona bem hoje (19 obras, ~536 episódios), mas cresce mal: cada obra ingerid
 - [ ] (Opcional, perguntar) Service worker simples para cache do app shell e dados locais.
 - [ ] Medir antes/depois: tamanho do payload (`/trending`), tempo de render ao marcar 1 episódio com 1.000+ episódios rastreados, Lighthouse.
 
-## Decisões pendentes
-Service worker/PWA agora ou no backlog? (padrão: backlog)
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvida:** D-20 (PWA/service worker no backlog).
 
 ## Critério de pronto
 Payload da lista cai uma ordem de grandeza; marcar um episódio não congela com bibliotecas grandes; métricas antes/depois registradas no diário.
