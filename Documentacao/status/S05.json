@@ -2,8 +2,8 @@
   "secao": "S05",
   "titulo": "Mobile e layout",
   "arquivo": "Documentacao/secoes/S05-mobile-e-layout.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s05-mobile-e-layout",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
