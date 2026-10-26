@@ -23,7 +23,19 @@ class UserController {
       }
       return sendError(res, err, 'Erro interno ao gravar a biblioteca.', 'user/library:put');
     }
-    return res.json({ updatedAt: library.updatedAt });
+    // `data` = biblioteca já mesclada com a do servidor (clientes da S03 aplicam; clientes antigos ignoram o campo)
+    const { schemaVersion, updatedAt, ...data } = library;
+    return res.json({ updatedAt, data });
+  }
+
+  // "Resetar + apagar a nuvem": zera a biblioteca da conta (os outros aparelhos zeram ao sincronizar).
+  deleteLibrary(req, res) {
+    try {
+      const library = LibraryModel.clear(req.userId);
+      return res.json({ resetAt: library.resetAt, updatedAt: library.updatedAt });
+    } catch (err) {
+      return sendError(res, err, 'Erro interno ao apagar a biblioteca.', 'user/library:delete');
+    }
   }
 }
 

@@ -17,15 +17,15 @@ O sync foi entregue em 2026-10-26 com limitações conhecidas, e a regra de stat
 - O selo "Sincronizado" do cabeçalho é fixo (`index.html` ~94) e contradiz o rótulo real (cobre também S08).
 
 ## Tarefas
-- [ ] Isolar o estado por usuário: guardar `showvault_last_user`; no logout limpar/arquivar o estado local; no login de usuário diferente do último **substituir** (não mesclar) o local pelo remoto.
-- [ ] Propagar remoções (decisão P-03): marcas de exclusão (`deletedAt`) nos itens ou "servidor vence após o primeiro sync do aparelho". Ajustar `LibraryModel.validate` junto.
-- [ ] Extrair `merge` para um módulo puro compartilhável (rodável no Node) e cobrir com testes (união, conflito, remoção, notas mais novas).
-- [ ] Status por obra editável na interface (Assistindo, Quero ver, Pausado, Finalizado, Desisti): seletor no modal e na lista; `addToList` com padrão coerente;
+- [x] Isolar o estado por usuário: guardar `showvault_last_user`; no logout limpar/arquivar o estado local; no login de usuário diferente do último **substituir** (não mesclar) o local pelo remoto.
+- [x] Propagar remoções (decisão P-03): marcas de exclusão (`deletedAt`) nos itens ou "servidor vence após o primeiro sync do aparelho". Ajustar `LibraryModel.validate` junto.
+- [x] Extrair `merge` para um módulo puro compartilhável (rodável no Node) e cobrir com testes (união, conflito, remoção, notas mais novas).
+- [x] Status por obra editável na interface (Assistindo, Quero ver, Pausado, Finalizado, Desisti): seletor no modal e na lista; `addToList` com padrão coerente;
   marcar como Finalizado automaticamente quando todos os episódios forem assistidos; estatísticas e lista usando a mesma regra.
-- [ ] "Resetar" com opção de também apagar a nuvem (confirmação explícita).
-- [ ] Tratar `PUT` com falha/401 e conflitos de forma visível (rótulo de status; botão "tentar de novo").
-- [ ] Avaliar nota do usuário 1–5 (decisão P-04) — só implementar se aprovada.
-- [ ] Testes de integração da rota `/api/user/library` (precisa de `app` exportável — ver S10/S04) ou, no mínimo, testes do `LibraryModel` com campos novos.
+- [x] "Resetar" com opção de também apagar a nuvem (confirmação explícita).
+- [x] Tratar `PUT` com falha/401 e conflitos de forma visível (rótulo de status; botão "tentar de novo").
+- [x] Avaliar nota do usuário 1–5 (decisão P-04) — decidido em D-14: **não implementada** (backlog).
+- [x] Testes de integração da rota `/api/user/library` (precisa de `app` exportável — ver S10/S04) ou, no mínimo, testes do `LibraryModel` com campos novos.
 
 ## Decisões (já resolvidas — não pergunte de novo)
 **Resolvidas:** D-13 (tombstones; `LibraryModel.validate` aceita marcas de exclusão), D-14 (sem nota 1–5 agora).
@@ -36,3 +36,8 @@ Duas contas no mesmo navegador não veem dados uma da outra; desmarcar/remover n
 
 ## Fora de escopo
 Tempo real/websocket; resolução de conflitos campo a campo além do necessário.
+
+
+## Feito (S03)
+
+Ver `diario/2026-10-26-S03.md` e D-S03-1..6. Nada ficou em aberto nesta seção. Testes: `tests/library-merge.test.js` (merge, importação, decisão no login, regra de status) e `tests/library-sync.test.js` (LibraryModel, rotas, e o frontend real em aparelhos simulados).

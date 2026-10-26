@@ -2,9 +2,9 @@
   "secao": "S03",
   "titulo": "Biblioteca e sincronização",
   "arquivo": "Documentacao/secoes/S03-biblioteca-e-sync.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s03-biblioteca-e-sync",
+  "concluidaEm": "2026-10-26",
   "commit": "",
-  "notas": ""
+  "notas": "Isolamento por conta (logout limpa, troca de conta nunca mescla), marcas de exclusão + resetAt, merge puro testado (servidor mescla no PUT), status por obra com regra única (lista/estatísticas/A Seguir), Resetar com opção de apagar a nuvem, falhas de sync visíveis com tentar de novo. 138 testes passando."
 }

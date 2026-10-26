@@ -3,6 +3,7 @@ const path = require('path');
 const config = require('../config/config');
 const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
 const { STATE_VERSION, migrateLibrary } = require('../../public/js/utils/migrations');
+const LibraryMerge = require('../../public/js/utils/libraryMerge');
 
 const USER_ID_RE = /^usr_[A-Za-z0-9_]+$/;
 const EPISODE_KEY_RE = /^\d+_(movie|s\d+_e\d+)$/;
@@ -20,7 +21,7 @@ class LibraryModel {
   }
 
   emptyLibrary() {
-    return { trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, updatedAt: null };
+    return { ...LibraryMerge.emptyData(), updatedAt: null };
   }
 
   filePathFor(userId) {
@@ -51,7 +52,10 @@ class LibraryModel {
         throw new Error('Item inválido em trackedShows.');
       }
       seen.add(t.showId);
-      cleanShows.push({ showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) });
+      const show = { showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) };
+      const updatedAt = LibraryMerge.cleanStamp(t.updatedAt);
+      if (updatedAt) show.updatedAt = updatedAt;
+      cleanShows.push(show);
     }
 
     const cleanWatched = {};
@@ -62,6 +66,8 @@ class LibraryModel {
         watchedAt: str(v.watchedAt, 40),
         rewatchCount: Number.isInteger(v.rewatchCount) && v.rewatchCount > 0 ? Math.min(v.rewatchCount, 1000) : 1
       };
+      const updatedAt = LibraryMerge.cleanStamp(v.updatedAt);
+      if (updatedAt) cleanWatched[key].updatedAt = updatedAt;
     }
 
     const cleanNotes = {};
@@ -79,11 +85,16 @@ class LibraryModel {
       };
     }
 
-    return { trackedShows: cleanShows, watchedEpisodes: cleanWatched, episodeNotes: cleanNotes };
+    // Marcas de exclusão (D-13) e "zerar a conta" (resetAt): ver public/js/utils/libraryMerge.js
+    const fail = () => { throw new Error('Item inválido em tombstones.'); };
+    const tombstones = LibraryMerge.cleanTombstones(payload.tombstones, fail);
+    const resetAt = LibraryMerge.cleanStamp(payload.resetAt);
+
+    return { trackedShows: cleanShows, watchedEpisodes: cleanWatched, episodeNotes: cleanNotes, tombstones, resetAt };
   }
 
   // Lê a biblioteca (migrando versões antigas do estado). Arquivo ilegível lança DataCorruptionError:
-  // nunca vira biblioteca vazia.
+  // nunca vira biblioteca vazia. Bibliotecas gravadas antes da S03 voltam com tombstones/resetAt vazios.
   get(userId) {
     const file = this.filePathFor(userId);
     const result = readJson(file);
@@ -91,7 +102,9 @@ class LibraryModel {
 
     const stored = result.data;
     const migrated = migrateLibrary(stored, stored.schemaVersion);
-    if (!migrated.changed && stored.schemaVersion === STATE_VERSION && !result.recovered) return stored;
+    if (!migrated.changed && stored.schemaVersion === STATE_VERSION && !result.recovered) {
+      return { ...stored, ...LibraryMerge.normalizeData(stored) };
+    }
 
     const library = { ...migrated.data, schemaVersion: STATE_VERSION };
     try {
@@ -99,21 +112,38 @@ class LibraryModel {
     } catch (err) {
       console.error(`[LibraryModel] Não foi possível gravar a migração de ${userId}:`, err.message);
     }
-    return library;
+    return { ...library, ...LibraryMerge.normalizeData(library) };
   }
 
-  // Grava o snapshot completo (last-write-wins) de forma atômica, com .bak da versão anterior.
+  // Grava de forma atômica, com .bak da versão anterior.
+  //  - Cliente da S03 (envia `tombstones`): o servidor MESCLA o que chegou com o que já tem (LibraryMerge.merge); um aparelho
+  //    desatualizado não apaga o trabalho de outro e as remoções (marcas de exclusão) se propagam. Vale `resetAt` ("zerar a conta").
+  //  - Cliente antigo (sem `tombstones`): snapshot completo, last-write-wins, como antes.
   // stateVersion = versão do estado do cliente: clientes antigos (ou sem versão) passam pela migração antes de gravar,
   // para não ressuscitar referências já removidas.
   save(userId, payload, { stateVersion } = {}) {
     const file = this.filePathFor(userId);
-    const clean = migrateLibrary(this.validate(payload), stateVersion).data;
-    const library = { ...clean, schemaVersion: STATE_VERSION, updatedAt: new Date().toISOString() };
+    const incoming = migrateLibrary(this.validate(payload), stateVersion).data;
 
     // Se o arquivo atual estiver quebrado, a leitura preserva uma cópia ".corrupt-*" antes de ele ser substituído
-    // pelo snapshot do cliente (que é a fonte primária local-first).
-    try { readJson(file); } catch { /* cópia já preservada */ }
+    // pelo snapshot do cliente (que é a fonte primária local-first); nesse caso não há o que mesclar.
+    let current = null;
+    try { current = this.get(userId); } catch { /* cópia já preservada */ }
 
+    const supportsMerge = payload.tombstones !== undefined && payload.tombstones !== null;
+    const next = supportsMerge && current ? LibraryMerge.merge(incoming, current, { now: Date.now() }) : incoming;
+    const library = { ...next, schemaVersion: STATE_VERSION, updatedAt: new Date().toISOString() };
+
+    writeJsonAtomic(file, library, { pretty: false });
+    return library;
+  }
+
+  // "Resetar + apagar a nuvem": biblioteca vazia com `resetAt` = agora. Os outros aparelhos, ao sincronizar, descartam tudo anterior a essa data.
+  clear(userId) {
+    const file = this.filePathFor(userId);
+    try { readJson(file); } catch { /* cópia .corrupt-* preservada pela leitura */ }
+    const now = new Date().toISOString();
+    const library = { ...LibraryMerge.emptyData(), resetAt: now, schemaVersion: STATE_VERSION, updatedAt: now };
     writeJsonAtomic(file, library, { pretty: false });
     return library;
   }

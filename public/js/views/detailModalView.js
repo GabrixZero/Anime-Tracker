@@ -108,6 +108,7 @@ class DetailModalView {
       ? `<span class="badge-type-tag badge-type-anime">Anime</span>`
       : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
+    const tracked = window.appState.getTracked(media.id);
     const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
     header.style.backgroundImage = cssUrl(safeUrl(media.backdrop_path) || media.poster_path);
     header.innerHTML = `
@@ -126,8 +127,12 @@ class DetailModalView {
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
         
         <div class="modal-actions">
-          ${window.appState.data.trackedShows.some(t => t.showId === media.id) ? `
+          ${tracked ? `
             <button class="btn btn-sm btn-secondary" onclick="window.appController.removeFromList(${toInt(media.id)})">Remover da Lista</button>
+            <label class="status-picker">
+              <span class="status-picker-label">Status</span>
+              <select class="status-select" id="detail-status-select" aria-label="Status da obra" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(window.appState.getStatus(tracked))}</select>
+            </label>
           ` : `
             <button class="btn btn-sm btn-primary" onclick="window.appController.addToList(${toInt(media.id)})">+ Adicionar à Lista</button>
           `}
@@ -172,6 +177,16 @@ class DetailModalView {
     }
 
     this.detailModal.classList.remove('hidden');
+  }
+
+  // Mantém o seletor de status do modal igual ao estado (ex.: virou "Finalizado" ao marcar o último episódio).
+  refreshStatusPicker() {
+    const select = document.getElementById('detail-status-select');
+    if (!select || this.currentShowId === null) return;
+    const tracked = window.appState.getTracked(this.currentShowId);
+    if (!tracked) return;
+    const status = window.appState.getStatus(tracked);
+    if (select.value !== status) select.value = status;
   }
 
   renderSeasonTabs() {

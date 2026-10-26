@@ -30,7 +30,8 @@ class NextUpView {
     if (!state || !state.data || !state.data.trackedShows) return queue;
 
     state.data.trackedShows.forEach(tracked => {
-      if (tracked.status === 'completed' || tracked.status === 'dropped') return;
+      // Finalizado, Pausado e Desisti não entram na fila (regra única em utils/watchStatus.js)
+      if (!window.WatchStatus.isQueueStatus(state.getStatus(tracked))) return;
 
       const media = state.getMedia(tracked.showId);
       if (!media) return;

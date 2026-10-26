@@ -40,9 +40,12 @@ class AuthView {
     document.getElementById('btn-logout').addEventListener('click', () => this.handleLogout());
 
     // Token rejeitado pelo servidor (expirado/inválido)
+    // Os dados locais continuam (são desta conta); o selo mostra "Sessão expirada" até um novo login.
     window.addEventListener('showvault:auth-expired', () => {
       window.syncService.stop();
       this.updateHeader(null);
+      window.syncService.setStatus('auth');
+      if (window.appController) window.appController.showToast('Sua sessão expirou. Entre de novo para voltar a sincronizar.', 'error');
     });
   }
 
@@ -57,7 +60,7 @@ class AuthView {
       const res = await window.apiClient.getMe();
       if (res && res.user) {
         this.updateHeader(res.user);
-        window.syncService.pullAndMerge();
+        window.syncService.pullAndMerge(res.user, { resumed: true });
       }
     } catch {
       localStorage.removeItem('showvault_auth_token');
@@ -205,7 +208,7 @@ class AuthView {
     this.updateHeader(res.user);
     this.showError('');
     this.close();
-    window.syncService.pullAndMerge();
+    window.syncService.pullAndMerge(res.user);
     window.appController.showToast(message, 'success');
   }
 
@@ -235,13 +238,20 @@ class AuthView {
     }
   }
 
-  handleLogout() {
-    if (confirm('Deseja sair da sua conta? Seus dados continuam gravados com segurança local no seu navegador.')) {
-      window.syncService.stop();
-      localStorage.removeItem('showvault_auth_token');
-      this.updateHeader(null);
-      window.appController.showToast('Sessão encerrada.', 'info');
-    }
+  // Sair = enviar o que falta, tirar os dados desta conta do navegador (a próxima pessoa não os vê) e encerrar a sessão.
+  // Se o envio falhar (sem rede), uma cópia fica guardada e volta quando a mesma conta entrar de novo.
+  async handleLogout() {
+    if (!confirm('Deseja sair da sua conta? Seus dados ficam guardados na sua conta e voltam quando você entrar de novo; este navegador será limpo.')) return;
+
+    const { synced } = await window.syncService.logout();
+    localStorage.removeItem('showvault_auth_token');
+    this.updateHeader(null);
+    document.getElementById('modal-show-detail').classList.add('hidden');
+    window.appController.refreshAll();
+    window.appController.showToast(
+      synced ? 'Sessão encerrada.' : 'Sessão encerrada. Algumas alterações não foram enviadas; elas voltam quando você entrar de novo.',
+      synced ? 'info' : 'error'
+    );
   }
 
   updateHeader(user) {

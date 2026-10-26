@@ -9,9 +9,27 @@ class WatchlistView {
     this.badge = document.getElementById('badge-watchlist');
     this.statusFilter = 'all';
     this.catFilter = 'all';
+    this.addStatusFilters();
     this.bindEvents();
   }
 
+  // Filtros "Pausados" e "Desisti": criados a partir do botão "Quero Ver" (mesmo visual), para não duplicar HTML.
+  addStatusFilters() {
+    const base = document.querySelector('#watchlist-filters [data-filter="plan_to_watch"]');
+    if (!base) return;
+    [['paused', 'Pausados', 'count-paused'], ['dropped', 'Desisti', 'count-dropped']].forEach(([filter, label, countId]) => {
+      if (document.getElementById(countId)) return;
+      const btn = base.cloneNode(false);
+      btn.classList.remove('active');
+      btn.setAttribute('data-filter', filter);
+      btn.append(`${label} (`);
+      const count = document.createElement('span');
+      count.id = countId;
+      count.textContent = '0';
+      btn.append(count, ')');
+      base.parentNode.appendChild(btn);
+    });
+  }
 
   bindEvents() {
     document.querySelectorAll('#watchlist-filters .pill-btn').forEach(btn => {
@@ -39,30 +57,22 @@ class WatchlistView {
     const trackedList = state.data.trackedShows || [];
     if (this.badge) this.badge.textContent = trackedList.length;
 
-    let countAll = 0, countWatching = 0, countCompleted = 0, countPlan = 0;
-    trackedList.forEach(t => {
-      countAll++;
-      if (t.status === 'watching') countWatching++;
-      if (t.status === 'completed') countCompleted++;
-      if (t.status === 'plan_to_watch') countPlan++;
+    // Mesma regra de status das estatísticas e do "A Seguir": state.getStatus (utils/watchStatus.js)
+    const counts = { all: trackedList.length, watching: 0, completed: 0, plan_to_watch: 0, paused: 0, dropped: 0 };
+    trackedList.forEach(t => { counts[state.getStatus(t)]++; });
+
+    const countIds = { all: 'count-all', watching: 'count-watching', completed: 'count-completed', plan_to_watch: 'count-plan', paused: 'count-paused', dropped: 'count-dropped' };
+    Object.entries(countIds).forEach(([key, id]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = counts[key];
     });
-
-    const elAll = document.getElementById('count-all');
-    const elWatching = document.getElementById('count-watching');
-    const elCompleted = document.getElementById('count-completed');
-    const elPlan = document.getElementById('count-plan');
-
-    if (elAll) elAll.textContent = countAll;
-    if (elWatching) elWatching.textContent = countWatching;
-    if (elCompleted) elCompleted.textContent = countCompleted;
-    if (elPlan) elPlan.textContent = countPlan;
 
     const filtered = trackedList.filter(t => {
       const media = state.getMedia(t.showId);
       if (!media) return false;
 
       if (this.catFilter !== 'all' && media.type !== this.catFilter) return false;
-      if (this.statusFilter !== 'all' && t.status !== this.statusFilter) return false;
+      if (this.statusFilter !== 'all' && state.getStatus(t) !== this.statusFilter) return false;
       return true;
     });
 
@@ -129,6 +139,8 @@ class WatchlistView {
                 <span>${isMovie ? `${escapeHtml(media.runtime)} min` : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
                 <span>${escapeHtml(media.status || '')}</span>
               </div>
+
+              <select class="status-select status-select--card" aria-label="Status de ${escapeHtml(media.name)}" onclick="event.stopPropagation()" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>
 
               <div class="show-progress-wrap">
                 <div class="show-progress-info">

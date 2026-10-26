@@ -27,7 +27,9 @@ class ApiClient {
         window.dispatchEvent(new CustomEvent('showvault:auth-expired'));
       }
       if (!res.ok) {
-        throw new Error(data.error || 'Erro na requisição à API.');
+        const error = new Error(data.error || 'Erro na requisição à API.');
+        error.status = res.status; // o sync diferencia sessão expirada (401), servidor com erro e falta de rede (sem status)
+        throw error;
       }
       return data;
     } catch (err) {
@@ -93,6 +95,11 @@ class ApiClient {
       // stateVersion: o servidor migra snapshots de clientes antigos (ver utils/migrations.js)
       body: JSON.stringify({ data, stateVersion: window.STATE_VERSION })
     });
+  }
+
+  // Apaga a biblioteca da conta no servidor ("Resetar" com nuvem). Devolve { resetAt }.
+  async deleteLibrary() {
+    return this.request('/user/library', { method: 'DELETE' });
   }
 }
 
