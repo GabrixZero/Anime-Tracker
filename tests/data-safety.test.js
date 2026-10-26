@@ -155,11 +155,11 @@ test('LibraryModel: biblioteca corrompida com .bak válido é recuperada', () =>
   assert.deepEqual(lib.get('usr_d1').trackedShows.map(t => t.showId), [7]);
 });
 
-test('UserModel: users.json corrompido NÃO vira lista vazia nem é sobrescrito pelo próximo cadastro', () => {
+test('UserModel: users.json corrompido NÃO vira lista vazia nem é sobrescrito pelo próximo cadastro', async () => {
   const dir = newDir();
   const users = new UserModel(dir);
-  users.create({ name: 'A', email: 'a@exemplo.test', password: 'senha-de-teste-1' });
-  users.create({ name: 'B', email: 'b@exemplo.test', password: 'senha-de-teste-2' });
+  await users.create({ name: 'A', email: 'a@exemplo.test', password: 'senha-de-teste-1' });
+  await users.create({ name: 'B', email: 'b@exemplo.test', password: 'senha-de-teste-2' });
   const file = path.join(dir, 'users.json');
   fs.writeFileSync(file, '[{"id": "usr_x", ');
   const broken = fs.readFileSync(file, 'utf-8');
@@ -169,17 +169,17 @@ test('UserModel: users.json corrompido NÃO vira lista vazia nem é sobrescrito 
 
   fs.rmSync(`${file}.bak`);
   assert.throws(() => users.getAll(), err => err instanceof DataCorruptionError);
-  assert.throws(() => users.create({ name: 'C', email: 'c@exemplo.test', password: 'senha-de-teste-3' }), err => err.code === 'DATA_CORRUPT');
+  await assert.rejects(() => users.create({ name: 'C', email: 'c@exemplo.test', password: 'senha-de-teste-3' }), err => err.code === 'DATA_CORRUPT');
   assert.throws(() => users.findByEmail('a@exemplo.test'), err => err.code === 'DATA_CORRUPT');
   assert.equal(fs.readFileSync(file, 'utf-8'), broken, 'arquivo corrompido continua intacto');
   assert.equal(fs.readdirSync(dir).some(f => f.startsWith('users.json.corrupt-')), true);
 });
 
-test('UserModel: grava de forma atômica (sem .tmp) e cria users.json vazio quando não existe', () => {
+test('UserModel: grava de forma atômica (sem .tmp) e cria users.json vazio quando não existe', async () => {
   const dir = newDir();
   const users = new UserModel(dir);
   assert.deepEqual(users.getAll(), []);
-  users.create({ name: 'A', email: 'a@exemplo.test', password: 'senha-de-teste-1' });
+  await users.create({ name: 'A', email: 'a@exemplo.test', password: 'senha-de-teste-1' });
   assert.equal(fs.readdirSync(dir).some(f => f.endsWith('.tmp')), false);
   assert.equal(users.findByEmail('A@EXEMPLO.test').name, 'A');
 });

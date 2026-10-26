@@ -18,6 +18,7 @@ Thumbs.db
 !.env.example
 server/data/users.json
 server/data/libraries/
+server/data/jwt.secret
 
 server/data/mediaCatalog.runtime.json
 server/data/mediaCatalog.json

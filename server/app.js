@@ -1,16 +1,40 @@
 // Monta o app Express (sem abrir porta), para o servidor real e para os testes de rotas.
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 
+const config = require('./config/config');
+const { requireActiveUser } = require('./middleware/auth');
 const authRoutes = require('./routes/authRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const userRoutes = require('./routes/userRoutes');
 
+// Resolve o segredo JWT já na partida (gera o arquivo local na primeira vez; em produção falha sem JWT_SECRET seguro).
+void config.JWT_SECRET;
+
 const app = express();
 
-// Middlewares Globais
-app.use(cors());
+app.disable('x-powered-by');
+if (config.TRUST_PROXY !== false) app.set('trust proxy', config.TRUST_PROXY);
+
+// Cabeçalhos de segurança. Sem CSP por enquanto: o HTML ainda usa onclick inline (a CSP estrita entra na S10).
+// COOP "same-origin-allow-popups" é o que o popup do Login com Google exige.
+app.use(helmet({
+  contentSecurityPolicy: false,
+  strictTransportSecurity: config.IS_PRODUCTION ? undefined : false, // HSTS só em produção (HTTPS)
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
+}));
+
+// CORS: o site e a API são da mesma origem (não precisa de CORS). Só origens listadas em CORS_ORIGINS podem chamar de fora.
+app.use(cors({
+  origin(origin, callback) {
+    callback(null, !origin || config.CORS_ORIGINS.includes(origin) ? true : false);
+  }
+}));
+
+// Rotas de autenticação recebem corpo pequeno (16 KB) e ficam ANTES do parser global de 2 MB.
+app.use('/api/auth', express.json({ limit: '16kb' }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -23,7 +47,8 @@ app.use('/api', (req, res, next) => {
 // Rotas da API REST
 app.use('/api/auth', authRoutes);
 app.use('/api/media', mediaRoutes);
-app.use('/api/user', userRoutes);
+// A biblioteca só serve contas que ainda existem (conta excluída / senha trocada derrubam sessões antigas).
+app.use('/api/user', requireActiveUser, userRoutes);
 
 // Rotas /api desconhecidas respondem JSON (não o index.html do fallback SPA)
 app.use('/api', (req, res) => {
@@ -42,7 +67,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   const status = err.status || err.statusCode || 500;
   if (status >= 500) console.error('Erro não tratado:', err);
-  res.status(status).json({ error: status >= 500 ? 'Erro interno do servidor.' : 'Requisição inválida.' });
+  res.status(status).json({
+    error: status >= 500 ? 'Erro interno do servidor.' : status === 413 ? 'Requisição grande demais.' : 'Requisição inválida.'
+  });
 });
 
 module.exports = app;
