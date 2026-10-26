@@ -4,7 +4,7 @@
     "createdAt": "2026-10-25T00:00:00.000Z",
     "name": "Usuario Demo",
     "email": "demo@showvault.local",
-    "password": "demo",
+    "password": "75065aa559a9429a4943a195891170b6:7a5451b4191e0e8d774a9bdd2b7789be838f0643755766578c0dd9d34b79c3f06b86cdd510ebaa7c344b73213c992529f9978ae2722e25ac73968ee259688554",
     "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=demo%40showvault.local",
     "provider": "email"
   }

@@ -22,6 +22,10 @@ class ApiClient {
         ...options
       });
       const data = await res.json();
+      if (res.status === 401 && endpoint !== '/auth/login' && localStorage.getItem('showvault_auth_token')) {
+        localStorage.removeItem('showvault_auth_token');
+        window.dispatchEvent(new CustomEvent('showvault:auth-expired'));
+      }
       if (!res.ok) {
         throw new Error(data.error || 'Erro na requisição à API.');
       }
@@ -76,6 +80,18 @@ class ApiClient {
 
   async getMe() {
     return this.request('/auth/me');
+  }
+
+  // --- BIBLIOTECA DO USUÁRIO ---
+  async getLibrary() {
+    return this.request('/user/library');
+  }
+
+  async putLibrary(data) {
+    return this.request('/user/library', {
+      method: 'PUT',
+      body: JSON.stringify({ data })
+    });
   }
 }
 

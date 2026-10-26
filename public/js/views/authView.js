@@ -33,6 +33,12 @@ class AuthView {
 
     // Logout
     document.getElementById('btn-logout').addEventListener('click', () => this.handleLogout());
+
+    // Token rejeitado pelo servidor (expirado/inválido)
+    window.addEventListener('showvault:auth-expired', () => {
+      window.syncService.stop();
+      this.updateHeader(null);
+    });
   }
 
   async checkSession() {
@@ -46,6 +52,7 @@ class AuthView {
       const res = await window.apiClient.getMe();
       if (res && res.user) {
         this.updateHeader(res.user);
+        window.syncService.pullAndMerge();
       }
     } catch {
       localStorage.removeItem('showvault_auth_token');
@@ -100,6 +107,7 @@ class AuthView {
       localStorage.setItem('showvault_auth_token', res.token);
       this.updateHeader(res.user);
       this.close();
+      window.syncService.pullAndMerge();
       window.appController.showToast(`Bem-vindo, ${res.user.name}! Conectado via Google.`, 'success');
     } catch (err) {
       window.appController.showToast(err.message, 'error');
@@ -122,6 +130,7 @@ class AuthView {
       localStorage.setItem('showvault_auth_token', res.token);
       this.updateHeader(res.user);
       this.close();
+      window.syncService.pullAndMerge();
       window.appController.showToast(res.message, 'success');
     } catch (err) {
       window.appController.showToast(err.message, 'error');
@@ -130,6 +139,7 @@ class AuthView {
 
   handleLogout() {
     if (confirm('Deseja sair da sua conta? Seus dados continuam gravados com segurança local no seu navegador.')) {
+      window.syncService.stop();
       localStorage.removeItem('showvault_auth_token');
       this.updateHeader(null);
       window.appController.showToast('Sessão encerrada.', 'info');
@@ -139,18 +149,17 @@ class AuthView {
   updateHeader(user) {
     const btnOpen = document.getElementById('btn-open-auth');
     const profile = document.getElementById('user-logged-profile');
-    const syncLabel = document.getElementById('sync-label');
 
     if (user) {
       btnOpen.classList.add('hidden');
       profile.classList.remove('hidden');
       document.getElementById('user-display-name').textContent = user.name;
       document.getElementById('user-avatar-img').src = user.avatar;
-      syncLabel.textContent = user.provider === 'google' ? 'Google Nuvem' : 'Nuvem Ativa';
+      window.syncService.setBaseLabel(user.provider === 'google' ? 'Google Nuvem' : 'Nuvem Ativa');
     } else {
       btnOpen.classList.remove('hidden');
       profile.classList.add('hidden');
-      syncLabel.textContent = 'Local-First';
+      window.syncService.setBaseLabel('Local-First');
     }
   }
 }

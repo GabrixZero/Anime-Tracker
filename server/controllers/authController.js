@@ -1,4 +1,6 @@
 ﻿const UserModel = require('../models/UserModel');
+const config = require('../config/config');
+const { issueToken } = require('../middleware/auth');
 
 class AuthController {
   async register(req, res) {
@@ -27,7 +29,7 @@ class AuthController {
       return res.status(201).json({
         message: 'Conta criada com sucesso!',
         user: safeUser,
-        token: 'token_' + user.id
+        token: issueToken(user)
       });
     } catch (err) {
       console.error('Erro no cadastro:', err);
@@ -47,11 +49,15 @@ class AuthController {
         return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
       }
 
+      if (UserModel.isLegacyPassword(user.password)) {
+        UserModel.updatePassword(user.id, password);
+      }
+
       const { password: _, ...safeUser } = user;
       return res.json({
         message: 'Login realizado com sucesso!',
         user: safeUser,
-        token: 'token_' + user.id
+        token: issueToken(user)
       });
     } catch (err) {
       console.error('Erro no login:', err);
@@ -61,10 +67,19 @@ class AuthController {
 
   async googleAuth(req, res) {
     try {
+      // Login Google ainda é simulado (confia no e-mail enviado pelo cliente);
+      // fica desligado em produção até a validação real do ID token (Roadmap P2).
+      if (config.IS_PRODUCTION) {
+        return res.status(501).json({ error: 'Login com Google indisponível.' });
+      }
+
       const { email, name, avatar } = req.body;
       const userEmail = (email || 'demo.google@showvault.local').toLowerCase();
 
       let user = UserModel.findByEmail(userEmail);
+      if (user && user.provider !== 'google') {
+        return res.status(403).json({ error: 'Este e-mail pertence a uma conta com senha. Entre com e-mail e senha.' });
+      }
       if (!user) {
         user = UserModel.create({
           name: name || 'Usuário Google',
@@ -78,7 +93,7 @@ class AuthController {
       return res.json({
         message: 'Autenticado via Google com sucesso!',
         user: safeUser,
-        token: 'token_' + user.id
+        token: issueToken(user)
       });
     } catch (err) {
       console.error('Erro no Google Auth:', err);
@@ -87,13 +102,7 @@ class AuthController {
   }
 
   async me(req, res) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: 'Não autenticado.' });
-    }
-
-    const userId = authHeader.replace('Bearer token_', '').replace('token_', '');
-    const user = UserModel.findById(userId);
+    const user = UserModel.findById(req.userId);
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
