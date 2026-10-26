@@ -24,3 +24,6 @@ server/data/mediaCatalog.json
 server/data/*.bak
 server/data/*.tmp
 server/data/*.corrupt-*
+
+# Worktrees temporarias dos agentes do Claude
+.claude/worktrees/
