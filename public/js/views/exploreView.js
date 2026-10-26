@@ -11,15 +11,6 @@ class ExploreView {
     this.bindEvents();
   }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
 
   bindEvents() {
     // Filtros de Categoria (Todos, Séries, Animes, Filmes)
@@ -75,7 +66,7 @@ class ExploreView {
 
       this.render(items);
     } catch (err) {
-      this.container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--accent-rose);">Erro ao carregar dados da API: ${err.message}</div>`;
+      this.container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--accent-rose);">Erro ao carregar dados da API: ${escapeHtml(err.message)}</div>`;
     }
   }
 
@@ -94,34 +85,34 @@ class ExploreView {
 
       return `
         <div class="show-card">
-          <div class="show-poster-wrap" onclick="window.detailModalView.open(${item.id})">
+          <div class="show-poster-wrap" onclick="window.detailModalView.open(${toInt(item.id)})">
             <img class="show-poster" 
-                 src="${this.escapeHtml(item.poster_path)}" 
-                 alt="${this.escapeHtml(item.name)}" 
+                 src="${safeSrc(item.poster_path) || fallbackPoster}" 
+                 alt="${escapeHtml(item.name)}" 
                  loading="lazy"
                  onerror="this.onerror=null; this.src='${fallbackPoster}';">
-            <div class="show-rating-badge">★ ${item.vote_average ? item.vote_average.toFixed(1) : '8.0'}</div>
+            <div class="show-rating-badge">★ ${formatRating(item.vote_average, '–')}</div>
           </div>
 
           <div class="show-info">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
               ${typeBadge}
-              <span style="font-size: 0.72rem; color: var(--text-muted);">${item.first_air_date ? item.first_air_date.slice(0, 4) : ''}</span>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(item.first_air_date ? String(item.first_air_date).slice(0, 4) : '')}</span>
             </div>
 
-            <h4 class="show-title" title="${this.escapeHtml(item.name)}" onclick="window.detailModalView.open(${item.id})">${this.escapeHtml(item.name)}</h4>
+            <h4 class="show-title" title="${escapeHtml(item.name)}" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</h4>
             <div class="show-meta-line">
-              <span>${isMovie ? `${item.runtime || 120} min` : `${item.seasons ? item.seasons.length : 1} temp.`}</span>
-              <span>${this.escapeHtml((item.genres || []).slice(0, 2).join(', '))}</span>
+              <span>${isMovie ? `${escapeHtml(item.runtime || 120)} min` : `${item.seasons ? item.seasons.length : 1} temp.`}</span>
+              <span>${escapeHtml((item.genres || []).slice(0, 2).join(', '))}</span>
             </div>
 
             <div style="margin-top: auto; padding-top: 0.5rem;">
               ${isTracked ? `
-                <button class="btn btn-sm btn-secondary" style="width: 100%;" onclick="window.detailModalView.open(${item.id})">
+                <button class="btn btn-sm btn-secondary" style="width: 100%;" onclick="window.detailModalView.open(${toInt(item.id)})">
                   Ver no Cofre
                 </button>
               ` : `
-                <button class="btn btn-sm btn-primary" style="width: 100%;" onclick="window.appController.addToList(${item.id})">
+                <button class="btn btn-sm btn-primary" style="width: 100%;" onclick="window.appController.addToList(${toInt(item.id)})">
                   + Adicionar à Lista
                 </button>
               `}

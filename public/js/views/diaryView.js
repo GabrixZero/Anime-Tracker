@@ -113,32 +113,34 @@ class DiaryView {
       disappointed: '😡 Decepcionado'
     };
 
+    const fallbackThumb = 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';
+
     this.container.innerHTML = filtered.map(e => {
       const formattedDate = new Date(e.updatedAt).toLocaleDateString('pt-BR', {
         day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
       });
 
-      const headerText = e.isMovie ? `${e.name} · Filme` : `${e.name} · T${e.seasonNum}:E${e.epNum}`;
+      const headerText = escapeHtml(e.isMovie ? `${e.name} · Filme` : `${e.name} · T${e.seasonNum}:E${e.epNum}`);
 
       return `
         <div class="diary-entry-card" style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; gap: 1.5rem; margin-bottom: 1.25rem;">
-          <img src="${e.stillPath}" alt="${this.escapeHtml(e.epTitle)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" style="width: 140px; height: 90px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0;" loading="lazy">
+          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="${escapeHtml(e.epTitle)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" style="width: 140px; height: 90px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0;" loading="lazy">
           
           <div style="flex: 1; display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
               <span style="font-size: 0.8rem; font-weight: 700; color: var(--tvtime-yellow); text-transform: uppercase;">${headerText}</span>
-              ${e.emotion ? `<span style="font-size: 0.78rem; background: rgba(255,255,255,0.06); padding: 0.2rem 0.55rem; border-radius: var(--radius-full);">${emotionLabels[e.emotion] || e.emotion}</span>` : ''}
+              ${e.emotion ? `<span style="font-size: 0.78rem; background: rgba(255,255,255,0.06); padding: 0.2rem 0.55rem; border-radius: var(--radius-full);">${escapeHtml(emotionLabels[e.emotion] || e.emotion)}</span>` : ''}
             </div>
 
-            <h4 style="font-family: var(--font-display); font-size: 1.15rem; color: #ffffff; margin-bottom: 0.4rem;">${e.epTitle}</h4>
+            <h4 style="font-family: var(--font-display); font-size: 1.15rem; color: #ffffff; margin-bottom: 0.4rem;">${escapeHtml(e.epTitle)}</h4>
 
-            ${e.character ? `<div style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.12); color: var(--accent-cyan); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-bottom: 0.5rem; width: fit-content;">Destaque: ${this.escapeHtml(e.character)}</div>` : ''}
+            ${e.character ? `<div style="font-size: 0.75rem; background: rgba(56, 189, 248, 0.12); color: var(--accent-cyan); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-bottom: 0.5rem; width: fit-content;">Destaque: ${escapeHtml(e.character)}</div>` : ''}
 
-            <div style="font-size: 0.92rem; color: #e2e8f0; line-height: 1.55; background: rgba(0,0,0,0.25); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--tvtime-yellow); margin-bottom: 0.65rem; white-space: pre-wrap;">${this.escapeHtml(e.text)}</div>
+            <div style="font-size: 0.92rem; color: #e2e8f0; line-height: 1.55; background: rgba(0,0,0,0.25); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--tvtime-yellow); margin-bottom: 0.65rem; white-space: pre-wrap;">${escapeHtml(e.text)}</div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); margin-top: auto;">
               <span>Gravado em: ${formattedDate}</span>
-              <button class="btn btn-sm btn-ghost" onclick="window.detailModalView.openNote(${e.showId}, ${e.seasonNum || null}, ${e.epNum || null})">Editar</button>
+              <button class="btn btn-sm btn-ghost" onclick="window.detailModalView.openNote(${toInt(e.showId)}, ${toInt(e.seasonNum) || null}, ${toInt(e.epNum) || null})">Editar</button>
             </div>
           </div>
         </div>
@@ -146,10 +148,6 @@ class DiaryView {
     }).join('');
   }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-  }
 
   exportMarkdown() {
     let md = `# Meu Diário de Obras · ShowVault\n*Exportado em: ${new Date().toLocaleString('pt-BR')}*\n\n---\n\n`;
