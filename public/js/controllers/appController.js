@@ -148,19 +148,19 @@ class AppController {
         reader.onload = (ev) => {
           try {
             const parsed = JSON.parse(ev.target.result);
-            const data = parsed.database || parsed;
-            if (data.trackedShows && data.watchedEpisodes) {
-              window.appState.data = data;
-              window.appState.save();
-              this.refreshAll();
-              modal.classList.add('hidden');
-              this.showToast('Backup restaurado com sucesso!', 'success');
-            }
-          } catch {
-            this.showToast('Arquivo de backup inválido.', 'error');
+            const data = window.validateBackup(parsed.database || parsed);
+            window.appState.data = data;
+            window.appState.save();
+            this.refreshAll();
+            modal.classList.add('hidden');
+            this.showToast('Backup restaurado com sucesso!', 'success');
+          } catch (err) {
+            const isFormat = err instanceof SyntaxError;
+            this.showToast(isFormat ? 'Arquivo de backup inválido.' : (err.message || 'Arquivo de backup inválido.'), 'error');
           }
         };
         reader.readAsText(e.target.files[0]);
+        e.target.value = ''; // permite escolher o mesmo arquivo de novo
       }
     });
 
@@ -179,7 +179,12 @@ class AppController {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : ''}`;
-    toast.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span><span>${message}</span>`;
+    // textContent: a mensagem pode trazer nome de usuário ou erro do servidor (nunca interpretar como HTML)
+    const icon = document.createElement('span');
+    icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+    const text = document.createElement('span');
+    text.textContent = String(message);
+    toast.append(icon, text);
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';

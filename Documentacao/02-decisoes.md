@@ -27,6 +27,12 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
 - **D-10 · 2026-10-26 · Sessões paralelas coordenadas pelo GitHub:** status em `Documentacao/status/SNN.json` (verdade em `origin/main`), dependências em `status/grafo.json`,
   `npm run status` decide se uma seção pode iniciar; a branch `feature/sNN-*` empurrada ao abrir reserva a seção; diário em um arquivo por sessão. Detalhes em `06-coordenacao-entre-sessoes.md`.
 
+- **D-S01-1 · 2026-10-26 · Escapar na saída (frontend) e sanear na entrada (servidor), as duas coisas.** O frontend nunca confia no catálogo (`escapeHtml`/`safeUrl` em toda interpolação);
+  o servidor remove HTML de dados externos na ingestão como defesa em profundidade. Motivo: o TVMaze é editável por qualquer pessoa e o catálogo é compartilhado.
+- **D-S01-2 · 2026-10-26 · Utilitários compartilhados em `public/js/utils/` como scripts clássicos "duais"** (expõem em `window` no navegador e `module.exports` no Node),
+  para serem testados com `node --test` sem criar etapa de build. `backupValidator.js` espelha `LibraryModel.validate`; um teste garante que os dois não divergem (se mudar um, mude o outro).
+- **D-S01-2b · 2026-10-26 · URLs de imagem:** só `http(s)` e `data:image/*`; qualquer outra vira imagem reserva. Ids em `onclick` passam por `toInt`.
+
 ## Pendentes (perguntar ao Gabriel na sessão indicada)
 
 - **P-01 · S02 ·** Esquema de ids para evitar colisão TMDB × TVMaze (ex.: faixas por fonte) e migração das obras já ingeridas e das bibliotecas existentes.

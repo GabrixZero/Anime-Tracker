@@ -60,3 +60,14 @@ Dependências *soft* (só avisam): S02 ← S01 · S07 ← S05 · S09 ← S06 · 
 | `server/services/mediaService.js` | S01 (sanitizador), S02, S06, S09 |
 | `server/models/UserModel.js`, `authController.js`, `server.js` | S02, S04, S10 |
 | `package.json` / `package-lock.json` | S04, S09, S10 (conflitos de lock: refaça com `npm install` após o merge) |
+
+## Uma pasta por sessão (aprendido na S01)
+
+Duas sessões na **mesma pasta** brigam pelo `HEAD`: uma troca de branch por baixo da outra e as mudanças não commitadas se misturam (aconteceu na S01).
+Se for rodar sessões em paralelo, cada uma deve trabalhar num **worktree próprio**:
+
+```bash
+git worktree add ../showvault-sNN feature/sNN-<slug>     # (crie a branch antes com: git branch feature/sNN-<slug> origin/develop)
+```
+
+`node_modules` pode ser ligado ao do projeto principal (junction/symlink) para não reinstalar. Remova o worktree no fim: `git worktree remove ../showvault-sNN`.

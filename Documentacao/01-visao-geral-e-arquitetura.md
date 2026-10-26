@@ -34,7 +34,8 @@ Com `NODE_ENV=production` sem `JWT_SECRET` o servidor se recusa a iniciar.
 | `server/models/UserModel.js` | usuários em `server/data/users.json` (scrypt `salt:hash`, migra senha legada no login) |
 | `server/models/LibraryModel.js` | biblioteca por usuário em `server/data/libraries/<userId>.json`; valida e grava de forma atômica |
 | `server/controllers/userController.js` + `routes/userRoutes.js` | `GET/PUT /api/user/library` (exigem login) |
-| `server/services/mediaService.js` | catálogo `server/data/mediaCatalog.json` + busca externa TVMaze + `ingest(id)` |
+| `server/services/mediaService.js` | catálogo `server/data/mediaCatalog.json` + busca externa TVMaze + `ingest(id)` (dados externos passam por `utils/sanitize.js`) |
+| `server/utils/sanitize.js` | `stripHtml`, `stripHtmlList`, `safeHttpUrl`: tiram HTML/URLs perigosas de dados externos (S01) |
 | `server/controllers/mediaController.js` + `routes/mediaRoutes.js` | `/api/media/trending`, `/search`, `/ingest`, `/:id` (rota `/:id` é a última) |
 
 Dados em disco (`server/data/`): `mediaCatalog.json` (versionado, mas reescrito em runtime), `users.example.json` (modelo versionado),
@@ -43,11 +44,13 @@ Dados em disco (`server/data/`): `mediaCatalog.json` (versionado, mas reescrito 
 ## Mapa do frontend (`public/`)
 
 Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
-`apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
+`utils/dom.js` → `utils/backupValidator.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
 `statsView.js` → `exploreView.js` → `detailModalView.js` → `appController.js`.
 
 | Arquivo | Papel |
 |---|---|
+| `js/utils/dom.js` | anti-XSS: `escapeHtml`, `safeUrl`/`safeSrc`, `cssUrl`, `toInt`, `formatRating`. **Todo valor de catálogo/usuário/erro interpolado em HTML passa por aqui** (também roda em Node nos testes) |
+| `js/utils/backupValidator.js` | `validateBackup`: valida o backup importado (espelha `LibraryModel.validate`) |
 | `js/api/apiClient.js` | `fetch` para `/api`, envia `Authorization: Bearer` (token em `localStorage['showvault_auth_token']`), trata 401 |
 | `js/models/state.js` | `AppState`: dados em `localStorage['showvault_state_mvc_v1']` = `{trackedShows, watchedEpisodes, episodeNotes}`; `mediaMap` em memória; `save()` dispara o sync; flag `seeded` (estado demo nunca editado) |
 | `js/services/syncService.js` | push com debounce (1,5 s) e `pullAndMerge()` no login; merge por união |

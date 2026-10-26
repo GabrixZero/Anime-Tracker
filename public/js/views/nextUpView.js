@@ -12,15 +12,6 @@ class NextUpView {
     this.bindEvents();
   }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
 
   bindEvents() {
     document.querySelectorAll('#view-next-up .type-pill-btn').forEach(btn => {
@@ -174,32 +165,32 @@ class NextUpView {
 
     return `
       <div class="next-up-card">
-        <div class="next-up-thumb-wrap" onclick="window.detailModalView.open(${item.showId})">
+        <div class="next-up-thumb-wrap" onclick="window.detailModalView.open(${toInt(item.showId)})">
           <img class="next-up-thumb" 
-               src="${this.escapeHtml(item.still_path)}" 
-               alt="${this.escapeHtml(item.title)}" 
+               src="${safeSrc(item.still_path) || fallbackThumb}" 
+               alt="${escapeHtml(item.title)}" 
                loading="lazy"
                onerror="this.onerror=null; this.src='${fallbackThumb}';">
-          <span class="next-up-badge">${codeBadge}</span>
-          <span class="next-up-runtime">${item.runtime} min</span>
+          <span class="next-up-badge">${escapeHtml(codeBadge)}</span>
+          <span class="next-up-runtime">${escapeHtml(item.runtime)} min</span>
         </div>
         
         <div class="next-up-info">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-            <span class="next-up-show-name" onclick="window.detailModalView.open(${item.showId})">${this.escapeHtml(item.showName)}</span>
+            <span class="next-up-show-name" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.showName)}</span>
             ${typeBadge}
           </div>
 
-          <h4 class="next-up-ep-title" onclick="window.detailModalView.open(${item.showId})">${this.escapeHtml(item.title)}</h4>
-          <p class="next-up-overview">${this.escapeHtml(item.overview || 'Sem descrição cadastrada.')}</p>
+          <h4 class="next-up-ep-title" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.title)}</h4>
+          <p class="next-up-overview">${escapeHtml(item.overview || 'Sem descrição cadastrada.')}</p>
           
           <div class="next-up-footer">
-            <button class="btn-check-episode" onclick="window.appController.quickCheck(${item.showId}, ${item.seasonNumber || null}, ${item.episodeNumber || null})">
+            <button class="btn-check-episode" onclick="window.appController.quickCheck(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
               <span>Assistido</span>
             </button>
             
-            <button class="btn-quick-note" onclick="window.detailModalView.openNote(${item.showId}, ${item.seasonNumber || null}, ${item.episodeNumber || null})" title="Anotar no Diário">
+            <button class="btn-quick-note" onclick="window.detailModalView.openNote(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})" title="Anotar no Diário">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </button>
           </div>

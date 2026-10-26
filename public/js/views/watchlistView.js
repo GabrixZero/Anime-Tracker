@@ -12,15 +12,6 @@ class WatchlistView {
     this.bindEvents();
   }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
 
   bindEvents() {
     document.querySelectorAll('#watchlist-filters .pill-btn').forEach(btn => {
@@ -117,26 +108,26 @@ class WatchlistView {
           : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
         return `
-          <div class="show-card" onclick="window.detailModalView.open(${media.id})">
+          <div class="show-card" onclick="window.detailModalView.open(${toInt(media.id)})">
             <div class="show-poster-wrap">
               <img class="show-poster" 
-                   src="${this.escapeHtml(media.poster_path)}" 
-                   alt="${this.escapeHtml(media.name)}" 
+                   src="${safeSrc(media.poster_path) || fallbackPoster}" 
+                   alt="${escapeHtml(media.name)}" 
                    loading="lazy"
                    onerror="this.onerror=null; this.src='${fallbackPoster}';">
-              <div class="show-rating-badge">★ ${media.vote_average ? media.vote_average.toFixed(1) : '8.0'}</div>
+              <div class="show-rating-badge">★ ${formatRating(media.vote_average, '–')}</div>
             </div>
             
             <div class="show-info">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
                 ${typeBadge}
-                <span style="font-size: 0.72rem; color: var(--text-muted);">${media.first_air_date ? media.first_air_date.slice(0, 4) : ''}</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(media.first_air_date ? String(media.first_air_date).slice(0, 4) : '')}</span>
               </div>
 
-              <h4 class="show-title" title="${this.escapeHtml(media.name)}">${this.escapeHtml(media.name)}</h4>
+              <h4 class="show-title" title="${escapeHtml(media.name)}">${escapeHtml(media.name)}</h4>
               <div class="show-meta-line">
-                <span>${isMovie ? `${media.runtime} min` : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
-                <span>${this.escapeHtml(media.status || '')}</span>
+                <span>${isMovie ? `${escapeHtml(media.runtime)} min` : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
+                <span>${escapeHtml(media.status || '')}</span>
               </div>
 
               <div class="show-progress-wrap">

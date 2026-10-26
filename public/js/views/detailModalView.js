@@ -109,27 +109,27 @@ class DetailModalView {
       : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
     const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
-    header.style.backgroundImage = `url('${media.backdrop_path || media.poster_path}')`;
+    header.style.backgroundImage = cssUrl(safeUrl(media.backdrop_path) || media.poster_path);
     header.innerHTML = `
-      <img class="modal-poster" src="${media.poster_path}" alt="${this.escapeHtml(media.name)}" onerror="this.onerror=null; this.src='${fallbackPoster}';" style="width: 140px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
+      <img class="modal-poster" src="${safeSrc(media.poster_path) || fallbackPoster}" alt="${escapeHtml(media.name)}" onerror="this.onerror=null; this.src='${fallbackPoster}';" style="width: 140px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
       <div style="flex: 1;">
         <div style="margin-bottom: 0.4rem;">${typeBadge}</div>
-        <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: #ffffff; line-height: 1.15; margin-bottom: 0.5rem;">${media.name}</h2>
+        <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: #ffffff; line-height: 1.15; margin-bottom: 0.5rem;">${escapeHtml(media.name)}</h2>
         <div style="display: flex; gap: 0.85rem; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          <span>★ <strong>${media.vote_average.toFixed(1)}</strong></span>
+          <span>★ <strong>${formatRating(media.vote_average)}</strong></span>
           <span>•</span>
-          <span>${media.first_air_date ? media.first_air_date.slice(0, 4) : ''}</span>
+          <span>${escapeHtml(media.first_air_date ? String(media.first_air_date).slice(0, 4) : '')}</span>
           <span>•</span>
-          <span>${(media.genres || []).join(', ')}</span>
-          ${media.runtime ? `<span>•</span><span>${media.runtime} min</span>` : ''}
+          <span>${escapeHtml((media.genres || []).join(', '))}</span>
+          ${media.runtime ? `<span>•</span><span>${escapeHtml(media.runtime)} min</span>` : ''}
         </div>
-        <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.55; margin-bottom: 1.25rem;">${media.overview || 'Sem sinopse.'}</p>
+        <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.55; margin-bottom: 1.25rem;">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
         
         <div style="display: flex; gap: 0.75rem;">
           ${window.appState.data.trackedShows.some(t => t.showId === media.id) ? `
-            <button class="btn btn-sm btn-secondary" onclick="window.appController.removeFromList(${media.id})">Remover da Lista</button>
+            <button class="btn btn-sm btn-secondary" onclick="window.appController.removeFromList(${toInt(media.id)})">Remover da Lista</button>
           ` : `
-            <button class="btn btn-sm btn-primary" onclick="window.appController.addToList(${media.id})">+ Adicionar à Lista</button>
+            <button class="btn btn-sm btn-primary" onclick="window.appController.addToList(${toInt(media.id)})">+ Adicionar à Lista</button>
           `}
         </div>
       </div>
@@ -147,15 +147,15 @@ class DetailModalView {
         <div class="movie-actions-box">
           <div>
             <h4>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h4>
-            <p>Duração: ${media.runtime || 120} minutos computados nas estatísticas de vida ao marcar.</p>
-            ${hasNote ? `<p style="color: var(--tvtime-yellow); margin-top: 0.4rem; font-weight: 600;">"${this.escapeHtml(note.text.slice(0, 75))}..."</p>` : ''}
+            <p>Duração: ${escapeHtml(media.runtime || 120)} minutos computados nas estatísticas de vida ao marcar.</p>
+            ${hasNote ? `<p style="color: var(--tvtime-yellow); margin-top: 0.4rem; font-weight: 600;">"${escapeHtml(note.text.slice(0, 75))}..."</p>` : ''}
           </div>
 
           <div class="movie-btn-group">
-            <button class="btn ${isWatched ? 'btn-secondary' : 'btn-primary'}" onclick="window.appController.quickCheck(${media.id})">
+            <button class="btn ${isWatched ? 'btn-secondary' : 'btn-primary'}" onclick="window.appController.quickCheck(${toInt(media.id)})">
               ${isWatched ? 'Desmarcar Filme' : '✓ Marcar como Assistido'}
             </button>
-            <button class="btn btn-outline" onclick="window.detailModalView.openNote(${media.id})">
+            <button class="btn btn-outline" onclick="window.detailModalView.openNote(${toInt(media.id)})">
               ${hasNote ? 'Editar Anotação' : 'Anotar no Diário'}
             </button>
           </div>
@@ -188,8 +188,8 @@ class DetailModalView {
 
       return `
         <button class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" 
-                onclick="window.detailModalView.switchSeason(${s.season_number})" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.55rem 1rem; font-size: 0.85rem; font-weight: 700; color: ${s.season_number === this.currentSeasonNum ? '#0b0c10' : 'var(--text-secondary)'}; background: ${s.season_number === this.currentSeasonNum ? 'var(--tvtime-yellow)' : 'var(--bg-surface)'}; cursor: pointer;">
-          ${s.name || `Temporada ${s.season_number}`} (${watched}/${total})
+                onclick="window.detailModalView.switchSeason(${toInt(s.season_number)})" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.55rem 1rem; font-size: 0.85rem; font-weight: 700; color: ${s.season_number === this.currentSeasonNum ? '#0b0c10' : 'var(--text-secondary)'}; background: ${s.season_number === this.currentSeasonNum ? 'var(--tvtime-yellow)' : 'var(--bg-surface)'}; cursor: pointer;">
+          ${escapeHtml(s.name || `Temporada ${s.season_number}`)} (${watched}/${total})
         </button>
       `;
     }).join('');
@@ -222,6 +222,8 @@ class DetailModalView {
 
     summary.innerHTML = `Progresso da Temporada: <strong>${watched}/${season.episodes.length} assistidos</strong>`;
 
+    const fallbackEpisodeThumb = 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';
+
     container.innerHTML = season.episodes.map(ep => {
       const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
       const note = window.appState.getNote(media.id, season.season_number, ep.episode_number);
@@ -229,20 +231,20 @@ class DetailModalView {
 
       return `
         <div class="episode-row ${isWatched ? 'watched' : ''}" style="display: flex; align-items: center; gap: 1.25rem; padding: 0.9rem 1.1rem; background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); margin-bottom: 0.85rem; border-left: ${isWatched ? '3px solid var(--tvtime-yellow)' : '1px solid var(--bg-card-border)'};">
-          <div style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid ${isWatched ? 'var(--tvtime-yellow)' : 'var(--text-muted)'}; display: flex; align-items: center; justify-content: center; cursor: pointer; background: ${isWatched ? 'var(--tvtime-yellow)' : 'transparent'}; color: #0b0c10; font-weight: 800; font-size: 13px;" onclick="window.appController.quickCheck(${media.id}, ${season.season_number}, ${ep.episode_number})">
+          <div style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid ${isWatched ? 'var(--tvtime-yellow)' : 'var(--text-muted)'}; display: flex; align-items: center; justify-content: center; cursor: pointer; background: ${isWatched ? 'var(--tvtime-yellow)' : 'transparent'}; color: #0b0c10; font-weight: 800; font-size: 13px;" onclick="window.appController.quickCheck(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
             ${isWatched ? '✓' : ''}
           </div>
 
-          <img src="${ep.still_path || media.backdrop_path || media.poster_path}" alt="${this.escapeHtml(ep.name)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" style="width: 80px; height: 50px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" loading="lazy">
+          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="${escapeHtml(ep.name)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" style="width: 80px; height: 50px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" loading="lazy">
 
           <div style="flex: 1;">
-            <span style="font-size: 0.76rem; font-weight: 700; color: var(--tvtime-yellow); text-transform: uppercase;">E${ep.episode_number} · ${ep.air_date ? ep.air_date.slice(0, 10) : ''}</span>
-            <div style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">${this.escapeHtml(ep.name)}</div>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">${ep.runtime || 45} min</span>
+            <span style="font-size: 0.76rem; font-weight: 700; color: var(--tvtime-yellow); text-transform: uppercase;">E${escapeHtml(ep.episode_number)} · ${escapeHtml(ep.air_date ? String(ep.air_date).slice(0, 10) : '')}</span>
+            <div style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">${escapeHtml(ep.name)}</div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(ep.runtime || 45)} min</span>
             ${hasNote ? `<span style="font-size: 0.75rem; background: rgba(255,208,0,0.12); color: var(--tvtime-yellow); padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">Anotação salva</span>` : ''}
           </div>
 
-          <button class="btn btn-sm btn-outline" onclick="window.detailModalView.openNote(${media.id}, ${season.season_number}, ${ep.episode_number})">
+          <button class="btn btn-sm btn-outline" onclick="window.detailModalView.openNote(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
             ${hasNote ? 'Ver/Editar' : 'Anotar'}
           </button>
         </div>
@@ -327,10 +329,6 @@ class DetailModalView {
     }, 350);
   }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-  }
 }
 
 window.detailModalView = new DetailModalView();

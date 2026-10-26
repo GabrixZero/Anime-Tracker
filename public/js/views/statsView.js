@@ -130,7 +130,7 @@ class StatsView {
         const pct = Math.round((count / maxGenre) * 100);
         return `
           <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.85rem;">
-            <span style="font-size: 0.84rem; font-weight: 600; width: 120px; color: var(--text-secondary);">${genre}</span>
+            <span style="font-size: 0.84rem; font-weight: 600; width: 120px; color: var(--text-secondary);">${escapeHtml(genre)}</span>
             <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;">
               <div style="height: 100%; border-radius: 99px; background: var(--accent-cyan); width: ${pct}%;"></div>
             </div>

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const config = require('../config/config');
+const { stripHtml, stripHtmlList, safeHttpUrl } = require('../utils/sanitize');
 
 class MediaService {
   constructor() {
@@ -102,14 +103,14 @@ class MediaService {
           externalResults.push({
             id: s.id,
             type: mediaType,
-            name: s.name,
-            overview: s.summary ? s.summary.replace(/<[^>]*>?/gm, '').trim() : 'Sem descrição cadastrada.',
-            poster_path: s.image ? (s.image.original || s.image.medium) : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500',
-            backdrop_path: s.image ? (s.image.original || s.image.medium) : 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600',
-            vote_average: s.rating?.average || 8.0,
-            first_air_date: s.premiered || '',
-            genres: (s.genres && s.genres.length) ? s.genres : ['Drama'],
-            status: s.status || 'Em Exibição',
+            name: stripHtml(s.name, 300),
+            overview: stripHtml(s.summary) || 'Sem descrição cadastrada.',
+            poster_path: safeHttpUrl(s.image && (s.image.original || s.image.medium), 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500'),
+            backdrop_path: safeHttpUrl(s.image && (s.image.original || s.image.medium), 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600'),
+            vote_average: Number(s.rating?.average) || 8.0,
+            first_air_date: stripHtml(s.premiered, 20),
+            genres: stripHtmlList(s.genres).length ? stripHtmlList(s.genres) : ['Drama'],
+            status: stripHtml(s.status, 40) || 'Em Exibição',
             isExternal: true
           });
         });
@@ -154,7 +155,7 @@ class MediaService {
     const rawEpisodes = data._embedded?.episodes || [];
 
     rawEpisodes.forEach(ep => {
-      const sNum = ep.season || 1;
+      const sNum = Number.isInteger(ep.season) ? ep.season : 1;
       if (!seasonsMap.has(sNum)) {
         seasonsMap.set(sNum, {
           season_number: sNum,
@@ -164,12 +165,12 @@ class MediaService {
       }
 
       seasonsMap.get(sNum).episodes.push({
-        episode_number: ep.number || 1,
-        name: ep.name || `Episódio ${ep.number}`,
-        runtime: ep.runtime || data.averageRuntime || 45,
-        air_date: ep.airdate || '',
-        overview: ep.summary ? ep.summary.replace(/<[^>]*>?/gm, '').trim() : '',
-        still_path: ep.image ? (ep.image.medium || ep.image.original) : (data.image?.original || '')
+        episode_number: Number.isInteger(ep.number) ? ep.number : 1,
+        name: stripHtml(ep.name, 300) || `Episódio ${ep.number}`,
+        runtime: Number(ep.runtime || data.averageRuntime) || 45,
+        air_date: stripHtml(ep.airdate, 20),
+        overview: stripHtml(ep.summary),
+        still_path: safeHttpUrl(ep.image && (ep.image.medium || ep.image.original), safeHttpUrl(data.image?.original))
       });
     });
 
@@ -179,14 +180,14 @@ class MediaService {
     const fullMedia = {
       id: data.id,
       type: mediaType,
-      name: data.name,
-      overview: data.summary ? data.summary.replace(/<[^>]*>?/gm, '').trim() : '',
-      poster_path: data.image ? (data.image.original || data.image.medium) : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500',
-      backdrop_path: data.image ? (data.image.original || data.image.medium) : 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600',
-      vote_average: data.rating?.average || 8.0,
-      first_air_date: data.premiered || '',
-      genres: (data.genres && data.genres.length) ? data.genres : ['Drama'],
-      status: data.status || 'Em Exibição',
+      name: stripHtml(data.name, 300),
+      overview: stripHtml(data.summary),
+      poster_path: safeHttpUrl(data.image && (data.image.original || data.image.medium), 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500'),
+      backdrop_path: safeHttpUrl(data.image && (data.image.original || data.image.medium), 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600'),
+      vote_average: Number(data.rating?.average) || 8.0,
+      first_air_date: stripHtml(data.premiered, 20),
+      genres: stripHtmlList(data.genres).length ? stripHtmlList(data.genres) : ['Drama'],
+      status: stripHtml(data.status, 40) || 'Em Exibição',
       seasons: Array.from(seasonsMap.values())
     };
 
