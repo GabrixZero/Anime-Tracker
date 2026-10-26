@@ -2,8 +2,8 @@
   "secao": "S02",
   "titulo": "Dados e catálogo (backend)",
   "arquivo": "Documentacao/secoes/S02-dados-e-catalogo.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s02-dados-e-catalogo",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
