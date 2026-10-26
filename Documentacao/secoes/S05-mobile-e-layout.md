@@ -28,8 +28,8 @@ inline no HTML, então as media queries não conseguem ajustá-lo.
 Navegador do app: `resize_window` preset `mobile` (375×812) e `tablet`; percorrer as 5 abas, abrir modal de detalhes, de anotação e de login; capturar prints antes/depois e
 rodar no console `document.documentElement.scrollWidth <= window.innerWidth`. Voltar o viewport para `desktop` ao terminar.
 
-## Decisões pendentes
-Nenhuma (se quiser alterar a identidade visual, perguntar ao Gabriel; por padrão manter tema escuro e amarelo atual).
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvida:** D-22 (manter identidade visual: tema escuro e amarelo).
 
 ## Critério de pronto
 Todas as abas e modais usáveis no celular sem overflow horizontal e com texto legível; desktop continua igual ou melhor.

@@ -26,8 +26,8 @@ Deixar o projeto sustentável (qualquer sessão futura altera sem medo) e public
 - [ ] Deploy (decisão P-09): escolher hospedagem e armazenamento persistente (SQLite com volume, ou Postgres); `Dockerfile`/`Procfile`, `/health`, variáveis de ambiente documentadas, passos de publicação. Migração dos JSON existentes.
 - [ ] Revisão final de segurança com a checklist de `01-visao-geral-e-arquitetura.md`.
 
-## Decisões pendentes
-P-09 (persistência e hospedagem). Perguntar ao Gabriel: onde pretende publicar, orçamento, e se o app será público ou só dele.
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvida:** D-21 (preparar sem publicar: Dockerfile, `/health`, env documentadas, persistência SQLite com migração dos JSON).
 
 ## Critério de pronto
 Zero `onclick`/estilo inline relevante; CSP ativa; CI verde no GitHub; README correto; app publicável com persistência e variáveis de ambiente documentadas.

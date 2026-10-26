@@ -27,7 +27,7 @@ no navegador de todos os usuários. Um título malicioso poderia executar script
 - [x] Testes: unidade do `escapeHtml/safeUrl` (rodável em Node) e do sanitizador do servidor; teste manual com uma obra de teste cujo nome é `<img src=x onerror=alert(1)>`.
 - [x] Varredura final: `grep -n '\${' public/js/views public/js/controllers | grep -i innerHTML` sem interpolação não escapada.
 
-## Decisões pendentes
+## Decisões (já resolvidas — não pergunte de novo)
 Nenhuma. (CSP estrita só será possível depois de remover os `onclick` inline — S10.)
 
 ## Critério de pronto

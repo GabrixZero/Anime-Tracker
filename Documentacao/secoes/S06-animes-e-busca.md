@@ -35,8 +35,8 @@ Foi a primeira tarefa P1 do roadmap original do Gabriel.
 - [ ] Unificar a detecção de anime no caminho TVMaze.
 - [ ] Decidir e (se aprovado) integrar filmes (P-07).
 
-## Decisões pendentes
-P-07 (filmes via TMDB?) e P-08 (modelagem das temporadas da MAL). Peça ao Gabriel antes de implementar.
+## Decisões (já resolvidas — não pergunte de novo)
+**Resolvidas:** D-17 (TMDB opcional via `TMDB_API_KEY`; sem chave segue catálogo local + TVMaze), D-18 (animes agrupados por franquia, em duas etapas), D-11 (faixas de ids por fonte vêm da S02).
 
 ## Critério de pronto
 Buscar "Frieren", "Naruto", "Attack on Titan" devolve cada obra uma única vez, em ordem relevante, com episódios importáveis e adição à lista funcionando;

@@ -33,15 +33,27 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
   para serem testados com `node --test` sem criar etapa de build. `backupValidator.js` espelha `LibraryModel.validate`; um teste garante que os dois não divergem (se mudar um, mude o outro).
 - **D-S01-2b · 2026-10-26 · URLs de imagem:** só `http(s)` e `data:image/*`; qualquer outra vira imagem reserva. Ids em `onclick` passam por `toInt`.
 
-## Pendentes (perguntar ao Gabriel na sessão indicada)
+- **D-11 · 2026-10-26 · (P-01) Catálogo recomeça do zero, ids por fonte.** Remover as 4 obras ingeridas do TVMaze (155 Beauty & the Beast, 555 Avatar, 13615 My Hero Academia, 495 Naruto)
+  e **restaurar o filme Batman (TMDB 155)**. Ids do seed (TMDB) ficam; cada fonte externa passa a ter faixa numérica própria (TVMaze, Jikan, TMDB-externo), definida na S02 e documentada em `01-visao-geral-e-arquitetura.md`.
+  Migração: remover das bibliotecas (servidor `server/data/libraries/*.json` e `localStorage`, via número de versão do estado) apenas as referências a essas 4 obras
+  (atenção: a chave `155_movie` é o Batman e deve ser mantida; `155_sX_eY` é a série antiga e deve ser removida). Não apagar bibliotecas inteiras.
+- **D-12 · 2026-10-26 · (P-02) Catálogo separado:** `server/data/mediaCatalog.seed.json` (versionado, só leitura) + catálogo de runtime ignorado pelo git (criado a partir do seed na primeira execução).
+- **D-13 · 2026-10-26 · (P-03) Remoções por marcas de exclusão (tombstones)** com data nos itens da biblioteca; o merge respeita a marca mais recente. `LibraryModel.validate` passa a aceitá-las.
+- **D-14 · 2026-10-26 · (P-04) Nota 1–5 do usuário: não agora** (backlog).
+- **D-15 · 2026-10-26 · (P-05) Segredo JWT:** fora de produção, gerar e persistir um segredo único em `server/data/` (ignorado pelo git); em produção exigir `JWT_SECRET` (já falha sem ele).
+- **D-16 · 2026-10-26 · (P-06) Google:** esconder o botão e remover o login falso; a integração real (Google Identity Services + validação do ID token no servidor) fica pronta, mas só aparece com `GOOGLE_CLIENT_ID` configurado.
+- **D-17 · 2026-10-26 · (P-07) Filmes e séries via TMDB** (títulos em PT-BR), com `TMDB_API_KEY` **opcional** no `.env`: sem chave o app segue com catálogo local + TVMaze. O Gabriel cria a chave gratuita em themoviedb.org depois; testes usam respostas simuladas.
+- **D-18 · 2026-10-26 · (P-08) Animes agrupados por franquia** (uma obra com várias temporadas, como nas séries), usando as relações da MAL. É a parte mais complexa da S06: entregar em duas etapas dentro da sessão
+  (1: busca/ingestão Jikan de obra única + deduplicação; 2: agrupamento por franquia) e registrar o que ficar para depois.
+- **D-19 · 2026-10-26 · (S08) Implementar** histórico de versões da anotação (restaurar em 1 clique) e Markdown simples com spoiler (sem HTML livre).
+- **D-20 · 2026-10-26 · (S09) PWA/service worker fica no backlog.**
+- **D-21 · 2026-10-26 · (P-09) Preparar sem publicar:** Dockerfile, `/health`, variáveis de ambiente documentadas e persistência em SQLite (arquivo único, pronto para volume persistente);
+  a hospedagem o Gabriel escolhe depois. Preferir `node:sqlite` embutido se o Node suportar de forma estável, senão `better-sqlite3`; migrar os JSON existentes.
+- **D-22 · 2026-10-26 · Padrões assumidos sem perguntar (o Gabriel pode reverter):** remover a conta demo do fluxo padrão (S04); estado inicial sem dados falsos — lista vazia com chamada para explorar e opção “Carregar exemplo” (S08);
+  manter a identidade visual atual, tema escuro e amarelo (S05); testes sempre sem tocar `server/data` real.
+- **D-23 · 2026-10-26 · Execução por subagentes** coordenados pela sessão principal: cada subagente trabalha numa worktree própria na branch `feature/sNN-*`, **não faz merge no main**;
+  a sessão principal confere, integra e faz o push até o `main`.
 
-- **P-01 · S02 ·** Esquema de ids para evitar colisão TMDB × TVMaze (ex.: faixas por fonte) e migração das obras já ingeridas e das bibliotecas existentes.
-  Recomendação: manter ids do seed; mover TVMaze para uma faixa própria e restaurar o filme Batman (155) no catálogo.
-- **P-02 · S02 ·** Catálogo: separar `mediaCatalog.seed.json` (versionado) de um arquivo de runtime ignorado pelo git? Recomendação: sim.
-- **P-03 · S03 ·** Como propagar remoções entre aparelhos (marcas de exclusão/tombstones vs. "servidor vence após o 1º sync").
-- **P-04 · S03 ·** Adicionar nota do usuário de 1 a 5 (o handover cita, mas não existe no modelo)?
-- **P-05 · S04 ·** `JWT_SECRET` ausente: falhar sempre, ou gerar e persistir um segredo local em `server/data/` (ignorado pelo git) para uso local? Recomendação: gerar/persistir local; falhar em produção.
-- **P-06 · S04 ·** Google: implementar de verdade (precisa de `GOOGLE_CLIENT_ID` criado pelo Gabriel no Google Cloud) ou esconder o botão até lá?
-- **P-07 · S06 ·** Filmes: TVMaze não tem filmes. Usar TMDB (a chave `TMDB_API_KEY` já está prevista e não é usada) ou ficar só com o catálogo local?
-- **P-08 · S06 ·** Modelagem de animes da MAL (uma entrada por temporada/cour): tratar cada entrada como obra separada ou agrupar por franquia?
-- **P-09 · S10 ·** Persistência em produção: arquivos JSON em disco efêmero perdem dados. Migrar para SQLite (volume persistente) ou outro banco? Escolher junto com a hospedagem.
+## Pendentes
+
+Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). Novas dúvidas devem ser levadas ao Gabriel pela sessão principal antes de disparar subagentes.

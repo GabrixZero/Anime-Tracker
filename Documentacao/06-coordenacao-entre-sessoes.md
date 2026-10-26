@@ -71,3 +71,13 @@ git worktree add ../showvault-sNN feature/sNN-<slug>     # (crie a branch antes 
 ```
 
 `node_modules` pode ser ligado ao do projeto principal (junction/symlink) para não reinstalar. Remova o worktree no fim: `git worktree remove ../showvault-sNN`.
+
+## Modo subagente (D-23)
+
+Quando a sessão principal dispara uma seção como **subagente** (worktree própria):
+
+- O subagente segue o protocolo, **exceto o passo de merge**: ele termina com a branch `feature/sNN-<slug>` **commitada e enviada ao GitHub**
+  (código + testes + `status/SNN.json` em `concluida` + `diario/` + docs atualizadas) e devolve um relatório curto: o que mudou, como verificar, o que ficou pendente, riscos.
+- Ele **não pode fazer perguntas ao Gabriel**: as decisões já estão em `02-decisoes.md`. Se algo for ambíguo, escolher o padrão mais conservador, **registrar em "Descobertas/Decisões" do diário** e seguir.
+- Ele **não faz merge em `develop`/`main` nem push nelas**; a sessão principal confere (diff, `npm test`, app rodando), integra as branches uma por vez (resolvendo conflitos) e faz o push até o `main`.
+- Cada subagente usa a porta do servidor de teste da sua seção (`PORT=30NN`), e remove usuários/arquivos de teste de `server/data` ao terminar.
