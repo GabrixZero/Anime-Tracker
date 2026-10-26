@@ -2,22 +2,30 @@
 const path = require('path');
 const crypto = require('crypto');
 const config = require('../config/config');
+const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
+const { DataCorruptionError } = require('../utils/errors');
 
 class UserModel {
-  constructor() {
-    this.filePath = path.join(config.DATA_DIR, 'users.json');
-    this.examplePath = path.join(config.DATA_DIR, 'users.example.json');
-    this.ensureFile();
+  constructor(dataDir = config.DATA_DIR) {
+    this.filePath = path.join(dataDir, 'users.json');
+    this.examplePath = path.join(dataDir, 'users.example.json');
+    try {
+      this.ensureFile();
+    } catch (err) {
+      // Não derruba o servidor, mas deixa o erro claro; getAll()/saveAll() falham enquanto o arquivo estiver ilegível.
+      console.error('[UserModel] Não foi possível preparar users.json:', err.message);
+    }
   }
 
+  // Cria users.json (a partir do exemplo versionado) só se NÃO existir. Arquivo ilegível nunca é recriado.
   ensureFile() {
-    if (!fs.existsSync(this.filePath)) {
-      if (fs.existsSync(this.examplePath)) {
-        fs.copyFileSync(this.examplePath, this.filePath);
-      } else {
-        fs.writeFileSync(this.filePath, JSON.stringify([]), 'utf-8');
-      }
+    if (readJson(this.filePath) !== null) return;
+    let initial = [];
+    if (fs.existsSync(this.examplePath)) {
+      const example = readJson(this.examplePath);
+      if (example && Array.isArray(example.data)) initial = example.data;
     }
+    writeJsonAtomic(this.filePath, initial);
   }
 
   hashPassword(password) {
@@ -54,17 +62,20 @@ class UserModel {
     return true;
   }
 
+  // Lança DataCorruptionError se users.json existir mas estiver ilegível (e sem .bak válido): nunca devolve [] nesse caso,
+  // senão o próximo cadastro sobrescreveria todas as contas.
   getAll() {
-    try {
-      const data = fs.readFileSync(this.filePath, 'utf-8');
-      return JSON.parse(data);
-    } catch {
-      return [];
+    const result = readJson(this.filePath);
+    if (result === null) return [];
+    if (!Array.isArray(result.data)) {
+      throw new DataCorruptionError(this.filePath, new Error('users.json não é uma lista'));
     }
+    return result.data;
   }
 
   saveAll(users) {
-    fs.writeFileSync(this.filePath, JSON.stringify(users, null, 2), 'utf-8');
+    if (!Array.isArray(users)) throw new Error('Lista de usuários inválida.');
+    writeJsonAtomic(this.filePath, users);
   }
 
   findByEmail(email) {
@@ -94,3 +105,4 @@ class UserModel {
 }
 
 module.exports = new UserModel();
+module.exports.UserModel = UserModel;

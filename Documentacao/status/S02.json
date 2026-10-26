@@ -2,9 +2,9 @@
   "secao": "S02",
   "titulo": "Dados e catálogo (backend)",
   "arquivo": "Documentacao/secoes/S02-dados-e-catalogo.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s02-dados-e-catalogo",
+  "concluidaEm": "2026-10-26",
   "commit": "",
-  "notas": ""
+  "notas": "Escrita atômica com .bak e leitura que nunca vira vazia, seed versionado x catálogo de runtime, faixas de ids por fonte, ingestão só com login, migração D-11 (estado v2). 57 testes passando. Branch pronta; integração (merge no main) fica com a sessão principal."
 }

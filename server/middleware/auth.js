@@ -24,4 +24,15 @@ function requireAuth(req, res, next) {
   }
 }
 
-module.exports = { issueToken, requireAuth };
+// Define req.userId se houver um token válido; caso contrário segue como visitante (sem erro).
+function optionalAuth(req, res, next) {
+  const match = /^Bearer (.+)$/.exec(req.headers.authorization || '');
+  if (match) {
+    try {
+      req.userId = jwt.verify(match[1], config.JWT_SECRET, { algorithms: ['HS256'] }).sub;
+    } catch { /* token inválido/expirado: trata como visitante */ }
+  }
+  return next();
+}
+
+module.exports = { issueToken, requireAuth, optionalAuth };

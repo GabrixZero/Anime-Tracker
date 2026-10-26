@@ -1,6 +1,7 @@
 ﻿const UserModel = require('../models/UserModel');
 const config = require('../config/config');
 const { issueToken } = require('../middleware/auth');
+const { sendError } = require('../utils/httpErrors');
 
 class AuthController {
   async register(req, res) {
@@ -32,8 +33,7 @@ class AuthController {
         token: issueToken(user)
       });
     } catch (err) {
-      console.error('Erro no cadastro:', err);
-      return res.status(500).json({ error: 'Erro interno ao criar conta.' });
+      return sendError(res, err, 'Erro interno ao criar conta.', 'auth/register');
     }
   }
 
@@ -60,8 +60,7 @@ class AuthController {
         token: issueToken(user)
       });
     } catch (err) {
-      console.error('Erro no login:', err);
-      return res.status(500).json({ error: 'Erro interno ao realizar login.' });
+      return sendError(res, err, 'Erro interno ao realizar login.', 'auth/login');
     }
   }
 
@@ -96,19 +95,22 @@ class AuthController {
         token: issueToken(user)
       });
     } catch (err) {
-      console.error('Erro no Google Auth:', err);
-      return res.status(500).json({ error: 'Erro ao autenticar com Google.' });
+      return sendError(res, err, 'Erro ao autenticar com Google.', 'auth/google');
     }
   }
 
   async me(req, res) {
-    const user = UserModel.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado.' });
-    }
+    try {
+      const user = UserModel.findById(req.userId);
+      if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado.' });
+      }
 
-    const { password: _, ...safeUser } = user;
-    return res.json({ user: safeUser });
+      const { password: _, ...safeUser } = user;
+      return res.json({ user: safeUser });
+    } catch (err) {
+      return sendError(res, err, 'Erro ao buscar o usuário.', 'auth/me');
+    }
   }
 }
 

@@ -21,17 +21,21 @@ Há risco real de **perder todos os usuários ou todo o catálogo**, o catálogo
 - `this.cache` em `MediaService` existe e nunca é usado; sem tratamento de rate limit do TVMaze (~20 req/10 s).
 
 ## Tarefas
-- [ ] Utilitário de escrita atômica de JSON (tmp + `renameSync`, como o `LibraryModel`) usado por `UserModel` e `MediaService`; manter cópia `.bak` da última versão boa.
-- [ ] Leitura segura: erro de parse **não** pode virar "lista vazia gravável". Falhar alto (log + tentar `.bak`) e nunca sobrescrever dados que não foi possível ler.
-- [ ] `fetchJson`: checar `statusCode`; tratar 404/429/5xx com erros tipados; timeout e 1 retry com espera para 429.
-- [ ] `ingest`: validar `id` inteiro positivo, exigir `data.id === id`, descartar respostas de erro; trava por id (mapa de promessas em andamento); usar o sanitizador da S01.
-- [ ] Exigir login (`requireAuth`) em `POST /api/media/ingest` e na ingestão disparada por `GET /api/media/:id` (ou separar leitura de ingestão); limitar frequência.
-- [ ] Validar `type`, `q` (string, tamanho máx.), `id`; responder 400 com mensagem, não 500.
-- [ ] **Esquema de ids** (decisão P-01): definir faixas por fonte, migrar as 4 obras ingeridas e as bibliotecas existentes (`localStorage` e `server/data/libraries/*.json`), restaurar Batman (155).
-- [ ] Unificar o seed: uma única fonte de verdade (servidor); remover o catálogo hardcoded de `state.js` (ou gerá-lo a partir da API).
-- [ ] Separar `mediaCatalog.seed.json` (versionado) do catálogo de runtime ignorado pelo git (decisão P-02); documentar como o seed é copiado na primeira execução.
-- [ ] Cache em memória com TTL para buscas externas (usar o `this.cache`).
-- [ ] Testes com `fetchJson` simulado: ingestão válida, 404, 429, id inválido, escrita atômica, leitura corrompida (não apaga dados).
+- [x] Utilitário de escrita atômica de JSON (tmp + `renameSync`, como o `LibraryModel`) usado por `UserModel` e `MediaService`; manter cópia `.bak` da última versão boa.
+- [x] Leitura segura: erro de parse **não** pode virar "lista vazia gravável". Falhar alto (log + tentar `.bak`) e nunca sobrescrever dados que não foi possível ler.
+- [x] `fetchJson`: checar `statusCode`; tratar 404/429/5xx com erros tipados; timeout e 1 retry com espera para 429.
+- [x] `ingest`: validar `id` inteiro positivo, exigir `data.id === id`, descartar respostas de erro; trava por id (mapa de promessas em andamento); usar o sanitizador da S01.
+- [x] Exigir login (`requireAuth`) em `POST /api/media/ingest` e na ingestão disparada por `GET /api/media/:id` (ou separar leitura de ingestão); limitar frequência.
+- [x] Validar `type`, `q` (string, tamanho máx.), `id`; responder 400 com mensagem, não 500.
+- [x] **Esquema de ids** (decisão P-01): definir faixas por fonte, migrar as 4 obras ingeridas e as bibliotecas existentes (`localStorage` e `server/data/libraries/*.json`), restaurar Batman (155).
+- [x] Unificar o seed: uma única fonte de verdade (servidor); remover o catálogo hardcoded de `state.js` (ou gerá-lo a partir da API).
+- [x] Separar `mediaCatalog.seed.json` (versionado) do catálogo de runtime ignorado pelo git (decisão P-02); documentar como o seed é copiado na primeira execução.
+- [x] Cache em memória com TTL para buscas externas (usar o `this.cache`).
+- [x] Testes com `fetchJson` simulado: ingestão válida, 404, 429, id inválido, escrita atômica, leitura corrompida (não apaga dados).
+
+## Resultado (2026-10-26)
+Tudo acima foi feito na branch `feature/s02-dados-e-catalogo`; detalhes e decisões `D-S02-1..6` em `02-decisoes.md`, mapa de arquivos e faixas de ids em `01-visao-geral-e-arquitetura.md`, diário em `diario/2026-10-26-S02.md`.
+Sobras (fora do escopo): ver "Descobertas" no diário (ex.: `/trending` devolve o catálogo inteiro; `vote_average` 8.0 inventado quando falta nota; conta demo; rate limit da busca externa por IP).
 
 ## Decisões (já resolvidas — não pergunte de novo)
 **Resolvidas:** D-11 (catálogo recomeça do zero, ids por fonte, Batman restaurado, migração só das referências às 4 obras), D-12 (seed × runtime), D-22 (testes não tocam `server/data`).

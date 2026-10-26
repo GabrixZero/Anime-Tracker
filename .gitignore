@@ -18,3 +18,12 @@ Thumbs.db
 !.env.example
 server/data/users.json
 server/data/libraries/
+
+server/data/mediaCatalog.runtime.json
+server/data/mediaCatalog.json
+server/data/*.bak
+server/data/*.tmp
+server/data/*.corrupt-*
+
+# Worktrees temporarias dos agentes do Claude
+.claude/worktrees/

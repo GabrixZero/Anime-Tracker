@@ -54,6 +54,19 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
 - **D-23 · 2026-10-26 · Execução por subagentes** coordenados pela sessão principal: cada subagente trabalha numa worktree própria na branch `feature/sNN-*`, **não faz merge no main**;
   a sessão principal confere, integra e faz o push até o `main`.
 
+- **D-S02-1 · 2026-10-26 · Faixas de ids por fonte:** seed/TMDB 1–999.999 (id nativo), TVMaze 1.000.000 + id, Jikan 10.000.000 + `mal_id`, TMDB-série 20.000.000 + id, TMDB-filme 30.000.000 + id.
+  Motivo: ids numéricos (D-06) sem colisão; TMDB reutiliza números entre séries e filmes, por isso faixas separadas. Tabela e regras em `01-visao-geral-e-arquitetura.md`.
+- **D-S02-2 · 2026-10-26 · Catálogo de runtime com nome novo (`mediaCatalog.runtime.json`)**, ignorado pelo git; o antigo `mediaCatalog.json` saiu do git e **não é importado** (as 4 obras do TVMaze nele eram justamente as que o D-11 manda descartar).
+  Obras novas do seed são acrescentadas ao runtime na partida, mas nunca sobrescrevem uma obra já presente (correção de uma obra do seed exige editar o runtime ou apagá-lo).
+- **D-S02-3 · 2026-10-26 · Arquivo ilegível nunca vira "vazio":** `jsonStore.readJson` tenta o `.bak`; sem `.bak` válido lança `DataCorruptionError` (HTTP 503 nas rotas), preserva `<arquivo>.corrupt-<data>` e **não grava**.
+  O catálogo ilegível entra em modo somente leitura (serve o seed). Biblioteca de usuário ilegível: o `GET` dá 503; o `PUT` do cliente (fonte primária local-first) substitui o arquivo, depois de preservar a cópia `.corrupt-*`.
+- **D-S02-4 · 2026-10-26 · Ingestão exige login e tem limite:** `POST /api/media/ingest` usa `requireAuth`; `GET /api/media/:id` é público para obra já completa no catálogo e exige login (`optionalAuth`) quando precisaria ingerir; 30 ingestões / 10 min por usuário (429).
+  A busca (`/search`) segue pública (só lê e usa cache de 10 min); o frontend só chama a ingestão quando a obra ainda não está completa no cache e, sem login, mostra o erro em vez de adicionar uma obra sem episódios.
+- **D-S02-5 · 2026-10-26 · Versão do estado em chave separada** (`showvault_state_version`; `STORAGE_KEY` continua `showvault_state_mvc_v1`) e `schemaVersion` nas bibliotecas do servidor; a migração v1→v2 está em `public/js/utils/migrations.js` (compartilhada navegador/servidor).
+  Regra do `showId` 155 (ambíguo): só sai da lista se houver chaves `155_sX_eY` (prova da série antiga) e nenhuma `155_movie` (prova do Batman); sem prova, fica (padrão conservador).
+- **D-S02-6 · 2026-10-26 · Caminhos de dados injetáveis:** `SHOWVAULT_DATA_DIR` (env) muda `config.DATA_DIR`; modelos/serviço aceitam o diretório no construtor (`new MediaService({dataDir, seedPath, tvmazeBase, sleep})`, `new UserModel(dir)`, `new LibraryModel(dir)`).
+  `server/app.js` separa o Express de `server.js` para testar rotas sem abrir a porta fixa. Todo teste novo define `SHOWVAULT_DATA_DIR` temporário **antes** de carregar os módulos.
+
 ## Pendentes
 
 Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). Novas dúvidas devem ser levadas ao Gabriel pela sessão principal antes de disparar subagentes.
