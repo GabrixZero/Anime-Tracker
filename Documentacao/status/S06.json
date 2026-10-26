@@ -2,8 +2,8 @@
   "secao": "S06",
   "titulo": "Animes e busca (Jikan)",
   "arquivo": "Documentacao/secoes/S06-animes-e-busca.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s06-animes-e-busca",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
