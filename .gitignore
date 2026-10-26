@@ -15,4 +15,6 @@ Thumbs.db
 # Credenciais e Dados de Runtime (NUNCA SUBIR NO GIT)
 .env
 .env.*
+!.env.example
 server/data/users.json
+server/data/libraries/

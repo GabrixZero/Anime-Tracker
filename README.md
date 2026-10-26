@@ -18,6 +18,12 @@ Este projeto foi construído para resolver definitivamente os problemas históri
    ```
    * Acesse `http://localhost:3000` no seu navegador.
 
+### Configuração e testes
+
+* **Variáveis de ambiente** (veja `.env.example`): `JWT_SECRET` assina os tokens de login. Sem ele o servidor usa um segredo de desenvolvimento (com aviso); com `NODE_ENV=production` ele é obrigatório. Para carregar um `.env`: `node --env-file=.env server.js`.
+* **Sincronização:** com a conta logada, sua lista, episódios assistidos e anotações são enviados ao servidor (`server/data/libraries/<usuario>.json`, ignorado pelo Git) e mesclados no próximo login. O navegador continua sendo a fonte primária (local-first).
+* **Testes:** `npm test`
+
 ---
 
 ## 🛠️ Recursos Implementados

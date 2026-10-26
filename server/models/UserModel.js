@@ -27,15 +27,31 @@ class UserModel {
     return `${salt}:${hash}`;
   }
 
+  isLegacyPassword(stored) {
+    return !!stored && !stored.includes(':');
+  }
+
   verifyPassword(password, stored) {
     if (!password || !stored) return false;
-    // Compatibilidade caso seja hash antigo ou legado
-    if (!stored.includes(':')) {
-      return password === stored;
+    // Compatibilidade com senha legada em texto puro (migrada para hash no login)
+    if (this.isLegacyPassword(stored)) {
+      const a = Buffer.from(password);
+      const b = Buffer.from(stored);
+      return a.length === b.length && crypto.timingSafeEqual(a, b);
     }
     const [salt, key] = stored.split(':');
-    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
-    return crypto.timingSafeEqual(Buffer.from(key, 'hex'), Buffer.from(hash, 'hex'));
+    const hash = crypto.scryptSync(password, salt, 64);
+    const expected = Buffer.from(key, 'hex');
+    return expected.length === hash.length && crypto.timingSafeEqual(expected, hash);
+  }
+
+  updatePassword(id, password) {
+    const users = this.getAll();
+    const user = users.find(u => u.id === id);
+    if (!user) return false;
+    user.password = this.hashPassword(password);
+    this.saveAll(users);
+    return true;
   }
 
   getAll() {

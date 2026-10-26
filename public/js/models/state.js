@@ -330,6 +330,7 @@ class AppState {
       console.warn('Erro ao ler estado local:', e);
     }
 
+    this.seeded = true; // estado demo padrão, ainda não editado pelo usuário
     return {
       trackedShows: [
         { showId: 1396, status: 'watching', addedAt: new Date().toISOString() },      // Breaking Bad
@@ -363,11 +364,13 @@ class AppState {
   }
 
   save() {
+    this.seeded = false;
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
     } catch (e) {
       console.error('Falha ao gravar estado local:', e);
     }
+    if (window.syncService) window.syncService.schedulePush();
   }
 
   cacheMediaList(items) {

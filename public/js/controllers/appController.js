@@ -12,6 +12,9 @@ class AppController {
     this.bindNavigation();
     this.bindBackupModal();
 
+    // Biblioteca mesclada com o servidor após login/sessão válida
+    window.addEventListener('showvault:synced', () => this.refreshAll());
+
     // Carrega dados iniciais da API para popular o cache
     try {
       const res = await window.apiClient.getTrending('all');
