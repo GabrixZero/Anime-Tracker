@@ -44,6 +44,17 @@
 
   --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-smooth: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Tamanhos utilitarios (S05): metadados nunca abaixo de 0,8rem */
+  --fs-meta: 0.8rem;
+
+  /* Altura da barra de abas inferior (celular); a area segura do notch usa env(safe-area-inset-bottom) direto nas regras */
+  --bottom-nav-h: 64px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 *, *::before, *::after {
@@ -79,4 +90,20 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #394058;
+}
+
+/* Celular: o fundo fixo pesa e treme no scroll; e campos com 16px evitam o zoom automatico do iOS */
+@media (max-width: 768px) {
+  body { background-attachment: scroll; }
+  input, textarea, select { font-size: 16px; }
+}
+
+/* Respeita quem pediu menos movimento (S05) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

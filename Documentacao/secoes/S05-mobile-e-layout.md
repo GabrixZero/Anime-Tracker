@@ -16,13 +16,13 @@ inline no HTML, então as media queries não conseguem ajustá-lo.
 - Textos de metadados em 0,72–0,78 rem.
 
 ## Tarefas
-- [ ] Mover para classes CSS os estilos inline de grades/cabeçalhos citados e criar breakpoints reais (≤480, ≤768, ≤1024).
-- [ ] Navegação móvel: barra de abas fixa na parte inferior (ícone + rótulo) ou menu que mostre todas as 5 abas; cabeçalho compacto (logo, entrar, sync).
-- [ ] Estatísticas, diário, lista e explorar em 1–2 colunas no celular, sem rolagem horizontal.
-- [ ] Modal de detalhes: gradiente sobre o backdrop, pôster menor/empilhado no celular, rolagem interna, botão de fechar alcançável com o polegar.
-- [ ] Modal de anotação e de login/backup utilizáveis com teclado virtual aberto.
-- [ ] `@media (prefers-reduced-motion: reduce)` desliga as animações; reduzir a animação inicial.
-- [ ] Verificar em 360×740, 375×812, 768×1024 e desktop; nenhuma tela com `document.documentElement.scrollWidth > innerWidth`.
+- [x] Mover para classes CSS os estilos inline de grades/cabeçalhos citados e criar breakpoints reais (≤480, ≤768, ≤1024).
+- [x] Navegação móvel: barra de abas fixa na parte inferior (ícone + rótulo) ou menu que mostre todas as 5 abas; cabeçalho compacto (logo, entrar, sync).
+- [x] Estatísticas, diário, lista e explorar em 1–2 colunas no celular, sem rolagem horizontal.
+- [x] Modal de detalhes: gradiente sobre o backdrop, pôster menor/empilhado no celular, rolagem interna, botão de fechar alcançável com o polegar.
+- [x] Modal de anotação e de login/backup utilizáveis com teclado virtual aberto.
+- [x] `@media (prefers-reduced-motion: reduce)` desliga as animações; reduzir a animação inicial.
+- [x] Verificar em 360×740, 375×812, 768×1024 e desktop; nenhuma tela com `document.documentElement.scrollWidth > innerWidth`.
 
 ## Como verificar
 Navegador do app: `resize_window` preset `mobile` (375×812) e `tablet`; percorrer as 5 abas, abrir modal de detalhes, de anotação e de login; capturar prints antes/depois e
@@ -36,3 +36,8 @@ Todas as abas e modais usáveis no celular sem overflow horizontal e com texto l
 
 ## Fora de escopo
 Acessibilidade de teclado/ARIA (S07); limpeza total de CSS inline e remoção de `onclick` (S10).
+
+## Resultado (S05 concluída em 2026-10-26)
+Feito conforme as tarefas acima. Detalhes e capturas descritas em `Documentacao/diario/2026-10-26-S05.md`; decisões em `02-decisoes.md` (D-S05-1..4).
+Sobrou para outras seções: ARIA/foco/teclado das abas e modais (S07); remover `onclick` inline e o resto de CSS inline dos botões gerados (S10); estilizar o seletor de status por obra da S03 (as classes novas
+ficam em `css/views.css`); texto do `status-label` de sincronização some abaixo de 480 px (só o pontinho) até a S03 expor o estado por classe CSS.

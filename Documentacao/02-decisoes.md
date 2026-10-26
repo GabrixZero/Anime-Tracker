@@ -67,6 +67,15 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
 - **D-S02-6 · 2026-10-26 · Caminhos de dados injetáveis:** `SHOWVAULT_DATA_DIR` (env) muda `config.DATA_DIR`; modelos/serviço aceitam o diretório no construtor (`new MediaService({dataDir, seedPath, tvmazeBase, sleep})`, `new UserModel(dir)`, `new LibraryModel(dir)`).
   `server/app.js` separa o Express de `server.js` para testar rotas sem abrir a porta fixa. Todo teste novo define `SHOWVAULT_DATA_DIR` temporário **antes** de carregar os módulos.
 
+- **D-S05-1 · 2026-10-26 · Navegação:** até 1024 px as 5 abas viram uma **barra fixa na parte de baixo** (ícone + rótulo curto: A Seguir, Lista, Diário, Estat., Explorar); o cabeçalho fica com logo, sync, backup e entrar (~57 px).
+  O contador de cada aba vira bolinha sobre o ícone. Os botões continuam sendo `.nav-tab#tab-btn-*` (nada muda no JS). Em notebooks (1025–1560 px) o cabeçalho original, que só cabia a partir de ~1520 px, ficou enxuto (sem subtítulo, "Entrar" sem "/ Cadastrar", só o pontinho de sync, ícones das abas ocultos até 1140 px).
+- **D-S05-2 · 2026-10-26 · CSS:** novo `public/css/views.css` (classes de telas e modais que saíram do inline); ordem de carga `variables → components → views → layout → auth-tvtime`. Os **breakpoints reais** ficam em `layout.css` (≤1560, ≤1320, ≤1140, ≤1024, ≤768, ≤480, ≤359) e as regras mobile do login em `auth-tvtime.css` (carrega depois).
+  Texto de metadados nunca abaixo de `--fs-meta` (0,8 rem); o teste `tests/layout.test.js` falha se aparecer um `font-size` menor. `style="..."` só sobrou para larguras dinâmicas (`width: N%` de barras de progresso).
+- **D-S05-3 · 2026-10-26 · Modais no celular:** viram folha de tela cheia com cabeçalho/rodapé fixos e miolo rolável (`.modal-container--split` + `.modal-scroll`); o meta viewport usa `viewport-fit=cover` e `interactive-widget=resizes-content` (o teclado virtual encolhe a área do modal em vez de cobri-lo).
+  No modal de detalhes o botão de fechar fica embaixo à direita (alcance do polegar); o backdrop ganhou gradiente escuro por cima (`::before`). Cartões de obra: grade automática (≥136 px por coluna → 2 colunas em 360–375 px, 4 em 768 px).
+- **D-S05-4 · 2026-10-26 · Detalhes técnicos:** `env(safe-area-inset-bottom)` é usado direto nas regras (guardá-lo numa variável CSS `--safe-bottom` não funcionou no Chrome); o `backdrop-filter` do cabeçalho é desligado ≤1024 px porque ele prenderia a barra de abas `position: fixed` dentro do cabeçalho;
+  animação de entrada das abas: 0,15 s e partindo de opacity 0,55 (antes 0,25 s a partir de 0, que escurecia a tela) e `prefers-reduced-motion` desliga todas as animações.
+
 ## Pendentes
 
 Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). Novas dúvidas devem ser levadas ao Gabriel pela sessão principal antes de disparar subagentes.
