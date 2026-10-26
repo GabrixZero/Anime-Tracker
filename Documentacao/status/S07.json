@@ -2,8 +2,8 @@
   "secao": "S07",
   "titulo": "Acessibilidade",
   "arquivo": "Documentacao/secoes/S07-acessibilidade.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s07-acessibilidade",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
