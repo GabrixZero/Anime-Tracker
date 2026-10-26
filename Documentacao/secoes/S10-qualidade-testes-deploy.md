@@ -1,6 +1,6 @@
 # S10 · Qualidade, testes e deploy
 
-**Status:** pendente · **Gravidade:** média · **Depende de:** idealmente depois das S01–S09 (consolida e fecha) · **Branch:** `feature/s10-qualidade-testes-deploy`
+**Status:** em `Documentacao/status/S10.json` (`npm run status -- S10`) · **Gravidade:** média · **Depende de:** idealmente depois das S01–S09 (consolida e fecha) · **Branch:** `feature/s10-qualidade-testes-deploy`
 
 ## Por que importa
 Deixar o projeto sustentável (qualquer sessão futura altera sem medo) e publicável de verdade.

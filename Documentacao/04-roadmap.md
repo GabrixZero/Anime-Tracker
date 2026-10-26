@@ -1,19 +1,21 @@
 # Roadmap — seções em ordem de prioridade
 
-Origem: auditoria de 2026-10-26 (revisão de código + tour pelo site). Status: `pendente` · `em andamento` · `concluída`.
+Origem: auditoria de 2026-10-26 (revisão de código + tour pelo site).
+**O status (pendente / em andamento / concluída) NÃO fica aqui**: a fonte da verdade é `Documentacao/status/SNN.json` em `origin/main`.
+Veja o quadro atual com `npm run status` (regras em [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md)).
 
-| Ordem | Seção | Arquivo | Gravidade | Status |
-|---|---|---|---|---|
-| 1 | Segurança do frontend (XSS) | [S01](secoes/S01-xss-frontend.md) | Alta | pendente |
-| 2 | Dados e catálogo (backend) | [S02](secoes/S02-dados-e-catalogo.md) | Alta | pendente |
-| 3 | Biblioteca e sincronização | [S03](secoes/S03-biblioteca-e-sync.md) | Média/Alta | pendente |
-| 4 | Contas e autenticação | [S04](secoes/S04-contas-e-auth.md) | Alta | pendente |
-| 5 | Mobile e layout | [S05](secoes/S05-mobile-e-layout.md) | Alta | pendente |
-| 6 | Animes e busca (Jikan) | [S06](secoes/S06-animes-e-busca.md) | Média | pendente |
-| 7 | Acessibilidade | [S07](secoes/S07-acessibilidade.md) | Média | pendente |
-| 8 | Funções prometidas e falsas | [S08](secoes/S08-funcoes-falsas.md) | Média | pendente |
-| 9 | Performance | [S09](secoes/S09-performance.md) | Baixa/Média | pendente |
-| 10 | Qualidade, testes e deploy | [S10](secoes/S10-qualidade-testes-deploy.md) | Média | pendente |
+| Ordem | Seção | Arquivo | Gravidade |
+|---|---|---|---|
+| 1 | Segurança do frontend (XSS) | [S01](secoes/S01-xss-frontend.md) | Alta |
+| 2 | Dados e catálogo (backend) | [S02](secoes/S02-dados-e-catalogo.md) | Alta |
+| 3 | Biblioteca e sincronização | [S03](secoes/S03-biblioteca-e-sync.md) | Média/Alta |
+| 4 | Contas e autenticação | [S04](secoes/S04-contas-e-auth.md) | Alta |
+| 5 | Mobile e layout | [S05](secoes/S05-mobile-e-layout.md) | Alta |
+| 6 | Animes e busca (Jikan) | [S06](secoes/S06-animes-e-busca.md) | Média |
+| 7 | Acessibilidade | [S07](secoes/S07-acessibilidade.md) | Média |
+| 8 | Funções prometidas e falsas | [S08](secoes/S08-funcoes-falsas.md) | Média |
+| 9 | Performance | [S09](secoes/S09-performance.md) | Baixa/Média |
+| 10 | Qualidade, testes e deploy | [S10](secoes/S10-qualidade-testes-deploy.md) | Média |
 
 Dependências: S06 depende do esquema de ids decidido na S02. S10 (remover `onclick` inline) habilita CSP e facilita S05/S07.
 Cada seção deve deixar testes para o que alterou (não esperar a S10).
@@ -29,5 +31,5 @@ Cada seção deve deixar testes para o que alterou (não esperar a S10).
 
 ## Como atualizar
 
-Ao encerrar uma sessão, mude o status da linha correspondente e anote em `05-diario-de-sessoes.md`.
+Ao encerrar uma sessão, atualize `Documentacao/status/SNN.json` e crie a entrada em `Documentacao/diario/`.
 Se uma seção for dividida ou reordenada, registre o motivo em `02-decisoes.md`.

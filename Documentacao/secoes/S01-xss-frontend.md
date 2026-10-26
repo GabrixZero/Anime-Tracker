@@ -1,6 +1,6 @@
 # S01 · Segurança do frontend (XSS)
 
-**Status:** pendente · **Gravidade:** alta · **Depende de:** nada · **Branch:** `feature/s01-xss-frontend`
+**Status:** em `Documentacao/status/S01.json` (`npm run status -- S01`) · **Gravidade:** alta · **Depende de:** nada · **Branch:** `feature/s01-xss-frontend`
 
 ## Por que importa
 Dados externos (TVMaze é editável por qualquer pessoa) são gravados no catálogo compartilhado e renderizados com `innerHTML` **sem escape**

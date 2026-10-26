@@ -1,0 +1,10 @@
+{
+  "secao": "S01",
+  "titulo": "Segurança do frontend (XSS)",
+  "arquivo": "Documentacao/secoes/S01-xss-frontend.md",
+  "status": "pendente",
+  "branch": "",
+  "concluidaEm": "",
+  "commit": "",
+  "notas": ""
+}

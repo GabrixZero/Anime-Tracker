@@ -1,6 +1,6 @@
 # S04 · Contas e autenticação
 
-**Status:** pendente · **Gravidade:** alta · **Depende de:** S02 (escrita segura do `users.json`) · **Branch:** `feature/s04-contas-e-auth`
+**Status:** em `Documentacao/status/S04.json` (`npm run status -- S04`) · **Gravidade:** alta · **Depende de:** S02 (escrita segura do `users.json`) · **Branch:** `feature/s04-contas-e-auth`
 
 ## Por que importa
 O login já usa JWT real, mas o cadastro aceita qualquer coisa, não há limite de tentativas e o segredo padrão é público fora de produção.

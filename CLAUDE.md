@@ -6,6 +6,7 @@ Rastreador de séries, animes e filmes (Express + HTML/CSS/JS vanilla, sem build
 (arquitetura, decisões, protocolo de sessão, roadmap por seções, diário). Ao terminar uma sessão você DEVE atualizá-la.
 
 Resumo mínimo:
+- Várias sessões podem rodar em paralelo: antes de começar rode `npm run status -- SNN`; se estiver bloqueada ou já em andamento, avise o Gabriel e pare (`Documentacao/06-coordenacao-entre-sessoes.md`).
 - Trabalho em seções (S01–S10), uma por sessão, em `feature/sNN-<slug>`; ao final, push até o `main` sem force push (passo a passo em `Documentacao/03-protocolo-de-sessao.md`).
 - `npm start` (porta 3000) · `npm test` · use `PORT=3055` para servidores de teste e apague usuários/arquivos de teste criados em `server/data`.
 - Nunca commitar `server/data/users.json`, `server/data/libraries/`, `.env`; nunca colocar e-mails/senhas/tokens reais em código, testes ou docs.

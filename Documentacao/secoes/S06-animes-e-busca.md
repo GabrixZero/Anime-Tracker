@@ -1,6 +1,6 @@
 # S06 · Animes e busca (Jikan / MyAnimeList)
 
-**Status:** pendente · **Gravidade:** média · **Depende de:** S02 (esquema de ids, escrita segura, fetch tipado) · **Branch:** `feature/s06-animes-e-busca`
+**Status:** em `Documentacao/status/S06.json` (`npm run status -- S06`) · **Gravidade:** média · **Depende de:** S02 (esquema de ids, escrita segura, fetch tipado) · **Branch:** `feature/s06-animes-e-busca`
 
 ## Por que importa
 Animes vêm de uma heurística em cima do TVMaze (feito para séries ocidentais) e a busca devolve resultados duplicados ou sem relação.
