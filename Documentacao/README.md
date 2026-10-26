@@ -8,9 +8,10 @@ estes arquivos, para o Gabriel nunca precisar explicar o projeto do zero.
 1. [01-visao-geral-e-arquitetura.md](01-visao-geral-e-arquitetura.md) — o que é o projeto, como rodar, mapa do código, histórico de segurança.
 2. [02-decisoes.md](02-decisoes.md) — decisões já tomadas (não reabrir sem motivo) e decisões pendentes.
 3. [03-protocolo-de-sessao.md](03-protocolo-de-sessao.md) — como abrir, executar e **encerrar** uma sessão (inclui o fluxo git até o `main`).
-4. [04-roadmap.md](04-roadmap.md) — as 10 seções em ordem de prioridade, com status.
-5. O arquivo da seção da sessão atual em [secoes/](secoes/) (ex.: `S01-xss-frontend.md`).
-6. [05-diario-de-sessoes.md](05-diario-de-sessoes.md) — o que cada sessão fez e deixou pendente.
+4. [04-roadmap.md](04-roadmap.md) — as 10 seções em ordem de prioridade (o status fica em `status/`).
+5. [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md) — sessões em paralelo: quadro de status (`npm run status`), dependências, conflitos.
+6. O arquivo da seção da sessão atual em [secoes/](secoes/) (ex.: `S01-xss-frontend.md`).
+7. [diario/](diario/) (um arquivo por sessão) e [05-diario-de-sessoes.md](05-diario-de-sessoes.md) (sessão 0) — o que cada sessão fez e deixou pendente.
 
 ## Regras da documentação
 

@@ -1,6 +1,6 @@
 # S08 · Funções prometidas e falsas
 
-**Status:** pendente · **Gravidade:** média · **Depende de:** S03 (status por obra) · **Branch:** `feature/s08-funcoes-falsas`
+**Status:** em `Documentacao/status/S08.json` (`npm run status -- S08`) · **Gravidade:** média · **Depende de:** S03 (status por obra) · **Branch:** `feature/s08-funcoes-falsas`
 
 ## Por que importa
 Há textos no README e elementos na interface que prometem algo que não existe, e valores inventados aparecem como se fossem dados reais.

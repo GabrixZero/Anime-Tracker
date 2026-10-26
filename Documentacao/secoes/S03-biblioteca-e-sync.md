@@ -1,6 +1,6 @@
 # S03 · Biblioteca e sincronização
 
-**Status:** pendente · **Gravidade:** média/alta · **Depende de:** S02 (ids estáveis) · **Branch:** `feature/s03-biblioteca-e-sync`
+**Status:** em `Documentacao/status/S03.json` (`npm run status -- S03`) · **Gravidade:** média/alta · **Depende de:** S02 (ids estáveis) · **Branch:** `feature/s03-biblioteca-e-sync`
 
 ## Por que importa
 O sync foi entregue em 2026-10-26 com limitações conhecidas, e a regra de status das séries não funciona para o usuário.

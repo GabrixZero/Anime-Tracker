@@ -1,6 +1,6 @@
 # S09 · Performance
 
-**Status:** pendente · **Gravidade:** baixa/média · **Depende de:** S02 (catálogo), S06 (novas fontes) · **Branch:** `feature/s09-performance`
+**Status:** em `Documentacao/status/S09.json` (`npm run status -- S09`) · **Gravidade:** baixa/média · **Depende de:** S02 (catálogo), S06 (novas fontes) · **Branch:** `feature/s09-performance`
 
 ## Por que importa
 Funciona bem hoje (19 obras, ~536 episódios), mas cresce mal: cada obra ingerida adiciona dezenas de KB e a tela inteira é redesenhada a cada clique.

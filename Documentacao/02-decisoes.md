@@ -1,6 +1,6 @@
 # Decisões
 
-Formato: **D-nn** · data · decisão · motivo. Decisões *tomadas* não devem ser reabertas sem fato novo.
+Formato: **D-nn** · data · decisão · motivo. Decisões novas das sessões usam **D-SNN-n** (ex.: D-S02-1) para não colidir entre sessões paralelas. Decisões *tomadas* não devem ser reabertas sem fato novo.
 Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recomendação) na sessão indicada.
 
 ## Tomadas
@@ -23,6 +23,9 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
 - **D-09 · 2026-10-26 · Ordem de prioridade das seções:** S01 XSS → S02 dados/catálogo → S03 biblioteca/sync → S04 contas/auth → S05 mobile →
   S06 animes/busca (Jikan) → S07 acessibilidade → S08 funções falsas → S09 performance → S10 qualidade/testes/deploy.
   (Seções de dados/segurança antes de recursos novos; S06 depende do esquema de ids da S02.)
+
+- **D-10 · 2026-10-26 · Sessões paralelas coordenadas pelo GitHub:** status em `Documentacao/status/SNN.json` (verdade em `origin/main`), dependências em `status/grafo.json`,
+  `npm run status` decide se uma seção pode iniciar; a branch `feature/sNN-*` empurrada ao abrir reserva a seção; diário em um arquivo por sessão. Detalhes em `06-coordenacao-entre-sessoes.md`.
 
 ## Pendentes (perguntar ao Gabriel na sessão indicada)
 

@@ -1,6 +1,6 @@
 # S02 · Dados e catálogo (backend)
 
-**Status:** pendente · **Gravidade:** alta · **Depende de:** S01 (sanitização compartilhada) · **Branch:** `feature/s02-dados-e-catalogo`
+**Status:** em `Documentacao/status/S02.json` (`npm run status -- S02`) · **Gravidade:** alta · **Depende de:** S01 (sanitização compartilhada) · **Branch:** `feature/s02-dados-e-catalogo`
 
 ## Por que importa
 Há risco real de **perder todos os usuários ou todo o catálogo**, o catálogo pode ser poluído por qualquer visitante, e ids de fontes diferentes colidem.
