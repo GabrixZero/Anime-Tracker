@@ -96,12 +96,8 @@ class AppController {
       }
     }
 
-    window.appState.data.trackedShows.push({
-      showId: numId,
-      status: 'watching',
-      addedAt: new Date().toISOString()
-    });
-    window.appState.save();
+    // Status inicial coerente com o progresso (Quero ver, ou Assistindo/Finalizado se já houver episódios marcados)
+    window.appState.addShow(numId);
     this.showToast('Adicionado à sua lista e salvo no catálogo!', 'success');
     this.refreshAll();
     if (window.detailModalView.currentShowId === numId) {
@@ -110,8 +106,7 @@ class AppController {
   }
 
   removeFromList(showId) {
-    window.appState.data.trackedShows = window.appState.data.trackedShows.filter(t => t.showId !== Number(showId));
-    window.appState.save();
+    window.appState.removeShow(showId); // grava também a marca de exclusão, para a remoção chegar aos outros aparelhos
     this.showToast('Removido da sua lista.');
     this.refreshAll();
     if (window.detailModalView.currentShowId === showId) {
@@ -119,11 +114,23 @@ class AppController {
     }
   }
 
+  // Seletor de status (modal e lista). O valor vem de um <select>, mas é validado de novo em AppState.
+  setStatus(showId, status) {
+    const ok = window.appState.setShowStatus(showId, status);
+    if (!ok) {
+      this.showToast('Não foi possível mudar o status desta obra.', 'error');
+    } else {
+      this.showToast(`Status: ${window.WatchStatus.statusLabel(status)}.`, 'success');
+    }
+    this.refreshAll();
+  }
+
   refreshAll() {
     window.nextUpView.render();
     window.watchlistView.render();
     window.diaryView.render();
     window.statsView.render();
+    window.detailModalView.refreshStatusPicker();
   }
 
   bindBackupModal() {
@@ -158,8 +165,8 @@ class AppController {
             const parsed = JSON.parse(ev.target.result);
             // Backups antigos podem conter obras aposentadas (D-11): migra antes de aplicar. Sem versão = versão 1.
             const data = window.migrateLibrary(window.validateBackup(parsed.database || parsed), parsed.stateVersion).data;
-            window.appState.data = data;
-            window.appState.save();
+            // O arquivo vira o estado deste aparelho; o que não está nele vira "removido" nos outros aparelhos (marcas de exclusão)
+            window.appState.importData(data);
             this.refreshAll();
             modal.classList.add('hidden');
             this.showToast('Backup restaurado com sucesso!', 'success');
@@ -174,14 +181,52 @@ class AppController {
     });
 
     document.getElementById('btn-reset-database').addEventListener('click', () => {
-      if (confirm('Deseja resetar todos os dados para o padrão original?')) {
-        localStorage.removeItem(window.appState.STORAGE_KEY);
-        window.appState.data = window.appState.load();
-        this.refreshAll();
-        modal.classList.add('hidden');
-        this.showToast('Banco de dados resetado.', 'info');
-      }
+      modal.classList.add('hidden');
+      this.resetData();
     });
+  }
+
+  // "Resetar": apaga os dados deste aparelho. Conectado, pergunta se a cópia na nuvem também deve ser apagada
+  // (confirmação explícita: confirm + digitar APAGAR). Sem apagar a nuvem, os dados voltam no próximo login.
+  async resetData() {
+    const state = window.appState;
+    const sync = window.syncService;
+
+    if (!confirm('Apagar todos os dados DESTE aparelho (séries, episódios e notas)? Se quiser guardá-los, exporte um backup antes.')) return;
+
+    if (!sync.isLoggedIn()) {
+      localStorage.removeItem(state.STORAGE_KEY); // visitante: volta ao estado inicial do app
+      state.data = state.load();
+      this.refreshAll();
+      this.showToast('Dados deste aparelho apagados.', 'info');
+      return;
+    }
+
+    const alsoCloud = confirm(
+      'Você está conectado. Apagar TAMBÉM a cópia guardada na nuvem desta conta?\n\n' +
+      'OK = apagar aqui e na nuvem (seus outros aparelhos também ficam zerados).\n' +
+      'Cancelar = apagar só neste aparelho (a cópia da nuvem volta no próximo login).'
+    );
+
+    if (alsoCloud) {
+      const typed = prompt('Esta ação não pode ser desfeita. Para confirmar, digite APAGAR:');
+      if (!typed || typed.trim().toUpperCase() !== 'APAGAR') {
+        this.showToast('Nada foi apagado.', 'info');
+        return;
+      }
+      try {
+        await sync.wipeCloud();
+      } catch (err) {
+        this.showToast(`Não foi possível apagar a nuvem (${err.message}). Nada foi apagado.`, 'error');
+        return;
+      }
+      this.refreshAll();
+      this.showToast('Dados apagados neste aparelho e na nuvem.', 'success');
+    } else {
+      state.resetLocal();
+      this.refreshAll();
+      this.showToast('Dados deste aparelho apagados. A cópia da nuvem volta no próximo login.', 'info');
+    }
   }
 
   showToast(message, type = 'info') {

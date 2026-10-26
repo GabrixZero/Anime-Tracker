@@ -62,7 +62,7 @@ test('validateBackup aceita backup válido e descarta campos extras', () => {
     episodeNotes: { '1_movie': { text: 'ok', emotion: 'fun', character: 'A', updatedAt: 'x', snapshots: [], extra: 1 } },
     seeded: true
   });
-  assert.deepEqual(Object.keys(ok).sort(), ['episodeNotes', 'trackedShows', 'watchedEpisodes']);
+  assert.deepEqual(Object.keys(ok).sort(), ['episodeNotes', 'resetAt', 'tombstones', 'trackedShows', 'watchedEpisodes']);
   assert.deepEqual(Object.keys(ok.trackedShows[0]).sort(), ['addedAt', 'showId', 'status']);
   assert.equal('extra' in ok.episodeNotes['1_movie'], false);
 });
@@ -103,9 +103,33 @@ test('validateBackup do navegador e LibraryModel.validate dão o mesmo resultado
       watchedEpisodes: { '7_s2_e3': { watched: true, rewatchCount: 5 } },
       episodeNotes: { '7_movie': { text: 't', emotion: 'sad', character: 'c', updatedAt: 'u', snapshots: [{ text: 's', updatedAt: 'u', z: 1 }] } }
     },
-    { trackedShows: [], watchedEpisodes: { '1_movie': { watched: 'yes', rewatchCount: -3 } }, episodeNotes: {} }
+    { trackedShows: [], watchedEpisodes: { '1_movie': { watched: 'yes', rewatchCount: -3 } }, episodeNotes: {} },
+    // S03: updatedAt, marcas de exclusão e resetAt
+    {
+      trackedShows: [{ showId: 3, status: 'paused', addedAt: 'a', updatedAt: '2026-10-26T10:00:00.000Z' }, { showId: 4, status: 'x', updatedAt: 'lixo' }],
+      watchedEpisodes: { '3_s1_e1': { watched: true, watchedAt: 'w', updatedAt: '2026-10-26T10:00:00.000Z', rewatchCount: 1 } },
+      episodeNotes: {},
+      tombstones: { shows: { 9: '2026-10-26T11:00:00.000Z' }, watched: { '3_s1_e2': '2026-10-26T11:00:00.000Z' }, notes: { '3_movie': '2026-10-26T11:00:00.000Z' } },
+      resetAt: '2026-10-25T00:00:00.000Z'
+    },
+    { trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: null, resetAt: 12345 }
   ];
   for (const s of samples) assert.deepEqual(validateBackup(s), LibraryModel.validate(s));
+
+  // entradas inválidas nas marcas de exclusão: os dois recusam
+  const badTombstones = [
+    { shows: { abc: '2026-10-26T11:00:00.000Z' } },
+    { shows: { 1: 'não é data' } },
+    { watched: { '1_s1_e1': 5 } },
+    { notes: { '../x': '2026-10-26T11:00:00.000Z' } },
+    { watched: [] },
+    'texto'
+  ];
+  for (const tombstones of badTombstones) {
+    const s = { trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones };
+    assert.throws(() => validateBackup(s), /inválido/i, JSON.stringify(tombstones));
+    assert.throws(() => LibraryModel.validate(s), /inválid/i, JSON.stringify(tombstones));
+  }
 });
 
 test('stripHtml remove tags, scripts e entidades que recriam tags', () => {

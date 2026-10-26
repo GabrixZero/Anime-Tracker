@@ -1,0 +1,70 @@
+/* ================================================================
+   SHOWVAULT · SELETOR DE STATUS POR OBRA E ESTADOS DO SELO DE SINCRONIZAÇÃO (S03)
+   Só classes e variáveis (nada de estilo inline). A S05 pode ajustar tamanhos/posição à vontade;
+   os nomes das classes são o contrato: .status-picker, .status-picker-label, .status-select, .status-select--card,
+   .sync-indicator--retry e o atributo [data-sync-state] em #sync-status e #user-cloud-badge.
+   ================================================================ */
+
+.status-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-picker-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.status-select {
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-select:hover,
+.status-select:focus-visible {
+  border-color: var(--bg-card-border-hover);
+  outline: none;
+}
+
+.status-select--card {
+  width: 100%;
+  margin: 0.5rem 0 0.25rem;
+}
+
+/* Falhas de sincronização: o selo do cabeçalho vira botão "tentar de novo" */
+.sync-indicator--retry {
+  cursor: pointer;
+}
+
+#sync-status[data-sync-state="offline"],
+#sync-status[data-sync-state="error"],
+#sync-status[data-sync-state="auth"] {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+#sync-status[data-sync-state="offline"] .status-dot,
+#sync-status[data-sync-state="error"] .status-dot,
+#sync-status[data-sync-state="auth"] .status-dot {
+  background: var(--accent-rose);
+  animation: none;
+}
+
+#user-cloud-badge[data-sync-state="offline"],
+#user-cloud-badge[data-sync-state="error"],
+#user-cloud-badge[data-sync-state="auth"] {
+  color: var(--accent-rose);
+}
+
+#user-cloud-badge[data-sync-state="syncing"] {
+  color: var(--text-secondary);
+}

@@ -7,5 +7,6 @@ router.use(requireAuth);
 
 router.get('/library', userController.getLibrary);
 router.put('/library', userController.putLibrary);
+router.delete('/library', userController.deleteLibrary);
 
 module.exports = router;

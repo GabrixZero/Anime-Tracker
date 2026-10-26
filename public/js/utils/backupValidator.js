@@ -13,7 +13,10 @@
   const isPlainObject = v => v !== null && typeof v === 'object' && !Array.isArray(v);
   const str = (v, max = 200) => (typeof v === 'string' ? v.slice(0, max) : '');
 
-  // Retorna uma cópia saneada {trackedShows, watchedEpisodes, episodeNotes} ou lança Error com mensagem em português.
+  // libraryMerge.js (carregado antes de qualquer uso): navegador = window.LibraryMerge; Node = require.
+  const merge = () => (typeof module !== 'undefined' && module.exports ? require('./libraryMerge') : root.LibraryMerge);
+
+  // Retorna uma cópia saneada {trackedShows, watchedEpisodes, episodeNotes, tombstones, resetAt} ou lança Error com mensagem em português.
   function validateBackup(payload) {
     if (!isPlainObject(payload)) throw new Error('Backup inválido.');
     const { trackedShows, watchedEpisodes, episodeNotes } = payload;
@@ -34,7 +37,10 @@
         throw new Error('Backup inválido: item incorreto em trackedShows.');
       }
       seen.add(t.showId);
-      cleanShows.push({ showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) });
+      const show = { showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) };
+      const updatedAt = merge().cleanStamp(t.updatedAt);
+      if (updatedAt) show.updatedAt = updatedAt;
+      cleanShows.push(show);
     }
 
     const cleanWatched = {};
@@ -45,6 +51,8 @@
         watchedAt: str(v.watchedAt, 40),
         rewatchCount: Number.isInteger(v.rewatchCount) && v.rewatchCount > 0 ? Math.min(v.rewatchCount, 1000) : 1
       };
+      const updatedAt = merge().cleanStamp(v.updatedAt);
+      if (updatedAt) cleanWatched[key].updatedAt = updatedAt;
     }
 
     const cleanNotes = {};
@@ -62,7 +70,11 @@
       };
     }
 
-    return { trackedShows: cleanShows, watchedEpisodes: cleanWatched, episodeNotes: cleanNotes };
+    const fail = () => { throw new Error('Backup inválido: item incorreto em tombstones.'); };
+    const tombstones = merge().cleanTombstones(payload.tombstones, fail);
+    const resetAt = merge().cleanStamp(payload.resetAt);
+
+    return { trackedShows: cleanShows, watchedEpisodes: cleanWatched, episodeNotes: cleanNotes, tombstones, resetAt };
   }
 
   const api = { validateBackup };

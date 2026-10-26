@@ -49,29 +49,8 @@ class StatsView {
       }
     });
 
-    let showsCompleted = 0;
-    state.data.trackedShows.forEach(tracked => {
-      const media = state.getMedia(tracked.showId);
-      if (!media) return;
-
-      if (media.type === 'movie') {
-        if (state.isWatched(media.id)) showsCompleted++;
-      } else if (media.seasons) {
-        let allWatched = true;
-        let hasEpisodes = false;
-        for (const s of media.seasons) {
-          for (const ep of s.episodes) {
-            hasEpisodes = true;
-            if (!state.isWatched(media.id, s.season_number, ep.episode_number)) {
-              allWatched = false;
-              break;
-            }
-          }
-          if (!allWatched) break;
-        }
-        if (hasEpisodes && allWatched) showsCompleted++;
-      }
-    });
+    // "Obras finalizadas" = as que a lista mostra como Finalizado (mesma regra: state.getStatus)
+    const showsCompleted = state.data.trackedShows.filter(tracked => state.getStatus(tracked) === 'completed').length;
 
     // Conversão de tempo
     const minutesInHour = 60;

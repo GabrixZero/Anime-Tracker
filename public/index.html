@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/auth-tvtime.css">
+  <link rel="stylesheet" href="css/status.css">
 </head>
 <body>
   <div id="app" class="app-container">
@@ -88,7 +89,7 @@
             <img class="user-avatar" id="user-avatar-img" src="" alt="Avatar">
             <div class="user-info-text">
               <span class="user-display-name" id="user-display-name">Usuário</span>
-              <span class="user-cloud-badge">Sincronizado</span>
+              <span class="user-cloud-badge" id="user-cloud-badge">Sincronizado</span>
             </div>
             <button class="btn-icon-tiny" id="btn-logout" title="Sair da Conta">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -498,6 +499,8 @@
 
   <!-- Scripts em Ordem de Dependência MVC -->
   <script src="js/utils/dom.js"></script>
+  <script src="js/utils/libraryMerge.js"></script>
+  <script src="js/utils/watchStatus.js"></script>
   <script src="js/utils/backupValidator.js"></script>
   <script src="js/utils/migrations.js"></script>
   <script src="js/api/apiClient.js"></script>
