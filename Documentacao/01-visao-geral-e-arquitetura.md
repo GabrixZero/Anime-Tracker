@@ -36,8 +36,8 @@ Com `NODE_ENV=production` o servidor se recusa a iniciar sem `JWT_SECRET` (mín.
 | `server/utils/validators.js` | validação centralizada das entradas de conta (400 `{error, fields, code:"INVALID_INPUT"}`; nunca 500 por entrada inválida) |
 | `server/services/googleAuth.js`, `accountService.js` | verificação do ID token (`google-auth-library`; `__setVerifierForTests` nos testes) · exclusão de conta + arquivos da biblioteca (`libraries/<id>.json*`) |
 | `server/models/UserModel.js` | usuários em `server/data/users.json` (scrypt **assíncrono** `salt:hash`, migra senha legada no login; `create`/`updatePassword`/`verifyPassword` são `async`; e-mail único checado na gravação; `passwordChangedAt`; `authInfo` em cache por mtime; conta demo só com `SEED_DEMO_USER=1`); leitura/escrita via `jsonStore` (arquivo ilegível = `DataCorruptionError`, nunca lista vazia) |
-| `server/models/LibraryModel.js` | biblioteca por usuário em `server/data/libraries/<userId>.json`; valida, grava de forma atômica (com `.bak`) e aplica a migração de versão do estado (`schemaVersion`) no `get`, no `save` (cliente sem `stateVersion`) e em `migrateAll()` |
-| `server/controllers/userController.js` + `routes/userRoutes.js` | `GET/PUT /api/user/library` (exigem login) |
+| `server/models/LibraryModel.js` | biblioteca por usuário em `server/data/libraries/<userId>.json`; valida, grava de forma atômica (com `.bak`) mescla no `save` (`LibraryMerge.merge`, quando o cliente envia `tombstones`), tem `clear()` e aplica a migração de versão do estado (`schemaVersion`) no `get`, no `save` (cliente sem `stateVersion`) e em `migrateAll()` |
+| `server/controllers/userController.js` + `routes/userRoutes.js` | `GET/PUT/DELETE /api/user/library` (exigem login). `PUT` de cliente da S03 **mescla** com o servidor e devolve `{updatedAt, data}`; `DELETE` zera a conta (`resetAt`) |
 | `server/services/mediaService.js` | catálogo = seed versionado + runtime (`mediaCatalog.runtime.json`); busca TVMaze com cache TTL (10 min); `ingest(id)` com trava por id (promessas em andamento), validação da resposta e gravação atômica; `fetchJson` com timeout, limite de tamanho, erros tipados e 1 nova tentativa em 429 (dados externos passam por `utils/sanitize.js`) |
 | `server/utils/ids.js` | faixas de ids por fonte (`SOURCES`), `parseId`, `describeId`, `toInternalId` (ver "Esquema de ids") |
 | `server/utils/jsonStore.js` | `readJson` / `writeJsonAtomic`: tmp + rename (com tentativas por causa do OneDrive), `.bak` da última versão válida, cópia `.corrupt-*` de arquivo quebrado |
@@ -84,17 +84,20 @@ Nova migração = subir `STATE_VERSION` e acrescentar o passo em `migrateLibrary
 ## Mapa do frontend (`public/`)
 
 Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
-`utils/dom.js` → `utils/backupValidator.js` → `utils/migrations.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
+`utils/dom.js` → `utils/libraryMerge.js` → `utils/watchStatus.js` → `utils/backupValidator.js` → `utils/migrations.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
 `statsView.js` → `exploreView.js` → `detailModalView.js` → `appController.js`.
 
 | Arquivo | Papel |
 |---|---|
 | `js/utils/dom.js` | anti-XSS: `escapeHtml`, `safeUrl`/`safeSrc`, `cssUrl`, `toInt`, `formatRating`. **Todo valor de catálogo/usuário/erro interpolado em HTML passa por aqui** (também roda em Node nos testes) |
-| `js/utils/backupValidator.js` | `validateBackup`: valida o backup importado (espelha `LibraryModel.validate`) |
+| `js/utils/backupValidator.js` | `validateBackup`: valida o backup importado (espelha `LibraryModel.validate`; as duas usam `cleanTombstones`/`cleanStamp` de `libraryMerge.js`) |
+| `js/utils/libraryMerge.js` | (S03) funções **puras**, navegador + servidor: `merge(local, remote, {now})` com marcas de exclusão e `resetAt`, `replaceWith` (importar backup), `decideLogin` (isolamento por conta), `normalizeData`, `cleanTombstones`. Ver "Biblioteca, sync e remoções" |
+| `js/utils/watchStatus.js` | (S03) regra única do status por obra: `STATUS_LIST`, `computeProgress`, `effectiveStatus`, `initialStatus`, `statusAfterProgress`, `isQueueStatus`, `statusOptionsHtml` |
 | `js/api/apiClient.js` | `fetch` para `/api`, envia `Authorization: Bearer` (token em `localStorage['showvault_auth_token']`), trata 401 |
 | `js/utils/migrations.js` | `STATE_VERSION` e `migrateLibrary(data, fromVersion)` (também roda no servidor) |
-| `js/models/state.js` | `AppState`: dados em `localStorage['showvault_state_mvc_v1']` = `{trackedShows, watchedEpisodes, episodeNotes}` (+ versão em `showvault_state_version`, migrada ao carregar); `mediaMap` em memória, **preenchido só pela API** (o catálogo hardcoded foi removido na S02); `save()` dispara o sync; flag `seeded` (estado demo nunca editado) |
-| `js/services/syncService.js` | push com debounce (1,5 s) e `pullAndMerge()` no login; merge por união |
+| `js/models/state.js` | `AppState`: dados em `localStorage['showvault_state_mvc_v1']` = `{trackedShows, watchedEpisodes, episodeNotes, tombstones, resetAt}` (+ dono em `showvault_last_user`, arquivo de segurança em `showvault_archive_<userId>`, versão em `showvault_state_version`, migrada ao carregar); `mediaMap` em memória, **preenchido só pela API** (o catálogo hardcoded foi removido na S02); `save()` = `persist()` + agenda o sync; métodos `addShow/removeShow/setShowStatus/getStatus/toggleWatched/batchSetSeason/importData/resetLocal/clearForLogout`; flag `seeded` (estado demo nunca editado) |
+| `js/services/syncService.js` | `beginSession(user)` (isolamento por conta), `pullAndMerge(user)` no login, push com debounce (1,5 s) que aplica a resposta mesclada do servidor, `retry()`, `flush()`/`logout()`, `wipeCloud()`; estados do selo (`idle/syncing/offline/error/auth`) |
+| `css/status.css` | (S03) seletor de status e estados do selo de sync (contrato de classes: `.status-picker`, `.status-select`, `.status-select--card`, `[data-sync-state]`) |
 | `js/views/*View.js` | telas: A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar, modal de detalhes, login |
 | `js/controllers/appController.js` | abas, toasts, backup/import/reset, `addToList`/`removeFromList`, `refreshAll()` (re-render geral) |
 | `css/` | `variables` (tokens, `--fs-meta`, reduced-motion), `components` (botões, cartões, modais base), **`views`** (telas e modais: diário, estatísticas, explorar, detalhes, anotação, backup — S05), `layout` (cabeçalho, navegação e **todos os breakpoints**; abas viram barra inferior ≤1024 px), `auth-tvtime` (login). O HTML quase não tem `style=` inline (só larguras dinâmicas); ver D-S05-1..4 |
@@ -125,3 +128,12 @@ Funciona: cadastro/login com JWT, 5 abas (A Seguir, Minha Lista, Meu Diário, Es
 estatísticas, busca em catálogo local + TVMaze, ingestão de temporadas, backup JSON, sincronização da biblioteca com o servidor.
 Contas (S04): cadastro/login validados, limite de tentativas, trocar senha e excluir conta na API (ainda **sem tela** no app), login com Google real mas só ativo com `GOOGLE_CLIENT_ID`.
 Frágil/falso/incompleto: veja as 10 seções em [04-roadmap.md](04-roadmap.md).
+
+## Biblioteca, sync e remoções (S03)
+
+- **Formato** (cliente e servidor): `{trackedShows[{showId,status,addedAt,updatedAt?}], watchedEpisodes{chave:{watched,watchedAt,updatedAt?,rewatchCount}}, episodeNotes, tombstones:{shows:{id:iso},watched:{chave:iso},notes:{chave:iso}}, resetAt}`.
+- **Remoção = marca de exclusão** (D-S03-1): remover obra, desmarcar episódio etc. grava `tombstones.<tipo>[chave] = data`. No merge, para cada chave vence o evento mais recente entre "existe" (`updatedAt`/`watchedAt`/`addedAt`) e "removido"; empate = o item fica. Marcas com mais de 180 dias saem; datas no futuro (relógio errado) são aparadas para agora + 5 min.
+- **`resetAt`** = "zerar a conta": tudo com evento anterior a essa data é descartado em qualquer merge. Gravado por `DELETE /api/user/library`.
+- **Servidor mescla no PUT** (se o corpo traz `tombstones`); clientes antigos (sem o campo) continuam em snapshot completo/last-write-wins. O `PUT` devolve a biblioteca mesclada e o cliente a aplica.
+- **Isolamento por conta**: o estado local tem dono (`showvault_last_user`). Login de outra conta = arquivar (`showvault_archive_<dono>`) e começar do remoto, nunca mesclar; logout envia o que falta (se não der, arquiva) e limpa o navegador; visitante que entra numa conta leva o que fez antes; a próxima entrada da mesma conta recupera o arquivo.
+- **Status por obra** (`watchStatus.js`): `watching`, `plan_to_watch`, `paused`, `completed`, `dropped`. Lista, estatísticas e "A Seguir" usam `appState.getStatus`. Adicionar = Quero ver (ou Assistindo/Finalizado se já houver progresso); marcar episódio = Assistindo; último episódio = Finalizado; desmarcar um Finalizado = Assistindo/Quero ver. Pausado/Desisti não entram em "A Seguir".

@@ -91,7 +91,9 @@ test('API: PUT mescla e devolve a biblioteca mesclada; DELETE zera; sem login = 
   const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}/api/user/library`;
-  const auth = { Authorization: `Bearer ${issueToken({ id: 'usr_s03_api' })}`, 'Content-Type': 'application/json' };
+  // S04: as rotas exigem conta existente (requireActiveUser): cadastra um usuário de teste no diretório temporário
+  const user = await require('../server/models/UserModel').create({ name: 'Teste S03', email: 's03@exemplo.test', password: 'senha-de-teste-s03' });
+  const auth = { Authorization: `Bearer ${issueToken(user)}`, 'Content-Type': 'application/json' };
   const t0 = ago(3);
   const put = (data) => fetch(base, { method: 'PUT', headers: auth, body: JSON.stringify({ data, stateVersion: 2 }) });
 
