@@ -47,14 +47,14 @@ test('requireAuth rejeita token expirado e alg none', () => {
   assert.equal(runAuth(`Bearer ${none}`).out.status, 401);
 });
 
-test('UserModel: hash scrypt, senha legada e comprimentos inválidos', () => {
-  const stored = UserModel.hashPassword('segredo');
-  assert.equal(UserModel.verifyPassword('segredo', stored), true);
-  assert.equal(UserModel.verifyPassword('errada', stored), false);
-  assert.equal(UserModel.verifyPassword('abc', 'abc'), true);
+test('UserModel: hash scrypt, senha legada e comprimentos inválidos', async () => {
+  const stored = await UserModel.hashPassword('segredo');
+  assert.equal(await UserModel.verifyPassword('segredo', stored), true);
+  assert.equal(await UserModel.verifyPassword('errada', stored), false);
+  assert.equal(await UserModel.verifyPassword('abc', 'abc'), true);
   assert.equal(UserModel.isLegacyPassword('abc'), true);
   assert.equal(UserModel.isLegacyPassword(stored), false);
-  assert.equal(UserModel.verifyPassword('x', 'abcd:0011'), false);
+  assert.equal(await UserModel.verifyPassword('x', 'abcd:0011'), false);
 });
 
 test('LibraryModel', async (t) => {
