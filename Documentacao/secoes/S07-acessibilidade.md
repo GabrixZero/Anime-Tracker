@@ -1,6 +1,6 @@
 # S07 · Acessibilidade
 
-**Status:** pendente · **Gravidade:** média · **Depende de:** S05 recomendado (layout estável) · **Branch:** `feature/s07-acessibilidade`
+**Status:** em `Documentacao/status/S07.json` (`npm run status -- S07`) · **Gravidade:** média · **Depende de:** S05 recomendado (layout estável) · **Branch:** `feature/s07-acessibilidade`
 
 ## Por que importa
 Hoje quem usa teclado ou leitor de tela não consegue usar o app: não existe nenhum `aria-*`, `role=` ou `tabindex` no projeto.

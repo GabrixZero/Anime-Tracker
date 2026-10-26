@@ -1,6 +1,6 @@
 # S05 · Mobile e layout
 
-**Status:** pendente · **Gravidade:** alta · **Depende de:** nada (S10 completa a limpeza de CSS inline) · **Branch:** `feature/s05-mobile-e-layout`
+**Status:** em `Documentacao/status/S05.json` (`npm run status -- S05`) · **Gravidade:** alta · **Depende de:** nada (S10 completa a limpeza de CSS inline) · **Branch:** `feature/s05-mobile-e-layout`
 
 ## Por que importa
 Em 375×812 só a aba "A Seguir" aparece no menu (as outras ficam escondidas numa rolagem horizontal com barra minúscula) e o cabeçalho ocupa ~180 px. Boa parte do layout é

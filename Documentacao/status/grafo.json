@@ -1,0 +1,48 @@
+{
+  "_ajuda": "hard = precisa estar concluida no main antes de iniciar. soft = recomendado; o script avisa mas nao bloqueia.",
+  "hard": {
+    "S01": [],
+    "S02": [],
+    "S03": [
+      "S02"
+    ],
+    "S04": [
+      "S02"
+    ],
+    "S05": [],
+    "S06": [
+      "S02"
+    ],
+    "S07": [],
+    "S08": [
+      "S03"
+    ],
+    "S09": [
+      "S02"
+    ],
+    "S10": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08"
+    ]
+  },
+  "soft": {
+    "S02": [
+      "S01"
+    ],
+    "S07": [
+      "S05"
+    ],
+    "S09": [
+      "S06"
+    ],
+    "S10": [
+      "S09"
+    ]
+  }
+}
