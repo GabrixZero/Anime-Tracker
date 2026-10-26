@@ -1,4 +1,4 @@
-const UserModel = require('../models/UserModel');
+﻿const UserModel = require('../models/UserModel');
 
 class AuthController {
   async register(req, res) {
@@ -18,12 +18,11 @@ class AuthController {
       const user = UserModel.create({
         name: name || email.split('@')[0],
         email: email.toLowerCase(),
-        password, // Em produção real usa bcrypt
+        password, // Hashed com scrypt no UserModel
         avatar: defaultAvatar,
         provider: 'email'
       });
 
-      // Retorna usuário sanitizado
       const { password: _, ...safeUser } = user;
       return res.status(201).json({
         message: 'Conta criada com sucesso!',
@@ -44,7 +43,7 @@ class AuthController {
       }
 
       const user = UserModel.findByEmail(email);
-      if (!user || user.password !== password) {
+      if (!user || !UserModel.verifyPassword(password, user.password)) {
         return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
       }
 
@@ -63,7 +62,7 @@ class AuthController {
   async googleAuth(req, res) {
     try {
       const { email, name, avatar } = req.body;
-      const userEmail = (email || 'usuario.google@gmail.com').toLowerCase();
+      const userEmail = (email || 'demo.google@showvault.local').toLowerCase();
 
       let user = UserModel.findByEmail(userEmail);
       if (!user) {

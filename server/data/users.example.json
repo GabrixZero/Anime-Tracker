@@ -1,0 +1,11 @@
+﻿[
+  {
+    "id": "usr_demo_01",
+    "createdAt": "2026-10-25T00:00:00.000Z",
+    "name": "Usuario Demo",
+    "email": "demo@showvault.local",
+    "password": "demo",
+    "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=demo%40showvault.local",
+    "provider": "email"
+  }
+]
