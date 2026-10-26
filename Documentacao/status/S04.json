@@ -2,8 +2,8 @@
   "secao": "S04",
   "titulo": "Contas e autenticação",
   "arquivo": "Documentacao/secoes/S04-contas-e-auth.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s04-contas-e-auth",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
