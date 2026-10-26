@@ -2,9 +2,9 @@
   "secao": "S05",
   "titulo": "Mobile e layout",
   "arquivo": "Documentacao/secoes/S05-mobile-e-layout.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s05-mobile-e-layout",
+  "concluidaEm": "2026-10-26",
   "commit": "",
-  "notas": ""
+  "notas": "Barra de abas inferior (<=1024px), cabecalho de ~57px, estilos inline movidos para classes (views.css), grades/modais responsivos, reduced-motion; sem overflow horizontal em 320/360/375/768px. Teste: tests/layout.test.js. Decisoes D-S05-1..4."
 }

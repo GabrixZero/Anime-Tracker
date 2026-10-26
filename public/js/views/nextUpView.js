@@ -95,7 +95,7 @@ class NextUpView {
       if (this.counterPill) this.counterPill.textContent = 'Carregando fila...';
       if (this.badge) this.badge.textContent = '0';
       if (this.container) {
-        this.container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">Carregando próximos episódios...</div>';
+        this.container.innerHTML = '<div class="grid-message grid-message--info">Carregando próximos episódios...</div>';
       }
       if (this.emptyState) this.emptyState.classList.add('hidden');
       return;
@@ -118,11 +118,11 @@ class NextUpView {
     // Caso 1: Usuário não possui nenhuma obra na lista
     if (trackedCount === 0) {
       this.emptyState.innerHTML = `
-        <div class="empty-icon" style="margin-bottom: 1rem;">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted);"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+        <div class="empty-icon empty-icon--muted">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
         </div>
-        <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Sua lista está vazia</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 480px; margin-left: auto; margin-right: auto;">Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar sua maratona.</p>
+        <h3 class="empty-title">Sua lista está vazia</h3>
+        <p class="empty-text empty-text--narrow">Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar sua maratona.</p>
         <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo</button>
       `;
       return;
@@ -132,11 +132,11 @@ class NextUpView {
     if (this.typeFilter !== 'all') {
       const typeLabel = this.typeFilter === 'tv' ? 'séries' : this.typeFilter === 'anime' ? 'animes' : 'filmes';
       this.emptyState.innerHTML = `
-        <div class="empty-icon" style="margin-bottom: 1rem;">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted);"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <div class="empty-icon empty-icon--muted">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         </div>
-        <h3 style="font-family: var(--font-display); font-size: 1.3rem; color: #fff; margin-bottom: 0.5rem;">Nenhum título pendente em ${typeLabel}</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Todos os seus lançamentos desta categoria estão concluídos.</p>
+        <h3 class="empty-title">Nenhum título pendente em ${typeLabel}</h3>
+        <p class="empty-text">Todos os seus lançamentos desta categoria estão concluídos.</p>
         <button class="btn btn-outline" onclick="document.querySelector('#view-next-up .type-pill-btn[data-type=all]').click()">Ver Todos os Títulos</button>
       `;
       return;
@@ -144,11 +144,11 @@ class NextUpView {
 
     // Caso 3: O usuário REALMENTE está com tudo em dia
     this.emptyState.innerHTML = `
-      <div class="empty-icon" style="margin-bottom: 1rem;">
-        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-emerald);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div class="empty-icon empty-icon--success">
+        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
-      <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Você está em dia com tudo!</h3>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 480px; margin-left: auto; margin-right: auto;">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
+      <h3 class="empty-title">Você está em dia com tudo!</h3>
+      <p class="empty-text empty-text--narrow">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
       <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo</button>
     `;
   }
@@ -176,7 +176,7 @@ class NextUpView {
         </div>
         
         <div class="next-up-info">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+          <div class="next-up-info-top">
             <span class="next-up-show-name" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.showName)}</span>
             ${typeBadge}
           </div>

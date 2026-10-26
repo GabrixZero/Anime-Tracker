@@ -2,24 +2,25 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
   <title>ShowVault · Rastreador de Séries, Filmes e Animes (TV Time Replica)</title>
   <meta name="description" content="Plataforma de rastreamento com API backend, arquitetura MVC, diário de episódios blindado contra perda de notas e autenticação estilo TV Show Time.">
-  
+
   <!-- Fontes Google: Outfit e Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Arquitetura CSS Modular -->
+
+  <!-- Arquitetura CSS Modular (layout.css vem depois de views.css: contém os breakpoints) -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/auth-tvtime.css">
 </head>
 <body>
   <div id="app" class="app-container">
-    
+
     <!-- BARRA SUPERIOR / HEADER -->
     <header class="app-header">
       <div class="header-left">
@@ -35,33 +36,34 @@
           </div>
         </div>
 
+        <!-- No celular esta navegação vira a barra de abas fixa na parte de baixo (layout.css) -->
         <nav class="main-nav">
           <button class="nav-tab active" data-tab="next-up" id="tab-btn-next-up">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span>A Seguir</span>
+            <span class="nav-label">A Seguir</span>
             <span class="badge" id="badge-next-up">0</span>
           </button>
-          
+
           <button class="nav-tab" data-tab="watchlist" id="tab-btn-watchlist">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-            <span>Minha Lista</span>
+            <span class="nav-label"><span class="nav-long">Minha Lista</span><span class="nav-short">Lista</span></span>
             <span class="badge" id="badge-watchlist">0</span>
           </button>
-          
+
           <button class="nav-tab" data-tab="diary" id="tab-btn-diary">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            <span>Meu Diário</span>
+            <span class="nav-label"><span class="nav-long">Meu Diário</span><span class="nav-short">Diário</span></span>
             <span class="badge badge-accent" id="badge-diary">0</span>
           </button>
-          
+
           <button class="nav-tab" data-tab="stats" id="tab-btn-stats">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>Estatísticas</span>
+            <span class="nav-label"><span class="nav-long">Estatísticas</span><span class="nav-short">Estat.</span></span>
           </button>
-          
+
           <button class="nav-tab" data-tab="explore" id="tab-btn-explore">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>Explorar API</span>
+            <span class="nav-label"><span class="nav-long">Explorar API</span><span class="nav-short">Explorar</span></span>
           </button>
         </nav>
       </div>
@@ -81,7 +83,7 @@
         <div class="user-auth-zone">
           <button class="btn btn-sm btn-primary" id="btn-open-auth">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Entrar / Cadastrar</span>
+            <span>Entrar<span class="auth-btn-extra"> / Cadastrar</span></span>
           </button>
 
           <div class="user-logged-profile hidden" id="user-logged-profile">
@@ -123,11 +125,11 @@
         <div class="next-up-grid" id="next-up-container"></div>
 
         <div class="empty-state hidden" id="next-up-empty">
-          <div class="empty-icon" style="margin-bottom: 1rem;">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-emerald);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div class="empty-icon empty-icon--success">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
-          <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Você está em dia com tudo!</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
+          <h3 class="empty-title">Você está em dia com tudo!</h3>
+          <p class="empty-text">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
           <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo da API</button>
         </div>
       </section>
@@ -140,11 +142,11 @@
             <p>Seu cofre pessoal de séries, filmes e animes com progresso detalhado.</p>
           </div>
 
-          <div class="filter-pills" id="watchlist-filters" style="display: flex; gap: 0.5rem; background: var(--bg-surface); padding: 0.3rem; border-radius: var(--radius-md); border: 1px solid var(--bg-card-border);">
-            <button class="pill-btn active" data-filter="all" style="background: transparent; border: none; color: var(--text-secondary); padding: 0.45rem 0.9rem; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm);">Todos (<span id="count-all">0</span>)</button>
-            <button class="pill-btn" data-filter="watching" style="background: transparent; border: none; color: var(--text-secondary); padding: 0.45rem 0.9rem; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm);">Em Andamento (<span id="count-watching">0</span>)</button>
-            <button class="pill-btn" data-filter="completed" style="background: transparent; border: none; color: var(--text-secondary); padding: 0.45rem 0.9rem; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm);">Finalizados (<span id="count-completed">0</span>)</button>
-            <button class="pill-btn" data-filter="plan_to_watch" style="background: transparent; border: none; color: var(--text-secondary); padding: 0.45rem 0.9rem; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm);">Quero Ver (<span id="count-plan">0</span>)</button>
+          <div class="filter-pills" id="watchlist-filters">
+            <button class="pill-btn active" data-filter="all">Todos (<span id="count-all">0</span>)</button>
+            <button class="pill-btn" data-filter="watching">Em Andamento (<span id="count-watching">0</span>)</button>
+            <button class="pill-btn" data-filter="completed">Finalizados (<span id="count-completed">0</span>)</button>
+            <button class="pill-btn" data-filter="plan_to_watch">Quero Ver (<span id="count-plan">0</span>)</button>
           </div>
         </div>
 
@@ -158,11 +160,11 @@
         <div class="shows-grid" id="watchlist-container"></div>
 
         <div class="empty-state hidden" id="watchlist-empty">
-          <div class="empty-icon" style="margin-bottom: 1rem;">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted);"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+          <div class="empty-icon empty-icon--muted">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
           </div>
-          <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Sua lista está vazia</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Adicione títulos para começar a registrar seu progresso e notas.</p>
+          <h3 class="empty-title">Sua lista está vazia</h3>
+          <p class="empty-text">Adicione títulos para começar a registrar seu progresso e notas.</p>
           <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Títulos Agora</button>
         </div>
       </section>
@@ -175,8 +177,8 @@
             <p>Todas as suas notas, reações e personagens gravados com persistência atômica.</p>
           </div>
 
-          <div style="display: flex; gap: 1rem; align-items: center;">
-            <input type="text" id="diary-search-input" placeholder="Buscar anotação ou personagem..." style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.55rem 1rem; color: #fff; min-width: 260px; outline: none;">
+          <div class="header-controls">
+            <input type="text" id="diary-search-input" class="input-field" placeholder="Buscar anotação ou personagem...">
             <button class="btn btn-secondary" id="btn-export-notes-md">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <span>Exportar (.md)</span>
@@ -184,7 +186,7 @@
           </div>
         </div>
 
-        <div class="type-filter-row" id="emotion-filters">
+        <div class="type-filter-row type-filter-row--scroll" id="emotion-filters">
           <button class="emotion-filter-btn type-pill-btn active" data-emotion="all">Todas as Reações</button>
           <button class="emotion-filter-btn type-pill-btn" data-emotion="awesome">😍 Adorei</button>
           <button class="emotion-filter-btn type-pill-btn" data-emotion="fun">😂 Divertido</button>
@@ -196,11 +198,11 @@
         <div id="diary-container"></div>
 
         <div class="empty-state hidden" id="diary-empty">
-          <div class="empty-icon" style="margin-bottom: 1rem;">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted);"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <div class="empty-icon empty-icon--muted">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </div>
-          <h3 style="font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Nenhuma anotação registrada ainda</h3>
-          <p style="color: var(--text-secondary);">Quando você marca um episódio ou filme e escreve uma reflexão, ela é gravada imediatamente aqui.</p>
+          <h3 class="empty-title">Nenhuma anotação registrada ainda</h3>
+          <p class="empty-text">Quando você marca um episódio ou filme e escreve uma reflexão, ela é gravada imediatamente aqui.</p>
         </div>
       </section>
 
@@ -213,58 +215,58 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem;">
-          <div style="background: linear-gradient(135deg, rgba(255, 208, 0, 0.12), rgba(245, 158, 11, 0.04)); border: 1px solid rgba(255, 208, 0, 0.25); border-radius: var(--radius-md); padding: 1.75rem; display: flex; align-items: center; gap: 1.5rem;">
-            <div style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: var(--radius-md); background: rgba(255,208,0,0.15); color: var(--tvtime-yellow);">
+        <div class="stats-grid">
+          <div class="stat-card stat-card--hero">
+            <div class="stat-hero-icon">
               <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
-            <div>
-              <span style="font-size: 0.75rem; font-weight: 800; color: var(--tvtime-yellow); text-transform: uppercase;">TEMPO TOTAL GASTO</span>
-              <div style="display: flex; gap: 0.75rem; font-family: var(--font-display); font-size: 1.15rem; color: var(--text-secondary);">
-                <span><strong id="time-months" style="font-size: 2rem; color: #fff;">0</strong>m</span>
-                <span><strong id="time-days" style="font-size: 2rem; color: #fff;">0</strong>d</span>
-                <span><strong id="time-hours" style="font-size: 2rem; color: #fff;">0</strong>h</span>
-                <span><strong id="time-minutes" style="font-size: 2rem; color: #fff;">0</strong>min</span>
+            <div class="stat-hero-body">
+              <span class="stat-kicker">TEMPO TOTAL GASTO</span>
+              <div class="stat-time">
+                <span><strong id="time-months">0</strong>m</span>
+                <span><strong id="time-days">0</strong>d</span>
+                <span><strong id="time-hours">0</strong>h</span>
+                <span><strong id="time-minutes">0</strong>min</span>
               </div>
-              <span id="stat-minutes-subtext" style="font-size: 0.8rem; color: var(--text-muted);">0 minutos assistidos</span>
+              <span class="stat-subtext" id="stat-minutes-subtext">0 minutos assistidos</span>
             </div>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="margin-bottom: 0.5rem; color: var(--tvtime-yellow);">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--yellow">
               <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
             </div>
-            <span class="stat-number" id="stat-episodes-count" style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff;">0</span>
-            <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Obras & Episódios</span>
+            <span class="stat-number" id="stat-episodes-count">0</span>
+            <span class="stat-label">Obras & Episódios</span>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="margin-bottom: 0.5rem; color: var(--accent-emerald);">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--green">
               <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <span class="stat-number" id="stat-shows-completed" style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff;">0</span>
-            <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Finalizadas</span>
+            <span class="stat-number" id="stat-shows-completed">0</span>
+            <span class="stat-label">Finalizadas</span>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="margin-bottom: 0.5rem; color: var(--accent-cyan);">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--cyan">
               <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </div>
-            <span class="stat-number" id="stat-notes-count" style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff;">0</span>
-            <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">Anotações Salvas</span>
+            <span class="stat-number" id="stat-notes-count">0</span>
+            <span class="stat-label">Anotações Salvas</span>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-          <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.75rem;">
-            <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: #fff; margin-bottom: 0.2rem;">Distribuição de Reações</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Como as obras fizeram você se sentir</p>
+        <div class="stats-panels">
+          <div class="stat-panel">
+            <h3>Distribuição de Reações</h3>
+            <p>Como as obras fizeram você se sentir</p>
             <div id="stats-emotions-chart"></div>
           </div>
 
-          <div style="background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 1.75rem;">
-            <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: #fff; margin-bottom: 0.2rem;">Top Gêneros</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Categorias mais frequentes</p>
+          <div class="stat-panel">
+            <h3>Top Gêneros</h3>
+            <p>Categorias mais frequentes</p>
             <div id="stats-genres-list"></div>
           </div>
         </div>
@@ -272,12 +274,12 @@
 
       <!-- ================= ABA 5: EXPLORAR API ================= -->
       <section class="tab-content" id="view-explore">
-        <div style="text-align: center; max-width: 720px; margin: 0 auto 3rem auto;">
-          <h2 style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Explorar Catálogo via API</h2>
-          <p style="color: var(--text-secondary); margin-bottom: 1.75rem;">Pesquise séries, filmes e animes conectados à nossa API REST em tempo real.</p>
-          
-          <div style="display: flex; background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-md); padding: 0.45rem 0.5rem 0.45rem 1.25rem; box-shadow: 0 8px 30px rgba(0,0,0,0.4);">
-            <input type="text" id="explore-search-input" placeholder="Busque qualquer título (ex: Attack on Titan, Oppenheimer, Breaking Bad)..." style="flex: 1; background: transparent; border: none; font-size: 1rem; color: #fff; outline: none;">
+        <div class="explore-hero">
+          <h2 class="explore-title">Explorar Catálogo via API</h2>
+          <p class="explore-sub">Pesquise séries, filmes e animes conectados à nossa API REST em tempo real.</p>
+
+          <div class="search-bar">
+            <input type="text" id="explore-search-input" placeholder="Busque qualquer título (ex: Attack on Titan, Oppenheimer, Breaking Bad)...">
             <button class="btn btn-primary" id="btn-search-shows">Pesquisar API</button>
           </div>
         </div>
@@ -289,8 +291,8 @@
           <button class="type-pill-btn" data-explore-type="movie">Filmes</button>
         </div>
 
-        <div class="section-title-wrap" style="margin-bottom: 1.5rem;">
-          <h3 id="explore-results-title" style="font-family: var(--font-display); font-size: 1.4rem; color: #fff;">Catálogo em Destaque</h3>
+        <div class="section-title-wrap">
+          <h3 class="section-title" id="explore-results-title">Catálogo em Destaque</h3>
         </div>
 
         <div class="shows-grid" id="explore-container"></div>
@@ -302,7 +304,7 @@
       <div class="tvtime-auth-card">
         <div class="tvtime-auth-backdrop"></div>
         <button class="tvtime-auth-close" id="btn-close-tvtime-auth">&times;</button>
-        
+
         <div class="tvtime-auth-content">
           <div class="tvtime-auth-header">
             <div class="tvtime-badge-icon">
@@ -316,7 +318,7 @@
 
           <!-- Login com Google: só aparece se o servidor tiver GOOGLE_CLIENT_ID (o authView.js mostra e carrega o botão oficial) -->
           <div id="google-signin-section" class="hidden">
-            <div id="google-signin-button" style="display: flex; justify-content: center; min-height: 44px;"></div>
+            <div id="google-signin-button" class="google-signin-slot"></div>
             <div class="tvtime-divider">
               <span>ou com e-mail</span>
             </div>
@@ -341,10 +343,10 @@
             <div class="tvtime-field">
               <label for="input-tvtime-password">Senha</label>
               <input type="password" id="input-tvtime-password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
-              <small id="tvtime-password-hint" class="hidden" style="display: block; margin-top: 0.35rem; font-size: 0.75rem; color: var(--text-muted);">Use de 8 a 128 caracteres.</small>
+              <small id="tvtime-password-hint" class="hidden auth-field-hint">Use de 8 a 128 caracteres.</small>
             </div>
 
-            <p id="tvtime-auth-error" class="hidden" role="alert" style="margin: 0 0 0.75rem; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.4); color: #fda4af; font-size: 0.85rem; line-height: 1.4;"></p>
+            <p id="tvtime-auth-error" class="hidden auth-form-error" role="alert"></p>
 
             <button type="submit" class="btn-tvtime-submit" id="btn-tvtime-auth-submit">Entrar na Conta</button>
           </form>
@@ -358,26 +360,28 @@
 
     <!-- ================= MODAL: DETALHES DA OBRA & TEMPORADAS ================= -->
     <div class="modal-overlay hidden" id="modal-show-detail">
-      <div class="modal-container" style="max-width: 900px;">
+      <div class="modal-container modal-container--split modal-container--detail">
         <button class="modal-close-btn" id="btn-close-show-modal">&times;</button>
-        
-        <div id="show-modal-header" style="position: relative; padding: 2.5rem; background-size: cover; background-position: center; border-bottom: 1px solid var(--bg-card-border); display: flex; gap: 2rem;"></div>
 
-        <div style="padding: 1.75rem 2.5rem;">
-          <div id="movie-detail-body" class="hidden"></div>
+        <div class="modal-scroll">
+          <div id="show-modal-header" class="show-modal-header"></div>
 
-          <div id="series-detail-body">
-            <div id="show-seasons-tabs" style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.75rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--bg-card-border);"></div>
+          <div class="modal-body">
+            <div id="movie-detail-body" class="hidden"></div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm);">
-              <div id="season-stats-summary" style="font-size: 0.85rem; color: var(--text-secondary);">Progresso: <strong>0/0</strong></div>
-              <div style="display: flex; gap: 0.75rem;">
-                <button class="btn btn-sm btn-outline" id="btn-batch-check-season">✓ Marcar Temporada Inteira</button>
-                <button class="btn btn-sm btn-ghost" id="btn-batch-uncheck-season">Desmarcar Temporada</button>
+            <div id="series-detail-body">
+              <div id="show-seasons-tabs" class="season-tabs"></div>
+
+              <div class="season-summary-bar">
+                <div id="season-stats-summary" class="season-summary">Progresso: <strong>0/0</strong></div>
+                <div class="season-batch-actions">
+                  <button class="btn btn-sm btn-outline" id="btn-batch-check-season">✓ Marcar Temporada Inteira</button>
+                  <button class="btn btn-sm btn-ghost" id="btn-batch-uncheck-season">Desmarcar Temporada</button>
+                </div>
               </div>
-            </div>
 
-            <div id="show-episodes-container"></div>
+              <div id="show-episodes-container"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -385,69 +389,71 @@
 
     <!-- ================= MODAL: DIÁRIO DE EPISÓDIO BLINDADO ================= -->
     <div class="modal-overlay hidden" id="modal-episode-note">
-      <div class="modal-container" style="max-width: 680px;">
+      <div class="modal-container modal-container--split modal-container--note">
         <button class="modal-close-btn" id="btn-close-note-modal">&times;</button>
-        
-        <div style="padding: 1.75rem 2rem; border-bottom: 1px solid var(--bg-card-border); display: flex; align-items: flex-start; justify-content: space-between;">
+
+        <div class="note-header">
           <div>
-            <span class="note-badge" id="note-ep-code" style="display: inline-block; padding: 0.2rem 0.6rem; background: rgba(255,208,0,0.15); color: var(--tvtime-yellow); font-weight: 800; font-size: 0.8rem; border-radius: 4px; margin-bottom: 0.3rem;">S01E01</span>
-            <h3 id="note-ep-title" style="font-family: var(--font-display); font-size: 1.45rem; color: #fff;">Nome do Episódio</h3>
-            <span id="note-show-title" style="font-size: 0.85rem; color: var(--text-muted);">Nome da Obra</span>
+            <span class="note-badge" id="note-ep-code">S01E01</span>
+            <h3 class="note-title" id="note-ep-title">Nome do Episódio</h3>
+            <span class="note-show-title" id="note-show-title">Nome da Obra</span>
           </div>
 
-          <div id="note-save-status" style="display: flex; align-items: center; gap: 0.45rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem; color: #6ee7b7; font-weight: 600;">
-            <span class="save-dot" style="width: 7px; height: 7px; border-radius: 50%; background: var(--accent-emerald);"></span>
+          <div class="note-save-status" id="note-save-status">
+            <span class="save-dot"></span>
             <span class="save-text">Salvo no disco</span>
           </div>
         </div>
 
-        <div style="padding: 1.75rem 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm);">
-            <label style="display: flex; align-items: center; gap: 0.65rem; cursor: pointer; font-weight: 700; font-size: 0.9rem;">
-              <input type="checkbox" id="note-watched-toggle">
-              <span>Marcar como Assistido</span>
-            </label>
-          </div>
-
-          <!-- Seletor de Emoções TV Show Time -->
-          <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.6rem;">Sua reação:</label>
-            <div id="note-emotion-selector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.65rem;">
-              <button class="emotion-btn" data-emotion="awesome" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem; display: flex; flex-direction: column; align-items: center; cursor: pointer;"><span style="font-size: 1.5rem;">😍</span><span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Adorei</span></button>
-              <button class="emotion-btn" data-emotion="fun" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem; display: flex; flex-direction: column; align-items: center; cursor: pointer;"><span style="font-size: 1.5rem;">😂</span><span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Divertido</span></button>
-              <button class="emotion-btn" data-emotion="mindblown" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem; display: flex; flex-direction: column; align-items: center; cursor: pointer;"><span style="font-size: 1.5rem;">😱</span><span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Chocado</span></button>
-              <button class="emotion-btn" data-emotion="sad" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem; display: flex; flex-direction: column; align-items: center; cursor: pointer;"><span style="font-size: 1.5rem;">😢</span><span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Triste</span></button>
-              <button class="emotion-btn" data-emotion="disappointed" style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.75rem 0.5rem; display: flex; flex-direction: column; align-items: center; cursor: pointer;"><span style="font-size: 1.5rem;">😡</span><span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Ruim</span></button>
+        <div class="modal-scroll">
+          <div class="note-body">
+            <div class="note-watched-row">
+              <label>
+                <input type="checkbox" id="note-watched-toggle">
+                <span>Marcar como Assistido</span>
+              </label>
             </div>
-          </div>
 
-          <div>
-            <label for="note-character-input" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.6rem;">Personagem ou Destaque:</label>
-            <input type="text" id="note-character-input" placeholder="Ex: Eren Yeager, Walter White, Richie..." style="width: 100%; background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); padding: 0.65rem 1rem; color: #fff; outline: none;">
-          </div>
-
-          <!-- Editor com Auto-Save Contínuo -->
-          <div style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); overflow: hidden;">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.85rem; background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--bg-card-border);">
-              <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);">Anotação Pessoal (Auto-Save 350ms):</span>
-              <div style="display: flex; gap: 0.35rem;">
-                <button type="button" class="tool-btn" data-insert="**" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;"><strong>B</strong></button>
-                <button type="button" class="tool-btn" data-insert="*" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;"><em>I</em></button>
-                <button type="button" class="tool-btn" data-insert="> " style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">❝</button>
-                <button type="button" class="tool-btn" data-insert=">!spoiler!<" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">Spoiler</button>
+            <!-- Seletor de Emoções TV Show Time -->
+            <div>
+              <span class="note-label">Sua reação:</span>
+              <div class="emotion-grid" id="note-emotion-selector">
+                <button class="emotion-btn" data-emotion="awesome"><span class="emotion-emoji">😍</span><span class="emotion-label">Adorei</span></button>
+                <button class="emotion-btn" data-emotion="fun"><span class="emotion-emoji">😂</span><span class="emotion-label">Divertido</span></button>
+                <button class="emotion-btn" data-emotion="mindblown"><span class="emotion-emoji">😱</span><span class="emotion-label">Chocado</span></button>
+                <button class="emotion-btn" data-emotion="sad"><span class="emotion-emoji">😢</span><span class="emotion-label">Triste</span></button>
+                <button class="emotion-btn" data-emotion="disappointed"><span class="emotion-emoji">😡</span><span class="emotion-label">Ruim</span></button>
               </div>
             </div>
 
-            <textarea id="note-textarea" rows="7" placeholder="Escreva o que achou... O salvamento é automático no disco local e não se perde mesmo se a aba fechar." style="width: 100%; background: transparent; border: none; padding: 1rem; color: #f1f5f9; font-family: var(--font-body); font-size: 0.95rem; line-height: 1.6; outline: none;"></textarea>
-            
-            <div style="display: flex; justify-content: space-between; padding: 0.5rem 1rem; background: rgba(0,0,0,0.25); font-size: 0.75rem; color: var(--text-muted);">
-              <span id="note-word-count">0 palavras · 0 caracteres</span>
-              <span id="note-last-saved">Nunca editado</span>
+            <div>
+              <label class="note-label" for="note-character-input">Personagem ou Destaque:</label>
+              <input type="text" id="note-character-input" class="input-field" placeholder="Ex: Eren Yeager, Walter White, Richie...">
+            </div>
+
+            <!-- Editor com Auto-Save Contínuo -->
+            <div class="note-editor">
+              <div class="note-toolbar">
+                <span class="note-toolbar-title">Anotação Pessoal (Auto-Save 350ms):</span>
+                <div class="note-toolbar-tools">
+                  <button type="button" class="tool-btn" data-insert="**"><strong>B</strong></button>
+                  <button type="button" class="tool-btn" data-insert="*"><em>I</em></button>
+                  <button type="button" class="tool-btn" data-insert="> ">❝</button>
+                  <button type="button" class="tool-btn" data-insert=">!spoiler!<">Spoiler</button>
+                </div>
+              </div>
+
+              <textarea id="note-textarea" class="note-textarea" rows="7" placeholder="Escreva o que achou... O salvamento é automático no disco local e não se perde mesmo se a aba fechar."></textarea>
+
+              <div class="note-counters">
+                <span id="note-word-count">0 palavras · 0 caracteres</span>
+                <span id="note-last-saved">Nunca editado</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div style="padding: 1.25rem 2rem; border-top: 1px solid var(--bg-card-border); display: flex; justify-content: flex-end; background: rgba(0,0,0,0.2);">
+        <div class="note-footer">
           <button class="btn btn-primary" id="btn-save-note-modal">Concluir & Fechar</button>
         </div>
       </div>
@@ -455,33 +461,33 @@
 
     <!-- ================= MODAL: BACKUP ================= -->
     <div class="modal-overlay hidden" id="modal-backup">
-      <div class="modal-container" style="max-width: 520px; padding: 2rem;">
+      <div class="modal-container modal-container--backup">
         <button class="modal-close-btn" id="btn-close-backup-modal">&times;</button>
-        <h3 style="font-family: var(--font-display); font-size: 1.35rem; color: #fff; margin-bottom: 0.25rem;">Central de Backup & Blindagem</h3>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.75rem;">Seus dados são 100% seus. Exporte e importe quando quiser.</p>
+        <h3 class="backup-title">Central de Backup & Blindagem</h3>
+        <p class="backup-sub">Seus dados são 100% seus. Exporte e importe quando quiser.</p>
 
-        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-          <div style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); padding: 1.25rem; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+        <div class="backup-list">
+          <div class="backup-row">
             <div>
-              <h4 style="color: #fff; font-size: 0.95rem;">Exportar Backup (JSON)</h4>
-              <p style="font-size: 0.78rem; color: var(--text-muted);">Todas as séries, animes, filmes e notas.</p>
+              <h4>Exportar Backup (JSON)</h4>
+              <p>Todas as séries, animes, filmes e notas.</p>
             </div>
             <button class="btn btn-primary btn-sm" id="btn-download-json-backup">Baixar .JSON</button>
           </div>
 
-          <div style="background: var(--bg-surface); border: 1px solid var(--bg-card-border); padding: 1.25rem; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+          <div class="backup-row">
             <div>
-              <h4 style="color: #fff; font-size: 0.95rem;">Restaurar Backup (JSON)</h4>
-              <p style="font-size: 0.78rem; color: var(--text-muted);">Carregue seu arquivo de backup.</p>
+              <h4>Restaurar Backup (JSON)</h4>
+              <p>Carregue seu arquivo de backup.</p>
             </div>
-            <label class="btn btn-outline btn-sm" style="cursor: pointer;">
-              <input type="file" id="input-import-backup" accept=".json" style="display: none;">
+            <label class="btn btn-outline btn-sm">
+              <input type="file" id="input-import-backup" accept=".json">
               Restaurar .JSON
             </label>
           </div>
 
-          <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(244,63,94,0.2);">
-            <h4 style="color: var(--accent-rose); font-size: 0.85rem; margin-bottom: 0.25rem;">Resetar Base de Dados</h4>
+          <div class="backup-reset">
+            <h4>Resetar Base de Dados</h4>
             <button class="btn btn-danger-outline btn-sm" id="btn-reset-database">Resetar Dados Locais</button>
           </div>
         </div>

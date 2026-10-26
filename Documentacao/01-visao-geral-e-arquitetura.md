@@ -97,7 +97,7 @@ Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
 | `js/services/syncService.js` | push com debounce (1,5 s) e `pullAndMerge()` no login; merge por união |
 | `js/views/*View.js` | telas: A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar, modal de detalhes, login |
 | `js/controllers/appController.js` | abas, toasts, backup/import/reset, `addToList`/`removeFromList`, `refreshAll()` (re-render geral) |
-| `css/` | `variables`, `components`, `layout`, `auth-tvtime` (~1.250 linhas; boa parte do estilo está **inline** no HTML) |
+| `css/` | `variables` (tokens, `--fs-meta`, reduced-motion), `components` (botões, cartões, modais base), **`views`** (telas e modais: diário, estatísticas, explorar, detalhes, anotação, backup — S05), `layout` (cabeçalho, navegação e **todos os breakpoints**; abas viram barra inferior ≤1024 px), `auth-tvtime` (login). O HTML quase não tem `style=` inline (só larguras dinâmicas); ver D-S05-1..4 |
 
 Formato do estado (ids de obra: ver "Esquema de ids"): chaves de episódio `"<id>_s<T>_e<E>"` e filmes `"<id>_movie"`. Ids de obra são **números** e o código usa `Number(id)` e
 injeta ids sem aspas em `onclick` em ~10 lugares (por isso ids de texto como `mal-123` quebrariam o app).
