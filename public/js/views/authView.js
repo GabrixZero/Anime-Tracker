@@ -112,7 +112,7 @@ class AuthView {
       passwordInput.setAttribute('autocomplete', 'new-password');
       tabRegister.classList.add('active');
       tabLogin.classList.remove('active');
-      footerLink.innerHTML = `Já tem conta? <a href="#" onclick="event.preventDefault(); window.authView.switchMode('login')">Entrar agora</a>`;
+      footerLink.innerHTML = `Já tem conta? <button type="button" class="auth-switch-link" onclick="window.authView.switchMode('login')">Entrar agora</button>`;
     } else {
       title.innerHTML = 'Bem-vindo ao <span>ShowVault</span>';
       submitBtn.textContent = 'Entrar na Conta';
@@ -121,7 +121,7 @@ class AuthView {
       passwordInput.setAttribute('autocomplete', 'current-password');
       tabLogin.classList.add('active');
       tabRegister.classList.remove('active');
-      footerLink.innerHTML = `Não tem conta? <a href="#" onclick="event.preventDefault(); window.authView.switchMode('register')">Cadastre-se grátis</a>`;
+      footerLink.innerHTML = `Não tem conta? <button type="button" class="auth-switch-link" onclick="window.authView.switchMode('register')">Cadastre-se grátis</button>`;
     }
   }
 
@@ -262,7 +262,9 @@ class AuthView {
       btnOpen.classList.add('hidden');
       profile.classList.remove('hidden');
       document.getElementById('user-display-name').textContent = user.name;
-      document.getElementById('user-avatar-img').src = window.safeUrl ? window.safeUrl(user.avatar) : user.avatar;
+      const avatar = document.getElementById('user-avatar-img');
+      avatar.src = window.safeUrl ? window.safeUrl(user.avatar) : user.avatar;
+      avatar.alt = `Avatar de ${user.name}`;
       window.syncService.setBaseLabel(user.provider === 'google' ? 'Google Nuvem' : 'Nuvem Ativa');
     } else {
       btnOpen.classList.remove('hidden');

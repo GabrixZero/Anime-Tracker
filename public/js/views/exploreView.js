@@ -85,10 +85,10 @@ class ExploreView {
 
       return `
         <div class="show-card">
-          <div class="show-poster-wrap" onclick="window.detailModalView.open(${toInt(item.id)})">
+          <div class="show-poster-wrap">
             <img class="show-poster" 
                  src="${safeSrc(item.poster_path) || fallbackPoster}" 
-                 alt="${escapeHtml(item.name)}" 
+                 alt="Pôster de ${escapeHtml(item.name)}" 
                  loading="lazy"
                  onerror="this.onerror=null; this.src='${fallbackPoster}';">
             <div class="show-rating-badge">★ ${formatRating(item.vote_average, '–')}</div>
@@ -100,7 +100,7 @@ class ExploreView {
               <span class="show-year">${escapeHtml(item.first_air_date ? String(item.first_air_date).slice(0, 4) : '')}</span>
             </div>
 
-            <h4 class="show-title" title="${escapeHtml(item.name)}" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</h4>
+            <h3 class="show-title" title="${escapeHtml(item.name)}"><button type="button" class="show-open-btn" data-focus-key="ex:${toInt(item.id)}:open" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</button></h3>
             <div class="show-meta-line">
               <span>${isMovie ? `${escapeHtml(item.runtime || 120)} min` : `${item.seasons ? item.seasons.length : 1} temp.`}</span>
               <span>${escapeHtml((item.genres || []).slice(0, 2).join(', '))}</span>
@@ -108,11 +108,11 @@ class ExploreView {
 
             <div class="show-card-actions">
               ${isTracked ? `
-                <button class="btn btn-sm btn-secondary" onclick="window.detailModalView.open(${toInt(item.id)})">
+                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" onclick="window.detailModalView.open(${toInt(item.id)})">
                   Ver no Cofre
                 </button>
               ` : `
-                <button class="btn btn-sm btn-primary" onclick="window.appController.addToList(${toInt(item.id)})">
+                <button type="button" class="btn btn-sm btn-primary" data-focus-key="ex:${toInt(item.id)}:action" onclick="window.appController.addToList(${toInt(item.id)})">
                   + Adicionar à Lista
                 </button>
               `}
