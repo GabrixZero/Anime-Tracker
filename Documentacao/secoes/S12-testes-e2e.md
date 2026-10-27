@@ -17,7 +17,7 @@ D-25: instalar **Playwright** (`@playwright/test`) + Chromium como dependência 
 - [x] Documentado como rodar/depurar (`npm run test:e2e`, `--ui`, `--headed`, `show-report`) no README.
 
 ## Critério de pronto
-`npm run test:e2e` verde local e no CI, cobrindo os fluxos acima em desktop e mobile, sem rede externa; tempo total razoável (< ~3 min no CI). **Atingido:** 69 testes passam (+ 3 pulados: 1 só-mobile e 2 `fixme` do bug de foco) em ≈ 50 s local e ≈ 1,5 min no CI.
+`npm run test:e2e` verde local e no CI, cobrindo os fluxos acima em desktop e mobile, sem rede externa; tempo total razoável (< ~3 min no CI). **Atingido:** 37 cenários × desktop/mobile = 74 execuções, 71 passam (+ 3 puladas: 1 só-celular e 2 `fixme` do bug de foco) em ≈ 50 s local e ≈ 1,5–2 min no CI (JSON e SQLite).
 
 ## Resultado e o que ficou para depois
 - Bug real achado e **não corrigido** (a S12 não mexe no app): depois de "Carregar exemplo" pelo teclado o foco cai no `<body>` — teste `fixme` em `tests/e2e/09-teclado.spec.js`. Sugestão para a S19: guardar também o foco de `#next-up-empty` no `a11y.js` ou, como no "Remover exemplo", mandar o foco para o título da tela.
