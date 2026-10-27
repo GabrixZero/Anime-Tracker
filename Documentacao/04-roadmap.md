@@ -34,3 +34,8 @@ Cada seção deve deixar testes para o que alterou (não esperar a S10).
 
 Ao encerrar uma sessão, atualize `Documentacao/status/SNN.json` e crie a entrada em `Documentacao/diario/`.
 Se uma seção for dividida ou reordenada, registre o motivo em `02-decisoes.md`.
+
+## Estado em 2026-10-27
+
+As 10 seções (S01–S10) estão **concluídas e no `main`**. O que resta (hospedagem, chaves opcionais, teste da Jikan real, pendências técnicas e o backlog acima)
+está listado em [diario/2026-10-27-encerramento-roadmap.md](diario/2026-10-27-encerramento-roadmap.md). Novas rodadas de trabalho devem abrir seções novas (S11…) neste arquivo e em `status/`.
