@@ -54,6 +54,10 @@ module.exports = {
   TMDB_API_KEY: process.env.TMDB_API_KEY || '',
   // AniList (anime, fonte principal desde a S13; GraphQL, sem chave). Vazio = https://graphql.anilist.co. Só para testes/desenvolvimento.
   ANILIST_BASE_URL: (process.env.ANILIST_BASE_URL || '').trim().replace(/\/+$/, ''),
+  // TVMaze (séries) e TMDB (séries/filmes, com TMDB_API_KEY): vazio = endereço oficial. Como a AniList e a Jikan, só para testes/desenvolvimento
+  // (os testes ponta a ponta da S12 apontam as quatro fontes para um servidor falso local; D-S12-3).
+  TVMAZE_BASE_URL: (process.env.TVMAZE_BASE_URL || '').trim().replace(/\/+$/, ''),
+  TMDB_BASE_URL: (process.env.TMDB_BASE_URL || '').trim().replace(/\/+$/, ''),
   // Atualização de obras em exibição (S13): de quantas em quantas horas uma obra "Em Exibição" busca episódios novos (padrão 6)
   // e de quantos em quantos minutos o servidor confere o que está vencido (padrão 30; 0 desliga a conferência automática).
   AIRING_TTL_MS: Math.round(numFromEnv('MEDIA_AIRING_TTL_HOURS', 6) * 60 * 60 * 1000),

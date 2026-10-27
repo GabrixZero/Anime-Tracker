@@ -2,9 +2,9 @@
   "secao": "S12",
   "titulo": "Testes ponta a ponta (E2E)",
   "arquivo": "Documentacao/secoes/S12-testes-e2e.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s12-testes-e2e",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": ""
+  "notas": "Playwright + Chromium (devDependency, ~441 MB dentro de node_modules; npm run test:e2e:install uma vez). 37 cenarios x desktop/mobile = 74 execucoes (71 ok, 3 puladas: 1 so-celular e 2 fixme do bug de foco apos Carregar exemplo pelo teclado) em ~50 s local e ~2 min no CI (job e2e, JSON e SQLite). Servidor do app na 3012 com pasta temporaria e fontes externas falsas (TVMAZE_BASE_URL e TMDB_BASE_URL novas, unica mudanca no app); todo teste falha com erro de console, violacao de CSP ou rede externa; axe sem violacao grave; teclado; 375 px; Google so com GOOGLE_CLIENT_ID. npm test 421/421, lint e format ok. Pendente: corrigir o bug de foco e as observacoes (toast cobre toque no celular, heading-order) na S19. PR #16 aberto pelo workflow auto-pr, nao mesclado."
 }

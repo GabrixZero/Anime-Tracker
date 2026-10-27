@@ -25,6 +25,11 @@ server/data/backup-pre-sqlite-*
 
 # Não precisa em produção
 tests
+playwright.config.js
+test-results
+playwright-report
+blob-report
+.playwright-browsers
 Documentacao
 scripts/status.js
 *.bat

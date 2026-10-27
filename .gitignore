@@ -33,5 +33,11 @@ server/data/mediaCatalog.backup-*.json
 *.sqlite-shm
 backup-pre-sqlite-*/
 
+# Testes E2E (S12): relatorios e artefatos do Playwright (o navegador fica em node_modules)
+test-results/
+playwright-report/
+blob-report/
+.playwright-browsers/
+
 # Worktrees temporarias dos agentes do Claude
 .claude/worktrees/
