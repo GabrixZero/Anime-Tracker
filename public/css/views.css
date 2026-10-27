@@ -51,7 +51,6 @@
   padding: 0.6rem 1rem;
   color: #ffffff;
   font-family: var(--font-body);
-  outline: none;
   transition: border-color var(--transition-fast);
 }
 
@@ -389,7 +388,6 @@
   font-family: var(--font-body);
   font-size: 1rem;
   color: #ffffff;
-  outline: none;
 }
 
 .section-title-wrap { margin-bottom: 1.5rem; }
@@ -775,7 +773,6 @@
   font-family: var(--font-body);
   font-size: 0.95rem;
   line-height: 1.6;
-  outline: none;
   resize: vertical;
 }
 
@@ -826,8 +823,9 @@
 
 .backup-row h4 { color: #ffffff; font-size: 0.95rem; }
 .backup-row p { font-size: var(--fs-meta); color: var(--text-muted); }
-.backup-row label.btn { cursor: pointer; }
-.backup-row input[type="file"] { display: none; }
+.backup-row label.btn { cursor: pointer; position: relative; }
+/* escondido so visualmente: com display:none o teclado nao alcancaria o seletor de arquivo (S07) */
+.backup-row input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0, 0, 0, 0); }
 
 .backup-reset {
   margin-top: 1rem;

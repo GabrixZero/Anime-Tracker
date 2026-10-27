@@ -117,7 +117,7 @@ class DiaryView {
 
       return `
         <div class="diary-entry-card">
-          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="${escapeHtml(e.epTitle)}" onerror="this.onerror=null; this.src='${fallbackThumb}';" class="diary-thumb" loading="lazy">
+          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackThumb}';" class="diary-thumb" loading="lazy">
           
           <div class="diary-body">
             <div class="diary-top">
@@ -133,7 +133,7 @@ class DiaryView {
 
             <div class="diary-foot">
               <span>Gravado em: ${formattedDate}</span>
-              <button class="btn btn-sm btn-ghost" onclick="window.detailModalView.openNote(${toInt(e.showId)}, ${toInt(e.seasonNum) || null}, ${toInt(e.epNum) || null})">Editar</button>
+              <button type="button" class="btn btn-sm btn-ghost" data-focus-key="di:${toInt(e.showId)}-${toInt(e.seasonNum)}-${toInt(e.epNum)}:edit" aria-label="Editar anotação: ${headerText}" onclick="window.detailModalView.openNote(${toInt(e.showId)}, ${toInt(e.seasonNum) || null}, ${toInt(e.epNum) || null})">Editar</button>
             </div>
           </div>
         </div>

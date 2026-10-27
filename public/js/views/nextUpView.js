@@ -169,10 +169,10 @@ class NextUpView {
 
     return `
       <div class="next-up-card">
-        <div class="next-up-thumb-wrap" onclick="window.detailModalView.open(${toInt(item.showId)})">
+        <div class="next-up-thumb-wrap" aria-hidden="true" onclick="window.detailModalView.open(${toInt(item.showId)})">
           <img class="next-up-thumb" 
                src="${safeSrc(item.still_path) || fallbackThumb}" 
-               alt="${escapeHtml(item.title)}" 
+               alt="" 
                loading="lazy"
                onerror="this.onerror=null; this.src='${fallbackThumb}';">
           <span class="next-up-badge">${escapeHtml(codeBadge)}</span>
@@ -185,17 +185,17 @@ class NextUpView {
             ${typeBadge}
           </div>
 
-          <h4 class="next-up-ep-title" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.title)}</h4>
+          <h3 class="next-up-ep-title"><button type="button" class="link-btn" data-focus-key="nu:${toInt(item.showId)}:open" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.title)}</button></h3>
           <p class="next-up-overview">${escapeHtml(item.overview || 'Sem descrição cadastrada.')}</p>
           
           <div class="next-up-footer">
-            <button class="btn-check-episode" onclick="window.appController.quickCheck(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <button type="button" class="btn-check-episode" data-focus-key="nu:${toInt(item.showId)}:check" aria-label="Marcar como assistido: ${escapeHtml(item.showName)}, ${escapeHtml(codeBadge)}" onclick="window.appController.quickCheck(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>
               <span>Assistido</span>
             </button>
             
-            <button class="btn-quick-note" onclick="window.detailModalView.openNote(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})" title="Anotar no Diário">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <button type="button" class="btn-quick-note" data-focus-key="nu:${toInt(item.showId)}:note" aria-label="Anotar no diário: ${escapeHtml(item.showName)}, ${escapeHtml(codeBadge)}" onclick="window.detailModalView.openNote(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})" title="Anotar no Diário">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </button>
           </div>
         </div>

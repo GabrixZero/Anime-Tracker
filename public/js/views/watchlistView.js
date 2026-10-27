@@ -129,11 +129,11 @@ class WatchlistView {
           : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
         return `
-          <div class="show-card" onclick="window.detailModalView.open(${toInt(media.id)})">
+          <div class="show-card">
             <div class="show-poster-wrap">
               <img class="show-poster" 
                    src="${safeSrc(media.poster_path) || fallbackPoster}" 
-                   alt="${escapeHtml(media.name)}" 
+                   alt="Pôster de ${escapeHtml(media.name)}" 
                    loading="lazy"
                    onerror="this.onerror=null; this.src='${fallbackPoster}';">
               <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(media.vote_average))}</div>
@@ -145,20 +145,20 @@ class WatchlistView {
                 <span class="show-year">${escapeHtml(MD.yearText(media.first_air_date))}</span>
               </div>
 
-              <h4 class="show-title" title="${escapeHtml(media.name)}">${escapeHtml(media.name)}</h4>
+              <h3 class="show-title" title="${escapeHtml(media.name)}"><button type="button" class="show-open-btn" data-focus-key="wl:${toInt(media.id)}:open" onclick="window.detailModalView.open(${toInt(media.id)})">${escapeHtml(media.name)}</button></h3>
               <div class="show-meta-line">
                 <span>${isMovie ? escapeHtml(MD.runtimeText(media.runtime) || 'Filme') : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
                 <span>${escapeHtml(MD.statusText(media.status))}</span>
               </div>
 
-              <select class="status-select status-select--card" aria-label="Status de ${escapeHtml(media.name)}" onclick="event.stopPropagation()" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>
+              <select class="status-select status-select--card" data-focus-key="wl:${toInt(media.id)}:status" aria-label="Status de ${escapeHtml(media.name)}" onclick="event.stopPropagation()" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>
 
               <div class="show-progress-wrap">
                 <div class="show-progress-info">
                   <span>Progresso</span>
                   <span>${progressText}</span>
                 </div>
-                <div class="show-progress-bar">
+                <div class="show-progress-bar" aria-hidden="true">
                   <div class="show-progress-fill ${percent === 100 ? 'complete' : ''}" style="width: ${percent}%;"></div>
                 </div>
               </div>

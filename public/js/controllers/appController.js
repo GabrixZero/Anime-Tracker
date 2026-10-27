@@ -248,6 +248,7 @@ class AppController {
     toast.className = `toast ${type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : ''}`;
     // textContent: a mensagem pode trazer nome de usuário ou erro do servidor (nunca interpretar como HTML)
     const icon = document.createElement('span');
+    icon.setAttribute('aria-hidden', 'true');
     icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
     const text = document.createElement('span');
     text.textContent = String(message);
@@ -258,7 +259,7 @@ class AppController {
       toast.style.transform = 'translateY(10px)';
       toast.style.transition = 'all 0.25s ease';
       setTimeout(() => toast.remove(), 250);
-    }, 3200);
+    }, type === 'error' ? 7000 : 4500); // um pouco mais de tempo para ler (acessibilidade)
   }
 }
 

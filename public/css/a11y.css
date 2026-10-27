@@ -1,0 +1,140 @@
+/* ================================================================
+   SHOWVAULT · ACESSIBILIDADE (S07)
+   Carrega por último. Contém: foco visível, texto só para leitor de tela, link de atalho,
+   e o visual dos elementos que antes eram <div> clicáveis e agora são <button> (D-S07-2).
+   ================================================================ */
+
+:root {
+  --focus-ring: var(--tvtime-yellow);
+}
+
+/* ---------- Foco visível (teclado) ---------- */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Campos dentro de caixas com borda/overflow: anel por dentro para não ser cortado */
+.note-textarea:focus-visible,
+.type-filter-row--scroll .type-pill-btn:focus-visible,
+.season-tab-btn:focus-visible,
+.modal-close-btn:focus-visible,
+.tvtime-auth-close:focus-visible {
+  outline-offset: -3px;
+}
+
+/* Cartão inteiro clicável: o anel aparece no cartão, não só no título */
+.show-open-btn:focus-visible { outline: none; }
+.show-open-btn:focus-visible::after {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: -3px;
+  border-radius: var(--radius-md);
+}
+
+/* O seletor de arquivo do backup é escondido de forma que o teclado ainda o alcança */
+.backup-row label.btn:has(input:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+::placeholder { color: var(--text-muted); opacity: 1; }
+
+/* ---------- Utilitários ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 3000;
+  padding: 0.6rem 1rem;
+  background: var(--tvtime-yellow);
+  color: #0b0c10;
+  font-weight: 800;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transform: translateY(-250%);
+}
+
+.skip-link:focus { transform: none; }
+
+/* O alvo do atalho não precisa de anel ao receber foco por script */
+.app-main:focus { outline: none; }
+
+/* ---------- Antes <div> clicável, agora <button>: visual idêntico ---------- */
+.brand {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.show-open-btn,
+.link-btn,
+.auth-switch-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.link-btn:hover,
+.auth-switch-link:hover { text-decoration: underline; }
+
+.auth-switch-link {
+  color: var(--tvtime-yellow);
+  font-weight: 700;
+}
+
+/* Cartões de obra: o botão do título "estica" e cobre o cartão todo (clique com o mouse continua igual) */
+.show-card { position: relative; }
+
+.show-open-btn {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.show-open-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* O que precisa continuar clicável por cima do botão esticado */
+.show-card .status-select,
+.show-card-actions {
+  position: relative;
+  z-index: 2;
+}
+
+/* Círculo de marcar episódio (checkbox acessível) */
+.episode-check {
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+}
+
+@media (pointer: coarse) {
+  .episode-check { width: 36px; height: 36px; }
+}

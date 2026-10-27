@@ -33,11 +33,11 @@ test('tabela de emoções: 5 ids únicos com rótulo e ícone, imutável', () =>
 });
 
 test('modal de anotação e filtros do diário (index.html) usam exatamente a tabela de emoções', () => {
-  const modal = [...html.matchAll(/<button class="emotion-btn" data-emotion="([a-z]+)"><span class="emotion-emoji">([^<]+)<\/span><span class="emotion-label">([^<]+)<\/span><\/button>/g)]
+  const modal = [...html.matchAll(/<button type="button" class="emotion-btn" data-emotion="([a-z]+)" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">([^<]+)<\/span><span class="emotion-label">([^<]+)<\/span><\/button>/g)]
     .map(m => ({ id: m[1], icon: m[2], label: m[3] }));
   assert.deepEqual(modal, Emotions.LIST.map(e => ({ id: e.id, icon: e.icon, label: e.label })), 'botões do modal divergem de emotions.js');
 
-  const filters = [...html.matchAll(/<button class="emotion-filter-btn type-pill-btn[^"]*" data-emotion="([a-z]+)">([^<]+)<\/button>/g)]
+  const filters = [...html.matchAll(/<button type="button" class="emotion-filter-btn type-pill-btn[^"]*" data-emotion="([a-z]+)" aria-pressed="(?:true|false)">([^<]+)<\/button>/g)]
     .map(m => ({ id: m[1], text: m[2] }))
     .filter(f => f.id !== 'all');
   assert.deepEqual(filters, Emotions.LIST.map(e => ({ id: e.id, text: `${e.icon} ${e.label}` })), 'filtros do diário divergem de emotions.js');
