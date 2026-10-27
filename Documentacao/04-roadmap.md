@@ -42,11 +42,11 @@ está listado em [diario/2026-10-27-encerramento-roadmap.md](diario/2026-10-27-e
 
 ## Rodada 2 — seções S11–S19 (proposta de 2026-10-27)
 
-Status pelo quadro (`npm run status`). Ondas sugeridas: **A** S12 + S13 · **B** S11 (após P-10) + S14 + S17 · **C** S15 + S16 · **D** S18 · **E** S19.
+Status pelo quadro (`npm run status`). Ondas sugeridas: **A** S12 + S13 · **B** S11 + S14 + S17 · **C** S15 + S16 · **D** S18 · **E** S19.
 
 | Ordem | Seção | Arquivo | Depende de |
 |---|---|---|---|
-| 11 | Deploy gratuito e produção | [S11](secoes/S11-deploy-gratuito.md) | P-10 (escolha da hospedagem) |
+| 11 | Deploy gratuito e produção (PC + Tailscale Funnel, D-29) | [S11](secoes/S11-deploy-gratuito.md) | — (link só vai para os amigos depois da S14) |
 | 12 | Testes ponta a ponta (E2E) | [S12](secoes/S12-testes-e2e.md) | — |
 | 13 | AniList e qualidade do catálogo | [S13](secoes/S13-anilist-e-catalogo.md) | — |
 | 14 | Contas completas e convites | [S14](secoes/S14-contas-completas.md) | (S12 recomendado) |
