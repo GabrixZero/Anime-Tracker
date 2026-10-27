@@ -73,3 +73,65 @@ jobs:
           done
           docker logs showvault
           exit 1
+
+  # Testes ponta a ponta (S12, D-25): o app de verdade num Chromium (Playwright), em desktop (1280x800) e mobile (375x812), com as
+  # fontes externas SIMULADAS (nenhum teste usa a internet) e uma pasta de dados temporária. Roda junto com "test" (não depende dele).
+  # Duas vezes: com arquivos JSON (padrão do desenvolvimento) e com SQLite (o modo de produção do PC e do Docker).
+  e2e:
+    name: E2E (Playwright, ${{ matrix.storage }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        storage: [json, sqlite]
+    env:
+      E2E_STORAGE: ${{ matrix.storage }}
+      # O navegador fica fora de node_modules para o cache sobreviver ao `npm ci` (o scripts/e2e.js respeita esta variável).
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.playwright-browsers
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Instalar o Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # A chave inclui o package-lock: trocar a versão do Playwright baixa o Chromium de novo; senão ele vem do cache.
+      - name: Cache do Chromium (Playwright)
+        id: chromium-cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: .playwright-browsers
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Baixar o Chromium e as bibliotecas do sistema
+        if: steps.chromium-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium --no-shell
+
+      # Com o navegador no cache ainda faltam as bibliotecas do sistema (apt), que o cache não guarda.
+      - name: Instalar só as bibliotecas do sistema
+        if: steps.chromium-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Testes ponta a ponta
+        run: npm run test:e2e
+
+      # Trace, captura de tela e o relatório HTML só existem quando algum teste falhou (ou foi repetido).
+      - name: Guardar relatório e artefatos da falha
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: e2e-falha-${{ matrix.storage }}
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+          if-no-files-found: ignore

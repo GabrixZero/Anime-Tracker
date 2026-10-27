@@ -37,6 +37,7 @@ backup-pre-sqlite-*/
 test-results/
 playwright-report/
 blob-report/
+.playwright-browsers/
 
 # Worktrees temporarias dos agentes do Claude
 .claude/worktrees/

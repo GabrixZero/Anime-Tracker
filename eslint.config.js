@@ -23,7 +23,8 @@ module.exports = [
       'coverage/**',
       'test-results/**',
       'playwright-report/**',
-      'blob-report/**'
+      'blob-report/**',
+      '.playwright-browsers/**'
     ]
   },
   js.configs.recommended,

@@ -29,6 +29,7 @@ playwright.config.js
 test-results
 playwright-report
 blob-report
+.playwright-browsers
 Documentacao
 scripts/status.js
 *.bat
