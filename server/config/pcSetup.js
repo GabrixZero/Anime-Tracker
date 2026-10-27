@@ -9,7 +9,7 @@ const path = require('path');
 const { parseArgs } = require('util');
 
 const { ensureEnvKeys, parseEnvText } = require('./envFile');
-const { MIN_SECRET_LENGTH } = require('./jwtSecret');
+const { MIN_SECRET_LENGTH, KNOWN_PUBLIC_SECRETS } = require('./jwtSecret');
 const { defaultDataDir, defaultBackupDir, isInsideOneDrive } = require('./paths');
 const { parseHost, isLoopbackHost } = require('./network');
 
@@ -47,6 +47,8 @@ function reviewEnv(effective, { root, env = process.env, platform = process.plat
       'JWT_SECRET',
       `JWT_SECRET tem menos de ${MIN_SECRET_LENGTH} caracteres: o servidor em produção vai recusar. Apague a linha e rode de novo.`
     );
+  } else if (KNOWN_PUBLIC_SECRETS.has(secret)) {
+    warn('JWT_SECRET', 'JWT_SECRET é o valor de exemplo (público): o servidor em produção vai recusar. Apague a linha e rode de novo.');
   }
   try {
     const host = parseHost(get('HOST'), { isProduction: get('NODE_ENV') === 'production' });

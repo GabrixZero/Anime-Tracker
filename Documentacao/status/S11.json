@@ -2,9 +2,9 @@
   "secao": "S11",
   "titulo": "Deploy gratuito e produção",
   "arquivo": "Documentacao/secoes/S11-deploy-gratuito.md",
-  "status": "em-andamento",
+  "status": "concluida",
   "branch": "feature/s11-deploy-gratuito",
-  "concluidaEm": "",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": ""
+  "notas": "Modo PC (D-29): HOST (127.0.0.1 em producao; Docker 0.0.0.0), TRUST_PROXY=1 conferido no codigo do Tailscale, npm run setup:pc (completa o .env sem sobrescrever; JWT_SECRET gerado sem imprimir), storage:migrate --from/--dry-run, npm run backup (VACUUM INTO, 7 diarios + 4 semanais) e restore (confirmacao, copia de seguranca), scripts/windows (autostart, supervisor, stop, status, update, backup) ensaiados numa porta de teste, guia deploy-pc-tailscale.md. Testes 418/418 (+53). Pendente com o Gabriel: instalar o Tailscale, ligar HTTPS/Funnel, registrar as tarefas (install-autostart.ps1) e energia; Funnel e Agendador reais nao foram testados; link so depois da S14."
 }

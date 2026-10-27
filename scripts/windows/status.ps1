@@ -161,7 +161,8 @@ if ($Log) {
     foreach ($name in @('supervisor.log', 'showvault.log', 'backup.log')) {
         $file = Join-Path $LogDir $name
         Write-Title ('Fim de ' + $file)
-        if (Test-Path -LiteralPath $file) { Get-Content -LiteralPath $file -Tail 15 } else { Write-Info '  (não existe ainda)' }
+        # -Encoding UTF8: o Node grava os logs em UTF-8 e o padrão do PowerShell 5.1 estragaria os acentos.
+        if (Test-Path -LiteralPath $file) { Get-Content -LiteralPath $file -Tail 15 -Encoding UTF8 } else { Write-Info '  (não existe ainda)' }
     }
 } else {
     Write-Info ''

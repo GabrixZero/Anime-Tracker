@@ -78,4 +78,4 @@ function resolveJwtSecret({ env = process.env, dataDir, isProduction }) {
   return { secret: local.secret, source: local.persisted ? 'file' : 'memory' };
 }
 
-module.exports = { resolveJwtSecret, loadOrCreateLocalSecret, SECRET_FILE_NAME, MIN_SECRET_LENGTH };
+module.exports = { resolveJwtSecret, loadOrCreateLocalSecret, SECRET_FILE_NAME, MIN_SECRET_LENGTH, KNOWN_PUBLIC_SECRETS };

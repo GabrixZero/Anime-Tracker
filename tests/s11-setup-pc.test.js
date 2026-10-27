@@ -209,10 +209,17 @@ test('reviewEnv: .env do modo PC não tem avisos; .env de desenvolvimento avisa 
   };
   assert.deepEqual(reviewEnv(pc, { env, platform: 'win32' }), []);
 
-  const root = path.join('C:', 'proj');
+  const root = path.join(os.tmpdir(), 'showvault-proj'); // caminho absoluto de verdade, em qualquer sistema
   const dev = { NODE_ENV: 'development', STORAGE: 'json', HOST: '0.0.0.0', TRUST_PROXY: 'true', JWT_SECRET: 'curto', PORT: 'abc' };
   const keys = reviewEnv(dev, { root, env, platform: process.platform }).map(w => w.key);
   assert.deepEqual(keys.sort(), ['HOST', 'JWT_SECRET', 'NODE_ENV', 'PORT', 'SHOWVAULT_DATA_DIR', 'STORAGE', 'TRUST_PROXY'].sort());
+
+  const example = reviewEnv({ ...pc, JWT_SECRET: 'troque-por-um-segredo-longo-e-aleatorio' }, { env, platform: 'win32' });
+  assert.deepEqual(
+    example.map(w => w.key),
+    ['JWT_SECRET'],
+    'o segredo de exemplo (público) também é avisado'
+  );
 
   const inside = reviewEnv({ ...pc, SHOWVAULT_DATA_DIR: 'C:\\Users\\Teste\\OneDrive\\Documentos\\dados' }, { env, platform: 'win32' });
   assert.match(inside[0].message, /dentro do OneDrive/);

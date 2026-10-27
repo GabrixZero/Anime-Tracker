@@ -25,6 +25,8 @@ amigo (celular/PC)  --https-->  link fixo  https://<máquina>.<rede>.ts.net   (o
 - [ ] Node.js 26+ e Git instalados (você já usa). Teste: `node --version` mostra `v26...`.
 - [ ] A sessão principal avisou que a **S11 chegou ao `main`**.
 - [ ] Você tem a conta do Gabriel no ShowVault hoje em `server\data` (modo antigo, arquivos JSON). Vamos copiar tudo para o banco novo **sem apagar nada do antigo**.
+- [ ] A pasta do projeto está **sempre disponível neste PC**: no Explorador de Arquivos, clique com o botão direito em `Antigravity Projeto` → *Manter sempre neste dispositivo*
+      (senão o OneDrive pode deixar os arquivos "só na nuvem" e o app não conseguir ligar sem internet).
 - [ ] Uns 30 minutos. Os comandos abaixo rodam no **PowerShell, dentro da pasta do projeto**: no Explorador de Arquivos abra
       `...\OneDrive\Documentos\Antigravity Projeto`, clique na barra de endereços, digite `powershell` e aperte Enter.
 
@@ -109,7 +111,8 @@ Quer espiar antes? Acrescente `-DryRun` e ele só mostra o que registraria. No f
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\status.ps1
 ```
 
-Tudo com `[ok]` e "Tudo certo." no fim. Depois abra **http://localhost:3000** no navegador, entre com a sua conta e confira que a sua lista está lá.
+Tudo com `[ok]` e "Tudo certo." no fim. Depois abra **http://localhost:3000** no navegador, entre com a sua conta e confira que a sua lista está lá
+(você vai precisar **entrar de novo**: o segredo dos logins mudou; a lista que está no navegador é mesclada com a do servidor).
 (`[!]` no backup é normal antes do primeiro backup; faça já um: `npm run backup`. Ele mostra o arquivo criado e "integridade ok".)
 
 ---
@@ -215,7 +218,8 @@ Duas coisas para ela saber: o Google limita a 100 usuários de teste, e **não f
 ### Backups
 
 - Todo dia às 04:00, em `...\OneDrive\Documentos\ShowVault-Backups`, com nomes como `showvault-2026-10-27_040000.sqlite`.
-- **Rotação automática:** ficam os 7 dias mais recentes e 1 por semana nas 4 últimas semanas (cerca de 10 arquivos). Nunca apaga nada com outro nome.
+- **Rotação automática:** ficam os 7 dias mais recentes e 1 por semana nas 4 últimas semanas (cerca de 10 arquivos). Nunca apaga nada com outro nome. Backups do **mesmo dia** colapsam no mais novo:
+  antes de algo arriscado (apagar contas, mexer no banco), faça `npm run backup` e **copie esse arquivo para outra pasta** se quiser guardá-lo de vez.
 - O backup é uma **foto consistente** feita pelo próprio banco, com o app ligado; nunca é uma cópia do arquivo aberto.
 - Os backups contêm as contas (senhas em hash) e as listas. Não compartilhe essa pasta.
 
