@@ -25,37 +25,10 @@ class AppState {
       console.warn('Erro ao ler estado local:', e);
     }
 
-    this.seeded = true; // estado demo padrão, ainda não editado pelo usuário
-    return window.LibraryMerge.normalizeData({
-      trackedShows: [
-        { showId: 1396, status: 'watching', addedAt: new Date().toISOString() },      // Breaking Bad
-        { showId: 1429, status: 'watching', addedAt: new Date().toISOString() },      // Attack on Titan
-        { showId: 157336, status: 'plan_to_watch', addedAt: new Date().toISOString() }, // Interestelar
-        { showId: 136283, status: 'watching', addedAt: new Date().toISOString() }     // The Bear
-      ],
-      watchedEpisodes: {
-        "1396_s1_e1": { watched: true, watchedAt: "2026-10-20T19:30:00Z", rewatchCount: 1 },
-        "1396_s1_e2": { watched: true, watchedAt: "2026-10-21T21:00:00Z", rewatchCount: 1 },
-        "1429_s1_e1": { watched: true, watchedAt: "2026-10-22T20:15:00Z", rewatchCount: 1 },
-        "136283_s1_e1": { watched: true, watchedAt: "2026-10-23T22:15:00Z", rewatchCount: 1 }
-      },
-      episodeNotes: {
-        "1396_s1_e1": {
-          text: "O piloto é simplesmente perfeito. A cena da van no deserto e a transformação inicial de Walter White.",
-          emotion: "awesome",
-          character: "Walter White",
-          updatedAt: "2026-10-20T20:45:00Z",
-          snapshots: []
-        },
-        "1429_s1_e1": {
-          text: "A abertura com o Titã Colossal surgindo acima da muralha Maria é inesquecível.",
-          emotion: "mindblown",
-          character: "Eren Yeager",
-          updatedAt: "2026-10-22T20:40:00Z",
-          snapshots: []
-        }
-      }
-    });
+    // Primeira visita: lista vazia (D-22). Nada de obras, datas ou anotações de enfeite; o usuário explora ou usa "Carregar exemplo".
+    // `seeded` = estado inicial ainda não editado (nem gravado): ao entrar numa conta, o servidor vence sem mesclar (decideLogin).
+    this.seeded = true;
+    return window.LibraryMerge.normalizeData(window.LibraryMerge.emptyData());
   }
 
   // Aplica as migrações de versão ao estado salvo (remove só as referências às obras aposentadas, D-11).
@@ -304,19 +277,33 @@ class AppState {
     this.save();
   }
 
-  saveNote(showId, seasonNum, epNum, noteData) {
+  // Chave da anotação: "<id>_movie" para filme, "<id>_s<T>_e<E>" para episódio.
+  noteKey(showId, seasonNum, epNum) {
     const show = this.getMedia(showId);
-    const key = (show && show.type === 'movie') ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+    return (show && show.type === 'movie') ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+  }
+
+  // ----- anotações e histórico de versões (S08, D-19) -----
+  // A anotação grava sozinha enquanto se digita. Para o histórico não virar uma pilha de rascunhos quase iguais,
+  // uma versão antiga só é guardada quando começa uma NOVA sessão de edição: a anotação ficou parada por
+  // NOTE_VERSION_GAP_MS ou mais. Guardamos até MAX_NOTE_VERSIONS (as mais novas); cada versão guarda o texto.
+  saveNote(showId, seasonNum, epNum, noteData) {
+    const key = this.noteKey(showId, seasonNum, epNum);
     const existing = this.data.episodeNotes[key] || { snapshots: [] };
+    const newText = typeof noteData.text === 'string' ? noteData.text : '';
 
     const newSnapshots = [...(existing.snapshots || [])];
-    if (existing.text && existing.text.trim() !== noteData.text.trim() && existing.text.length > 10) {
-      newSnapshots.unshift({ text: existing.text, updatedAt: existing.updatedAt || new Date().toISOString() });
-      if (newSnapshots.length > 5) newSnapshots.pop();
+    const before = typeof existing.text === 'string' ? existing.text : '';
+    if (before.trim() && before.trim() !== newText.trim()) {
+      const lastEdit = Date.parse(existing.updatedAt) || 0;
+      if (Date.now() - lastEdit >= AppState.NOTE_VERSION_GAP_MS) {
+        newSnapshots.unshift({ text: before, updatedAt: existing.updatedAt || new Date().toISOString() });
+        if (newSnapshots.length > AppState.MAX_NOTE_VERSIONS) newSnapshots.length = AppState.MAX_NOTE_VERSIONS;
+      }
     }
 
     this.data.episodeNotes[key] = {
-      text: noteData.text,
+      text: newText,
       emotion: noteData.emotion || null,
       character: noteData.character || '',
       updatedAt: this.stampFor('notes', key, existing.updatedAt),
@@ -327,11 +314,61 @@ class AppState {
     this.save();
   }
 
+  // Versões anteriores da anotação, da mais nova para a mais antiga: [{text, updatedAt}]
+  getNoteVersions(showId, seasonNum, epNum) {
+    const note = this.data.episodeNotes[this.noteKey(showId, seasonNum, epNum)];
+    return note && Array.isArray(note.snapshots) ? note.snapshots.map(v => ({ text: v.text || '', updatedAt: v.updatedAt || '' })) : [];
+  }
+
+  // Restaura a versão `index` do histórico (0 = a mais nova). O texto que estava valendo vira uma versão nova
+  // no topo do histórico e a versão restaurada sai da lista (virou o texto atual): nenhuma outra versão se perde
+  // (só a mais antiga, se já houvesse o máximo). Emoção e personagem não mudam. Devolve o texto restaurado ou null.
+  restoreNoteVersion(showId, seasonNum, epNum, index) {
+    const key = this.noteKey(showId, seasonNum, epNum);
+    const note = this.data.episodeNotes[key];
+    const list = note && Array.isArray(note.snapshots) ? note.snapshots : [];
+    const version = Number.isInteger(index) ? list[index] : null;
+    if (!note || !version || typeof version.text !== 'string') return null;
+
+    const snapshots = list.filter((_, i) => i !== index);
+    const current = typeof note.text === 'string' ? note.text : '';
+    if (current.trim() && current.trim() !== version.text.trim()) {
+      snapshots.unshift({ text: current, updatedAt: note.updatedAt || new Date().toISOString() });
+    }
+    if (snapshots.length > AppState.MAX_NOTE_VERSIONS) snapshots.length = AppState.MAX_NOTE_VERSIONS;
+
+    this.data.episodeNotes[key] = {
+      ...note,
+      text: version.text,
+      updatedAt: this.stampFor('notes', key, note.updatedAt),
+      snapshots
+    };
+    this.clearDeleted('notes', key);
+    this.save();
+    return version.text;
+  }
+
   getNote(showId, seasonNum, epNum) {
-    const show = this.getMedia(showId);
-    const key = (show && show.type === 'movie') ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
-    return this.data.episodeNotes[key] || null;
+    return this.data.episodeNotes[this.noteKey(showId, seasonNum, epNum)] || null;
+  }
+
+  // ----- exemplo opcional (D-22) -----
+  // "Carregar exemplo": põe algumas obras do catálogo na lista como "Quero ver", SEM episódios assistidos, datas
+  // ou anotações de enfeite. São obras comuns: o usuário remove quando quiser. Só entram as que o catálogo já trouxe.
+  loadExample() {
+    const added = [];
+    let missing = 0;
+    for (const id of AppState.EXAMPLE_SHOW_IDS) {
+      if (this.getTracked(id)) continue;
+      if (!this.getMedia(id)) { missing++; continue; }
+      if (this.addShow(id)) added.push(id);
+    }
+    return { added, missing };
   }
 }
+
+AppState.NOTE_VERSION_GAP_MS = 10 * 60 * 1000; // anotação parada por 10 min = nova sessão de edição
+AppState.MAX_NOTE_VERSIONS = 5;                // igual ao limite do servidor e do backup (MAX_SNAPSHOTS)
+AppState.EXAMPLE_SHOW_IDS = [157336, 872585, 1396, 1429]; // Interestelar, Oppenheimer, Breaking Bad, Attack on Titan (seed)
 
 window.appState = new AppState();

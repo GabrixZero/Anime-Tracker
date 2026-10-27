@@ -139,7 +139,7 @@ const MOVIE = { id: 200, type: 'movie', name: 'Filme B', genres: ['Ação'], run
 const OTHER = { id: 300, type: 'tv', name: 'Série C', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] };
 
 // Um aparelho = um navegador (localStorage próprio) com os scripts reais do app carregados.
-function makeDevice(model, { withViews = false, demo = false } = {}) {
+function makeDevice(model, { withViews = false, firstVisit = false } = {}) {
   const store = new Map();
   const elements = new Map();
   const el = (id) => {
@@ -162,7 +162,7 @@ function makeDevice(model, { withViews = false, demo = false } = {}) {
   };
   ctx.window = ctx;
   vm.createContext(ctx);
-  const files = ['utils/dom.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
+  const files = ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
 
   const userFromToken = () => {
     const tok = store.get('showvault_auth_token');
@@ -189,8 +189,8 @@ function makeDevice(model, { withViews = false, demo = false } = {}) {
       return { resetAt: cleared.resetAt, updatedAt: cleared.updatedAt };
     }
   };
-  // navegador "já usado" (estado vazio salvo): sem a lista de exemplo, que só aparece na primeira visita
-  if (!demo) store.set('showvault_state_mvc_v1', JSON.stringify(empty()));
+  // navegador "já usado" (estado vazio salvo); `firstVisit` = nada salvo ainda (S08: a primeira visita também é vazia, mas `seeded`)
+  if (!firstVisit) store.set('showvault_state_mvc_v1', JSON.stringify(empty()));
   for (const f of files) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf-8'), ctx, { filename: f });
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'models/state.js'), 'utf-8'), ctx, { filename: 'state.js' });
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'services/syncService.js'), 'utf-8'), ctx, { filename: 'syncService.js' });

@@ -45,7 +45,7 @@ class ExploreView {
   async loadMedia() {
     if (!this.container) return;
     try {
-      this.container.innerHTML = `<div class="grid-message">Carregando catálogo da API...</div>`;
+      this.container.innerHTML = `<div class="grid-message">Carregando catálogo...</div>`;
 
       let response;
       if (this.searchQuery) {
@@ -53,7 +53,7 @@ class ExploreView {
         if (this.titleEl) this.titleEl.textContent = `Resultados para "${this.searchQuery}" (${response ? response.count : 0})`;
       } else {
         response = await window.apiClient.getTrending(this.typeFilter);
-        if (this.titleEl) this.titleEl.textContent = `Destaques da API (${response ? response.count : 0})`;
+        if (this.titleEl) this.titleEl.textContent = `Catálogo (${response ? response.count : 0})`;
       }
 
       const items = (response && response.data) ? response.data : [];
@@ -66,12 +66,13 @@ class ExploreView {
 
       this.render(items);
     } catch (err) {
-      this.container.innerHTML = `<div class="grid-message grid-message--error">Erro ao carregar dados da API: ${escapeHtml(err.message)}</div>`;
+      this.container.innerHTML = `<div class="grid-message grid-message--error">Não foi possível carregar o catálogo: ${escapeHtml(err.message)}</div>`;
     }
   }
 
   render(items) {
-    const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
+    const MD = window.MediaDisplay; // S08: "Sem nota"/"Sem gênero"/imagem local quando a fonte não informa
+    const fallbackPoster = MD.POSTER_PLACEHOLDER;
 
     this.container.innerHTML = items.map(item => {
       const isTracked = window.appState ? window.appState.data.trackedShows.some(t => t.showId === item.id) : false;
@@ -91,19 +92,19 @@ class ExploreView {
                  alt="${escapeHtml(item.name)}" 
                  loading="lazy"
                  onerror="this.onerror=null; this.src='${fallbackPoster}';">
-            <div class="show-rating-badge">★ ${formatRating(item.vote_average, '–')}</div>
+            <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(item.vote_average))}</div>
           </div>
 
           <div class="show-info">
             <div class="show-info-top">
               ${typeBadge}
-              <span class="show-year">${escapeHtml(item.first_air_date ? String(item.first_air_date).slice(0, 4) : '')}</span>
+              <span class="show-year">${escapeHtml(MD.yearText(item.first_air_date))}</span>
             </div>
 
             <h4 class="show-title" title="${escapeHtml(item.name)}" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</h4>
             <div class="show-meta-line">
-              <span>${isMovie ? `${escapeHtml(item.runtime || 120)} min` : `${item.seasons ? item.seasons.length : 1} temp.`}</span>
-              <span>${escapeHtml((item.genres || []).slice(0, 2).join(', '))}</span>
+              <span>${isMovie ? escapeHtml(MD.runtimeText(item.runtime) || 'Filme') : `${item.seasons ? item.seasons.length : 1} temp.`}</span>
+              <span>${escapeHtml(MD.genresText(item.genres, 2))}</span>
             </div>
 
             <div class="show-card-actions">

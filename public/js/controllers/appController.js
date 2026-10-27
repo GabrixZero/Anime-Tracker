@@ -84,7 +84,7 @@ class AppController {
     const complete = known && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
     if (!complete) {
       try {
-        this.showToast('Salvando obra no catálogo mestre...', 'info');
+        this.showToast('Buscando os episódios da obra...', 'info');
         const res = await window.apiClient.ingest(numId);
         if (res && res.data) {
           window.appState.mediaMap.set(res.data.id, res.data);
@@ -98,11 +98,24 @@ class AppController {
 
     // Status inicial coerente com o progresso (Quero ver, ou Assistindo/Finalizado se já houver episódios marcados)
     window.appState.addShow(numId);
-    this.showToast('Adicionado à sua lista e salvo no catálogo!', 'success');
+    this.showToast('Adicionado à sua lista!', 'success');
     this.refreshAll();
     if (window.detailModalView.currentShowId === numId) {
       window.detailModalView.open(numId);
     }
+  }
+
+  // S08 (D-22): "Carregar exemplo" no estado vazio. Só põe obras do catálogo na lista (Quero ver), sem progresso nem notas.
+  loadExample() {
+    const { added, missing } = window.appState.loadExample();
+    if (added.length > 0) {
+      this.showToast(`Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Remova quando quiser.`, 'success');
+    } else if (missing > 0) {
+      this.showToast('O catálogo ainda não carregou. Tente de novo em instantes.', 'error');
+    } else {
+      this.showToast('Os títulos de exemplo já estão na sua lista.', 'info');
+    }
+    this.refreshAll();
   }
 
   removeFromList(showId) {
@@ -195,7 +208,7 @@ class AppController {
     if (!confirm('Apagar todos os dados DESTE aparelho (séries, episódios e notas)? Se quiser guardá-los, exporte um backup antes.')) return;
 
     if (!sync.isLoggedIn()) {
-      localStorage.removeItem(state.STORAGE_KEY); // visitante: volta ao estado inicial do app
+      localStorage.removeItem(state.STORAGE_KEY); // visitante: volta ao estado inicial do app (lista vazia)
       state.data = state.load();
       this.refreshAll();
       this.showToast('Dados deste aparelho apagados.', 'info');

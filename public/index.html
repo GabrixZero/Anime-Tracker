@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-  <title>ShowVault · Rastreador de Séries, Filmes e Animes (TV Time Replica)</title>
-  <meta name="description" content="Plataforma de rastreamento com API backend, arquitetura MVC, diário de episódios blindado contra perda de notas e autenticação estilo TV Show Time.">
+  <title>ShowVault · Rastreador de Séries, Filmes e Animes</title>
+  <meta name="description" content="Acompanhe séries, filmes e animes: progresso episódio por episódio, diário de anotações com histórico de versões e estatísticas de tempo assistido.">
 
   <!-- Fontes Google: Outfit e Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@
           </div>
           <div class="brand-text">
             <span class="brand-title">SHOW<strong>VAULT</strong></span>
-            <span class="brand-subtitle">TV Show Time Replica · MVC</span>
+            <span class="brand-subtitle">Séries, filmes e animes</span>
           </div>
         </div>
 
@@ -64,19 +64,19 @@
 
           <button class="nav-tab" data-tab="explore" id="tab-btn-explore">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span class="nav-label"><span class="nav-long">Explorar API</span><span class="nav-short">Explorar</span></span>
+            <span class="nav-label"><span class="nav-long">Explorar</span><span class="nav-short">Explorar</span></span>
           </button>
         </nav>
       </div>
 
       <div class="header-right">
-        <!-- Status do Banco Local-First / Nuvem -->
+        <!-- Selo de sincronização: o texto é decidido pelo syncService (visitante = só neste aparelho; conta = nuvem/offline/erro) -->
         <div class="sync-indicator" id="sync-status">
           <span class="status-dot pulsing"></span>
-          <span class="status-label" id="sync-label">Local-First</span>
+          <span class="status-label" id="sync-label">Só neste aparelho</span>
         </div>
 
-        <button class="btn-icon" id="btn-open-backup" title="Central de Backup & Exportação">
+        <button class="btn-icon" id="btn-open-backup" title="Backup e dados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
 
@@ -91,7 +91,7 @@
             <img class="user-avatar" id="user-avatar-img" src="" alt="Avatar">
             <div class="user-info-text">
               <span class="user-display-name" id="user-display-name">Usuário</span>
-              <span class="user-cloud-badge" id="user-cloud-badge">Sincronizado</span>
+              <span class="user-cloud-badge" id="user-cloud-badge"></span>
             </div>
             <button class="btn-icon-tiny" id="btn-logout" title="Sair da Conta">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -131,7 +131,7 @@
           </div>
           <h3 class="empty-title">Você está em dia com tudo!</h3>
           <p class="empty-text">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
-          <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo da API</button>
+          <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar</button>
         </div>
       </section>
 
@@ -164,9 +164,12 @@
           <div class="empty-icon empty-icon--muted">
             <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
           </div>
-          <h3 class="empty-title">Sua lista está vazia</h3>
-          <p class="empty-text">Adicione títulos para começar a registrar seu progresso e notas.</p>
-          <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Títulos Agora</button>
+          <h3 class="empty-title" id="watchlist-empty-title">Sua lista está vazia</h3>
+          <p class="empty-text" id="watchlist-empty-text">Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.</p>
+          <div class="empty-actions">
+            <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar</button>
+            <button class="btn btn-outline" id="btn-watchlist-example" onclick="window.appController.loadExample()">Carregar exemplo</button>
+          </div>
         </div>
       </section>
 
@@ -175,7 +178,7 @@
         <div class="section-header-row">
           <div>
             <h2>Meu Diário de Episódios & Filmes</h2>
-            <p>Todas as suas notas, reações e personagens gravados com persistência atômica.</p>
+            <p>Todas as suas anotações, reações e personagens destaque, guardados neste aparelho (e na sua conta, se você estiver conectado).</p>
           </div>
 
           <div class="header-controls">
@@ -203,7 +206,7 @@
             <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </div>
           <h3 class="empty-title">Nenhuma anotação registrada ainda</h3>
-          <p class="empty-text">Quando você marca um episódio ou filme e escreve uma reflexão, ela é gravada imediatamente aqui.</p>
+          <p class="empty-text">Abra um episódio ou filme e clique em "Anotar": o que você escrever aparece aqui, com negrito, itálico, citação e spoiler.</p>
         </div>
       </section>
 
@@ -212,7 +215,7 @@
         <div class="section-header-row">
           <div>
             <h2>Seu Tempo de Vida em Telas</h2>
-            <p>Métricas precisas baseadas na duração real das obras que você assistiu.</p>
+            <p>Estimativa a partir da duração das obras que você assistiu. Quando a fonte não informa a duração, contamos 45 min por episódio e 120 min por filme.</p>
           </div>
         </div>
 
@@ -273,15 +276,15 @@
         </div>
       </section>
 
-      <!-- ================= ABA 5: EXPLORAR API ================= -->
+      <!-- ================= ABA 5: EXPLORAR ================= -->
       <section class="tab-content" id="view-explore">
         <div class="explore-hero">
-          <h2 class="explore-title">Explorar Catálogo via API</h2>
-          <p class="explore-sub">Pesquise séries, filmes e animes conectados à nossa API REST em tempo real.</p>
+          <h2 class="explore-title">Explorar</h2>
+          <p class="explore-sub">Pesquise séries, filmes e animes e adicione à sua lista.</p>
 
           <div class="search-bar">
             <input type="text" id="explore-search-input" placeholder="Busque qualquer título (ex: Attack on Titan, Oppenheimer, Breaking Bad)...">
-            <button class="btn btn-primary" id="btn-search-shows">Pesquisar API</button>
+            <button class="btn btn-primary" id="btn-search-shows">Pesquisar</button>
           </div>
         </div>
 
@@ -293,14 +296,14 @@
         </div>
 
         <div class="section-title-wrap">
-          <h3 class="section-title" id="explore-results-title">Catálogo em Destaque</h3>
+          <h3 class="section-title" id="explore-results-title">Catálogo</h3>
         </div>
 
         <div class="shows-grid" id="explore-container"></div>
       </section>
     </main>
 
-    <!-- ================= MODAL: AUTENTICAÇÃO ESTILO TV SHOW TIME ================= -->
+    <!-- ================= MODAL: ENTRAR / CADASTRAR ================= -->
     <div class="tvtime-auth-overlay hidden" id="tvtime-auth-modal">
       <div class="tvtime-auth-card">
         <div class="tvtime-auth-backdrop"></div>
@@ -314,7 +317,7 @@
               </svg>
             </div>
             <h2 id="tvtime-auth-title">Bem-vindo ao <span>ShowVault</span></h2>
-            <p>Nunca mais perca um episódio. Suas notas e reações salvas com persistência atômica.</p>
+            <p>Acompanhe seus episódios e guarde suas anotações. Com uma conta, sua lista fica salva e sincronizada entre aparelhos.</p>
           </div>
 
           <!-- Login com Google: só aparece se o servidor tiver GOOGLE_CLIENT_ID (o authView.js mostra e carrega o botão oficial) -->
@@ -402,7 +405,7 @@
 
           <div class="note-save-status" id="note-save-status">
             <span class="save-dot"></span>
-            <span class="save-text">Salvo no disco</span>
+            <span class="save-text">Salvo neste aparelho</span>
           </div>
         </div>
 
@@ -415,7 +418,7 @@
               </label>
             </div>
 
-            <!-- Seletor de Emoções TV Show Time -->
+            <!-- Seletor de emoções (rótulos e ícones: tabela única em js/utils/emotions.js; tests/emotions.test.js confere este HTML) -->
             <div>
               <span class="note-label">Sua reação:</span>
               <div class="emotion-grid" id="note-emotion-selector">
@@ -423,7 +426,7 @@
                 <button class="emotion-btn" data-emotion="fun"><span class="emotion-emoji">😂</span><span class="emotion-label">Divertido</span></button>
                 <button class="emotion-btn" data-emotion="mindblown"><span class="emotion-emoji">😱</span><span class="emotion-label">Chocado</span></button>
                 <button class="emotion-btn" data-emotion="sad"><span class="emotion-emoji">😢</span><span class="emotion-label">Triste</span></button>
-                <button class="emotion-btn" data-emotion="disappointed"><span class="emotion-emoji">😡</span><span class="emotion-label">Ruim</span></button>
+                <button class="emotion-btn" data-emotion="disappointed"><span class="emotion-emoji">😡</span><span class="emotion-label">Decepcionado</span></button>
               </div>
             </div>
 
@@ -432,23 +435,33 @@
               <input type="text" id="note-character-input" class="input-field" placeholder="Ex: Eren Yeager, Walter White, Richie...">
             </div>
 
-            <!-- Editor com Auto-Save Contínuo -->
+            <!-- Editor com salvamento automático. Markdown simples (S08): **negrito**, *itálico*, > citação, >!spoiler!< -->
             <div class="note-editor">
               <div class="note-toolbar">
-                <span class="note-toolbar-title">Anotação Pessoal (Auto-Save 350ms):</span>
+                <span class="note-toolbar-title">Sua anotação (salva sozinha):</span>
                 <div class="note-toolbar-tools">
-                  <button type="button" class="tool-btn" data-insert="**"><strong>B</strong></button>
-                  <button type="button" class="tool-btn" data-insert="*"><em>I</em></button>
-                  <button type="button" class="tool-btn" data-insert="> ">❝</button>
-                  <button type="button" class="tool-btn" data-insert=">!spoiler!<">Spoiler</button>
+                  <button type="button" class="tool-btn" data-insert="**" title="Negrito"><strong>B</strong></button>
+                  <button type="button" class="tool-btn" data-insert="*" title="Itálico"><em>I</em></button>
+                  <button type="button" class="tool-btn" data-insert="> " title="Citação">❝</button>
+                  <button type="button" class="tool-btn" data-insert=">!spoiler!<" title="Spoiler (escondido até clicar)">Spoiler</button>
+                  <button type="button" class="tool-btn tool-btn--history hidden" id="btn-note-history" aria-expanded="false" aria-controls="note-history-panel">Histórico</button>
                 </div>
               </div>
 
-              <textarea id="note-textarea" class="note-textarea" rows="7" placeholder="Escreva o que achou... O salvamento é automático no disco local e não se perde mesmo se a aba fechar."></textarea>
+              <textarea id="note-textarea" class="note-textarea" rows="7" placeholder="Escreva o que achou... O texto é salvo sozinho neste aparelho enquanto você digita."></textarea>
 
               <div class="note-counters">
                 <span id="note-word-count">0 palavras · 0 caracteres</span>
                 <span id="note-last-saved">Nunca editado</span>
+              </div>
+
+              <!-- Histórico de versões: até 5 textos anteriores; "Restaurar" troca o texto e guarda o atual como nova versão -->
+              <div class="note-history hidden" id="note-history-panel">
+                <div class="note-history-head">
+                  <strong>Versões anteriores</strong>
+                  <span>Ao restaurar, o texto atual fica guardado no histórico.</span>
+                </div>
+                <ul class="note-history-list" id="note-history-list"></ul>
               </div>
             </div>
           </div>
@@ -464,7 +477,7 @@
     <div class="modal-overlay hidden" id="modal-backup">
       <div class="modal-container modal-container--backup">
         <button class="modal-close-btn" id="btn-close-backup-modal">&times;</button>
-        <h3 class="backup-title">Central de Backup & Blindagem</h3>
+        <h3 class="backup-title">Backup e dados</h3>
         <p class="backup-sub">Seus dados são 100% seus. Exporte e importe quando quiser.</p>
 
         <div class="backup-list">
@@ -501,6 +514,9 @@
 
   <!-- Scripts em Ordem de Dependência MVC -->
   <script src="js/utils/dom.js"></script>
+  <script src="js/utils/emotions.js"></script>
+  <script src="js/utils/markdown.js"></script>
+  <script src="js/utils/mediaDisplay.js"></script>
   <script src="js/utils/libraryMerge.js"></script>
   <script src="js/utils/watchStatus.js"></script>
   <script src="js/utils/backupValidator.js"></script>
