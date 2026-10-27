@@ -34,7 +34,7 @@ class MediaService {
     const dataDir = opts.dataDir || config.DATA_DIR;
     this.seedPath = opts.seedPath || SEED_PATH;
     this.catalogPath = path.join(dataDir, 'mediaCatalog.runtime.json');
-    this.tvmazeBase = opts.tvmazeBase || TVMAZE_BASE;
+    this.tvmazeBase = opts.tvmazeBase || config.TVMAZE_BASE_URL || TVMAZE_BASE;
     this.cache = new TtlCache({ ttlMs: opts.cacheTtlMs ?? 10 * 60 * 1000, max: 200 }); // buscas no TVMaze
     this.inflight = new Map();        // ingestões em andamento: id -> Promise
     this.sleep = opts.sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
@@ -46,7 +46,7 @@ class MediaService {
     this.anilist = new AniListClient({ fetchJson, sleep: this.sleep, baseUrl: opts.anilistBase || config.ANILIST_BASE_URL || undefined, ...(opts.anilist || {}) });
     this.jikanEnabled = opts.jikanEnabled !== false;
     this.jikan = new JikanClient({ fetchJson, sleep: this.sleep, baseUrl: opts.jikanBase || process.env.JIKAN_BASE_URL, ...(opts.jikan || {}) });
-    this.tmdb = new TmdbClient({ apiKey: opts.tmdbKey !== undefined ? opts.tmdbKey : config.TMDB_API_KEY, baseUrl: opts.tmdbBase, fetchJson });
+    this.tmdb = new TmdbClient({ apiKey: opts.tmdbKey !== undefined ? opts.tmdbKey : config.TMDB_API_KEY, baseUrl: opts.tmdbBase || config.TMDB_BASE_URL || undefined, fetchJson });
 
     // Atualização de obras em exibição (S13): validade por obra, tentativas recentes e orçamento de tempo dos títulos da Jikan.
     this.airingTtlMs = opts.airingTtlMs ?? config.AIRING_TTL_MS;

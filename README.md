@@ -48,7 +48,7 @@ Todas são opcionais em desenvolvimento. O modelo comentado está em `.env.examp
 | `TMDB_API_KEY` | liga a busca de filmes e séries do TMDB em português (chave grátis em themoviedb.org); sem ela o app usa o catálogo local, TVMaze (séries) e AniList/Jikan (animes) | vazio |
 | `SEED_DEMO_USER` | `1` cria a conta de demonstração (ignorado em produção) | desligado |
 | `AUTH_*` | ajustam os limites de tentativas de login/cadastro (`AUTH_LOGIN_MAX`, `AUTH_REGISTER_MAX`, ...; veja `server/config/config.js`) | veja o código |
-| `JIKAN_BASE_URL`, `ANILIST_BASE_URL` | só para testes/desenvolvimento (apontam para uma Jikan/AniList falsa) | APIs oficiais |
+| `JIKAN_BASE_URL`, `ANILIST_BASE_URL`, `TVMAZE_BASE_URL`, `TMDB_BASE_URL` | só para testes/desenvolvimento (apontam para uma fonte falsa; os testes E2E usam as quatro) | APIs oficiais |
 | `MEDIA_AIRING_TTL_HOURS`, `MEDIA_REFRESH_INTERVAL_MIN` | animes e séries "Em Exibição" buscam episódios novos sozinhos: validade da obra em horas e intervalo da conferência em minutos (0 desliga) | 6 h · 30 min |
 
 ### Armazenamento: arquivos JSON ou SQLite
