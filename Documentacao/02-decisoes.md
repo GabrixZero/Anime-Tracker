@@ -140,3 +140,22 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
 ## Pendentes
 
 Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). Novas dúvidas devem ser levadas ao Gabriel pela sessão principal antes de disparar subagentes.
+
+## Rodada 2 (a partir de 2026-10-27)
+
+- **D-24 · 2026-10-27 · Verificações do Gabriel feitas pela sessão principal (Chrome conectado):** CI verde no GitHub (lint, testes e job "Imagem Docker (build e health)");
+  Jikan inacessível de todos os pontos testados (sandbox, máquina do Gabriel, Chrome dele, servidores da Anthropic: timeout de TCP em `api.jikan.moe`); AniList respondendo.
+  Sem contas em Render/Railway/TMDB; logado no Google Cloud.
+- **D-25 · 2026-10-27 · E2E com Playwright** (`@playwright/test` + Chromium como devDependency), aprovado pelo Gabriel. `npm test` segue só com os unitários.
+- **D-26 · 2026-10-27 · Animes: AniList principal, Jikan reserva.** Obra com `idMal` usa `10_000_000 + idMal` (mesmo id da Jikan); sem `idMal`, faixa nova `40_000_000 + anilistId`.
+- **D-27 · 2026-10-27 · Login com Google configurado:** no projeto Google Cloud "My First Project" do Gabriel, tela de consentimento "ShowVault" (Externo, modo **teste**,
+  política de dados aceita com autorização explícita dele), cliente Web "ShowVault (local)" com origens `http://localhost` e `http://localhost:3000`, e o Gabriel como único usuário de teste.
+  O Client ID (público) está no `.env` local (ignorado pelo git); o segredo do cliente não é usado nem foi lido. Para amigos entrarem com Google: adicioná-los como usuários de teste (máx. 100) ou publicar o app.
+  A origem de produção é adicionada na S11, com OK do Gabriel.
+- **D-28 · 2026-10-27 · Rodada 2 = seções S11–S19** (deploy gratuito, E2E, AniList/catálogo, contas, calendário, importar/exportar, nota 1–5, performance/offline, polimento), com dependências em `status/grafo.json`.
+
+### Pendentes da rodada 2
+
+- **P-10 · S11 · Hospedagem gratuita** (para o Gabriel e ~10 amigos): recomendado **Render (web service grátis) + Turso (SQLite/libSQL grátis)**; alternativa **PC do Gabriel + Tailscale Funnel**.
+  Contas e tokens são criados pelo Gabriel. Confirmar antes de iniciar a S11.
+- **P-11 · S14 · Recuperação de senha:** padrão sem serviço de e-mail (script do dono para redefinir a senha de um amigo); e-mail só se o Gabriel pedir.

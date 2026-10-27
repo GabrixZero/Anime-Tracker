@@ -39,3 +39,19 @@ Se uma seção for dividida ou reordenada, registre o motivo em `02-decisoes.md`
 
 As 10 seções (S01–S10) estão **concluídas e no `main`**. O que resta (hospedagem, chaves opcionais, teste da Jikan real, pendências técnicas e o backlog acima)
 está listado em [diario/2026-10-27-encerramento-roadmap.md](diario/2026-10-27-encerramento-roadmap.md). Novas rodadas de trabalho devem abrir seções novas (S11…) neste arquivo e em `status/`.
+
+## Rodada 2 — seções S11–S19 (proposta de 2026-10-27)
+
+Status pelo quadro (`npm run status`). Ondas sugeridas: **A** S12 + S13 · **B** S11 (após P-10) + S14 + S17 · **C** S15 + S16 · **D** S18 · **E** S19.
+
+| Ordem | Seção | Arquivo | Depende de |
+|---|---|---|---|
+| 11 | Deploy gratuito e produção | [S11](secoes/S11-deploy-gratuito.md) | P-10 (escolha da hospedagem) |
+| 12 | Testes ponta a ponta (E2E) | [S12](secoes/S12-testes-e2e.md) | — |
+| 13 | AniList e qualidade do catálogo | [S13](secoes/S13-anilist-e-catalogo.md) | — |
+| 14 | Contas completas e convites | [S14](secoes/S14-contas-completas.md) | (S12 recomendado) |
+| 15 | Calendário de lançamentos | [S15](secoes/S15-calendario.md) | S13 |
+| 16 | Importar e exportar histórico | [S16](secoes/S16-importar-exportar.md) | S13 |
+| 17 | Nota do usuário (1 a 5) | [S17](secoes/S17-nota-1-a-5.md) | (S12 recomendado) |
+| 18 | Performance 2 e modo offline | [S18](secoes/S18-performance-e-offline.md) | S13 |
+| 19 | Acessibilidade real e polimento | [S19](secoes/S19-polimento-final.md) | S11–S18 |
