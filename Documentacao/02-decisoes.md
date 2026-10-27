@@ -154,8 +154,11 @@ Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). N
   A origem de produção é adicionada na S11, com OK do Gabriel.
 - **D-28 · 2026-10-27 · Rodada 2 = seções S11–S19** (deploy gratuito, E2E, AniList/catálogo, contas, calendário, importar/exportar, nota 1–5, performance/offline, polimento), com dependências em `status/grafo.json`.
 
+- **D-29 · 2026-10-27 · (P-10) Hospedagem: o PC do Gabriel + Tailscale Funnel** (escolha dele, gratuita, para ele e ~10 amigos). Render + Turso foi descartado, então **não** há adaptador libSQL/Turso.
+  O app roda em modo produção no Windows (`NODE_ENV=production`, `STORAGE=sqlite`, escutando só em `127.0.0.1`), com dados **fora do OneDrive** (o OneDrive pode travar/corromper um SQLite em uso) e backups diários **dentro** do OneDrive (cópia fora da máquina).
+  O Funnel publica `https://<máquina>.<tailnet>.ts.net`; só funciona com o PC ligado e acordado. Instalar o Tailscale, criar a conta, registrar a tarefa de inicialização e mudar opções de energia do Windows ficam com o Gabriel (os scripts e o guia são da S11).
+  Compartilhar o link com amigos só depois da S14 (cadastro por convite), para estranhos não criarem conta.
+
 ### Pendentes da rodada 2
 
-- **P-10 · S11 · Hospedagem gratuita** (para o Gabriel e ~10 amigos): recomendado **Render (web service grátis) + Turso (SQLite/libSQL grátis)**; alternativa **PC do Gabriel + Tailscale Funnel**.
-  Contas e tokens são criados pelo Gabriel. Confirmar antes de iniciar a S11.
 - **P-11 · S14 · Recuperação de senha:** padrão sem serviço de e-mail (script do dono para redefinir a senha de um amigo); e-mail só se o Gabriel pedir.
