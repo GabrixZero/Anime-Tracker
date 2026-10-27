@@ -62,11 +62,12 @@ app.use('/api', (req, res) => {
 });
 
 // Servidor de Arquivos Estáticos (Frontend MVC)
-app.use(express.static(path.join(__dirname, '..', 'public')));
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+app.use(express.static(PUBLIC_DIR));
 
-// Fallback SPA
+// Fallback SPA (com `root`, uma pasta com ponto no caminho, como .claude/worktrees, não é tratada como arquivo oculto)
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  res.sendFile('index.html', { root: PUBLIC_DIR });
 });
 
 // Erros não tratados (ex.: JSON malformado ou corpo grande demais)

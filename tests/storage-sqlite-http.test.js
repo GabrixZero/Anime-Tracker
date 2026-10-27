@@ -27,17 +27,26 @@ const cleanup = [DATA_DIR];
 process.on('exit', () => cleanup.forEach(d => fs.rmSync(d, { recursive: true, force: true })));
 
 test.before(async () => {
-  server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   base = `http://127.0.0.1:${server.address().port}`;
 });
-test.after(() => { server.close(); storage.close(); });
+test.after(() => {
+  server.close();
+  storage.close();
+});
 
 const api = async (method, route, { body, token } = {}) => {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${base}${route}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
   let json = null;
-  try { json = await res.json(); } catch { /* sem corpo */ }
+  try {
+    json = await res.json();
+  } catch {
+    /* sem corpo */
+  }
   return { status: res.status, body: json };
 };
 
@@ -62,10 +71,18 @@ test('modo sqlite: cadastro, login, biblioteca (PUT mescla, GET, DELETE) e exclu
   assert.equal((await api('GET', '/api/auth/me', { token: login.body.token })).body.user.email, 'sqlite@exemplo.test');
 
   const t0 = new Date(Date.now() - 1000).toISOString();
-  const data = { trackedShows: [{ showId: 1396, status: 'watching', addedAt: t0, updatedAt: t0 }], watchedEpisodes: {}, episodeNotes: {}, tombstones: { shows: {}, watched: {}, notes: {} } };
+  const data = {
+    trackedShows: [{ showId: 1396, status: 'watching', addedAt: t0, updatedAt: t0 }],
+    watchedEpisodes: {},
+    episodeNotes: {},
+    tombstones: { shows: {}, watched: {}, notes: {} }
+  };
   assert.equal((await api('PUT', '/api/user/library', { token, body: { data, stateVersion: 2 } })).status, 200);
   const got = await api('GET', '/api/user/library', { token });
-  assert.deepEqual(got.body.data.trackedShows.map(s => s.showId), [1396]);
+  assert.deepEqual(
+    got.body.data.trackedShows.map(s => s.showId),
+    [1396]
+  );
 
   // a biblioteca está no banco, não em arquivo
   const userId = reg.body.user.id;
@@ -96,7 +113,11 @@ test('modo sqlite: o catálogo vivo é gravado no banco e a lista/obra funcionam
 });
 
 test('modo sqlite: LibraryModel.migrateAll percorre as bibliotecas do banco', () => {
-  LibraryModel.save('usr_migra_1', { trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: { shows: {}, watched: {}, notes: {} } }, { stateVersion: 2 });
+  LibraryModel.save(
+    'usr_migra_1',
+    { trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: { shows: {}, watched: {}, notes: {} } },
+    { stateVersion: 2 }
+  );
   const summary = LibraryModel.migrateAll();
   assert.equal(summary.failed, 0);
   assert.ok(summary.skipped >= 1);
@@ -104,13 +125,17 @@ test('modo sqlite: LibraryModel.migrateAll percorre as bibliotecas do banco', ()
 
 // ---- Partida real do servidor: migra JSON antigos para o SQLite antes de subir ----
 
-const freePort = () => new Promise((resolve, reject) => {
-  const s = net.createServer();
-  s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => resolve(port)); });
-  s.on('error', reject);
-});
+const freePort = () =>
+  new Promise((resolve, reject) => {
+    const s = net.createServer();
+    s.listen(0, '127.0.0.1', () => {
+      const { port } = s.address();
+      s.close(() => resolve(port));
+    });
+    s.on('error', reject);
+  });
 
-test('server.js com STORAGE=sqlite migra os JSON existentes, mantém as contas e responde /health', async (t) => {
+test('server.js com STORAGE=sqlite migra os JSON existentes, mantém as contas e responde /health', async t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-boot-'));
   cleanup.push(dir);
   // Dados "antigos" em JSON, criados pelo modelo no modo de arquivos (processo filho sem STORAGE).
@@ -129,25 +154,56 @@ test('server.js com STORAGE=sqlite migra os JSON existentes, mantém as contas e
   assert.ok(fs.existsSync(path.join(dir, 'users.json')));
 
   const port = await freePort();
-  const child = spawn(process.execPath, ['server.js'], { cwd, env: { ...env, STORAGE: 'sqlite', PORT: String(port) }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, ['server.js'], {
+    cwd,
+    env: { ...env, STORAGE: 'sqlite', PORT: String(port) },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
   let output = '';
-  child.stdout.on('data', d => { output += d; });
-  child.stderr.on('data', d => { output += d; });
-  t.after(() => new Promise(resolve => { child.once('exit', resolve); child.kill(); setTimeout(resolve, 3000).unref(); }));
+  child.stdout.on('data', d => {
+    output += d;
+  });
+  child.stderr.on('data', d => {
+    output += d;
+  });
+  t.after(
+    () =>
+      new Promise(resolve => {
+        child.once('exit', resolve);
+        child.kill();
+        setTimeout(resolve, 3000).unref();
+      })
+  );
 
   const url = `http://127.0.0.1:${port}`;
   let health = null;
   for (let i = 0; i < 100 && !health; i++) {
-    try { health = await (await fetch(`${url}/health`)).json(); } catch { await new Promise(r => setTimeout(r, 100)); }
+    try {
+      health = await (await fetch(`${url}/health`)).json();
+    } catch {
+      await new Promise(r => setTimeout(r, 100));
+    }
   }
   assert.ok(health, `servidor não subiu:\n${output}`);
   assert.equal(health.storage, 'sqlite');
   assert.match(output, /Migração JSON -> SQLite: 1 usuário\(s\), 1 biblioteca\(s\)/);
-  assert.ok(fs.readdirSync(dir).some(n => n.startsWith('backup-pre-sqlite-')), 'backup criado');
+  assert.ok(
+    fs.readdirSync(dir).some(n => n.startsWith('backup-pre-sqlite-')),
+    'backup criado'
+  );
   assert.ok(fs.existsSync(path.join(dir, 'users.json')), 'JSON original mantido');
 
-  const login = await (await fetch(`${url}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'antigo@exemplo.test', password: PASS }) })).json();
+  const login = await (
+    await fetch(`${url}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'antigo@exemplo.test', password: PASS })
+    })
+  ).json();
   assert.equal(login.user.id, userId, 'a conta antiga entra com a mesma senha');
   const lib = await (await fetch(`${url}/api/user/library`, { headers: { Authorization: `Bearer ${login.token}` } })).json();
-  assert.deepEqual(lib.data.trackedShows.map(s => s.showId), [7]);
+  assert.deepEqual(
+    lib.data.trackedShows.map(s => s.showId),
+    [7]
+  );
 });

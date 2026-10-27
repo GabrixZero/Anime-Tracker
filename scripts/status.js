@@ -73,7 +73,7 @@ if (!target) {
   for (const id of ids) {
     const i = info[id];
     const { faltam, avisos } = bloqueios(id);
-    let sit = '';
+    let sit;
     if (i.estado === 'concluida') sit = i.concluidaEm ? `concluída em ${i.concluidaEm}` : 'concluída';
     else if (i.estado === 'em andamento') sit = `branch ${i.branchAtiva}`;
     else if (faltam.length) sit = `AGUARDANDO ${faltam.join(', ')}`;

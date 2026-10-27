@@ -30,7 +30,7 @@ function createStorage(mode = 'json') {
   if (mode !== 'sqlite') throw new Error(`STORAGE inválido: "${mode}" (use "json" ou "sqlite").`);
 
   const stores = new Map(); // pasta de dados -> SqliteStore
-  const storeFor = (dataDir) => {
+  const storeFor = dataDir => {
     const dir = path.resolve(dataDir);
     if (!stores.has(dir)) stores.set(dir, new SqliteStore(path.join(dir, DB_FILE_NAME)));
     return stores.get(dir);
@@ -39,7 +39,7 @@ function createStorage(mode = 'json') {
   return {
     name: 'sqlite',
     storeFor,
-    dbFileFor: (dataDir) => path.join(path.resolve(dataDir), DB_FILE_NAME),
+    dbFileFor: dataDir => path.join(path.resolve(dataDir), DB_FILE_NAME),
 
     readJson(file) {
       const loc = locate(file);
@@ -60,7 +60,10 @@ function createStorage(mode = 'json') {
       const abs = path.resolve(dir);
       if (path.basename(abs) !== 'libraries') return fileStore.listNames(dir, regex);
       const prefix = 'libraries/';
-      return storeFor(path.dirname(abs)).list(prefix).map(k => k.slice(prefix.length)).filter(name => regex.test(name));
+      return storeFor(path.dirname(abs))
+        .list(prefix)
+        .map(k => k.slice(prefix.length))
+        .filter(name => regex.test(name));
     },
     removeAll(file) {
       const loc = locate(file);
@@ -86,9 +89,11 @@ module.exports = {
   locate,
   DB_FILE_NAME,
   LIBRARY_FILE_RE,
-  get name() { return backend().name; },
+  get name() {
+    return backend().name;
+  },
   // Só no modo sqlite: o SqliteStore de uma pasta de dados (usado por testes e ferramentas).
-  storeFor: (dataDir) => {
+  storeFor: dataDir => {
     const b = backend();
     if (!b.storeFor) throw new Error('storeFor só existe com STORAGE=sqlite.');
     return b.storeFor(dataDir);
@@ -98,5 +103,10 @@ module.exports = {
   stamp: (...a) => backend().stamp(...a),
   listNames: (...a) => backend().listNames(...a),
   removeAll: (...a) => backend().removeAll(...a),
-  close: () => { if (current) { current.close(); current = null; } }
+  close: () => {
+    if (current) {
+      current.close();
+      current = null;
+    }
+  }
 };

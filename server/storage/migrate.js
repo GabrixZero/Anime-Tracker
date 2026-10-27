@@ -25,7 +25,11 @@ function candidateFiles(dataDir) {
   }
   const libDir = path.join(dataDir, 'libraries');
   let names = [];
-  try { names = fs.readdirSync(libDir); } catch { /* sem pasta de bibliotecas */ }
+  try {
+    names = fs.readdirSync(libDir);
+  } catch {
+    /* sem pasta de bibliotecas */
+  }
   for (const name of names.filter(n => LIBRARY_FILE_RE.test(n)).sort()) {
     found.push({ key: `libraries/${name}`, file: path.join(libDir, name) });
   }
@@ -91,7 +95,10 @@ function migrateJsonToSqlite(dataDir, { log = console.log, warn = console.warn, 
     const inserted = [];
     store.transaction(() => {
       for (const item of ready) {
-        if (!store.insertIfAbsent(item.key, item.json)) { summary.existing++; continue; }
+        if (!store.insertIfAbsent(item.key, item.json)) {
+          summary.existing++;
+          continue;
+        }
         inserted.push(item);
         if (item.key === 'users.json') summary.users = JSON.parse(item.json).length;
         else if (item.key === 'mediaCatalog.runtime.json') summary.catalog = JSON.parse(item.json).length;
@@ -102,12 +109,15 @@ function migrateJsonToSqlite(dataDir, { log = console.log, warn = console.warn, 
     // Confere o que foi gravado: a releitura do banco precisa ser igual ao que foi lido do arquivo.
     for (const { key, json } of inserted) {
       const back = store.read(key);
-      if (!back || JSON.stringify(back.data) !== json) throw new Error(`Verificação da migração falhou em ${key}; a marca de migração NÃO foi gravada.`);
+      if (!back || JSON.stringify(back.data) !== json)
+        throw new Error(`Verificação da migração falhou em ${key}; a marca de migração NÃO foi gravada.`);
     }
 
     store.setMeta(META_KEY, `${now.toISOString()} users=${summary.users} libraries=${summary.libraries} catalog=${summary.catalog}`);
-    log(`[storage] Migração JSON -> SQLite: ${summary.users} usuário(s), ${summary.libraries} biblioteca(s), catálogo com ${summary.catalog} obra(s)` +
-      `${summary.failed.length ? `, ${summary.failed.length} arquivo(s) com erro` : ''}. Os JSON originais foram mantidos.`);
+    log(
+      `[storage] Migração JSON -> SQLite: ${summary.users} usuário(s), ${summary.libraries} biblioteca(s), catálogo com ${summary.catalog} obra(s)` +
+        `${summary.failed.length ? `, ${summary.failed.length} arquivo(s) com erro` : ''}. Os JSON originais foram mantidos.`
+    );
     return summary;
   } finally {
     store.close();

@@ -16,7 +16,9 @@ function loadDriver() {
     try {
       ({ DatabaseSync } = require('node:sqlite'));
     } catch (err) {
-      throw new Error(`STORAGE=sqlite exige Node 26 ou mais novo (módulo node:sqlite indisponível em ${process.version}): ${err.message}`);
+      throw new Error(`STORAGE=sqlite exige Node 26 ou mais novo (módulo node:sqlite indisponível em ${process.version}): ${err.message}`, {
+        cause: err
+      });
     }
   }
   return DatabaseSync;
@@ -42,8 +44,13 @@ const SCHEMA = `
   );
 `;
 
-const isValidJson = (text) => {
-  try { JSON.parse(text); return true; } catch { return false; }
+const isValidJson = text => {
+  try {
+    JSON.parse(text);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 class SqliteStore {
@@ -95,7 +102,9 @@ class SqliteStore {
           const data = JSON.parse(row.prev);
           console.error(`[sqliteStore] ${key} recuperado da versão anterior.`);
           return { data, recovered: true };
-        } catch { /* cai no erro abaixo */ }
+        } catch {
+          /* cai no erro abaixo */
+        }
       }
       throw new DataCorruptionError(`${this.dbFile}#${key}`, mainError);
     }
@@ -148,13 +157,21 @@ class SqliteStore {
       this.db.exec('COMMIT');
       return result;
     } catch (err) {
-      try { this.db.exec('ROLLBACK'); } catch { /* já revertido */ }
+      try {
+        this.db.exec('ROLLBACK');
+      } catch {
+        /* já revertido */
+      }
       throw err;
     }
   }
 
   close() {
-    try { this.db.close(); } catch { /* já fechado */ }
+    try {
+      this.db.close();
+    } catch {
+      /* já fechado */
+    }
   }
 }
 

@@ -14,10 +14,13 @@ const { DataCorruptionError } = require('../server/utils/errors');
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-storage-'));
 const cleanup = (...dirs) => dirs.forEach(d => fs.rmSync(d, { recursive: true, force: true }));
 
-test('SqliteStore: grava, lê, versiona o carimbo e guarda a versão anterior', (t) => {
+test('SqliteStore: grava, lê, versiona o carimbo e guarda a versão anterior', t => {
   const dir = tmp();
   const store = new SqliteStore(path.join(dir, 'x.sqlite'));
-  t.after(() => { store.close(); cleanup(dir); });
+  t.after(() => {
+    store.close();
+    cleanup(dir);
+  });
 
   assert.equal(store.read('users.json'), null);
   assert.equal(store.stamp('users.json'), 'missing');
@@ -34,10 +37,13 @@ test('SqliteStore: grava, lê, versiona o carimbo e guarda a versão anterior', 
   assert.equal(store.read('k'), null, 'gravação inválida não cria documento');
 });
 
-test('SqliteStore: documento ilegível volta da versão anterior; sem ela lança DataCorruptionError (nunca "vazio")', (t) => {
+test('SqliteStore: documento ilegível volta da versão anterior; sem ela lança DataCorruptionError (nunca "vazio")', t => {
   const dir = tmp();
   const store = new SqliteStore(path.join(dir, 'x.sqlite'));
-  t.after(() => { store.close(); cleanup(dir); });
+  t.after(() => {
+    store.close();
+    cleanup(dir);
+  });
 
   store.write('libraries/usr_a.json', { v: 1 });
   store.write('libraries/usr_a.json', { v: 2 });
@@ -59,10 +65,13 @@ test('SqliteStore: documento ilegível volta da versão anterior; sem ela lança
   assert.throws(() => store.read('users.json'), DataCorruptionError);
 });
 
-test('SqliteStore: list por prefixo, remove apaga também as cópias, insertIfAbsent não sobrescreve e transaction reverte', (t) => {
+test('SqliteStore: list por prefixo, remove apaga também as cópias, insertIfAbsent não sobrescreve e transaction reverte', t => {
   const dir = tmp();
   const store = new SqliteStore(path.join(dir, 'x.sqlite'));
-  t.after(() => { store.close(); cleanup(dir); });
+  t.after(() => {
+    store.close();
+    cleanup(dir);
+  });
 
   store.write('libraries/usr_b.json', {});
   store.write('libraries/usr_a.json', {});
@@ -79,11 +88,18 @@ test('SqliteStore: list por prefixo, remove apaga também as cópias, insertIfAb
   assert.deepEqual(store.read('users.json').data, []);
   assert.throws(() => store.insertIfAbsent('novo', '{ruim'), /JSON inválido/);
 
-  assert.throws(() => store.transaction(() => { store.write('t', { a: 1 }); throw new Error('falha'); }), /falha/);
+  assert.throws(
+    () =>
+      store.transaction(() => {
+        store.write('t', { a: 1 });
+        throw new Error('falha');
+      }),
+    /falha/
+  );
   assert.equal(store.read('t'), null, 'transação com erro não grava nada');
 });
 
-test('SqliteStore: dados persistem ao reabrir o arquivo', (t) => {
+test('SqliteStore: dados persistem ao reabrir o arquivo', t => {
   const dir = tmp();
   t.after(() => cleanup(dir));
   const file = path.join(dir, 'x.sqlite');
@@ -107,10 +123,13 @@ test('locate: só users.json, libraries/usr_*.json e o catálogo de runtime vão
   assert.equal(locate(path.join(d, 'libraries', '..', 'x.json')), null);
 });
 
-test('adaptador SQLite: documentos de dados vão para o banco, o resto continua em arquivo', (t) => {
+test('adaptador SQLite: documentos de dados vão para o banco, o resto continua em arquivo', t => {
   const dir = tmp();
   const storage = createStorage('sqlite');
-  t.after(() => { storage.close(); cleanup(dir); });
+  t.after(() => {
+    storage.close();
+    cleanup(dir);
+  });
 
   const users = path.join(dir, 'users.json');
   const lib = path.join(dir, 'libraries', 'usr_x.json');
@@ -138,7 +157,7 @@ test('adaptador SQLite: documentos de dados vão para o banco, o resto continua 
   assert.deepEqual(storage.listNames(path.join(dir, 'libraries'), /./), []);
 });
 
-test('adaptador JSON (padrão): mesmos métodos, em arquivos', (t) => {
+test('adaptador JSON (padrão): mesmos métodos, em arquivos', t => {
   const dir = tmp();
   const storage = createStorage('json');
   t.after(() => cleanup(dir));
@@ -157,10 +176,18 @@ test('adaptador JSON (padrão): mesmos métodos, em arquivos', (t) => {
 
 test('createStorage recusa modo desconhecido; STORAGE inválido derruba a config com mensagem clara', () => {
   assert.throws(() => createStorage('postgres'), /STORAGE inválido/);
-  const run = (value) => {
+  const run = value => {
     try {
-      return { ok: true, out: execFileSync(process.execPath, ['-e', "console.log(require('./server/config/config').STORAGE)"], {
-        cwd: path.join(__dirname, '..'), env: { ...process.env, STORAGE: value, SHOWVAULT_DATA_DIR: os.tmpdir() }, stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim() };
+      return {
+        ok: true,
+        out: execFileSync(process.execPath, ['-e', "console.log(require('./server/config/config').STORAGE)"], {
+          cwd: path.join(__dirname, '..'),
+          env: { ...process.env, STORAGE: value, SHOWVAULT_DATA_DIR: os.tmpdir() },
+          stdio: ['ignore', 'pipe', 'pipe']
+        })
+          .toString()
+          .trim()
+      };
     } catch (err) {
       return { ok: false, err: String(err.stderr) };
     }
