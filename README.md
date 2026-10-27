@@ -1,8 +1,8 @@
 # ShowVault / Anime-Tracker · Rastreador Pessoal de Séries, Animes e Filmes
 
-> **Engenharia Reversa & Réplica Pessoal Estilo TV Show Time (Blindado contra perda de dados).**
+> Acompanhe séries, filmes e animes: progresso episódio por episódio, diário de anotações e estatísticas de tempo assistido.
 
-Este projeto foi construído para resolver definitivamente os problemas históricos de rastreadores (bugs de sincronização, anotações perdidas, instabilidade e encerramento de serviços).
+Os dados ficam no seu navegador (e, se você criar uma conta, também numa cópia no servidor para usar em vários aparelhos). O primeiro acesso começa com a lista **vazia**: explore o catálogo, ou use "Carregar exemplo" para ver o app com alguns títulos (sem progresso nem anotações de mentira).
 
 ---
 
@@ -51,28 +51,26 @@ Observação: contas Google nunca são fundidas automaticamente com uma conta de
    * Marcação com 1 clique de assistido.
    * Acesso imediato ao diário de cada episódio.
 
-2. **Diário de Episódios Blindado (Anti-Data-Loss):**
-   * **Auto-Save contínuo (Debounce 350ms):** cada letra digitada é gravada instantaneamente no seu disco local.
-   * **Histórico de Snapshots:** restaure versões anteriores em 1 clique.
-   * **Reações estilo TV Time:** 😍 Adorei, 😂 Divertido, 😱 Chocado, 😢 Triste, 😡 Ruim.
-   * **Personagem destaque:** registre quem roubou a cena no episódio.
-   * **Suporte a Markdown:** negrito, itálico, citações e spoiler.
+2. **Diário de Episódios e Filmes:**
+   * **Salvamento automático:** o texto é gravado neste aparelho (e enviado à conta, se você estiver conectado) logo depois que você para de digitar (~0,35 s).
+   * **Histórico de versões:** o botão **Histórico (n)** do editor lista até 5 versões anteriores do texto, da mais nova para a mais antiga. **Restaurar** troca o texto em 1 clique e guarda o texto que estava valendo como uma versão nova (nada se perde; só a mais antiga sai quando passa de 5). Uma versão nova é criada quando você volta a editar uma anotação que ficou parada por 10 minutos ou mais (digitar seguido não enche o histórico). O histórico guarda o **texto**; reação e personagem não entram nas versões.
+   * **Markdown simples:** `**negrito**`, `*itálico*`, `***os dois***`, `> citação` (linha começando com `> `) e `>!spoiler!<` (escondido no diário até você clicar ou apertar Enter/Espaço). A barra do editor insere essas marcas. Não existe HTML, link nem imagem: qualquer `<tag>` que você escreva aparece como texto.
+   * **Reações:** 😍 Adorei, 😂 Divertido, 😱 Chocado, 😢 Triste, 😡 Decepcionado (os mesmos nomes no editor, no diário e nas estatísticas).
+   * **Personagem ou destaque:** campo livre para registrar quem roubou a cena.
 
-3. **Minhas Séries / Animes / Filmes (Watchlist):**
-   * Filtros dinâmicos: *Todos*, *Em Andamento*, *Finalizados*, *Quero Ver*.
-   * Barras de progresso com porcentagem e total de episódios assistidos.
+3. **Minha Lista:**
+   * Status por obra: *Assistindo*, *Quero ver*, *Pausado*, *Finalizado* e *Desisti* (muda sozinho ao marcar episódios).
+   * Filtros por status e por tipo (séries, animes, filmes); barra de progresso com o total de episódios assistidos.
 
-4. **Estatísticas de Tempo de Vida:**
-   * Cálculo exato baseado na duração (`runtime`) de cada obra assistida:
-     * **Meses, Dias, Horas e Minutos** de tempo gasto.
-     * Gráfico de distribuição de reações/emoções.
-     * Top gêneros mais assistidos.
+4. **Estatísticas:**
+   * Tempo assistido em meses, dias, horas e minutos: é uma **estimativa** (soma a duração informada de cada episódio/filme; quando a fonte não informa, conta 45 min por episódio e 120 min por filme).
+   * Distribuição de reações, top gêneros e obras finalizadas.
 
-5. **Central de Backup & Exportação:**
-   * **Exportar Base Completa (.JSON):** salve tudo no seu computador quando quiser.
-   * **Importar / Restaurar (.JSON):** troque de computador ou navegador sem perder nada.
-   * **Exportar Diário em Markdown (.MD):** exporte para Obsidian, Notion ou bloco de notas.
+5. **Backup e dados:**
+   * **Baixar `.json`** com toda a sua biblioteca e **restaurar** em outro navegador ou computador.
+   * **Exportar o diário em Markdown (`.md`)** para guardar fora do app (as marcas de spoiler saem como `>!texto!<`).
+   * **Resetar** apaga os dados deste aparelho (e, se você confirmar, a cópia da conta).
 
-6. **Catálogo & Conexão Externa:**
-   * Pré-carregado com catálogo verificado de séries, animes e filmes em PT-BR.
-   * Ingestão sob demanda: busca externa em tempo real e auto-gravação local.
+6. **Catálogo e busca:**
+   * Catálogo inicial com 16 séries, animes e filmes (os de série/anime trazem poucos episódios de amostra) e busca no TVMaze para ampliar; adicionar uma obra nova à lista exige estar conectado.
+   * O que a fonte não informa aparece como **"Sem nota"**, **"Sem gênero"** ou uma imagem neutra, nunca como um valor de enfeite.
