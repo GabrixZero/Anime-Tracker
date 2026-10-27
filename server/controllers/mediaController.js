@@ -9,6 +9,8 @@ const MAX_QUERY_LENGTH = 100;
 
 // Limite de ingestões por usuário (cada uma baixa uma obra inteira da fonte externa).
 const ingestLimiter = new RateLimiter({ windowMs: 10 * 60 * 1000, max: 30 });
+// Limite de buscas por IP (o frontend espera ~400 ms entre teclas; 60/min é folgado para uso humano).
+const searchLimiter = new RateLimiter({ windowMs: 60 * 1000, max: 60 });
 
 // type opcional: ausente => 'all'; repetido (?type=a&type=b) ou desconhecido => 400.
 function readType(req) {
@@ -52,8 +54,15 @@ class MediaController {
   async search(req, res) {
     try {
       const query = readQuery(req);
-      const items = await mediaService.search(query, readType(req));
-      return res.json({ query, count: items.length, data: items });
+      const type = readType(req);
+      if (query.trim()) {
+        // A busca é pública mas dispara consultas a fontes externas (Jikan, TVMaze, TMDB): limite por IP.
+        const limit = searchLimiter.hit(req.ip || 'anon');
+        if (!limit.ok) throw mediaErrors.tooManySearches(limit.retryAfterSec);
+      }
+      const { items, warnings } = await mediaService.searchDetailed(query, type);
+      // warnings = fontes que falharam/não estão configuradas (a lista vem mesmo assim, com o que as outras fontes devolveram)
+      return res.json({ query, count: items.length, data: items, warnings });
     } catch (err) {
       return sendError(res, err, 'Erro na pesquisa de mídia.', 'media/search');
     }
@@ -85,3 +94,4 @@ class MediaController {
 
 module.exports = new MediaController();
 module.exports.ingestLimiter = ingestLimiter;
+module.exports.searchLimiter = searchLimiter;
