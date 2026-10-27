@@ -25,6 +25,8 @@ server/data/mediaCatalog.json
 server/data/*.bak
 server/data/*.tmp
 server/data/*.corrupt-*
+# Backup que a migração da S13 faz do catálogo vivo antes de limpar obras antigas
+server/data/mediaCatalog.backup-*.json
 # Banco SQLite (STORAGE=sqlite) e backups da migração JSON -> SQLite
 *.sqlite
 *.sqlite-wal

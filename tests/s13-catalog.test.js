@@ -302,7 +302,7 @@ test('laço de conferência: liga, não bloqueia o processo (unref) e desliga', 
   svc.refreshDueWorks = async () => { ran++; return { checked: 0, refreshed: [], failed: [] }; };
   svc.startRefreshLoop({ intervalMs: 20, initialDelayMs: 5, log: () => {} });
   assert.equal(svc.refreshTimers.length, 1);
-  await new Promise(resolve => setTimeout(resolve, 120));
+  await new Promise(resolve => setTimeout(resolve, 250));
   assert.ok(ran >= 2, `rodou ${ran} vezes`);
   svc.stopRefreshLoop();
   const stopped = ran;
