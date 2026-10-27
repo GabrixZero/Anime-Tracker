@@ -62,10 +62,33 @@ class AuthView {
         this.updateHeader(res.user);
         window.syncService.pullAndMerge(res.user, { resumed: true });
       }
-    } catch {
-      localStorage.removeItem('showvault_auth_token');
+    } catch (err) {
+      if (err && err.status === 401) {
+        // O servidor recusou o token (expirado, conta excluída, senha trocada): aí sim a sessão acabou.
+        localStorage.removeItem('showvault_auth_token');
+        this.updateHeader(null);
+        return;
+      }
+      // Sem rede, servidor fora do ar ou erro 5xx: o token pode estar perfeitamente válido. NÃO apaga; mostra o problema
+      // no selo de sincronização e tenta de novo quando a conexão voltar (ou depois de um tempo).
       this.updateHeader(null);
+      window.syncService.setStatus(err && !err.status ? 'offline' : 'error');
+      this.scheduleSessionRetry();
     }
+  }
+
+  // Uma nova tentativa de retomar a sessão: ao voltar a conexão ou após 30 s (no máximo 5 vezes seguidas).
+  scheduleSessionRetry() {
+    if (this.sessionRetryTimer || (this.sessionRetries || 0) >= 5) return;
+    const retry = () => {
+      window.removeEventListener('online', retry);
+      clearTimeout(this.sessionRetryTimer);
+      this.sessionRetryTimer = null;
+      this.sessionRetries = (this.sessionRetries || 0) + 1;
+      this.checkSession();
+    };
+    window.addEventListener('online', retry);
+    this.sessionRetryTimer = setTimeout(retry, 30000);
   }
 
   open() {
