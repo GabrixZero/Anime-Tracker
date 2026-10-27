@@ -42,7 +42,7 @@ está listado em [diario/2026-10-27-encerramento-roadmap.md](diario/2026-10-27-e
 
 ## Rodada 2 — seções S11–S19 (proposta de 2026-10-27)
 
-Status pelo quadro (`npm run status`). Ondas sugeridas: **A** S12 + S13 · **B** S11 + S14 + S17 · **C** S15 + S16 · **D** S18 · **E** S19.
+Status pelo quadro (`npm run status`). Ordem (uma por vez, D-30): **S13 → S11 → S12 → S14 → S17 → S15 → S16 → S18 → S19**.
 
 | Ordem | Seção | Arquivo | Depende de |
 |---|---|---|---|
