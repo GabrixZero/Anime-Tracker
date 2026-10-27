@@ -27,6 +27,7 @@ test('existem os scripts prometidos pelo guia e pela seção S11', () => {
     'start-showvault.ps1',
     'status.ps1',
     'update.ps1',
+    'stop-showvault.ps1',
     'backup-showvault.ps1',
     '_common.ps1'
   ]) {

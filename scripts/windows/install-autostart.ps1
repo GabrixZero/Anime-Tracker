@@ -134,6 +134,6 @@ if ($StartNow) {
 
 Write-Title 'Pronto.'
 Write-Info '  Ligar agora:     Start-ScheduledTask -TaskName ShowVault'
-Write-Info '  Parar:           Stop-ScheduledTask -TaskName ShowVault'
+Write-Info '  Parar:           powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\stop-showvault.ps1'
 Write-Info '  Ver a situação:  powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\status.ps1'
 Write-Info '  Remover tudo:    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\uninstall-autostart.ps1'

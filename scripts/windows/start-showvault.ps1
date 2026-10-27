@@ -13,7 +13,7 @@
     - roda "node server.js" sem janela, com a saída gravada em %LOCALAPPDATA%\ShowVault\logs\showvault.log;
     - se o servidor cair, espera um pouco e liga de novo; se cair 5 vezes seguidas em menos de 1 minuto, desiste
       (o Agendador tenta de novo; o motivo fica em supervisor.log e showvault.log).
-  Para parar: Stop-ScheduledTask -TaskName ShowVault   (ou feche a janela, se você rodou à mão).
+  Para parar: stop-showvault.ps1 (na mesma pasta), que para a tarefa e o servidor.
 
 .PARAMETER EnvFile  .env a usar (padrão: o da pasta do projeto).
 .PARAMETER LogDir   Pasta dos logs (padrão: %LOCALAPPDATA%\ShowVault\logs).

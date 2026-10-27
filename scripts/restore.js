@@ -123,7 +123,8 @@ async function main(argv) {
 
     if (await serverIsRunning(port)) {
       console.error(`\nO ShowVault está rodando (respondeu em http://127.0.0.1:${port}/health). Pare-o antes de restaurar:`);
-      console.error('  Stop-ScheduledTask -TaskName ShowVault        (e feche a janela do iniciar.bat, se usar)');
+      console.error('  powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\windows\\stop-showvault.ps1');
+      console.error('  (e feche a janela do iniciar.bat ou do npm start, se usar)');
       return 1;
     }
 

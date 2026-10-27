@@ -204,7 +204,8 @@ Duas coisas para ela saber: o Google limita a 100 usuários de teste, e **não f
 | Quero... | Comando (PowerShell, na pasta do projeto) |
 |---|---|
 | ver se está tudo bem | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\status.ps1` (acrescente `-Log` para ver as últimas linhas dos logs) |
-| ligar / parar o app | `Start-ScheduledTask -TaskName ShowVault` / `Stop-ScheduledTask -TaskName ShowVault` |
+| ligar o app | `Start-ScheduledTask -TaskName ShowVault` |
+| parar o app | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\stop-showvault.ps1` (para a tarefa **e** o servidor; não remove o início automático) |
 | fazer um backup agora | `npm run backup` |
 | ver os backups | `npm run restore` (lista) — ou abra a pasta `OneDrive\Documentos\ShowVault-Backups` |
 | atualizar o app | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\update.ps1` (use `-DryRun` para só ver o que mudaria) |
@@ -220,7 +221,7 @@ Duas coisas para ela saber: o Google limita a 100 usuários de teste, e **não f
 
 ### Restaurar um backup (se algo der errado)
 
-1. Pare o app: `Stop-ScheduledTask -TaskName ShowVault`.
+1. Pare o app: `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\stop-showvault.ps1`.
 2. Veja os backups: `npm run restore`.
 3. Confira o que escolheu sem trocar nada: `npm run restore -- ultimo --dry-run` (mostra contas, listas e obras do backup e do banco atual).
 4. Restaure: `npm run restore -- ultimo` (ou o nome de um deles). Ele pede para você digitar `RESTAURAR`, guarda uma cópia do banco que estava em uso
