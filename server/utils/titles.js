@@ -92,12 +92,22 @@ function malIdsOf(item) {
   return ids;
 }
 
-// A e B são a mesma obra? (mesmo id da MAL; ou mesmo tipo + algum título normalizado em comum + anos compatíveis)
+// Ids da AniList da obra (S13): `anilist_id` e, na franquia ingerida, `anilist_ids`. Obras sem idMal só têm este.
+function anilistIdsOf(item) {
+  const ids = new Set();
+  if (item && Array.isArray(item.anilist_ids)) item.anilist_ids.forEach(n => Number.isSafeInteger(n) && ids.add(n));
+  if (item && Number.isSafeInteger(item.anilist_id)) ids.add(item.anilist_id);
+  return ids;
+}
+
+// A e B são a mesma obra? (mesmo id da MAL ou da AniList; ou mesmo tipo + algum título normalizado em comum + anos compatíveis)
 function sameWork(a, b) {
   if (!a || !b) return false;
   if (a.id !== undefined && a.id === b.id) return true;
   const ma = malIdsOf(a);
   for (const id of malIdsOf(b)) if (ma.has(id)) return true;
+  const aa = anilistIdsOf(a);
+  for (const id of anilistIdsOf(b)) if (aa.has(id)) return true;
   if (a.type !== b.type) return false;
   const ya = yearOf(a);
   const yb = yearOf(b);
@@ -106,4 +116,4 @@ function sameWork(a, b) {
   return titlesOf(a).some(t => tb.has(t));
 }
 
-module.exports = { normalizeTitle, titlesOf, scoreTitle, relevance, franchiseKey, yearOf, malIdsOf, sameWork };
+module.exports = { normalizeTitle, titlesOf, scoreTitle, relevance, franchiseKey, yearOf, malIdsOf, anilistIdsOf, sameWork };

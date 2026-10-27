@@ -26,6 +26,12 @@ const server = app.listen(config.PORT, () => {
   console.log(`========================================================`);
 });
 
+// S13: de tempos em tempos busca episódios novos das obras em exibição (e atualiza as marcadas pela migração do catálogo antigo).
+// MEDIA_REFRESH_INTERVAL_MIN=0 desliga. Os testes não passam por aqui.
+if (config.REFRESH_INTERVAL_MIN > 0) {
+  require('./server/services/mediaService').startRefreshLoop({ intervalMs: config.REFRESH_INTERVAL_MIN * 60 * 1000 });
+}
+
 // Encerramento limpo (Docker envia SIGTERM): para de aceitar conexões e fecha o banco.
 function shutdown(signal) {
   console.log(`[servidor] ${signal} recebido, encerrando...`);

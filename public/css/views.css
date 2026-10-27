@@ -827,6 +827,27 @@
    S08 · Markdown das anotações, spoiler, histórico de versões e estado vazio
    ================================================================ */
 
+/* Faixa "Remover exemplo" na Minha Lista (S13): aparece enquanto houver títulos do exemplo ainda sem uso */
+.example-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-surface);
+  border: 1px dashed var(--bg-card-border);
+  border-radius: var(--radius-sm);
+}
+
+.example-bar-text {
+  margin: 0;
+  flex: 1 1 16rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
 /* Botões lado a lado no estado vazio (Explorar + Carregar exemplo) */
 .empty-actions {
   display: flex;

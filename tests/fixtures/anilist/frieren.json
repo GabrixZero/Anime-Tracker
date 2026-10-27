@@ -1,0 +1,723 @@
+{
+ "_comment": "Respostas REAIS da AniList (https://graphql.anilist.co) capturadas uma vez em 2026-10-27 para os testes offline da S13.",
+ "capturedAt": "2026-10-27T15:11:52.535Z",
+ "requests": [
+  {
+   "kind": "search",
+   "variables": {
+    "search": "Frieren",
+    "perPage": 25
+   },
+   "response": {
+    "data": {
+     "Page": {
+      "media": [
+       {
+        "id": 154587,
+        "idMal": 52991,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 28,
+        "duration": 24,
+        "season": "FALL",
+        "seasonYear": 2023,
+        "isAdult": false,
+        "title": {
+         "romaji": "Sousou no Frieren",
+         "english": "Frieren: Beyond Journey’s End",
+         "native": "葬送のフリーレン"
+        },
+        "synonyms": [
+         "Frieren at the Funeral",
+         "장송의 프리렌",
+         "Frieren - Oltre la Fine del Viaggio",
+         "คำอธิษฐานในวันที่จากลา Frieren",
+         "Frieren e a Jornada para o Além",
+         "Frieren – Nach dem Ende der Reise",
+         "葬送的芙莉蓮",
+         "Frieren: Más allá del final del viaje",
+         "Frieren en el funeral",
+         "Sōsō no Furīren",
+         "Frieren. U kresu drogi",
+         "Frieren - Pháp sư tiễn táng",
+         "Фрирен, провожающая в последний путь",
+         "فريرن: ما وراء نهاية الرحلة",
+         "Frieren: Tras finalizar el viaje"
+        ],
+        "startDate": {
+         "year": 2023,
+         "month": 9,
+         "day": 29
+        },
+        "averageScore": 91,
+        "meanScore": 91,
+        "genres": [
+         "Adventure",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to understand what life means to the people around her? Decades after their victory, the funeral of one her friends confronts Frieren with her own near immortality. Frieren sets out to fulfill the last wishes of her comrades and finds herself beginning a new adventure…\n<br><br>\n(Source: Crunchyroll)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-ivXNJ23SM1xB.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 209939,
+        "idMal": 63816,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "NOT_YET_RELEASED",
+        "episodes": null,
+        "duration": null,
+        "season": "FALL",
+        "seasonYear": 2027,
+        "isAdult": false,
+        "title": {
+         "romaji": "Sousou no Frieren 3rd Season",
+         "english": null,
+         "native": "葬送のフリーレン 第3期"
+        },
+        "synonyms": [
+         "Frieren: Beyond Journey’s End Season 3 Golden Land Arc",
+         "葬送のフリーレン 第3期【黄金郷編】",
+         "Sousou no Frieren 3rd Season [Ougonkyou-hen]"
+        ],
+        "startDate": {
+         "year": 2027,
+         "month": 10,
+         "day": null
+        },
+        "averageScore": null,
+        "meanScore": null,
+        "genres": [
+         "Adventure",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "The third season of <i>Sousou no Frieren</i>.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx209939-g2Njkml1rheG.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx209939-g2Njkml1rheG.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 182255,
+        "idMal": 59978,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 10,
+        "duration": 24,
+        "season": "WINTER",
+        "seasonYear": 2026,
+        "isAdult": false,
+        "title": {
+         "romaji": "Sousou no Frieren 2nd Season",
+         "english": "Frieren: Beyond Journey’s End Season 2",
+         "native": "葬送のフリーレン 第2期"
+        },
+        "synonyms": [
+         "Провожающая в последний путь Фрирен 2",
+         "장송의 프리렌 2기"
+        ],
+        "startDate": {
+         "year": 2026,
+         "month": 1,
+         "day": 16
+        },
+        "averageScore": 87,
+        "meanScore": 88,
+        "genres": [
+         "Adventure",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "Following the First-Class Mage Exam, the trio—elven mage Frieren, warrior Stark, and first-class mage Fern—gains access to the dangerous Northern Plateau. As the party presses onward toward Aureole, formidable adversaries force Stark to confront his insecurities, solidifying his resolve and his role as the party's frontliner. Meanwhile, Fern continues to cherish the gifts she has been blessed with throughout her life, each a reminder of those she holds dear.<br><br>\n\nFrieren—still honoring her vow to understand humanity—revisits memories of her journey with the Hero's party and her fleeting encounter with a legendary figure. As she reflects on the passage of time, the elven mage quietly questions whether she has truly changed, yet in the small, almost subtle choices that she makes, there are signs that she might have become more human than she realizes.<br><br>\n\n(Source: MAL Rewrite)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx182255-butzrqd4I0aC.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx182255-butzrqd4I0aC.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/182255-wyHvp6zJbWsO.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 170068,
+        "idMal": 56885,
+        "type": "ANIME",
+        "format": "ONA",
+        "status": "FINISHED",
+        "episodes": 12,
+        "duration": 1,
+        "season": "FALL",
+        "seasonYear": 2023,
+        "isAdult": false,
+        "title": {
+         "romaji": "Sousou no Frieren: ●● no Mahou",
+         "english": null,
+         "native": "葬送のフリーレン ～●●の魔法～"
+        },
+        "synonyms": [
+         "Sousou no Frieren Mini Anime",
+         "Frieren: Beyond Journey’s End Mini Anime",
+         "葬送のフリーレン ミニアニメ",
+         "Sousou no Frieren Marumaru no Mahou",
+         "葬送のフリーレン ミニアニメ",
+         "Frieren: Beyond Journey's End: Magic of ??"
+        ],
+        "startDate": {
+         "year": 2023,
+         "month": 10,
+         "day": 11
+        },
+        "averageScore": 73,
+        "meanScore": 74,
+        "genres": [
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "Chibi shorts posted on the official YouTube account of TOHO animation and Twitter account of the main series.<br><br>\n<i>Note: Includes \"Tokubetsu-hen:「Shokutaku o Shiawase ni Suru Mahou」/ Mizkan Ajipon Collaboration\"</i>",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx170068-ijY3tCP8KoWP.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx170068-ijY3tCP8KoWP.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 189513,
+        "idMal": null,
+        "type": "ANIME",
+        "format": "ONA",
+        "status": "FINISHED",
+        "episodes": 6,
+        "duration": 1,
+        "season": "SPRING",
+        "seasonYear": 2025,
+        "isAdult": false,
+        "title": {
+         "romaji": "Sousou no Frieren: ●● no Mahou Part 2",
+         "english": null,
+         "native": "葬送のフリーレン ～●●の魔法～ 2クール"
+        },
+        "synonyms": [
+         "Sousou no Frieren Mini Anime",
+         "Frieren: Beyond Journey’s End Mini Anime",
+         "Sousou no Frieren: Marumaru no Mahou",
+         "葬送のフリーレン ミニアニメ",
+         "Frieren: Beyond Journey's End: Magic of ??"
+        ],
+        "startDate": {
+         "year": 2025,
+         "month": 4,
+         "day": 2
+        },
+        "averageScore": 71,
+        "meanScore": 72,
+        "genres": [
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "A second batch of the <i>●● no Mahou</i> shorts released monthly in the lead up to the TV anime's second season, starting with #12. Posted on the official YouTube account of TOHO animation, Frieren Twitter, and Frieren TikTok account.<br><br>\n\n<b>Includes:</b><br>\n• Shinchou ga Nobiru Mahou (身長が伸びる魔法), released Apr 2, 2025. <br>\n• Onaka-ippai ni Naru Mahou (おなかいっぱいになる魔法), released May 7, 2025. <br>\n• Daitai Nan demo Kiru Mahou (大体なんでも切る魔法), released Jun 4, 2025. <br>\n• Kousoku de Idou Suru Mahou (高速で移動する魔法), released Jul 2, 2025. <br>\n• Karada no Mawari wo Suzushiku Suru Mahou (体のまわりを涼しくする魔法), released Aug 6, 2025. <br>\n• Tokui Waza wo Fuujiru Mahou (得意技を封じる魔法), released Sep 3, 2025.<br>",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx189513-1R9Sryve0K53.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx189513-1R9Sryve0K53.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/189513-HjE2qNupgfEe.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 206425,
+        "idMal": null,
+        "type": "ANIME",
+        "format": "ONA",
+        "status": "FINISHED",
+        "episodes": 6,
+        "duration": 1,
+        "season": "WINTER",
+        "seasonYear": 2026,
+        "isAdult": false,
+        "title": {
+         "romaji": "Sousou no Frieren: ●● no Mahou Part 3",
+         "english": null,
+         "native": "葬送のフリーレン ～●●の魔法～ 3クール"
+        },
+        "synonyms": [
+         "Sousou no Frieren 2nd Season Mini Anime",
+         "Frieren: Beyond Journey’s End Season 2 Mini Anime",
+         "Sousou no Frieren: Marumaru no Mahou"
+        ],
+        "startDate": {
+         "year": 2026,
+         "month": 1,
+         "day": 19
+        },
+        "averageScore": 70,
+        "meanScore": 72,
+        "genres": [
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "A third batch of the <i>●● no Mahou</i> shorts released alongside the airing of the TV anime's second season, starting with #18. Posted on the official YouTube account of TOHO animation, Frieren Twitter, and Frieren TikTok account.<br><br>\n\n<b>Includes:</b><br>\n• Mita Mono wo Kousoku Suru Mahou (見た者を拘束する魔法), released Jan 19, 2026. <br>\n• Doushin ni Kaeru Mahou (童心に還る魔法), released Feb 2, 2026.<br>\n• Kokoro to Karada ga Irekawaru Mahou (心と体が入れ替わる魔法), released Feb 17, 2026.<br>\n• Osentaku no Mahou (お洗濯の魔法), released Mar 2, 2026.<br>\n• Kangaeteiru Koto wo Itte Shimau Mahou Sono Ni (考えていることを言ってしまう魔法その2), released Mar 16, 2026.<br>\n• Akogare ni Hitareru Mahou (憧れにひたれる魔法), released May 22, 2026.<br>",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b206425-WOwXsfDbHZwb.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b206425-WOwXsfDbHZwb.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "kind": "media",
+   "variables": {
+    "idMal": 52991
+   },
+   "response": {
+    "data": {
+     "Media": {
+      "id": 154587,
+      "idMal": 52991,
+      "type": "ANIME",
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 28,
+      "duration": 24,
+      "season": "FALL",
+      "seasonYear": 2023,
+      "isAdult": false,
+      "title": {
+       "romaji": "Sousou no Frieren",
+       "english": "Frieren: Beyond Journey’s End",
+       "native": "葬送のフリーレン"
+      },
+      "synonyms": [
+       "Frieren at the Funeral",
+       "장송의 프리렌",
+       "Frieren - Oltre la Fine del Viaggio",
+       "คำอธิษฐานในวันที่จากลา Frieren",
+       "Frieren e a Jornada para o Além",
+       "Frieren – Nach dem Ende der Reise",
+       "葬送的芙莉蓮",
+       "Frieren: Más allá del final del viaje",
+       "Frieren en el funeral",
+       "Sōsō no Furīren",
+       "Frieren. U kresu drogi",
+       "Frieren - Pháp sư tiễn táng",
+       "Фрирен, провожающая в последний путь",
+       "فريرن: ما وراء نهاية الرحلة",
+       "Frieren: Tras finalizar el viaje"
+      ],
+      "startDate": {
+       "year": 2023,
+       "month": 9,
+       "day": 29
+      },
+      "averageScore": 91,
+      "meanScore": 91,
+      "genres": [
+       "Adventure",
+       "Drama",
+       "Fantasy"
+      ],
+      "description": "The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to understand what life means to the people around her? Decades after their victory, the funeral of one her friends confronts Frieren with her own near immortality. Frieren sets out to fulfill the last wishes of her comrades and finds herself beginning a new adventure…\n<br><br>\n(Source: Crunchyroll)",
+      "coverImage": {
+       "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg",
+       "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg"
+      },
+      "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-ivXNJ23SM1xB.jpg",
+      "nextAiringEpisode": null,
+      "relations": {
+       "edges": [
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 118586,
+          "idMal": 126287,
+          "type": "MANGA",
+          "format": "MANGA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 169811,
+          "idMal": 56805,
+          "type": "ANIME",
+          "format": "MUSIC",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 170068,
+          "idMal": 56885,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "OTHER",
+         "node": {
+          "id": 175691,
+          "idMal": 58313,
+          "type": "ANIME",
+          "format": "MUSIC",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SEQUEL",
+         "node": {
+          "id": 182255,
+          "idMal": 59978,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 189513,
+          "idMal": null,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        }
+       ]
+      },
+      "airingSchedule": {
+       "nodes": [
+        {
+         "episode": 5,
+         "airingAt": 1696600800
+        },
+        {
+         "episode": 6,
+         "airingAt": 1697205600
+        },
+        {
+         "episode": 7,
+         "airingAt": 1697810400
+        },
+        {
+         "episode": 8,
+         "airingAt": 1698415200
+        },
+        {
+         "episode": 9,
+         "airingAt": 1699020000
+        },
+        {
+         "episode": 10,
+         "airingAt": 1699624800
+        },
+        {
+         "episode": 11,
+         "airingAt": 1700229600
+        },
+        {
+         "episode": 12,
+         "airingAt": 1700834400
+        },
+        {
+         "episode": 13,
+         "airingAt": 1701439200
+        },
+        {
+         "episode": 14,
+         "airingAt": 1702044000
+        },
+        {
+         "episode": 15,
+         "airingAt": 1702648800
+        },
+        {
+         "episode": 16,
+         "airingAt": 1703253600
+        },
+        {
+         "episode": 17,
+         "airingAt": 1704463200
+        },
+        {
+         "episode": 18,
+         "airingAt": 1705068000
+        },
+        {
+         "episode": 19,
+         "airingAt": 1705672800
+        },
+        {
+         "episode": 20,
+         "airingAt": 1706277600
+        },
+        {
+         "episode": 21,
+         "airingAt": 1706882400
+        },
+        {
+         "episode": 22,
+         "airingAt": 1707487200
+        },
+        {
+         "episode": 23,
+         "airingAt": 1708092000
+        },
+        {
+         "episode": 24,
+         "airingAt": 1708696800
+        },
+        {
+         "episode": 25,
+         "airingAt": 1709301600
+        },
+        {
+         "episode": 26,
+         "airingAt": 1709906400
+        },
+        {
+         "episode": 27,
+         "airingAt": 1710511200
+        },
+        {
+         "episode": 28,
+         "airingAt": 1711116000
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "kind": "media",
+   "variables": {
+    "id": 182255
+   },
+   "response": {
+    "data": {
+     "Media": {
+      "id": 182255,
+      "idMal": 59978,
+      "type": "ANIME",
+      "format": "TV",
+      "status": "FINISHED",
+      "episodes": 10,
+      "duration": 24,
+      "season": "WINTER",
+      "seasonYear": 2026,
+      "isAdult": false,
+      "title": {
+       "romaji": "Sousou no Frieren 2nd Season",
+       "english": "Frieren: Beyond Journey’s End Season 2",
+       "native": "葬送のフリーレン 第2期"
+      },
+      "synonyms": [
+       "Провожающая в последний путь Фрирен 2",
+       "장송의 프리렌 2기"
+      ],
+      "startDate": {
+       "year": 2026,
+       "month": 1,
+       "day": 16
+      },
+      "averageScore": 87,
+      "meanScore": 88,
+      "genres": [
+       "Adventure",
+       "Drama",
+       "Fantasy"
+      ],
+      "description": "Following the First-Class Mage Exam, the trio—elven mage Frieren, warrior Stark, and first-class mage Fern—gains access to the dangerous Northern Plateau. As the party presses onward toward Aureole, formidable adversaries force Stark to confront his insecurities, solidifying his resolve and his role as the party's frontliner. Meanwhile, Fern continues to cherish the gifts she has been blessed with throughout her life, each a reminder of those she holds dear.<br><br>\n\nFrieren—still honoring her vow to understand humanity—revisits memories of her journey with the Hero's party and her fleeting encounter with a legendary figure. As she reflects on the passage of time, the elven mage quietly questions whether she has truly changed, yet in the small, almost subtle choices that she makes, there are signs that she might have become more human than she realizes.<br><br>\n\n(Source: MAL Rewrite)",
+      "coverImage": {
+       "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx182255-butzrqd4I0aC.jpg",
+       "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx182255-butzrqd4I0aC.jpg"
+      },
+      "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/182255-wyHvp6zJbWsO.jpg",
+      "nextAiringEpisode": null,
+      "relations": {
+       "edges": [
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 118586,
+          "idMal": 126287,
+          "type": "MANGA",
+          "format": "MANGA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "PREQUEL",
+         "node": {
+          "id": 154587,
+          "idMal": 52991,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 206425,
+          "idMal": null,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SEQUEL",
+         "node": {
+          "id": 209939,
+          "idMal": 63816,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        }
+       ]
+      },
+      "airingSchedule": {
+       "nodes": [
+        {
+         "episode": 1,
+         "airingAt": 1768572000
+        },
+        {
+         "episode": 2,
+         "airingAt": 1769176800
+        },
+        {
+         "episode": 3,
+         "airingAt": 1769781600
+        },
+        {
+         "episode": 4,
+         "airingAt": 1770386400
+        },
+        {
+         "episode": 5,
+         "airingAt": 1770992760
+        },
+        {
+         "episode": 6,
+         "airingAt": 1772200800
+        },
+        {
+         "episode": 7,
+         "airingAt": 1772805600
+        },
+        {
+         "episode": 8,
+         "airingAt": 1773410400
+        },
+        {
+         "episode": 9,
+         "airingAt": 1774015200
+        },
+        {
+         "episode": 10,
+         "airingAt": 1774620000
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "kind": "media",
+   "variables": {
+    "id": 209939
+   },
+   "response": {
+    "data": {
+     "Media": {
+      "id": 209939,
+      "idMal": 63816,
+      "type": "ANIME",
+      "format": "TV",
+      "status": "NOT_YET_RELEASED",
+      "episodes": null,
+      "duration": null,
+      "season": "FALL",
+      "seasonYear": 2027,
+      "isAdult": false,
+      "title": {
+       "romaji": "Sousou no Frieren 3rd Season",
+       "english": null,
+       "native": "葬送のフリーレン 第3期"
+      },
+      "synonyms": [
+       "Frieren: Beyond Journey’s End Season 3 Golden Land Arc",
+       "葬送のフリーレン 第3期【黄金郷編】",
+       "Sousou no Frieren 3rd Season [Ougonkyou-hen]"
+      ],
+      "startDate": {
+       "year": 2027,
+       "month": 10,
+       "day": null
+      },
+      "averageScore": null,
+      "meanScore": null,
+      "genres": [
+       "Adventure",
+       "Drama",
+       "Fantasy"
+      ],
+      "description": "The third season of <i>Sousou no Frieren</i>.",
+      "coverImage": {
+       "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx209939-g2Njkml1rheG.jpg",
+       "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx209939-g2Njkml1rheG.jpg"
+      },
+      "bannerImage": null,
+      "nextAiringEpisode": null,
+      "relations": {
+       "edges": [
+        {
+         "relationType": "PREQUEL",
+         "node": {
+          "id": 182255,
+          "idMal": 59978,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 118586,
+          "idMal": 126287,
+          "type": "MANGA",
+          "format": "MANGA",
+          "isAdult": false
+         }
+        }
+       ]
+      },
+      "airingSchedule": {
+       "nodes": []
+      }
+     }
+    }
+   }
+  }
+ ]
+}

@@ -2,9 +2,9 @@
   "secao": "S13",
   "titulo": "AniList e qualidade do catálogo",
   "arquivo": "Documentacao/secoes/S13-anilist-e-catalogo.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s13-anilist-e-catalogo",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": ""
+  "notas": "AniList e a fonte principal de anime (Jikan de reserva, local/TVMaze por ultimo, warnings por fonte), ids 10M+idMal ou 40M+id, dedupe do seed (a obra real ocupa o lugar da amostra), migracao idempotente do catalogo antigo com backup, validade por obra + refresh de obras em exibicao, botao Remover exemplo. Testes 365/365 com fixtures reais da AniList. Pendente: smoke test real da Jikan (continua fora do ar), frontend ainda nao chama /refresh."
 }
