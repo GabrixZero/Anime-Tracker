@@ -178,6 +178,7 @@ npm run test:e2e -- tests/e2e/05-conta.spec.js -g "isola"   # um arquivo / teste
 * **Onde está cada coisa:** `playwright.config.js` (projetos, tempos) · `tests/e2e/*.spec.js` (os testes, em ordem de história) · `tests/e2e/support/` (subida do servidor, guarda de erros, atalhos) · `tests/e2e/fake-sources/` (as fontes falsas e seus dados fictícios) · `scripts/e2e.js` (guarda o navegador dentro do projeto). Decisões em `Documentacao/02-decisoes.md` (D-S12-1 a D-S12-8).
 * **No CI:** o job `e2e` roda tudo duas vezes (arquivos JSON e SQLite), com o Chromium em cache; relatório e `trace.zip` só são guardados (7 dias) quando algo falha.
 * `npm test` continua só com os testes rápidos (sem navegador).
+* **Pasta no OneDrive?** O Chromium (~440 MB) fica em `node_modules`, junto do projeto. Se o OneDrive reclamar de espaço ou ficar sincronizando essa pasta, defina `PLAYWRIGHT_BROWSERS_PATH` com uma pasta fora dele (no PowerShell: `$env:PLAYWRIGHT_BROWSERS_PATH="C:\ShowVault-navegador"`) antes de `npm run test:e2e:install` e de `npm run test:e2e`; o `scripts/e2e.js` respeita a variável.
 
 ## Fluxo de branches
 

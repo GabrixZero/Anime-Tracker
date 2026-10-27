@@ -124,7 +124,8 @@ jobs:
       - name: Testes ponta a ponta
         run: npm run test:e2e
 
-      # Trace, captura de tela e o relatório HTML só existem quando algum teste falhou (ou foi repetido).
+      # Só guarda algo quando o job falhou: trace e captura de tela existem apenas para os testes que falharam (a config do Playwright
+      # usa retain-on-failure / only-on-failure) e o relatório HTML mostra o passo a passo de cada um.
       - name: Guardar relatório e artefatos da falha
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
