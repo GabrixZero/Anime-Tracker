@@ -84,18 +84,21 @@ Nova migração = subir `STATE_VERSION` e acrescentar o passo em `migrateLibrary
 ## Mapa do frontend (`public/`)
 
 Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
-`utils/dom.js` → `utils/libraryMerge.js` → `utils/watchStatus.js` → `utils/backupValidator.js` → `utils/migrations.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
+`utils/dom.js` → `utils/emotions.js` → `utils/markdown.js` → `utils/mediaDisplay.js` → `utils/libraryMerge.js` → `utils/watchStatus.js` → `utils/backupValidator.js` → `utils/migrations.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
 `statsView.js` → `exploreView.js` → `detailModalView.js` → `appController.js`.
 
 | Arquivo | Papel |
 |---|---|
 | `js/utils/dom.js` | anti-XSS: `escapeHtml`, `safeUrl`/`safeSrc`, `cssUrl`, `toInt`, `formatRating`. **Todo valor de catálogo/usuário/erro interpolado em HTML passa por aqui** (também roda em Node nos testes) |
+| `js/utils/emotions.js` | (S08) tabela única de emoções `window.Emotions` (`LIST`, `label`, `withIcon`, `emptyCounts`); diário e estatísticas leem dela, e um teste confere os botões estáticos do `index.html` |
+| `js/utils/markdown.js` | (S08) `window.NoteMarkdown.render(texto)`: escapa e depois converte `**negrito**`, `*itálico*`, `> citação`, `>!spoiler!<` (sem HTML, links ou imagens); `toPlainText`, `toggleSpoiler` e o ouvinte global do spoiler. Usado pelo diário (D-S08-2) |
+| `js/utils/mediaDisplay.js` | (S08) `window.MediaDisplay`: "Sem nota"/"Sem gênero", ano/duração só se existirem, tradução de status, caminhos das imagens reserva locais (`public/img/*.svg`) |
 | `js/utils/backupValidator.js` | `validateBackup`: valida o backup importado (espelha `LibraryModel.validate`; as duas usam `cleanTombstones`/`cleanStamp` de `libraryMerge.js`) |
 | `js/utils/libraryMerge.js` | (S03) funções **puras**, navegador + servidor: `merge(local, remote, {now})` com marcas de exclusão e `resetAt`, `replaceWith` (importar backup), `decideLogin` (isolamento por conta), `normalizeData`, `cleanTombstones`. Ver "Biblioteca, sync e remoções" |
 | `js/utils/watchStatus.js` | (S03) regra única do status por obra: `STATUS_LIST`, `computeProgress`, `effectiveStatus`, `initialStatus`, `statusAfterProgress`, `isQueueStatus`, `statusOptionsHtml` |
 | `js/api/apiClient.js` | `fetch` para `/api`, envia `Authorization: Bearer` (token em `localStorage['showvault_auth_token']`), trata 401 |
 | `js/utils/migrations.js` | `STATE_VERSION` e `migrateLibrary(data, fromVersion)` (também roda no servidor) |
-| `js/models/state.js` | `AppState`: dados em `localStorage['showvault_state_mvc_v1']` = `{trackedShows, watchedEpisodes, episodeNotes, tombstones, resetAt}` (+ dono em `showvault_last_user`, arquivo de segurança em `showvault_archive_<userId>`, versão em `showvault_state_version`, migrada ao carregar); `mediaMap` em memória, **preenchido só pela API** (o catálogo hardcoded foi removido na S02); `save()` = `persist()` + agenda o sync; métodos `addShow/removeShow/setShowStatus/getStatus/toggleWatched/batchSetSeason/importData/resetLocal/clearForLogout`; flag `seeded` (estado demo nunca editado) |
+| `js/models/state.js` | `AppState`: dados em `localStorage['showvault_state_mvc_v1']` = `{trackedShows, watchedEpisodes, episodeNotes, tombstones, resetAt}` (+ dono em `showvault_last_user`, arquivo de segurança em `showvault_archive_<userId>`, versão em `showvault_state_version`, migrada ao carregar); `mediaMap` em memória, **preenchido só pela API** (o catálogo hardcoded foi removido na S02); `save()` = `persist()` + agenda o sync; métodos `addShow/removeShow/setShowStatus/getStatus/toggleWatched/batchSetSeason/importData/resetLocal/clearForLogout`; flag `seeded` (estado inicial nunca editado; **não há mais demo**: primeira visita = lista vazia); S08: `saveNote` com histórico de versões (`getNoteVersions`, `restoreNoteVersion`, D-S08-1) e `loadExample()` ("Carregar exemplo") |
 | `js/services/syncService.js` | `beginSession(user)` (isolamento por conta), `pullAndMerge(user)` no login, push com debounce (1,5 s) que aplica a resposta mesclada do servidor, `retry()`, `flush()`/`logout()`, `wipeCloud()`; estados do selo (`idle/syncing/offline/error/auth`) |
 | `css/status.css` | (S03) seletor de status e estados do selo de sync (contrato de classes: `.status-picker`, `.status-select`, `.status-select--card`, `[data-sync-state]`) |
 | `js/views/*View.js` | telas: A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar, modal de detalhes, login |
@@ -127,6 +130,7 @@ first_air_date, genres[], status, runtime? (filmes), seasons: [{season_number, n
 Funciona: cadastro/login com JWT, 5 abas (A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar), marcar episódios, anotações com emoção,
 estatísticas, busca em catálogo local + TVMaze, ingestão de temporadas, backup JSON, sincronização da biblioteca com o servidor.
 Contas (S04): cadastro/login validados, limite de tentativas, trocar senha e excluir conta na API (ainda **sem tela** no app), login com Google real mas só ativo com `GOOGLE_CLIENT_ID`.
+S08: o primeiro acesso é uma lista vazia (chamada para explorar + "Carregar exemplo"); a anotação tem histórico de versões (até 5, restaurar em 1 clique) e Markdown simples com spoiler no diário; a interface mostra "Sem nota"/"Sem gênero"/imagem neutra em vez de valores inventados.
 Frágil/falso/incompleto: veja as 10 seções em [04-roadmap.md](04-roadmap.md).
 
 ## Biblioteca, sync e remoções (S03)

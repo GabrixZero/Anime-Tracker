@@ -213,7 +213,7 @@
   // O que fazer com a biblioteca do servidor ao entrar (login ou sessão retomada)?
   //  ownerId = dono do estado guardado neste navegador (ausente = visitante); userId = conta que acabou de entrar.
   //  - outro dono: SUBSTITUI pelo remoto (nunca mescla dados de duas contas) e pede para arquivar o local;
-  //  - estado demo nunca editado (seeded): o servidor vence (mesmo vazio: conta nova não herda dados de exemplo);
+  //  - estado inicial nunca editado (seeded; desde a S08 é uma lista vazia): o servidor vence (mesmo vazio);
   //  - demais casos (mesmo dono, ou visitante entrando numa conta): mescla.
   function decideLogin({ ownerId, userId, seeded, local, remote }) {
     if (ownerId && ownerId !== userId) {

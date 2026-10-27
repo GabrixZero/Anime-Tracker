@@ -18,13 +18,16 @@ Há textos no README e elementos na interface que prometem algo que não existe,
 - Botão do Google que não é Google de verdade (resolvido na S04).
 
 ## Tarefas
-- [ ] Decidir com o Gabriel, item a item: **implementar** (histórico de versões da nota; Markdown simples com spoiler) **ou remover** a promessa do README/interface.
-- [ ] Tabela única de emoções (id, rótulo, ícone) usada por modal, diário e estatísticas.
-- [ ] Remover valores inventados: mostrar "sem nota", "sem gênero", placeholder neutro de imagem (arquivo local, sem Unsplash).
-- [ ] Estado inicial: lista vazia com chamada para explorar, ou demo claramente marcado como exemplo e removível em 1 clique; tirar datas/notas falsas.
-- [ ] Renomear abas/botões ("Explorar", "Pesquisar"), título "Em alta/Catálogo", subtítulo da marca; selo de sync derivado do `syncService`.
-- [ ] Tradução do que for possível (status "Running" → "Em exibição" etc.).
-- [ ] Atualizar README para refletir exatamente o que existe.
+- [x] ~~Decidir com o Gabriel~~ — decidido (D-19): **implementados** o histórico de versões (D-S08-1) e o Markdown simples com spoiler (D-S08-2).
+- [x] Tabela única de emoções (id, rótulo, ícone) usada por modal, diário e estatísticas (D-S08-3; modal/filtros conferidos por teste).
+- [x] Remover valores inventados na **tela**: "Sem nota", "Sem gênero", placeholder neutro local, sem Unsplash no frontend (D-S08-5). O que o **backend** grava (8.0/'Drama'/Unsplash no `mediaService.js`) é da S06.
+- [x] Estado inicial: lista vazia com chamada para explorar + "Carregar exemplo"; demo, datas e notas falsas removidos (D-S08-4).
+- [x] Renomear abas/botões ("Explorar", "Pesquisar"), "Catálogo (N)", subtítulo da marca; selo de sync derivado do `syncService` (D-S08-6).
+- [x] Tradução do que for possível (status "Running" → "Em exibição" etc., `MediaDisplay.statusText`). **Não feito:** sinopses/títulos em inglês vindos das fontes (depende de TMDB, S06).
+- [x] Atualizar README para refletir exatamente o que existe.
+
+## Resultado
+Feito em 2026-10-27 (subagente, branch `feature/s08-funcoes-falsas`). Pendências que ficaram: episódios de amostra do seed (1–3 por obra: Breaking Bad some em 3 cliques) só se resolvem com episódios reais (TMDB/S06); obras antigas do catálogo de runtime com nota 8.0/gênero "Drama" inventados; demo antigo já gravado em navegadores que o editaram; "Remover exemplo" em 1 clique (hoje remove-se obra por obra).
 
 ## Decisões (já resolvidas — não pergunte de novo)
 **Resolvidas:** D-19 (implementar histórico de versões da nota e Markdown simples com spoiler), D-22 (estado inicial vazio com “Carregar exemplo”; sem dados inventados).
