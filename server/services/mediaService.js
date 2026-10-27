@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const config = require('../config/config');
 const { stripHtml, stripHtmlList, safeHttpUrl } = require('../utils/sanitize');
@@ -147,8 +146,9 @@ class MediaService {
   }
 
   static mapTvmazeShow(show) {
-    const image = show.image && (show.image.original || show.image.medium);
-    const poster = safeHttpUrl(image, null);
+    // S09: o cartão usa o tamanho médio do pôster (bem menor); o fundo do modal segue com a imagem grande.
+    const poster = safeHttpUrl(show.image && (show.image.medium || show.image.original), null);
+    const backdrop = safeHttpUrl(show.image && (show.image.original || show.image.medium), null);
     const rating = Number(show.rating && show.rating.average);
     const status = stripHtml(show.status, 40);
     return {
@@ -157,7 +157,7 @@ class MediaService {
       name: stripHtml(show.name, 300),
       overview: stripHtml(show.summary),
       poster_path: poster,
-      backdrop_path: poster,
+      backdrop_path: backdrop,
       vote_average: rating > 0 ? rating : null,
       first_air_date: stripHtml(show.premiered, 20),
       genres: stripHtmlList(show.genres),
@@ -187,6 +187,19 @@ class MediaService {
 
   canIngest(id) {
     return describeId(id).ingestable;
+  }
+
+  // Várias obras COMPLETAS do catálogo de uma vez (S09: o app carrega o detalhe das obras da lista em lote ao abrir).
+  // Nunca ingere nada: o que não está completo no catálogo volta em `missing`.
+  getMany(ids) {
+    const data = [];
+    const missing = [];
+    for (const id of ids) {
+      const item = this.findLocal(id);
+      if (item && MediaService.isComplete(item)) data.push(item);
+      else missing.push(id);
+    }
+    return { data, missing };
   }
 
   async getTrending(type = 'all') {
@@ -472,7 +485,7 @@ class MediaService {
         runtime: runtime > 0 ? runtime : null,
         air_date: stripHtml(ep.airdate, 20),
         overview: stripHtml(ep.summary),
-        still_path: safeHttpUrl(ep.image && (ep.image.medium || ep.image.original), safeHttpUrl(data.image && data.image.original, null))
+        still_path: safeHttpUrl(ep.image && (ep.image.medium || ep.image.original), safeHttpUrl(data.image && (data.image.medium || data.image.original), null))
       });
     });
 

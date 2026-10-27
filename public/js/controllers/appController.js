@@ -5,6 +5,10 @@
 class AppController {
   constructor() {
     this.activeTab = 'next-up';
+    // S09 · render incremental: só a aba visível é redesenhada; as outras guardam "ficou desatualizada" e redesenham ao abrir.
+    this.dirty = new Set();          // abas marcadas à mão (ex.: o detalhe de uma obra chegou)
+    this.renderedRev = {};           // revisão do estado (appState.rev) com que cada aba foi desenhada pela última vez
+    this.detailChain = Promise.resolve(); // carregamentos de detalhe em fila (um lote por vez)
     this.init();
   }
 
@@ -12,20 +16,62 @@ class AppController {
     this.bindNavigation();
     this.bindBackupModal();
 
-    // Biblioteca mesclada com o servidor após login/sessão válida
-    window.addEventListener('showvault:synced', () => this.refreshAll());
+    // Biblioteca mesclada com o servidor após login/sessão válida: as obras novas da lista precisam do detalhe (episódios)
+    window.addEventListener('showvault:synced', () => this.onLibraryChanged());
 
-    // Carrega dados iniciais da API para popular o cache
-    try {
-      const res = await window.apiClient.getTrending('all');
-      if (res && res.data) {
-        window.appState.cacheMediaList(res.data);
-      }
-    } catch (err) {
-      console.warn('API inicial em cache local:', err.message);
-    }
+    // S09: a lista do usuário não depende mais do catálogo inteiro. Só o detalhe das obras da lista (temporadas/episódios) é
+    // carregado, em lote; a lista do catálogo (leve e paginada) é buscada pela aba Explorar quando ela abre.
+    await this.onLibraryChanged();
+  }
 
+  // Desenha o que já dá (mostra "carregando" nas obras sem episódios) e carrega em lote o detalhe das obras da lista.
+  async onLibraryChanged() {
     this.refreshAll();
+    if (await this.ensureTrackedDetails()) this.refreshAll();
+  }
+
+  trackedIds() {
+    const state = window.appState;
+    return ((state && state.data && state.data.trackedShows) || []).map(t => t.showId);
+  }
+
+  // Carrega o detalhe das obras da lista que ainda não o têm. Devolve true se buscou algo (a tela deve ser redesenhada).
+  async ensureTrackedDetails() {
+    const state = window.appState;
+    const need = this.trackedIds().filter(id => !state.hasDetail(id));
+    if (need.length === 0) return false;
+    await this.ensureDetails(need);
+    return true;
+  }
+
+  retryDetails() {
+    return this.onLibraryChanged();
+  }
+
+  // Carrega em lote (até 50 por requisição) o detalhe completo dessas obras. Nunca lança: em falha deixa
+  // `appState.detailsStatus = 'error'` e as telas mostram o aviso. Chamadas simultâneas entram numa fila (um lote por vez).
+  ensureDetails(ids) {
+    const run = this.detailChain.then(() => this.loadDetails(ids));
+    this.detailChain = run.catch(() => {});
+    return run;
+  }
+
+  async loadDetails(ids) {
+    const state = window.appState;
+    const need = [...new Set(ids.map(Number))].filter(id => Number.isSafeInteger(id) && id > 0 && !state.hasDetail(id));
+    if (need.length === 0) return;
+    state.detailsStatus = 'loading';
+    let failed = false;
+    for (let i = 0; i < need.length; i += AppController.DETAIL_BATCH) {
+      try {
+        const res = await window.apiClient.getBatch(need.slice(i, i + AppController.DETAIL_BATCH));
+        ((res && res.data) || []).forEach(item => state.cacheMediaDetail(item));
+      } catch (err) {
+        failed = true;
+        console.warn('Não foi possível carregar o detalhe das obras:', err.message);
+      }
+    }
+    state.detailsStatus = failed ? 'error' : 'idle';
   }
 
   bindNavigation() {
@@ -47,27 +93,49 @@ class AppController {
     if (btn) btn.classList.add('active');
     if (view) view.classList.add('active');
 
-    if (tabId === 'next-up') window.nextUpView.render();
-    if (tabId === 'watchlist') window.watchlistView.render();
-    if (tabId === 'diary') window.diaryView.render();
-    if (tabId === 'stats') window.statsView.render();
     if (tabId === 'explore') window.exploreView.loadMedia();
+    else this.renderTab(tabId);
+  }
+
+  // As views das 4 abas que dependem da lista do usuário (a aba Explorar tem o próprio ciclo de carga).
+  viewFor(tabId) {
+    return { 'next-up': window.nextUpView, watchlist: window.watchlistView, diary: window.diaryView, stats: window.statsView }[tabId] || null;
+  }
+
+  // Redesenha a aba se ela ficou para trás (estado mudou ou foi marcada); senão não faz nada.
+  renderTab(tabId) {
+    const view = this.viewFor(tabId);
+    if (!view) return;
+    const rev = window.appState.rev;
+    if (!this.dirty.has(tabId) && this.renderedRev[tabId] === rev) return;
+    this.dirty.delete(tabId);
+    this.renderedRev[tabId] = rev;
+    view.render();
+  }
+
+  // Números das abas (A Seguir, Lista, Diário) sempre em dia, mesmo com a aba oculta e sem redesenhar nada.
+  updateBadges(except = null) {
+    ['next-up', 'watchlist', 'diary'].forEach((tab) => {
+      const view = this.viewFor(tab);
+      if (tab !== except && view && view.refreshBadge) view.refreshBadge();
+    });
   }
 
   quickCheck(showId, seasonNum = null, epNum = null) {
     const isWatched = window.appState.toggleWatched(showId, seasonNum, epNum);
     this.showToast(isWatched ? 'Marcado como assistido!' : 'Desmarcado.', 'success');
-    this.refreshAll();
+    this.onEpisodeToggled(showId, seasonNum, epNum);
+  }
 
-    // Se o modal de detalhes estiver aberto, atualiza ele também
-    if (window.detailModalView.currentShowId === showId) {
+  // Depois de marcar/desmarcar um episódio ou filme (S09): atualiza só o que mudou, não a tela inteira.
+  onEpisodeToggled(showId, seasonNum = null, epNum = null) {
+    this.refreshShow(showId);
+    // Se o modal de detalhes estiver aberto nesta obra, atualiza a linha do episódio (filme: o modal pequeno é redesenhado)
+    const modal = window.detailModalView;
+    if (modal.isOpenFor(showId)) {
       const media = window.appState.getMedia(showId);
-      if (media && media.type === 'movie') {
-        window.detailModalView.open(showId);
-      } else {
-        window.detailModalView.renderEpisodes();
-        window.detailModalView.renderSeasonTabs();
-      }
+      if (media && media.type === 'movie') modal.open(showId);
+      else modal.updateEpisode(seasonNum, epNum);
     }
   }
 
@@ -79,16 +147,17 @@ class AppController {
       return;
     }
 
-    // Obra já completa no cache (filme ou com temporadas): não precisa ingerir. Senão a ingestão exige login (S02).
+    // Obra já completa no cache (filme ou com temporadas): não precisa buscar de novo. Senão pede o detalhe ao servidor:
+    // obra que já está no catálogo é pública; obra nova é ingerida e isso exige login (S02).
     const known = window.appState.getMedia(numId);
-    // (resultado de busca externa — isExternal — nunca conta como completo, nem filme: ainda não está no catálogo do servidor)
-    const complete = known && !known.isExternal && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
+    // (resultado de busca externa — isExternal — e item leve da lista — light — nunca contam como completos: sem episódios no cache)
+    const complete = known && !known.isExternal && !known.light && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
     if (!complete) {
       try {
         this.showToast('Buscando os episódios da obra...', 'info');
-        const res = await window.apiClient.ingest(numId);
+        const res = await window.apiClient.getById(numId);
         if (res && res.data) {
-          window.appState.mediaMap.set(res.data.id, res.data);
+          window.appState.cacheMediaDetail(res.data);
         }
       } catch (e) {
         console.warn('Não foi possível ingerir a obra:', e.message);
@@ -107,7 +176,9 @@ class AppController {
   }
 
   // S08 (D-22): "Carregar exemplo" no estado vazio. Só põe obras do catálogo na lista (Quero ver), sem progresso nem notas.
-  loadExample() {
+  async loadExample() {
+    // as obras de exemplo precisam do catálogo em memória: busca o detalhe delas em lote (a lista não traz mais o catálogo inteiro)
+    await this.ensureDetails(window.appState.constructor.EXAMPLE_SHOW_IDS || []);
     const { added, missing } = window.appState.loadExample();
     if (added.length > 0) {
       this.showToast(`Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Remova quando quiser.`, 'success');
@@ -136,14 +207,37 @@ class AppController {
     } else {
       this.showToast(`Status: ${window.WatchStatus.statusLabel(status)}.`, 'success');
     }
-    this.refreshAll();
+    this.refreshShow(showId);
   }
 
+  // Tudo pode ter mudado (login, sync, importar/resetar, adicionar/remover obra): marca as 4 telas como desatualizadas e
+  // redesenha só a que está visível; as outras redesenham quando forem abertas (S09). Os números das abas ficam em dia.
   refreshAll() {
-    window.nextUpView.render();
-    window.watchlistView.render();
-    window.diaryView.render();
-    window.statsView.render();
+    ['next-up', 'watchlist', 'diary', 'stats'].forEach(tab => this.dirty.add(tab));
+    this.renderTab(this.activeTab);
+    this.updateBadges(this.activeTab);
+    window.detailModalView.refreshStatusPicker();
+  }
+
+  // Mudou algo de UMA obra (episódio marcado, status): atualiza só o cartão/linha dela na aba visível.
+  // Só vale se a aba estava em dia antes desta mudança (`appState.prevRev`); senão cai no redesenho completo da aba.
+  refreshShow(showId) {
+    const state = window.appState;
+    const tab = this.activeTab;
+    const view = this.viewFor(tab);
+    if (view) {
+      const clean = !this.dirty.has(tab) && this.renderedRev[tab] === state.prevRev;
+      if (clean && view.updateShow) {
+        view.updateShow(showId);
+        this.renderedRev[tab] = state.rev;
+      } else if (clean && tab === 'diary') {
+        this.renderedRev[tab] = state.rev; // episódios não aparecem no diário: nada a redesenhar
+      } else {
+        this.dirty.add(tab);
+        this.renderTab(tab);
+      }
+    }
+    this.updateBadges(tab);
     window.detailModalView.refreshStatusPicker();
   }
 
@@ -263,6 +357,8 @@ class AppController {
     }, type === 'error' ? 7000 : 4500); // um pouco mais de tempo para ler (acessibilidade)
   }
 }
+
+AppController.DETAIL_BATCH = 50; // ids por requisição de /api/media/batch (o servidor aceita no máximo 50)
 
 document.addEventListener('DOMContentLoaded', () => {
   window.appController = new AppController();

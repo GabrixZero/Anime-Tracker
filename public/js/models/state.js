@@ -14,7 +14,17 @@ class AppState {
     this.ARCHIVE_PREFIX = 'showvault_archive_';
     this.data = this.load();
     // Catálogo em memória: preenchido pela API (appController.init / exploreView / ingestão). Fonte única = servidor.
+    // S09: as listas trazem itens LEVES (`light: true`, sem temporadas/episódios); o detalhe completo das obras da lista do usuário
+    // chega em lote (`cacheMediaDetail`). Um item leve nunca substitui um detalhe já carregado.
     this.mediaMap = new Map();
+    // 'idle' | 'loading' | 'error': situação do carregamento do detalhe das obras da lista (preenchido pelo appController).
+    this.detailsStatus = 'idle';
+    // Contador que sobe a cada gravação do estado e a cada detalhe carregado (telas ocultas só redesenham se ficaram para trás).
+    this.rev = 0;
+    this.prevRev = 0; // revisão imediatamente anterior à última gravação
+    // Cache em memória por obra (progresso e próximo episódio) e índice de episódios por obra. Veja `getProgress`.
+    this._progress = new Map();
+    this._episodeIndex = new WeakMap();
   }
 
   load() {
@@ -53,6 +63,8 @@ class AppState {
   // Grava só no navegador (usado também quando o dado veio do servidor: não precisa reenviar).
   persist() {
     this.seeded = false;
+    this.prevRev = this.rev;
+    this.rev++; // "revisão" do estado: o controlador sabe quais telas ocultas ficaram desatualizadas
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
       if (window.STATE_VERSION) localStorage.setItem(this.VERSION_KEY, String(window.STATE_VERSION));
@@ -82,6 +94,7 @@ class AppState {
   // Troca todo o conteúdo (sem agendar envio: quem chama decide).
   replaceData(data) {
     this.data = window.LibraryMerge.normalizeData(data);
+    this.invalidateProgress();
     this.persist();
   }
 
@@ -141,13 +154,56 @@ class AppState {
   }
 
   // ----- catálogo em memória -----
+  // Itens vindos de uma LISTA (explorar/busca): leves (`light`) ou resultados externos. Nunca rebaixam um detalhe já carregado.
   cacheMediaList(items) {
     if (!Array.isArray(items)) return;
-    items.forEach(item => this.mediaMap.set(item.id, item));
+    items.forEach((item) => {
+      if (!item || !Number.isSafeInteger(item.id)) return;
+      const current = this.mediaMap.get(item.id);
+      if (current && this.isDetailed(current) && (item.light || item.isExternal)) return;
+      this.mediaMap.set(item.id, item);
+      this._progress.delete(item.id);
+    });
+  }
+
+  // Detalhe completo de uma obra (temporadas/episódios): `GET /api/media/:id` ou `/batch`.
+  cacheMediaDetail(item) {
+    if (!item || !Number.isSafeInteger(item.id)) return;
+    this.mediaMap.set(item.id, item);
+    this._progress.delete(item.id);
+    this.prevRev = this.rev;
+    this.rev++;
+  }
+
+  // Item com os dados completos? (os de teste e os do servidor antigo, sem a marca `light`, contam como completos)
+  isDetailed(item) {
+    return !!item && !item.light && !item.isExternal;
+  }
+
+  hasDetail(id) {
+    return this.isDetailed(this.mediaMap.get(Number(id)));
   }
 
   getMedia(id) {
     return this.mediaMap.get(Number(id)) || null;
+  }
+
+  // Episódio (objeto do catálogo) por temporada/número, sem varrer a lista (índice por obra, montado uma vez).
+  getEpisode(showId, seasonNum, epNum) {
+    const media = this.getMedia(showId);
+    if (!media || !Array.isArray(media.seasons)) return null;
+    let index = this._episodeIndex.get(media);
+    if (!index) {
+      index = new Map();
+      for (const season of media.seasons) {
+        for (const ep of season.episodes || []) {
+          const key = `${season.season_number}:${ep.episode_number}`;
+          if (!index.has(key)) index.set(key, ep); // dado repetido: vale o primeiro, como na busca linear antiga
+        }
+      }
+      this._episodeIndex.set(media, index);
+    }
+    return index.get(`${seasonNum}:${epNum}`) || null;
   }
 
   // ----- obras na lista e status por obra (regra única em utils/watchStatus.js) -----
@@ -155,14 +211,45 @@ class AppState {
     return this.data.trackedShows.find(t => t.showId === Number(showId)) || null;
   }
 
-  // Progresso da obra (filme: 1 item; série: todos os episódios do catálogo).
+  // Progresso da obra (filme: 1 item; série: todos os episódios do catálogo), com o próximo episódio a assistir.
+  // Cache em memória por obra (S09): uma varredura dos episódios por obra, reaproveitada pela lista, pelo "A Seguir", pelas
+  // estatísticas e pelo seletor de status. Só é recalculado quando algo dessa obra muda: `toggleWatched`/`batchSetSeason`
+  // limpam a obra; `replaceData` e a troca do catálogo limpam tudo. Quem alterar `data.watchedEpisodes` diretamente (fora destes
+  // métodos) precisa chamar `invalidateProgress()`. O resultado é somente leitura.
   getProgress(showId) {
-    return window.WatchStatus.computeProgress(this.getMedia(showId), (s, e) => this.isWatched(showId, s, e));
+    const id = Number(showId);
+    const media = this.getMedia(id);
+    const source = this.data.watchedEpisodes;
+    const hit = this._progress.get(id);
+    if (hit && hit.media === media && hit.source === source) return hit.value;
+
+    let next = null;
+    const progress = window.WatchStatus.computeProgress(media, (s, e) => {
+      const watched = this.isWatched(id, s, e);
+      if (!watched && !next && s !== undefined) next = { seasonNumber: s, episodeNumber: e };
+      return watched;
+    });
+    const value = { ...progress, next };
+    this._progress.set(id, { media, source, value });
+    return value;
+  }
+
+  // Próximo episódio ainda não assistido da série/anime: { seasonNumber, episodeNumber } ou null.
+  getNextEpisode(showId) {
+    return this.getProgress(showId).next;
+  }
+
+  invalidateProgress(showId) {
+    if (showId === undefined) this._progress.clear();
+    else this._progress.delete(Number(showId));
   }
 
   // Status mostrado nas telas (lista, estatísticas, A Seguir): a mesma conta para todas.
   getStatus(tracked) {
-    return window.WatchStatus.effectiveStatus(tracked, this.getMedia(tracked.showId), (s, e) => this.isWatched(tracked.showId, s, e));
+    const media = this.getMedia(tracked.showId);
+    // só itens antigos (sem updatedAt) precisam do progresso para decidir; os demais valem como estão
+    const progress = (!tracked.updatedAt && media) ? this.getProgress(tracked.showId) : null;
+    return window.WatchStatus.effectiveStatus(tracked, media, (s, e) => this.isWatched(tracked.showId, s, e), progress);
   }
 
   addShow(showId) {
@@ -244,6 +331,7 @@ class AppState {
       this.markDeleted('watched', key, current.updatedAt || current.watchedAt);
     }
 
+    this.invalidateProgress(showId);
     this.applyProgressRules(showId, isNowWatched);
     this.save();
     return isNowWatched;
@@ -273,6 +361,7 @@ class AppState {
       }
     });
 
+    this.invalidateProgress(showId);
     this.applyProgressRules(showId, !!shouldWatch);
     this.save();
   }

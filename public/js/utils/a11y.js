@@ -135,6 +135,9 @@
     wrapRender(window.nextUpView, 'render', '#next-up-container', '#view-next-up');
     wrapRender(window.watchlistView, 'render', '#watchlist-container', '#view-watchlist');
     wrapRender(window.diaryView, 'render', '#diary-container', '#view-diary');
+    // S09: troca de um só cartão/linha ao marcar episódio (o foco volta ao mesmo botão do cartão novo)
+    wrapRender(window.nextUpView, 'updateShow', '#next-up-container', '#view-next-up');
+    wrapRender(window.watchlistView, 'updateShow', '#watchlist-container', '#view-watchlist');
     const dv = window.detailModalView;
     wrapRender(dv, 'renderEpisodes', '#show-episodes-container');
     wrapRender(dv, 'renderSeasonTabs', '#show-seasons-tabs');

@@ -33,7 +33,18 @@ class DiaryView {
     document.getElementById('btn-export-notes-md').addEventListener('click', () => this.exportMarkdown());
   }
 
+  // Só o número da aba (barato): usado quando a aba está oculta e não será redesenhada.
+  refreshBadge() {
+    if (this.badge && window.appState) this.badge.textContent = this.buildEntries().length;
+  }
+
   render() {
+    const entries = this.buildEntries();
+    this.renderEntries(entries);
+  }
+
+  // Anotações com texto cujas obras o catálogo conhece, da mais recente para a mais antiga.
+  buildEntries() {
     const state = window.appState;
     const entries = [];
 
@@ -65,8 +76,7 @@ class DiaryView {
 
         const media = state.getMedia(showId);
         if (media) {
-          const season = media.seasons ? media.seasons.find(s => s.season_number === seasonNum) : null;
-          const ep = season ? season.episodes.find(e => e.episode_number === epNum) : null;
+          const ep = state.getEpisode(showId, seasonNum, epNum); // índice por obra (S09)
 
           entries.push({
             isMovie: false,
@@ -86,6 +96,10 @@ class DiaryView {
     });
 
     entries.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    return entries;
+  }
+
+  renderEntries(entries) {
     this.badge.textContent = entries.length;
 
     const filtered = entries.filter(e => {
@@ -117,7 +131,7 @@ class DiaryView {
 
       return `
         <div class="diary-entry-card">
-          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackThumb}';" class="diary-thumb" loading="lazy">
+          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackThumb}';" class="diary-thumb" loading="lazy" decoding="async">
           
           <div class="diary-body">
             <div class="diary-top">
