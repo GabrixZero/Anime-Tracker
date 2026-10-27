@@ -33,10 +33,20 @@ const getJwtSecret = () => {
 };
 if (IS_PRODUCTION) getJwtSecret();
 
+// STORAGE: onde ficam usuários, bibliotecas e catálogo vivo. "json" (padrão) = arquivos em DATA_DIR; "sqlite" = um arquivo showvault.sqlite em DATA_DIR.
+function parseStorage(value) {
+  const mode = (value || 'json').trim().toLowerCase();
+  if (mode !== 'json' && mode !== 'sqlite') {
+    throw new Error(`STORAGE inválido: "${value}". Use "json" (padrão) ou "sqlite".`);
+  }
+  return mode;
+}
+
 module.exports = {
   PORT: process.env.PORT || 3000,
   IS_PRODUCTION,
   DATA_DIR,
+  STORAGE: parseStorage(process.env.STORAGE),
   TMDB_API_KEY: process.env.TMDB_API_KEY || '',
   DEFAULT_LANGUAGE: 'pt-BR',
   get JWT_SECRET() { return getJwtSecret().secret; },

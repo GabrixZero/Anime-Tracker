@@ -25,6 +25,11 @@ server/data/mediaCatalog.json
 server/data/*.bak
 server/data/*.tmp
 server/data/*.corrupt-*
+# Banco SQLite (STORAGE=sqlite) e backups da migração JSON -> SQLite
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+backup-pre-sqlite-*/
 
 # Worktrees temporarias dos agentes do Claude
 .claude/worktrees/

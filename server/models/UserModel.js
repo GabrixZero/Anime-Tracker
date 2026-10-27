@@ -3,7 +3,8 @@ const path = require('path');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const config = require('../config/config');
-const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
+const storage = require('../storage');
+const { readJson, writeJsonAtomic } = storage;
 const { DataCorruptionError } = require('../utils/errors');
 
 const scrypt = promisify(crypto.scrypt);
@@ -135,11 +136,7 @@ class UserModel {
   // Fica em cache enquanto users.json não muda (comparando tamanho e data de modificação).
   authInfo(id) {
     if (typeof id !== 'string' || !id) return null;
-    let stamp = 'missing';
-    try {
-      const st = fs.statSync(this.filePath);
-      stamp = `${st.mtimeMs}:${st.size}`;
-    } catch { /* arquivo ainda não existe */ }
+    const stamp = storage.stamp(this.filePath); // arquivo: data+tamanho; SQLite: versão do documento
 
     if (!this._authIndex || this._authIndex.stamp !== stamp) {
       const map = new Map();
