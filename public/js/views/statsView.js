@@ -32,11 +32,10 @@ class StatsView {
         const media = state.getMedia(showId);
         if (media) {
           (media.genres || []).forEach(g => { genresCount[g] = (genresCount[g] || 0) + 1; });
-          const season = media.seasons ? media.seasons.find(s => s.season_number === seasonNum) : null;
-          if (season) {
-            const ep = season.episodes.find(e => e.episode_number === epNum);
-            totalMinutes += ((ep && ep.runtime) ? ep.runtime : 45) * (item.rewatchCount || 1);
-          }
+          // S09: episódio por índice da obra (antes: duas varreduras lineares por episódio assistido)
+          const ep = state.getEpisode(showId, seasonNum, epNum);
+          const seasonExists = !!ep || (Array.isArray(media.seasons) && media.seasons.some(s => s.season_number === seasonNum));
+          if (seasonExists) totalMinutes += ((ep && ep.runtime) ? ep.runtime : 45) * (item.rewatchCount || 1);
         }
       }
     });

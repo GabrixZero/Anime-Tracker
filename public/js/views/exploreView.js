@@ -4,6 +4,7 @@
 
 const SEARCH_DEBOUNCE_MS = 400;   // espera o usuário parar de digitar antes de buscar (a Jikan limita ~3 req/s)
 const SEARCH_MIN_CHARS = 2;       // digitando: só busca com 2+ letras (Enter e o botão buscam qualquer tamanho)
+const EXPLORE_PAGE_SIZE = 60;     // obras por página na lista do catálogo (S09); "Mostrar mais" traz as próximas
 
 class ExploreView {
   constructor() {
@@ -13,6 +14,10 @@ class ExploreView {
     this.searchQuery = '';
     this.requestSeq = 0;        // só a resposta da requisição mais recente é exibida
     this.debounceTimer = null;
+    this.items = [];            // itens já exibidos (a lista paginada cresce com "Mostrar mais")
+    this.notice = '';
+    this.hasMore = false;
+    this.loadingMore = false;
     this.bindEvents();
   }
 
@@ -81,9 +86,10 @@ class ExploreView {
         if (seq !== this.requestSeq) return; // chegou uma busca mais nova: esta resposta é descartada
         if (this.titleEl) this.titleEl.textContent = `Resultados para "${query}" (${response ? response.count : 0})`;
       } else {
-        response = await window.apiClient.getTrending(this.typeFilter);
+        // S09: lista leve e paginada (a primeira página; "Mostrar mais" busca as seguintes)
+        response = await window.apiClient.getTrending(this.typeFilter, { limit: EXPLORE_PAGE_SIZE });
         if (seq !== this.requestSeq) return;
-        if (this.titleEl) this.titleEl.textContent = `Catálogo (${response ? response.count : 0})`;
+        if (this.titleEl) this.titleEl.textContent = `Catálogo (${response ? (response.total ?? response.count) : 0})`;
       }
 
       const items = (response && response.data) ? response.data : [];
@@ -92,6 +98,9 @@ class ExploreView {
 
       const warnings = (response && Array.isArray(response.warnings)) ? response.warnings : [];
       const notice = this.renderWarnings(warnings);
+      this.items = items;
+      this.notice = notice;
+      this.hasMore = !query && !!(response && response.hasMore);
 
       if (items.length === 0) {
         this.container.innerHTML = `${notice}<div class="grid-message">Nenhuma obra encontrada${query ? ` para "${escapeHtml(query)}"` : ''}.</div>`;
@@ -104,6 +113,29 @@ class ExploreView {
       this.container.removeAttribute('aria-busy');
       this.container.innerHTML = `<div class="grid-message grid-message--error" role="alert">${escapeHtml(this.describeError(err))}
         <div><button type="button" class="btn btn-sm btn-secondary" onclick="window.exploreView.loadMedia()">Tentar de novo</button></div></div>`;
+    }
+  }
+
+  // "Mostrar mais": próxima página da lista leve do catálogo (só na lista sem busca).
+  async loadMore() {
+    if (!this.hasMore || this.loadingMore) return;
+    this.loadingMore = true;
+    const seq = this.requestSeq; // se uma carga/busca nova começar enquanto isso, esta resposta é descartada
+    try {
+      const response = await window.apiClient.getTrending(this.typeFilter, { limit: EXPLORE_PAGE_SIZE, offset: this.items.length });
+      if (seq !== this.requestSeq) return;
+      const more = (response && response.data) ? response.data : [];
+      if (window.appState) window.appState.cacheMediaList(more);
+      this.items = this.items.concat(more);
+      this.hasMore = !!(response && response.hasMore) && more.length > 0;
+      this.render(this.items, this.notice);
+      // o botão "Mostrar mais" foi redesenhado: leva o foco ao primeiro título novo
+      const first = more.length ? this.container.querySelector(`[data-focus-key="ex:${toInt(more[0].id)}:open"]`) : null;
+      if (first && first.focus) first.focus();
+    } catch (err) {
+      if (seq === this.requestSeq && window.appController) window.appController.showToast(this.describeError(err), 'error');
+    } finally {
+      this.loadingMore = false;
     }
   }
 
@@ -122,8 +154,10 @@ class ExploreView {
   // anime ainda não carregado = tipo (Filme/OVA), temporada de exibição e quantas partes da franquia foram agrupadas.
   metaText(item) {
     if (item.type === 'movie') return window.MediaDisplay.runtimeText(item.runtime) || 'Filme';
-    if (Array.isArray(item.seasons) && item.seasons.length > 0) {
-      return `${item.seasons.length} ${item.seasons.length === 1 ? 'temporada' : 'temporadas'}`;
+    // obra do catálogo: a lista leve traz `season_count`; o detalhe completo traz as temporadas
+    const seasonCount = Array.isArray(item.seasons) ? item.seasons.length : (Number(item.season_count) || 0);
+    if (seasonCount > 0) {
+      return `${seasonCount} ${seasonCount === 1 ? 'temporada' : 'temporadas'}`;
     }
     const parts = [];
     if (item.anime_kind) parts.push(item.anime_kind);
@@ -135,9 +169,10 @@ class ExploreView {
   render(items, notice = '') {
     const MD = window.MediaDisplay; // S08: "Sem nota"/"Sem gênero"/imagem local quando a fonte não informa
     const fallbackPoster = MD.POSTER_PLACEHOLDER;
+    const trackedIds = new Set(window.appState ? window.appState.data.trackedShows.map(t => t.showId) : []);
 
     this.container.innerHTML = notice + items.map(item => {
-      const isTracked = window.appState ? window.appState.data.trackedShows.some(t => t.showId === item.id) : false;
+      const isTracked = trackedIds.has(item.id);
 
       const typeBadge = item.type === 'movie'
         ? `<span class="badge-type-tag badge-type-movie">Filme</span>`
@@ -155,7 +190,7 @@ class ExploreView {
             <img class="show-poster"
                  src="${safeSrc(item.poster_path) || fallbackPoster}"
                  alt="Pôster de ${escapeHtml(item.name)}"
-                 loading="lazy"
+                 loading="lazy" decoding="async"
                  onerror="this.onerror=null; this.src='${fallbackPoster}';">
             <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(item.vote_average))}</div>
           </div>
@@ -186,7 +221,7 @@ class ExploreView {
           </div>
         </div>
       `;
-    }).join('');
+    }).join('') + (this.hasMore ? `<div class="grid-message"><button type="button" class="btn btn-secondary" data-focus-key="ex:more:load" onclick="window.exploreView.loadMore()">Mostrar mais</button></div>` : '');
   }
 }
 

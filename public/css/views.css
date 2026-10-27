@@ -535,6 +535,9 @@
   border: 1px solid var(--bg-card-border);
   border-radius: var(--radius-sm);
   margin-bottom: 0.85rem;
+  /* S09: temporadas com centenas de episódios — linhas fora da tela não entram em layout/pintura até chegarem perto */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 5.5rem;
 }
 
 .episode-row.watched { border-left: 3px solid var(--tvtime-yellow); }

@@ -24,79 +24,99 @@ class NextUpView {
     });
   }
 
+  // Item da fila de UMA obra da lista (ou null se ela não tem nada pendente / não entra na fila).
+  // S09: o próximo episódio vem do cache de progresso do estado (uma varredura por obra, não por render).
+  queueItemFor(tracked) {
+    const state = window.appState;
+    // Finalizado, Pausado e Desisti não entram na fila (regra única em utils/watchStatus.js)
+    if (!window.WatchStatus.isQueueStatus(state.getStatus(tracked))) return null;
+
+    const media = state.getMedia(tracked.showId);
+    if (!media) return null;
+
+    if (this.typeFilter !== 'all' && media.type !== this.typeFilter) return null;
+
+    // Filme
+    if (media.type === 'movie') {
+      if (state.isWatched(media.id)) return null;
+      return {
+        isMovie: true,
+        showId: media.id,
+        showName: media.name,
+        type: media.type,
+        title: "Filme Completo",
+        runtime: media.runtime,
+        overview: media.overview,
+        still_path: media.backdrop_path || media.poster_path
+      };
+    }
+
+    // Série ou Anime: primeiro episódio ainda não assistido (obra sem detalhe carregado ainda não tem episódios)
+    const next = state.getNextEpisode(media.id);
+    const ep = next ? state.getEpisode(media.id, next.seasonNumber, next.episodeNumber) : null;
+    if (!ep) return null;
+    return {
+      isMovie: false,
+      showId: media.id,
+      showName: media.name,
+      type: media.type,
+      seasonNumber: next.seasonNumber,
+      episodeNumber: next.episodeNumber,
+      title: ep.name,
+      runtime: ep.runtime,
+      overview: ep.overview,
+      still_path: ep.still_path || media.backdrop_path || media.poster_path
+    };
+  }
+
   calculateQueue() {
     const queue = [];
     const state = window.appState;
     if (!state || !state.data || !state.data.trackedShows) return queue;
-
-    state.data.trackedShows.forEach(tracked => {
-      // Finalizado, Pausado e Desisti não entram na fila (regra única em utils/watchStatus.js)
-      if (!window.WatchStatus.isQueueStatus(state.getStatus(tracked))) return;
-
-      const media = state.getMedia(tracked.showId);
-      if (!media) return;
-
-      if (this.typeFilter !== 'all' && media.type !== this.typeFilter) return;
-
-      // Filme
-      if (media.type === 'movie') {
-        const isWatched = state.isWatched(media.id);
-        if (!isWatched) {
-          queue.push({
-            isMovie: true,
-            showId: media.id,
-            showName: media.name,
-            type: media.type,
-            title: "Filme Completo",
-            runtime: media.runtime,
-            overview: media.overview,
-            still_path: media.backdrop_path || media.poster_path
-          });
-        }
-        return;
-      }
-
-      // Série ou Anime
-      if (media.seasons) {
-        for (const season of media.seasons) {
-          if (!season.episodes) continue;
-          let found = false;
-          for (const ep of season.episodes) {
-            if (!state.isWatched(media.id, season.season_number, ep.episode_number)) {
-              queue.push({
-                isMovie: false,
-                showId: media.id,
-                showName: media.name,
-                type: media.type,
-                seasonNumber: season.season_number,
-                episodeNumber: ep.episode_number,
-                title: ep.name,
-                runtime: ep.runtime,
-                overview: ep.overview,
-                still_path: ep.still_path || media.backdrop_path || media.poster_path
-              });
-              found = true;
-              break;
-            }
-          }
-          if (found) break;
-        }
-      }
+    state.data.trackedShows.forEach((tracked) => {
+      const item = this.queueItemFor(tracked);
+      if (item) queue.push(item);
     });
-
     return queue;
+  }
+
+  // Só o número da aba (barato): usado quando a aba está oculta e não será redesenhada.
+  refreshBadge() {
+    if (!window.appState || window.appState.detailsStatus === 'loading') return null;
+    const count = this.calculateQueue().length;
+    if (this.badge) this.badge.textContent = count;
+    return count;
+  }
+
+  // Marcou/desmarcou um episódio da obra: troca só o cartão dela (ou o tira da fila); o resto da lista não é tocado.
+  // Mudanças que alteram a estrutura (obra entrou na fila, fila ficou vazia, mensagem de carregamento) caem no render completo.
+  updateShow(showId) {
+    const state = window.appState;
+    const id = Number(showId);
+    const card = this.container ? this.container.querySelector(`[data-show-id="${id}"]`) : null;
+    const tracked = state ? state.getTracked(id) : null;
+    const item = tracked ? this.queueItemFor(tracked) : null;
+    if (!card || (!item && this.container.querySelectorAll('[data-show-id]').length <= 1)) return this.render();
+    if (item) card.outerHTML = this.renderCard(item);
+    else card.remove();
+    const count = this.refreshBadge();
+    if (this.counterPill && count !== null) this.counterPill.textContent = `${count} título${count === 1 ? '' : 's'} na fila`;
   }
 
   render() {
     const state = window.appState;
     const trackedCount = (state && state.data && state.data.trackedShows) ? state.data.trackedShows.length : 0;
 
-    // Aguarda catálogo inicial estar carregado se ainda estiver vazio
-    if (!state || state.mediaMap.size === 0) {
-      if (this.counterPill) this.counterPill.textContent = 'Carregando fila...';
+    // Obras da lista ainda sem episódios (o detalhe chega em lote do servidor, S09): mostra o carregamento em vez de uma fila errada.
+    if (state && trackedCount > 0 && state.detailsStatus !== 'idle' && state.data.trackedShows.some(t => !state.hasDetail(t.showId))) {
+      const failed = state.detailsStatus === 'error';
+      if (this.counterPill) this.counterPill.textContent = failed ? 'Não carregou' : 'Carregando fila...';
       if (this.badge) this.badge.textContent = '0';
       if (this.container) {
-        this.container.innerHTML = '<div class="grid-message grid-message--info">Carregando próximos episódios...</div>';
+        this.container.innerHTML = failed
+          ? `<div class="grid-message grid-message--error" role="alert">Não foi possível carregar os episódios das suas obras. Verifique a conexão.
+              <div><button type="button" class="btn btn-sm btn-secondary" data-focus-key="nuload:retry" onclick="window.appController.retryDetails()">Tentar de novo</button></div></div>`
+          : '<div class="grid-message grid-message--info" role="status">Carregando próximos episódios...</div>';
       }
       if (this.emptyState) this.emptyState.classList.add('hidden');
       return;
@@ -168,12 +188,12 @@ class NextUpView {
     const fallbackThumb = window.MediaDisplay.STILL_PLACEHOLDER;
 
     return `
-      <div class="next-up-card">
+      <div class="next-up-card" data-show-id="${toInt(item.showId)}">
         <div class="next-up-thumb-wrap" aria-hidden="true" onclick="window.detailModalView.open(${toInt(item.showId)})">
-          <img class="next-up-thumb" 
-               src="${safeSrc(item.still_path) || fallbackThumb}" 
-               alt="" 
-               loading="lazy"
+          <img class="next-up-thumb"
+               src="${safeSrc(item.still_path) || fallbackThumb}"
+               alt=""
+               loading="lazy" decoding="async"
                onerror="this.onerror=null; this.src='${fallbackThumb}';">
           <span class="next-up-badge">${escapeHtml(codeBadge)}</span>
           ${window.MediaDisplay.runtimeText(item.runtime) ? `<span class="next-up-runtime">${escapeHtml(window.MediaDisplay.runtimeText(item.runtime))}</span>` : ''}

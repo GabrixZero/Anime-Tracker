@@ -10,6 +10,7 @@ class DetailModalView {
     this.currentSeasonNum = 1;
     this.currentNoteEp = { showId: null, seasonNum: null, epNum: null, isMovie: false };
     this.autoSaveTimer = null;
+    this.detailToken = 0; // invalida o carregamento de detalhe de uma obra que já não é a aberta
     this.bindEvents();
   }
 
@@ -82,34 +83,54 @@ class DetailModalView {
 
     // Toggle de Assistido dentro do Diário
     document.getElementById('note-watched-toggle').addEventListener('change', () => {
-      const isWatched = window.appState.toggleWatched(this.currentNoteEp.showId, this.currentNoteEp.seasonNum, this.currentNoteEp.epNum);
+      const { showId, seasonNum, epNum } = this.currentNoteEp;
+      const isWatched = window.appState.toggleWatched(showId, seasonNum, epNum);
       document.getElementById('note-watched-toggle').checked = isWatched;
-      window.appController.refreshAll();
+      window.appController.onEpisodeToggled(showId, seasonNum, epNum);
     });
 
-    // Batch Actions
+    // Batch Actions (S09: atualiza as linhas no lugar, sem reconstruir a lista de episódios)
     document.getElementById('btn-batch-check-season').addEventListener('click', () => {
       window.appState.batchSetSeason(this.currentShowId, this.currentSeasonNum, true);
-      this.renderEpisodes();
-      this.renderSeasonTabs();
-      window.appController.refreshAll();
+      this.syncEpisodeRows();
+      window.appController.refreshShow(this.currentShowId);
       window.appController.showToast('Temporada inteira marcada como assistida!', 'success');
     });
 
     document.getElementById('btn-batch-uncheck-season').addEventListener('click', () => {
       window.appState.batchSetSeason(this.currentShowId, this.currentSeasonNum, false);
-      this.renderEpisodes();
-      this.renderSeasonTabs();
-      window.appController.refreshAll();
+      this.syncEpisodeRows();
+      window.appController.refreshShow(this.currentShowId);
       window.appController.showToast('Temporada desmarcada.');
     });
+  }
+
+  // O modal está aberto mostrando esta obra?
+  isOpenFor(showId) {
+    return this.currentShowId === Number(showId) && !this.detailModal.classList.contains('hidden');
+  }
+
+  // Obra da lista leve (ou resultado de busca) ainda sem episódios: carrega o detalhe e redesenha o modal (S09).
+  async loadDetail(showId) {
+    const token = ++this.detailToken;
+    await window.appController.ensureDetails([showId]);
+    if (token !== this.detailToken || !this.isOpenFor(showId)) return; // abriu outra obra / fechou enquanto carregava
+    if (window.appState.hasDetail(showId)) this.open(showId);
+    else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
+  }
+
+  // Sem episódios para mostrar (carregando, erro ou obra que ainda não foi adicionada): limpa abas e lista antigas.
+  renderNoEpisodes(message) {
+    document.getElementById('show-seasons-tabs').innerHTML = '';
+    document.getElementById('season-stats-summary').innerHTML = '';
+    document.getElementById('show-episodes-container').innerHTML = `<p class="muted" role="status">${escapeHtml(message)}</p>`;
   }
 
   open(showId) {
     const media = window.appState.getMedia(showId);
     if (!media) return;
 
-    this.currentShowId = showId;
+    this.currentShowId = Number(showId);
     const header = document.getElementById('show-modal-header');
     const seriesBody = document.getElementById('series-detail-body');
     const movieBody = document.getElementById('movie-detail-body');
@@ -185,13 +206,19 @@ class DetailModalView {
       movieBody.classList.add('hidden');
       seriesBody.classList.remove('hidden');
 
-      const seasons = media.seasons || [];
-      this.currentSeasonNum = seasons.length > 0 ? seasons[0].season_number : 1;
-      this.renderSeasonTabs();
-      this.renderEpisodes();
+      if (!Array.isArray(media.seasons)) {
+        // lista leve (episódios a caminho) ou resultado de busca externo (sem episódios até a obra ser adicionada)
+        this.renderNoEpisodes(media.isExternal ? 'Os episódios aparecem depois que a obra é adicionada à lista.' : 'Carregando episódios...');
+      } else {
+        const seasons = media.seasons;
+        this.currentSeasonNum = seasons.length > 0 ? seasons[0].season_number : 1;
+        this.renderSeasonTabs();
+        this.renderEpisodes();
+      }
     }
 
     this.detailModal.classList.remove('hidden');
+    if (!window.appState.hasDetail(media.id) && !media.isExternal) this.loadDetail(media.id);
   }
 
   // Mantém o seletor de status do modal igual ao estado (ex.: virou "Finalizado" ao marcar o último episódio).
@@ -210,19 +237,66 @@ class DetailModalView {
 
     const bar = document.getElementById('show-seasons-tabs');
     bar.innerHTML = media.seasons.map(s => {
-      let watched = 0;
-      (s.episodes || []).forEach(ep => {
-        if (window.appState.isWatched(media.id, s.season_number, ep.episode_number)) watched++;
-      });
-      const total = s.episodes ? s.episodes.length : 0;
-
       return `
-        <button type="button" class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" id="season-tab-${toInt(s.season_number)}" data-focus-key="season:${toInt(s.season_number)}:tab" role="tab" aria-selected="${s.season_number === this.currentSeasonNum}" tabindex="${s.season_number === this.currentSeasonNum ? 0 : -1}" aria-controls="show-episodes-container" 
+        <button type="button" class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" id="season-tab-${toInt(s.season_number)}" data-focus-key="season:${toInt(s.season_number)}:tab" role="tab" aria-selected="${s.season_number === this.currentSeasonNum}" tabindex="${s.season_number === this.currentSeasonNum ? 0 : -1}" aria-controls="show-episodes-container"
                 onclick="window.detailModalView.switchSeason(${toInt(s.season_number)})">
-          ${escapeHtml(s.name || `Temporada ${s.season_number}`)} (${watched}/${total})
+          ${escapeHtml(this.seasonTabLabel(media, s))}
         </button>
       `;
     }).join('');
+  }
+
+  // "Temporada 1 (3/12)": nome da temporada e episódios assistidos.
+  seasonTabLabel(media, season) {
+    let watched = 0;
+    (season.episodes || []).forEach((ep) => {
+      if (window.appState.isWatched(media.id, season.season_number, ep.episode_number)) watched++;
+    });
+    const total = season.episodes ? season.episodes.length : 0;
+    return `${season.name || `Temporada ${season.season_number}`} (${watched}/${total})`;
+  }
+
+  // Marcou/desmarcou UM episódio com o modal aberto (S09): muda só aquela linha, o rótulo da temporada e o resumo.
+  // Sem reconstruir a lista (com 1.000+ episódios, reconstruir congelava a tela).
+  updateEpisode(seasonNum, epNum) {
+    const media = window.appState.getMedia(this.currentShowId);
+    if (!media || !Array.isArray(media.seasons)) return;
+    if (Number(seasonNum) === this.currentSeasonNum) {
+      const row = document.getElementById('show-episodes-container').querySelector(`[data-ep="${toInt(epNum)}"]`);
+      if (row) this.paintRow(row, window.appState.isWatched(media.id, seasonNum, epNum));
+    }
+    this.updateSeasonCounts(media);
+  }
+
+  // Marcou/desmarcou a temporada inteira: repinta as linhas existentes (também sem reconstruir).
+  syncEpisodeRows() {
+    const media = window.appState.getMedia(this.currentShowId);
+    if (!media || !Array.isArray(media.seasons)) return;
+    const rows = document.getElementById('show-episodes-container').querySelectorAll('[data-ep]');
+    rows.forEach(row => this.paintRow(row, window.appState.isWatched(media.id, this.currentSeasonNum, Number(row.getAttribute('data-ep')))));
+    this.updateSeasonCounts(media);
+  }
+
+  paintRow(row, isWatched) {
+    row.classList.toggle('watched', isWatched);
+    const check = row.querySelector('.episode-check');
+    if (!check) return;
+    check.setAttribute('aria-checked', String(isWatched));
+    const mark = check.querySelector('span');
+    if (mark) mark.textContent = isWatched ? '✓' : '';
+  }
+
+  // Rótulo da aba da temporada atual e resumo "Progresso da Temporada" (texto igual ao de renderSeasonTabs/renderEpisodes).
+  updateSeasonCounts(media) {
+    const season = media.seasons.find(s => s.season_number === this.currentSeasonNum);
+    if (!season) return;
+    const tab = document.getElementById(`season-tab-${toInt(season.season_number)}`);
+    if (tab) tab.textContent = this.seasonTabLabel(media, season);
+    const episodes = season.episodes || [];
+    if (episodes.length > 0) {
+      const watched = episodes.filter(ep => window.appState.isWatched(media.id, season.season_number, ep.episode_number)).length;
+      document.getElementById('season-stats-summary').innerHTML = `Progresso da Temporada: <strong>${watched}/${episodes.length} assistidos</strong>`;
+    }
   }
 
   switchSeason(num) {
@@ -261,12 +335,12 @@ class DetailModalView {
       const hasNote = note && note.text && note.text.trim();
 
       return `
-        <div class="episode-row ${isWatched ? 'watched' : ''}">
+        <div class="episode-row ${isWatched ? 'watched' : ''}" data-ep="${toInt(ep.episode_number)}">
           <button type="button" class="episode-check" role="checkbox" aria-checked="${isWatched}" data-focus-key="ep:${toInt(ep.episode_number)}:check" aria-label="Assistido: episódio ${toInt(ep.episode_number)}, ${escapeHtml(ep.name)}" onclick="window.appController.quickCheck(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
             <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
           </button>
 
-          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackEpisodeThumb}';" class="episode-thumb" loading="lazy">
+          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackEpisodeThumb}';" class="episode-thumb" loading="lazy" decoding="async">
 
           <div class="episode-info">
             <span class="episode-code">E${escapeHtml(ep.episode_number)}${ep.air_date ? ` · ${escapeHtml(String(ep.air_date).slice(0, 10))}` : ''}</span>
@@ -299,8 +373,7 @@ class DetailModalView {
       epTitle.textContent = media.name;
       showTitle.textContent = window.MediaDisplay.runtimeText(media.runtime) ? `Duração: ${window.MediaDisplay.runtimeText(media.runtime)}` : 'Filme';
     } else {
-      const season = media.seasons ? media.seasons.find(s => s.season_number === seasonNum) : null;
-      const ep = season ? season.episodes.find(e => e.episode_number === epNum) : null;
+      const ep = window.appState.getEpisode(showId, seasonNum, epNum);
       epCode.textContent = `S${String(seasonNum).padStart(2, '0')}E${String(epNum).padStart(2, '0')}`;
       epTitle.textContent = ep ? ep.name : `Episódio ${epNum}`;
       showTitle.textContent = media.name;

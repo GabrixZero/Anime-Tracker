@@ -39,8 +39,15 @@ class ApiClient {
   }
 
   // --- MÍDIA ---
-  async getTrending(type = 'all') {
-    return this.request(`/media/trending?type=${encodeURIComponent(type)}`);
+  // Lista LEVE e paginada do catálogo (S09): { count, total, offset, limit, hasMore, data }.
+  async getTrending(type = 'all', { limit, offset } = {}) {
+    const extra = (limit ? `&limit=${encodeURIComponent(limit)}` : '') + (offset ? `&offset=${encodeURIComponent(offset)}` : '');
+    return this.request(`/media/trending?type=${encodeURIComponent(type)}${extra}`);
+  }
+
+  // Detalhe completo (temporadas/episódios) de várias obras do catálogo de uma vez: { count, data, missing }. Máx. 50 ids.
+  async getBatch(ids) {
+    return this.request(`/media/batch?ids=${ids.map(id => encodeURIComponent(Number(id))).join(',')}`);
   }
 
   async search(query = '', type = 'all') {

@@ -49,10 +49,11 @@
   // Status que a tela deve mostrar/contar. Correção só para itens antigos (sem updatedAt = nunca tocados pelas regras da S03):
   // série/filme com tudo assistido e status "Assistindo/Quero ver" aparece como "Finalizado". Itens novos valem como estão
   // (assim o usuário ainda pode escolher "Assistindo" para rever uma série).
-  function effectiveStatus(tracked, media, isWatched) {
+  // `progress` (opcional) = progresso já calculado/em cache (S09); sem ele, calcula com `isWatched`.
+  function effectiveStatus(tracked, media, isWatched, progress) {
     const status = normalizeStatus(tracked && tracked.status);
     const legacy = !(tracked && tracked.updatedAt);
-    if (legacy && media && (status === 'watching' || status === 'plan_to_watch') && computeProgress(media, isWatched).complete) {
+    if (legacy && media && (status === 'watching' || status === 'plan_to_watch') && (progress || computeProgress(media, isWatched)).complete) {
       return 'completed';
     }
     return status;
