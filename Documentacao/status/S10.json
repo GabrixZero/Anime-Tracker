@@ -2,9 +2,9 @@
   "secao": "S10",
   "titulo": "Qualidade, testes e deploy",
   "arquivo": "Documentacao/secoes/S10-qualidade-testes-deploy.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s10-qualidade-testes-deploy",
   "concluidaEm": "",
   "commit": "",
-  "notas": ""
+  "notas": "Fase A (infra, CI, SQLite, Docker, testes, README) em andamento; fase B (limpeza do frontend/CSP) aguarda a S09."
 }
