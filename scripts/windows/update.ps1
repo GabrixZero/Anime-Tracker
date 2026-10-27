@@ -110,7 +110,8 @@ try {
     if ($config) { $dbFile = Join-Path $config.dataDir 'showvault.sqlite' }
     if ($dbFile -and (Test-Path -LiteralPath $dbFile)) {
         Write-Info '  Fazendo o backup do banco antes de atualizar...'
-        Write-Info (Invoke-Native $node @('--env-file=' + $envFile, (Join-Path $root 'scripts\backup.js')))
+        # Atenção ao montar a lista de argumentos: sem os parênteses, o "+" juntaria o texto com a lista inteira e viraria UM argumento só.
+        Write-Info (Invoke-Native $node @(('--env-file=' + $envFile), (Join-Path $root 'scripts\backup.js')))
     } else {
         Write-Warn 'Não achei o banco; seguindo sem backup.'
     }
