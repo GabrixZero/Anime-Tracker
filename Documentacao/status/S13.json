@@ -2,8 +2,8 @@
   "secao": "S13",
   "titulo": "AniList e qualidade do catálogo",
   "arquivo": "Documentacao/secoes/S13-anilist-e-catalogo.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s13-anilist-e-catalogo",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
