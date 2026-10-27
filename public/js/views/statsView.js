@@ -89,7 +89,7 @@ class StatsView {
       const pct = Math.round((count / maxEmotion) * 100);
       return `
         <div class="stat-bar-row">
-          <span class="stat-bar-icon">${emo.icon}</span>
+          <span class="stat-bar-icon" aria-hidden="true">${emo.icon}</span>
           <span class="stat-bar-label">${emo.label}</span>
           <div class="stat-bar-track">
             <div class="stat-bar-fill" style="width: ${pct}%;"></div>

@@ -112,10 +112,10 @@ class DetailModalView {
     const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
     header.style.backgroundImage = cssUrl(safeUrl(media.backdrop_path) || media.poster_path);
     header.innerHTML = `
-      <img class="modal-poster" src="${safeSrc(media.poster_path) || fallbackPoster}" alt="${escapeHtml(media.name)}" onerror="this.onerror=null; this.src='${fallbackPoster}';">
+      <img class="modal-poster" src="${safeSrc(media.poster_path) || fallbackPoster}" alt="Pôster de ${escapeHtml(media.name)}" onerror="this.onerror=null; this.src='${fallbackPoster}';">
       <div class="modal-header-info">
         <div class="modal-type-row">${typeBadge}</div>
-        <h2 class="modal-title">${escapeHtml(media.name)}</h2>
+        <h2 class="modal-title" id="detail-modal-title">${escapeHtml(media.name)}</h2>
         <div class="modal-meta">
           <span>★ <strong>${formatRating(media.vote_average)}</strong></span>
           <span>•</span>
@@ -128,13 +128,13 @@ class DetailModalView {
         
         <div class="modal-actions">
           ${tracked ? `
-            <button class="btn btn-sm btn-secondary" onclick="window.appController.removeFromList(${toInt(media.id)})">Remover da Lista</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-focus-key="detail:primary" onclick="window.appController.removeFromList(${toInt(media.id)})">Remover da Lista</button>
             <label class="status-picker">
               <span class="status-picker-label">Status</span>
               <select class="status-select" id="detail-status-select" aria-label="Status da obra" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(window.appState.getStatus(tracked))}</select>
             </label>
           ` : `
-            <button class="btn btn-sm btn-primary" onclick="window.appController.addToList(${toInt(media.id)})">+ Adicionar à Lista</button>
+            <button type="button" class="btn btn-sm btn-primary" data-focus-key="detail:primary" onclick="window.appController.addToList(${toInt(media.id)})">+ Adicionar à Lista</button>
           `}
         </div>
       </div>
@@ -157,10 +157,10 @@ class DetailModalView {
           </div>
 
           <div class="movie-btn-group">
-            <button class="btn ${isWatched ? 'btn-secondary' : 'btn-primary'}" onclick="window.appController.quickCheck(${toInt(media.id)})">
+            <button type="button" class="btn ${isWatched ? 'btn-secondary' : 'btn-primary'}" data-focus-key="detail:movie-check" onclick="window.appController.quickCheck(${toInt(media.id)})">
               ${isWatched ? 'Desmarcar Filme' : '✓ Marcar como Assistido'}
             </button>
-            <button class="btn btn-outline" onclick="window.detailModalView.openNote(${toInt(media.id)})">
+            <button type="button" class="btn btn-outline" data-focus-key="detail:movie-note" onclick="window.detailModalView.openNote(${toInt(media.id)})">
               ${hasNote ? 'Editar Anotação' : 'Anotar no Diário'}
             </button>
           </div>
@@ -202,7 +202,7 @@ class DetailModalView {
       const total = s.episodes ? s.episodes.length : 0;
 
       return `
-        <button class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" 
+        <button type="button" class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" id="season-tab-${toInt(s.season_number)}" data-focus-key="season:${toInt(s.season_number)}:tab" role="tab" aria-selected="${s.season_number === this.currentSeasonNum}" tabindex="${s.season_number === this.currentSeasonNum ? 0 : -1}" aria-controls="show-episodes-container" 
                 onclick="window.detailModalView.switchSeason(${toInt(s.season_number)})">
           ${escapeHtml(s.name || `Temporada ${s.season_number}`)} (${watched}/${total})
         </button>
@@ -223,6 +223,7 @@ class DetailModalView {
     const season = media.seasons.find(s => s.season_number === this.currentSeasonNum);
     const container = document.getElementById('show-episodes-container');
     const summary = document.getElementById('season-stats-summary');
+    container.setAttribute('aria-labelledby', `season-tab-${toInt(this.currentSeasonNum)}`);
 
     if (!season || !season.episodes || season.episodes.length === 0) {
       container.innerHTML = `<p class="muted">Nenhum episódio cadastrado.</p>`;
@@ -246,11 +247,11 @@ class DetailModalView {
 
       return `
         <div class="episode-row ${isWatched ? 'watched' : ''}">
-          <div class="episode-check" onclick="window.appController.quickCheck(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
-            ${isWatched ? '✓' : ''}
-          </div>
+          <button type="button" class="episode-check" role="checkbox" aria-checked="${isWatched}" data-focus-key="ep:${toInt(ep.episode_number)}:check" aria-label="Assistido: episódio ${toInt(ep.episode_number)}, ${escapeHtml(ep.name)}" onclick="window.appController.quickCheck(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
+            <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
+          </button>
 
-          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="${escapeHtml(ep.name)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" class="episode-thumb" loading="lazy">
+          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" class="episode-thumb" loading="lazy">
 
           <div class="episode-info">
             <span class="episode-code">E${escapeHtml(ep.episode_number)} · ${escapeHtml(ep.air_date ? String(ep.air_date).slice(0, 10) : '')}</span>
@@ -259,7 +260,7 @@ class DetailModalView {
             ${hasNote ? `<span class="episode-note-tag">Anotação salva</span>` : ''}
           </div>
 
-          <button class="btn btn-sm btn-outline" onclick="window.detailModalView.openNote(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
+          <button type="button" class="btn btn-sm btn-outline" data-focus-key="ep:${toInt(ep.episode_number)}:note" aria-label="${hasNote ? 'Ver ou editar' : 'Anotar'} episódio ${toInt(ep.episode_number)}: ${escapeHtml(ep.name)}" onclick="window.detailModalView.openNote(${toInt(media.id)}, ${toInt(season.season_number)}, ${toInt(ep.episode_number)})">
             ${hasNote ? 'Ver/Editar' : 'Anotar'}
           </button>
         </div>
