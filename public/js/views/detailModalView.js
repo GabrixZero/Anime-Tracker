@@ -48,7 +48,7 @@ class DetailModalView {
     });
 
     // Toolbar de Markdown
-    document.querySelectorAll('.tool-btn').forEach(btn => {
+    document.querySelectorAll('.tool-btn[data-insert]').forEach(btn => {
       btn.addEventListener('click', () => {
         const ins = btn.getAttribute('data-insert');
         const start = textarea.selectionStart;
@@ -268,7 +268,7 @@ class DetailModalView {
           <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="${escapeHtml(ep.name)}" onerror="this.onerror=null; this.src='${fallbackEpisodeThumb}';" class="episode-thumb" loading="lazy">
 
           <div class="episode-info">
-            <span class="episode-code">E${escapeHtml(ep.episode_number)} · ${escapeHtml(ep.air_date ? String(ep.air_date).slice(0, 10) : '')}</span>
+            <span class="episode-code">E${escapeHtml(ep.episode_number)}${ep.air_date ? ` · ${escapeHtml(String(ep.air_date).slice(0, 10))}` : ''}</span>
             <div class="episode-name">${escapeHtml(ep.name)}</div>
             ${window.MediaDisplay.runtimeText(ep.runtime) ? `<span class="episode-runtime">${escapeHtml(window.MediaDisplay.runtimeText(ep.runtime))}</span>` : ''}
             ${hasNote ? `<span class="episode-note-tag">Anotação salva</span>` : ''}
