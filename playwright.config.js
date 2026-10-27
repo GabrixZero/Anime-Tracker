@@ -34,6 +34,9 @@ module.exports = defineConfig({
     channel: 'chromium',
     locale: 'pt-BR',
     timezoneId: 'America/Sao_Paulo',
+    // Sem animações: o app respeita prefers-reduced-motion (variables.css, S05). As telas caem direto no estado final (nada de medir
+    // contraste/posição no meio de um fade) e o teste não espera transições.
+    reducedMotion: 'reduce',
     acceptDownloads: true,
     serviceWorkers: 'block',
     // Artefatos só quando algo falha (D-S12-7).

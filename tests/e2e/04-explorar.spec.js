@@ -40,7 +40,9 @@ test.describe('Explorar', () => {
     await expect(more).toBeVisible();
 
     await tap(more);
-    await expect(cards).toHaveCount(total);
+    // (outros testes trazem obras novas ao catálogo enquanto este roda: a 2ª página pode ter alguma a mais que o título mostrava)
+    await expect.poll(() => cards.count()).toBeGreaterThanOrEqual(total);
+    expect(await cards.count()).toBeLessThan(total + 10);
     await expect(more).toHaveCount(0); // acabou: o botão some
     // o foco vai para o primeiro título novo (o botão foi redesenhado), nunca cai no <body>
     await expect(page.locator('#explore-container .show-open-btn').nth(60)).toBeFocused();
@@ -113,8 +115,10 @@ test.describe('Explorar', () => {
     await expect(page.locator('#explore-container .show-card')).toHaveCount(1);
     const card = exploreCard(page, anime.name);
     await expect(card.locator('.badge-type-tag')).toHaveText('Anime');
-    await expect(card.locator('.show-year')).toHaveText('Outono 2023');
-    await expect(card.locator('.show-meta-line')).toContainText('+1 parte da franquia');
+    // O catálogo é compartilhado entre os testes: se o outro projeto (desktop/mobile) já trouxe a franquia, o cartão é o da obra gravada
+    // ("2023" e "2 temporadas"); se não, é o resultado da AniList ("Outono 2023" e "+1 parte da franquia"). As duas formas valem.
+    await expect(card.locator('.show-year')).toHaveText(/^(Outono )?2023$/);
+    await expect(card.locator('.show-meta-line')).toContainText(/\+1 parte da franquia|2 temporadas/);
     await expect(card.locator('.show-meta-line')).toContainText('Adventure, Fantasy');
 
     await tap(card.getByRole('button', { name: '+ Adicionar à Lista' }));
