@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { DB_FILE_NAME } = require('./index');
+const { openReadOnly } = require('./readOnly');
 
 class BackupError extends Error {
   constructor(code, message) {
@@ -120,7 +121,7 @@ function inspectDatabase(file) {
   let db = null;
   try {
     info.size = fs.statSync(file).size;
-    db = openDatabase(file, { readOnly: true });
+    db = openReadOnly(file); // sem criar -wal/-shm ao lado do arquivo conferido
     db.exec('PRAGMA busy_timeout = 5000');
     const integrity = db
       .prepare('PRAGMA integrity_check')

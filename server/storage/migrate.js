@@ -10,8 +10,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
+const { readJson, writeJsonAtomic, stripBom } = require('../utils/jsonStore');
 const { SqliteStore } = require('./sqliteStore');
+const { openReadOnly } = require('./readOnly');
 const { DB_FILE_NAME, LIBRARY_FILE_RE } = require('./index');
 
 const META_KEY = 'json_migration';
@@ -61,16 +62,121 @@ function backupJsonFiles(dataDir, files, now = new Date()) {
   return dest;
 }
 
-// Migra dataDir/*.json para dataDir/showvault.sqlite. Seguro para chamar sempre que o servidor sobe (só age uma vez).
-function migrateJsonToSqlite(dataDir, { log = console.log, warn = console.warn, force = false, now = new Date() } = {}) {
+// Lê um JSON sem NENHUM efeito colateral (o readJson cria uma cópia .corrupt-* ao achar arquivo quebrado). Usa o .bak se o principal falhar.
+// null = nem o arquivo nem o .bak existem; lança o erro do arquivo principal se nenhum dos dois for legível.
+function peekJson(file) {
+  const attempt = f => {
+    try {
+      return { data: JSON.parse(stripBom(fs.readFileSync(f, 'utf-8'))) };
+    } catch (error) {
+      return { error };
+    }
+  };
+  const main = attempt(file);
+  if (!main.error) return main;
+  const bak = attempt(`${file}.bak`);
+  if (!bak.error) return bak;
+  if (main.error.code === 'ENOENT' && bak.error.code === 'ENOENT') return null;
+  throw main.error.code === 'ENOENT' ? bak.error : main.error;
+}
+
+// Lê (somente leitura, sem criar nada) o que o banco já tem: a marca de migração e as chaves dos documentos.
+function peekDatabase(dbFile) {
+  const info = { exists: fs.existsSync(dbFile), previous: null, keys: new Set() };
+  if (!info.exists) return info;
+  try {
+    const db = openReadOnly(dbFile); // sem criar -wal/-shm
+    try {
+      info.keys = new Set(
+        db
+          .prepare('SELECT key FROM documents')
+          .all()
+          .map(row => row.key)
+      );
+      const row = db.prepare('SELECT value FROM meta WHERE name = ?').get(META_KEY);
+      info.previous = row ? row.value : null;
+    } finally {
+      db.close();
+    }
+  } catch {
+    /* banco ilegível ou sem as tabelas: para a simulação conta como vazio */
+  }
+  return info;
+}
+
+// Modo simulação (--dry-run): conta o que seria importado e o que o banco já tem. Não cria pasta, banco, backup nem marca nada.
+function previewMigration(dir, sourceDir, { force }) {
+  const dbFile = path.join(dir, DB_FILE_NAME);
+  const known = peekDatabase(dbFile);
+  const preview = {
+    dryRun: true,
+    skipped: false,
+    sourceDir,
+    dbFile,
+    dbExists: known.exists,
+    files: 0,
+    users: 0,
+    libraries: 0,
+    catalog: 0,
+    existingKeys: [],
+    failed: []
+  };
+  if (known.previous && !force) return { ...preview, skipped: true, reason: 'already-migrated', previous: known.previous };
+
+  const files = candidateFiles(sourceDir);
+  preview.files = files.length;
+  for (const { key, file } of files) {
+    let result;
+    try {
+      result = peekJson(file);
+    } catch (err) {
+      preview.failed.push({ key, error: err.message });
+      continue;
+    }
+    if (result === null) continue;
+    if (known.keys.has(key)) {
+      preview.existingKeys.push(key);
+      continue;
+    }
+    if (key === 'users.json') preview.users = result.data.length;
+    else if (key === 'mediaCatalog.runtime.json') preview.catalog = result.data.length;
+    else preview.libraries++;
+  }
+  return preview;
+}
+
+// Migra os JSON para dataDir/showvault.sqlite. Seguro para chamar sempre que o servidor sobe (só age uma vez).
+//  - fromDir: lê os JSON de OUTRA pasta (ex.: server/data do projeto, quando o banco vai para %LOCALAPPDATA%\ShowVault\data).
+//    Pedir a pasta de propósito vale como --force: ignora a marca "já migrado", mas continua sem sobrescrever nada do banco.
+//  - dryRun: só simula (ver previewMigration).
+function migrateJsonToSqlite(
+  dataDir,
+  { log = console.log, warn = console.warn, force = false, now = new Date(), fromDir = null, dryRun = false } = {}
+) {
   const dir = path.resolve(dataDir);
+  const sourceDir = fromDir ? path.resolve(fromDir) : dir;
+  if (dryRun) return previewMigration(dir, sourceDir, { force: force || !!fromDir });
+
+  const summary = {
+    skipped: false,
+    users: 0,
+    libraries: 0,
+    catalog: 0,
+    existing: 0,
+    existingKeys: [],
+    failed: [],
+    backupDir: null,
+    sourceDir
+  };
+  // Pasta indicada à mão e sem JSON: nada a fazer, e o destino nem chega a ser tocado (não cria banco vazio nem marca "migrado").
+  if (fromDir && candidateFiles(sourceDir).length === 0) return { ...summary, nothingFound: true };
+
   const store = new SqliteStore(path.join(dir, DB_FILE_NAME));
   try {
     const previous = store.getMeta(META_KEY);
-    if (previous && !force) return { skipped: true, reason: 'already-migrated', previous };
+    if (previous && !force && !fromDir) return { skipped: true, reason: 'already-migrated', previous };
 
-    const files = candidateFiles(dir);
-    const summary = { skipped: false, users: 0, libraries: 0, catalog: 0, existing: 0, failed: [], backupDir: null };
+    const files = candidateFiles(sourceDir);
     if (files.length === 0) {
       store.setMeta(META_KEY, `${now.toISOString()} (nada para migrar)`);
       return summary;
@@ -97,6 +203,7 @@ function migrateJsonToSqlite(dataDir, { log = console.log, warn = console.warn, 
       for (const item of ready) {
         if (!store.insertIfAbsent(item.key, item.json)) {
           summary.existing++;
+          summary.existingKeys.push(item.key);
           continue;
         }
         inserted.push(item);
@@ -113,7 +220,16 @@ function migrateJsonToSqlite(dataDir, { log = console.log, warn = console.warn, 
         throw new Error(`Verificação da migração falhou em ${key}; a marca de migração NÃO foi gravada.`);
     }
 
-    store.setMeta(META_KEY, `${now.toISOString()} users=${summary.users} libraries=${summary.libraries} catalog=${summary.catalog}`);
+    store.setMeta(
+      META_KEY,
+      `${now.toISOString()} users=${summary.users} libraries=${summary.libraries} catalog=${summary.catalog}${fromDir ? ' (de outra pasta)' : ''}`
+    );
+    if (summary.existingKeys.length) {
+      warn(
+        `[storage] Já existiam no banco e NÃO foram sobrescritos: ${summary.existingKeys.join(', ')}. ` +
+          'Se o ShowVault chegou a rodar neste banco antes da migração, pare o app, mova o showvault.sqlite* para outro lugar e migre de novo.'
+      );
+    }
     log(
       `[storage] Migração JSON -> SQLite: ${summary.users} usuário(s), ${summary.libraries} biblioteca(s), catálogo com ${summary.catalog} obra(s)` +
         `${summary.failed.length ? `, ${summary.failed.length} arquivo(s) com erro` : ''}. Os JSON originais foram mantidos.`
