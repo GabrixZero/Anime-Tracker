@@ -30,12 +30,15 @@ let origin;
 test.before(async () => {
   server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   origin = `http://127.0.0.1:${server.address().port}`;
-  mediaService.jikan.minIntervalMs = 0;
-  mediaService.jikan.retries = 0;
+  for (const client of [mediaService.anilist, mediaService.jikan]) { client.minIntervalMs = 0; client.retries = 0; }
   mediaService.sleep = async () => {};
 });
 test.after(() => server.close());
-test.beforeEach(() => { mediaController.searchLimiter.reset(); mediaService.jikan.cache.clear(); mediaService.cache.clear(); });
+test.beforeEach(() => {
+  mediaController.searchLimiter.reset();
+  mediaService.cache.clear();
+  for (const client of [mediaService.anilist, mediaService.jikan]) { client.cache.clear(); client.breaker.success(); }
+});
 
 const api = (p, headers = {}) => new Promise((resolve, reject) => {
   http.get(origin + p, { headers }, (res) => {
@@ -110,6 +113,7 @@ test('/trending guarda no navegador só com revalidação (ETag + no-cache) e re
 
 test('busca: obra do catálogo vem leve; resultado externo segue como a fonte devolveu (precisa da sinopse até ser adicionado)', async () => {
   mediaService.fetchJson = async (url) => {
+    if (url.includes('anilist')) return { data: { Page: { media: [] } } };
     if (url.includes('jikan')) return { data: [] };
     return [{ show: { id: 4242, name: 'Zzyzx Show', type: 'Scripted', genres: ['Drama'], status: 'Running', summary: '<p>Sinopse externa</p>' } }];
   };

@@ -8,8 +8,11 @@
 # Node 26 é a versão em que o módulo embutido node:sqlite é estável (ver Documentacao/02-decisoes.md, D-S10-1).
 FROM node:26-slim
 
+# HOST=0.0.0.0: dentro do contêiner o servidor precisa escutar em todas as interfaces para o -p 3000:3000 funcionar
+# (fora do Docker, em produção, o padrão é 127.0.0.1: só o próprio computador; ver Documentacao/deploy-pc-tailscale.md).
 ENV NODE_ENV=production \
     PORT=3000 \
+    HOST=0.0.0.0 \
     STORAGE=sqlite \
     SHOWVAULT_DATA_DIR=/data
 

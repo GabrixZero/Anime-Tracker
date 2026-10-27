@@ -14,11 +14,14 @@
     "test": "node --test tests/",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write eslint.config.js prettier.config.js scripts/storage.js \"server/storage/**/*.js\" \"tests/storage-*.test.js\" tests/routes-http.test.js tests/auth-session.test.js tests/s10-frontend.test.js server/config/csp.js public/js/utils/actions.js public/js/utils/viewKit.js public/js/controllers/actionHandlers.js",
-    "format:check": "prettier --check eslint.config.js prettier.config.js scripts/storage.js \"server/storage/**/*.js\" \"tests/storage-*.test.js\" tests/routes-http.test.js tests/auth-session.test.js tests/s10-frontend.test.js server/config/csp.js public/js/utils/actions.js public/js/utils/viewKit.js public/js/controllers/actionHandlers.js",
+    "format": "prettier --write eslint.config.js prettier.config.js scripts/storage.js \"server/storage/**/*.js\" \"tests/storage-*.test.js\" tests/routes-http.test.js tests/auth-session.test.js tests/s10-frontend.test.js server/config/csp.js public/js/utils/actions.js public/js/utils/viewKit.js public/js/controllers/actionHandlers.js server/config/network.js server/config/paths.js server/config/envFile.js server/config/pcSetup.js scripts/setup-pc.js scripts/show-config.js scripts/backup.js scripts/restore.js \"tests/s11-*.test.js\"",
+    "format:check": "prettier --check eslint.config.js prettier.config.js scripts/storage.js \"server/storage/**/*.js\" \"tests/storage-*.test.js\" tests/routes-http.test.js tests/auth-session.test.js tests/s10-frontend.test.js server/config/csp.js public/js/utils/actions.js public/js/utils/viewKit.js public/js/controllers/actionHandlers.js server/config/network.js server/config/paths.js server/config/envFile.js server/config/pcSetup.js scripts/setup-pc.js scripts/show-config.js scripts/backup.js scripts/restore.js \"tests/s11-*.test.js\"",
     "status": "node scripts/status.js",
     "storage:migrate": "node scripts/storage.js migrate",
-    "storage:export": "node scripts/storage.js export"
+    "storage:export": "node scripts/storage.js export",
+    "setup:pc": "node scripts/setup-pc.js",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js"
   },
   "repository": {
     "type": "git",

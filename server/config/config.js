@@ -1,9 +1,10 @@
-const path = require('path');
 const { resolveJwtSecret } = require('./jwtSecret');
+const { parseHost, parseTrustProxy } = require('./network');
+const { resolveDataDir } = require('./paths');
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-// SHOWVAULT_DATA_DIR permite apontar os dados para outra pasta (os testes usam um diretório temporário).
-const DATA_DIR = process.env.SHOWVAULT_DATA_DIR ? path.resolve(process.env.SHOWVAULT_DATA_DIR) : path.join(__dirname, '..', 'data');
+// SHOWVAULT_DATA_DIR permite apontar os dados para outra pasta (os testes usam um diretório temporário; o modo PC usa %LOCALAPPDATA%).
+const DATA_DIR = resolveDataDir();
 
 const intFromEnv = (name, fallback) => {
   const n = Number.parseInt(process.env[name], 10);
@@ -15,14 +16,8 @@ const listFromEnv = (name) => (process.env[name] || '')
   .map(s => s.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
-// TRUST_PROXY: atrás de proxy/hospedagem, número de proxies confiáveis (ex.: 1). Vazio = não confiar em X-Forwarded-For.
-function parseTrustProxy(value) {
-  if (value === undefined || value === '') return false;
-  if (/^\d+$/.test(value)) return Number(value);
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  return value; // ex.: "loopback" ou lista de sub-redes aceita pelo Express
-}
+// HOST e TRUST_PROXY (S11): ver server/config/network.js. Em produção o servidor escuta só em 127.0.0.1 (modo PC com Tailscale Funnel).
+// TRUST_PROXY: número de proxies confiáveis (modo PC: 1). Vazio = não confiar em X-Forwarded-For.
 
 // O segredo é resolvido na primeira leitura (assim, carregar a config só para ler a pasta de dados não cria arquivo nenhum).
 // Em produção a verificação acontece já ao carregar: sem JWT_SECRET seguro o servidor não sobe.
@@ -42,12 +37,27 @@ function parseStorage(value) {
   return mode;
 }
 
+// Número >= 0 (aceita 0 = desligado) vindo do ambiente.
+const numFromEnv = (name, fallback) => {
+  const n = Number(process.env[name]);
+  return process.env[name] !== undefined && process.env[name] !== '' && Number.isFinite(n) && n >= 0 ? n : fallback;
+};
+
 module.exports = {
   PORT: process.env.PORT || 3000,
+  // Endereço em que escuta: em produção 127.0.0.1 (só este computador; o Tailscale Funnel conecta localmente); fora dela, todas as
+  // interfaces (null). Docker/hospedagem: HOST=0.0.0.0. Lança erro se o valor for inválido.
+  HOST: parseHost(process.env.HOST, { isProduction: IS_PRODUCTION }),
   IS_PRODUCTION,
   DATA_DIR,
   STORAGE: parseStorage(process.env.STORAGE),
   TMDB_API_KEY: process.env.TMDB_API_KEY || '',
+  // AniList (anime, fonte principal desde a S13; GraphQL, sem chave). Vazio = https://graphql.anilist.co. Só para testes/desenvolvimento.
+  ANILIST_BASE_URL: (process.env.ANILIST_BASE_URL || '').trim().replace(/\/+$/, ''),
+  // Atualização de obras em exibição (S13): de quantas em quantas horas uma obra "Em Exibição" busca episódios novos (padrão 6)
+  // e de quantos em quantos minutos o servidor confere o que está vencido (padrão 30; 0 desliga a conferência automática).
+  AIRING_TTL_MS: Math.round(numFromEnv('MEDIA_AIRING_TTL_HOURS', 6) * 60 * 60 * 1000),
+  REFRESH_INTERVAL_MIN: numFromEnv('MEDIA_REFRESH_INTERVAL_MIN', 30),
   DEFAULT_LANGUAGE: 'pt-BR',
   get JWT_SECRET() { return getJwtSecret().secret; },
   get JWT_SECRET_SOURCE() { return getJwtSecret().source; },

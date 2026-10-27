@@ -13,14 +13,14 @@ Decisão D-26: **AniList principal, Jikan reserva**.
 - **Limites:** AniList ~90 req/min (pode cair para ~30 em degradação): fila com espaçamento, cache, retry em 429 com `Retry-After`.
 
 ## Tarefas
-- [ ] Cliente `server/services/anilistClient.js` + mapper (busca, detalhe, relações, airingSchedule), com respostas reais gravadas como fixtures de teste (capture uma vez e salve em `tests/fixtures/anilist/`).
-- [ ] `MediaService`: anime → AniList; se falhar, Jikan; se ambas falharem, catálogo local/TVMaze (como hoje), com `warnings` por fonte.
-- [ ] Smoke test real da Jikan quando ela voltar (registrar resultado no diário); ajustes em `jikanMapper.js` se o formato real divergir.
-- [ ] Duplicatas seed × fontes externas (D-S06-4): ao adicionar, reconhecer a obra do seed pelo `mal_id`/títulos e não criar outra.
-- [ ] Catálogo de runtime antigo: re-ingestar/atualizar obras gravadas antes da S06 que ainda têm 8.0/"Drama"/Unsplash (migração idempotente com backup).
-- [ ] Atualização de obras em exibição (novos episódios): TTL por obra + endpoint de atualização (base para o calendário da S15).
-- [ ] "Remover exemplo" em 1 clique (remove só as 4 obras do exemplo, se intocadas).
-- [ ] Testes com respostas simuladas para busca, ingestão, fallback e dedupe.
+- [x] Cliente `server/services/anilistClient.js` + mapper (busca, detalhe, relações, airingSchedule), com respostas reais gravadas como fixtures de teste (capture uma vez e salve em `tests/fixtures/anilist/`). 25 respostas reais (Frieren, Naruto, Attack on Titan, One Piece, "進撃の巨人"); fila/cache/429 e disjuntor em `sourceClient.js`. D-S13-1/3/4/5/10.
+- [x] `MediaService`: anime → AniList; se falhar, Jikan; se ambas falharem, catálogo local/TVMaze (como hoje), com `warnings` por fonte. Busca e ingestão; `ANILIST_BASE_URL` no `.env.example`. D-S13-2.
+- [ ] Smoke test real da Jikan quando ela voltar (registrar resultado no diário); ajustes em `jikanMapper.js` se o formato real divergir. **Pendente:** 1 tentativa real em 2026-10-27 (timeout de conexão); a Jikan segue fora do ar, `jikanMapper.js` ficou como está. Repetir quando ela voltar (`GET /v4/anime/52991/full`).
+- [x] Duplicatas seed × fontes externas (D-S06-4): ao adicionar, reconhecer a obra do seed pelo `mal_id`/títulos e não criar outra. A obra real ocupa o lugar da amostra com o mesmo id (`catalog_id` na busca, alias público, corrida entre temporadas). D-S13-6.
+- [x] Catálogo de runtime antigo: re-ingestar/atualizar obras gravadas antes da S06 que ainda têm 8.0/"Drama"/Unsplash (migração idempotente com backup). `catalogMigration.js` + backup `mediaCatalog.backup-pre-s13-<data>.json`; a atualização baixa os dados reais. D-S13-7.
+- [x] Atualização de obras em exibição (novos episódios): TTL por obra + endpoint de atualização (base para o calendário da S15). `POST /api/media/:id/refresh`, `refreshedAt`, conferência automática a cada 30 min. D-S13-8.
+- [x] "Remover exemplo" em 1 clique (remove só as 4 obras do exemplo, se intocadas). Faixa + botão na Minha Lista. D-S13-9.
+- [x] Testes com respostas simuladas para busca, ingestão, fallback e dedupe. `s13-sources`, `s13-anilist`, `s13-catalog`, `s13-http`, `s13-frontend` (ver o diário para os números).
 
 ## Critério de pronto
 Buscar "Frieren", "Naruto", "Attack on Titan", "One Piece" com a Jikan fora do ar devolve as obras certas via AniList, sem duplicatas, com temporadas agrupadas e episódios importáveis; adicionar à lista funciona; testes verdes.

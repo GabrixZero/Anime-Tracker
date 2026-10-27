@@ -7,3 +7,4 @@
 - **Ação 4 (chaves):** TMDB: o Gabriel não tem conta (não crio contas por ele; chave fica opcional). Google: tela de consentimento + cliente Web criados com autorização explícita dele (D-27); botão "Continuar com o Google" conferido no app (porta 80 de teste), sem erros de origem/CSP no console. O login de ponta a ponta precisa ser feito pelo próprio Gabriel.
 - **Docs:** seções S11–S19, `status/` e `grafo.json` criados; D-24…D-28, P-10 e P-11 registrados.
 - **Próximo passo:** Onda A (S12 + S13) por subagentes; S11 depois da confirmação da P-10.
+- **P-10 resolvida (D-29):** o Gabriel escolheu rodar no PC dele com Tailscale Funnel. Seção S11 reescrita para esse caminho (sem Render/Turso). S11 disparada em seguida.

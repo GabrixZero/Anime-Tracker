@@ -5,7 +5,7 @@ leia também [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md).
 
 ## 1. Abertura (primeiros minutos)
 
-1. Ler `CLAUDE.md` → `Documentacao/README.md` → `02-decisoes.md` → `04-roadmap.md` → `06-coordenacao-entre-sessoes.md` → arquivo da seção → diário recente (`diario/`).
+1. Leitura mínima (D-30): `CLAUDE.md` → `Documentacao/README.md` → bloco "Regras vigentes" de `02-decisoes.md` → arquivo da seção. Os outros documentos só sob demanda.
 2. `git fetch origin` e **`npm run status -- SNN`**. Bloqueada ou já pegada por outra sessão → avisar o Gabriel e **parar** (regras em `06`).
 3. Se houver mudanças soltas na cópia local, perguntar ao Gabriel antes de mexer.
 4. Criar a branch **a partir de `origin/develop`**: `git checkout -b feature/sNN-<slug> origin/develop`.
@@ -17,7 +17,7 @@ leia também [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md).
 
 - Mudanças pequenas e verificáveis; commits no estilo do histórico (`feat(...)`, `fix(...)`, `docs:`, `chore:`).
 - Cada correção ganha teste automatizado quando possível (`tests/`, `node --test`). Testes **não** podem escrever em `server/data` real (use `fs.mkdtempSync`).
-- Verificar rodando de verdade: servidor em porta própria da sessão (`PORT=30NN node server.js`, por exemplo 3001 para S01, 3002 para S02…; sessões paralelas **não** podem usar a mesma porta),
+- Verificar (D-30): testes, lint e CI primeiro; navegador só quando a mudança for visual ou de fluxo de tela. Quando subir servidor: porta própria da sessão (`PORT=30NN node server.js`, por exemplo 3001 para S01, 3002 para S02…; sessões paralelas **não** podem usar a mesma porta),
   `curl` na API e a interface no navegador do app (viewport mobile 375×812 quando mexer em layout). Encerrar o servidor de teste no fim e **limpar usuários/arquivos de teste** criados em `server/data`.
 - Seguir as regras de segurança de `01-visao-geral-e-arquitetura.md` (nada de segredos/e-mails reais; nada de `users.json`/`libraries/` no git).
 - Fora do escopo da seção: **não corrigir de passagem**; anotar em "Descobertas" no diário (ou na seção certa).
