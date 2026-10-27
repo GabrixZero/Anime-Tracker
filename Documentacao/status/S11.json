@@ -2,8 +2,8 @@
   "secao": "S11",
   "titulo": "Deploy gratuito e produção",
   "arquivo": "Documentacao/secoes/S11-deploy-gratuito.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s11-deploy-gratuito",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
