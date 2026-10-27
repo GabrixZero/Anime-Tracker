@@ -8,13 +8,14 @@ const path = require('path');
 const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'anilist');
 const { mediaErrors } = require('../../server/utils/errors');
 
+const searchKey = text => String(text).trim().toLowerCase();   // a AniList não diferencia maiúsculas na busca
 const searches = new Map();   // texto buscado -> resposta
 const medias = new Map();     // 'id:<anilist>' / 'mal:<idMal>' -> resposta
 for (const file of fs.readdirSync(FIXTURES_DIR).filter(f => f.endsWith('.json'))) {
   const json = JSON.parse(fs.readFileSync(path.join(FIXTURES_DIR, file), 'utf-8'));
   for (const r of json.requests) {
     if (r.kind === 'search') {
-      searches.set(r.variables.search, r.response);
+      searches.set(searchKey(r.variables.search), r.response);
     } else {
       const m = r.response.data.Media;
       medias.set(`id:${m.id}`, r.response);
@@ -26,7 +27,7 @@ for (const file of fs.readdirSync(FIXTURES_DIR).filter(f => f.endsWith('.json'))
 // O que a AniList responderia a este corpo GraphQL ({query, variables}), com as respostas reais. Busca desconhecida = lista vazia
 // (como a API de verdade); obra desconhecida = 404 (NOT_FOUND tipado, como o httpJson faz).
 function respond(body) {
-  if (body.query.includes('Page(')) return structuredClone(searches.get(body.variables.search) || { data: { Page: { media: [] } } });
+  if (body.query.includes('Page(')) return structuredClone(searches.get(searchKey(body.variables.search)) || { data: { Page: { media: [] } } });
   const v = body.variables;
   const hit = medias.get(v.id ? `id:${v.id}` : `mal:${v.idMal}`);
   if (!hit) throw mediaErrors.notFound();
@@ -51,6 +52,7 @@ function makeService(MediaService, dir, { handlers = {}, extra = {} } = {}) {
   svc.calls = [];
   const fixture = (url, opts) => respond(JSON.parse(opts.body));
   const h = { anilist: fixture, jikan: jikanDown, tvmaze: () => [], ...handlers };
+  svc.handlers = h;   // o teste pode trocar uma fonte no meio (ex.: a Jikan cai depois da 1ª ingestão)
   svc.fetchJson = async (url, opts = {}) => {
     if (url.startsWith(FAKE.anilist)) {
       const body = JSON.parse(opts.body);
