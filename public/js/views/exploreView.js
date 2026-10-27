@@ -156,7 +156,8 @@ class ExploreView {
   // Fontes que falharam ou não estão configuradas: a lista mostra o que as outras entregaram e avisa o que faltou.
   renderWarnings(warnings) {
     if (!warnings.length) return '';
-    const texts = [...new Set(warnings.map(w => {
+    // aviso com `fallback` = a fonte reserva respondeu no lugar da que falhou: os resultados estão completos, nada a avisar
+    const texts = [...new Set(warnings.filter(w => !w.fallback).map(w => {
       if (w.code === 'NOT_CONFIGURED') return w.message;
       if (w.code === 'RATE_LIMITED') return `Uma fonte pediu para aguardar${w.retryAfterSec ? ` (~${w.retryAfterSec} s)` : ''}; alguns resultados podem estar faltando. Tente de novo em instantes.`;
       return 'Uma fonte do catálogo está indisponível; alguns resultados podem estar faltando.';
@@ -185,7 +186,9 @@ class ExploreView {
     const trackedIds = new Set(window.appState ? window.appState.data.trackedShows.map(t => t.showId) : []);
 
     this.container.innerHTML = notice + items.map(item => {
-      const isTracked = trackedIds.has(item.id);
+      // S13: resultado externo que é a MESMA obra de uma que o catálogo já tem (amostra do seed): `catalog_id` é o id dela
+      const ownId = item.catalog_id && trackedIds.has(item.catalog_id) ? item.catalog_id : item.id;
+      const isTracked = trackedIds.has(ownId);
 
       const typeBadge = window.ViewKit.typeBadge(item.type);
 
@@ -217,7 +220,7 @@ class ExploreView {
 
             <div class="show-card-actions">
               ${isTracked ? `
-                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" data-action="open-detail" data-show="${toInt(item.id)}">
+                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" data-action="open-detail" data-show="${toInt(ownId)}">
                   Ver no Cofre
                 </button>
               ` : `

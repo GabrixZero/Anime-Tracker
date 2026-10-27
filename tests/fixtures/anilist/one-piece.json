@@ -1,0 +1,1985 @@
+{
+ "_comment": "Respostas REAIS da AniList (https://graphql.anilist.co) capturadas uma vez em 2026-10-27 para os testes offline da S13.",
+ "capturedAt": "2026-10-27T15:12:22.388Z",
+ "requests": [
+  {
+   "kind": "search",
+   "variables": {
+    "search": "One Piece",
+    "perPage": 25
+   },
+   "response": {
+    "data": {
+     "Page": {
+      "media": [
+       {
+        "id": 21,
+        "idMal": 21,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "RELEASING",
+        "episodes": null,
+        "duration": 24,
+        "season": "FALL",
+        "seasonYear": 1999,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE",
+         "english": "ONE PIECE",
+         "native": "ONE PIECE"
+        },
+        "synonyms": [
+         "ワンピース",
+         "海贼王",
+         "וואן פיס",
+         "ون بيس",
+         "วันพีซ",
+         "Vua Hải Tặc",
+         "All'arrembaggio!",
+         "Tutti all'arrembaggio!",
+         "Ντρέηκ, το Κυνήγι του Θησαυρού",
+         "OP",
+         "Ван-Пис"
+        ],
+        "startDate": {
+         "year": 1999,
+         "month": 10,
+         "day": 20
+        },
+        "averageScore": 87,
+        "meanScore": 87,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "Gold Roger was known as the Pirate King, the strongest and most infamous being to have sailed the Grand Line. The capture and death of Roger by the World Government brought a change throughout the world. His last words before his death revealed the location of the greatest treasure in the world, One Piece. It was this revelation that brought about the Grand Age of Pirates, men who dreamed of finding One Piece (which promises an unlimited amount of riches and fame), and quite possibly the most coveted of titles for the person who found it, the title of the Pirate King.<br><br>\nEnter Monkey D. Luffy, a 17-year-old boy that defies your standard definition of a pirate. Rather than the popular persona of a wicked, hardened, toothless pirate who ransacks villages for fun, Luffy’s reason for being a pirate is one of pure wonder; the thought of an exciting adventure and meeting new and intriguing people, along with finding One Piece, are his reasons of becoming a pirate. Following in the footsteps of his childhood hero, Luffy and his crew travel across the Grand Line, experiencing crazy adventures, unveiling dark mysteries and battling strong enemies, all in order to reach One Piece.<br><br>\n<b>*This includes the following special episodes:</b><br>\n- Chopperman to the Rescue! Protect the TV Station by the Shore! (Episode 336)<br>\n- The Strongest Tag-Team! Luffy and Toriko's Hard Struggle! (Episode 492)<br>\n- Team Formation! Save Chopper (Episode 542)<br>\n- History's Strongest Collaboration vs. Glutton of the Sea (Episode 590)<br>\n- 20th Anniversary! Special Romance Dawn (Episode 907)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-ELSYx3yMPcKM.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-ELSYx3yMPcKM.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21-wf37VakJmZqs.jpg",
+        "nextAiringEpisode": {
+         "episode": 1181,
+         "airingAt": 1798985760
+        }
+       },
+       {
+        "id": 171630,
+        "idMal": 57557,
+        "type": "ANIME",
+        "format": null,
+        "status": "NOT_YET_RELEASED",
+        "episodes": 7,
+        "duration": 43,
+        "season": "WINTER",
+        "seasonYear": 2027,
+        "isAdult": false,
+        "title": {
+         "romaji": "THE ONE PIECE",
+         "english": "THE ONE PIECE",
+         "native": "THE ONE PIECE"
+        },
+        "synonyms": [
+         "ザワンピース"
+        ],
+        "startDate": {
+         "year": 2027,
+         "month": 2,
+         "day": null
+        },
+        "averageScore": null,
+        "meanScore": null,
+        "genres": [
+         "Adventure"
+        ],
+        "description": "To commemorate the <i>ONE PIECE</i> anime's 25th anniversary: <i>THE ONE PIECE</i> anime by WIT Studio will recreate the story of the original <i>ONE PIECE</i> manga, starting from the East Blue arc.<br><br>\n\n(Source: Netflix, edited)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171630-2U7Y5OIWwXJJ.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx171630-2U7Y5OIWwXJJ.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 459,
+        "idMal": 459,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 50,
+        "season": "WINTER",
+        "seasonYear": 2000,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE (Movie)",
+         "english": "ONE PIECE: The Movie",
+         "native": "ONE PIECE (Movie)"
+        },
+        "synonyms": [
+         "One Piece: The Movie",
+         "One Piece (2000)",
+         "One Piece: La Película",
+         "วันพีซ เดอะมูฟวี่ 1 เกาะสมบัติแห่งวูนัน",
+         "Vua Hải Tặc: Đảo Châu Báu",
+         "One Piece: Golden Island Adventure",
+         "One Piece - Per tutto l'oro del mondo"
+        ],
+        "startDate": {
+         "year": 2000,
+         "month": 3,
+         "day": 4
+        },
+        "averageScore": 68,
+        "meanScore": 68,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "There once was a pirate known as the Great Gold Pirate Woonan, who obtained almost 1/3 of the world's gold. Over the course of a few years, the pirate's existence faded, and a legend grew that he disappeared with his gold to a remote island, an island pirates continue to search for. Aboard the Going Merry, Luffy and his crew, starved and reckless, are robbed of their treasure. In an attempt to get it back, they wreck the getaway ship, guided by a young boy named Tabio, who's a captured part of El Drago's pirate crew. El Drago's love for gold has driven him to look for Woonan's island, and thanks to Woonan's treasure map, he finds it. During this time, Luffy's crew have been split up, and despite their own circumstances, they must find a way to stop El Drago from obtaining Woonan's gold. <br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx459-Ivw65mUXackh.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx459-Ivw65mUXackh.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/459-JqlCjcwxxFrr.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 19123,
+        "idMal": 19123,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 106,
+        "season": "SUMMER",
+        "seasonYear": 2013,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Episode of Merry - Mou Hitori no Nakama no Monogatari",
+         "english": "One Piece: Episode of Merry - The Tale of One More Friend",
+         "native": "ONE PIECE エピソードオブメリー 〜もうひとりの仲間の物語〜"
+        },
+        "synonyms": [
+         "One Piece Special"
+        ],
+        "startDate": {
+         "year": 2013,
+         "month": 8,
+         "day": 24
+        },
+        "averageScore": 78,
+        "meanScore": 78,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "The story arcs aboard the Straw Hat Crew's first ship Going Merry (Merry Go in some adaptations) are recreated with brand-new animation, from Luffy and Usopp's fight and Robin's disappearance to the crew's final farewell to the ship. Going Merry is treated as another member of the Straw Hats as Luffy, Zoro, Nami, and the rest of the crew set sail for the legendary treasure, the One Piece.<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx19123-leET1CrSJknT.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx19123-leET1CrSJknT.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/19123-QyRShJCfnIWD.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 188668,
+        "idMal": 61293,
+        "type": "ANIME",
+        "format": "ONA",
+        "status": "FINISHED",
+        "episodes": 5,
+        "duration": 7,
+        "season": "SPRING",
+        "seasonYear": 2025,
+        "isAdult": false,
+        "title": {
+         "romaji": "Koisuru ONE PIECE",
+         "english": null,
+         "native": "恋するワンピース"
+        },
+        "synonyms": [
+         "One Piece in Love"
+        ],
+        "startDate": {
+         "year": 2025,
+         "month": 4,
+         "day": 1
+        },
+        "averageScore": 66,
+        "meanScore": 67,
+        "genres": [
+         "Comedy",
+         "Romance"
+        ],
+        "description": "The premise of this spinoff is about three high school students: a young male student, his girlfriend and a third wheel who is a One Piece fanatic. Their names are similar to the Straw Hat Pirates and the group form a fan club dedicated to One Piece.\n<br><Br>\n(Source: One Piece Wiki)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx188668-rOB7rkgOz89w.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx188668-rOB7rkgOz89w.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 15323,
+        "idMal": 15323,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 105,
+        "season": "SUMMER",
+        "seasonYear": 2012,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Episode of Nami - Koukaishi no Namida to Nakama no Kizuna",
+         "english": null,
+         "native": "ONE PIECE エピソードオブナミ 〜航海士の涙と仲間の絆〜"
+        },
+        "synonyms": [
+         "One Piece Special"
+        ],
+        "startDate": {
+         "year": 2012,
+         "month": 8,
+         "day": 25
+        },
+        "averageScore": 78,
+        "meanScore": 78,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "A retelling of the Arlong Park arc, with new animation.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/15323.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/15323.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/15323-zrax5OGlGepE.png",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 116054,
+        "idMal": 41340,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 3,
+        "duration": 8,
+        "season": "SUMMER",
+        "seasonYear": 1992,
+        "isAdult": false,
+        "title": {
+         "romaji": "Noroi no One Piece",
+         "english": null,
+         "native": "呪いのワンピース"
+        },
+        "synonyms": [
+         "内田春菊の呪いのワンピース",
+         "The Living Dress",
+         "Uchida Shungiku no Noroi no One Piece"
+        ],
+        "startDate": {
+         "year": 1992,
+         "month": 8,
+         "day": 25
+        },
+        "averageScore": 58,
+        "meanScore": 58,
+        "genres": [
+         "Drama",
+         "Horror",
+         "Psychological",
+         "Romance",
+         "Supernatural"
+        ],
+        "description": "When three schoolgirls, Yuuko, Kaori and Michiyo, receive a mysterious package containing a beautiful dress with a floral pattern, they're overjoyed. It'll be their chance to shine in front of their love interests! However, little do they know that this sweet-looking gift might have been not so fortunate, after all...<br><br>\n\n(Source: Old Castle)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116054-FD9QZRypg2Ot.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx116054-FD9QZRypg2Ot.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/116054-it2LGF3XpwkV.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 105143,
+        "idMal": 38234,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 101,
+        "season": "SUMMER",
+        "seasonYear": 2019,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE STAMPEDE",
+         "english": "One Piece: Stampede",
+         "native": "ONE PIECE STAMPEDE"
+        },
+        "synonyms": [
+         "ワンピース スタンピード",
+         "One Piece: Estampida",
+         "航海王：狂热行动",
+         "One Piece Film 14"
+        ],
+        "startDate": {
+         "year": 2019,
+         "month": 8,
+         "day": 9
+        },
+        "averageScore": 80,
+        "meanScore": 80,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "Monkey D. Luffy and the Straw Hats arrive aboard the Sunny to the Pirates Festival, the world's largest celebration created by and for pirates. Buena Festa, the festival organizer, invites the Straw Hats and all Worst Generation crews to partake in the festivities. Luring even Shichibukai and Marines to its shores, it seems that no pirate or sailor can resist the enticing secrets that the event hides behind its glamor.\n<br><br>\nThe festival's contest is simple: find one of the treasures Gol D. Roger left behind. As the competition progresses, the various pirate crews fight each other in a free-for-all battle royale—that is, until the sudden appearance of an unexpected pirate drastically changes the game.\n<br><br>\n(Source: MAL Rewrite)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105143-5uBDmhvMr6At.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx105143-5uBDmhvMr6At.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/105143-y8oSKa8PSsgK.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 197178,
+        "idMal": 62233,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 23,
+        "season": "SUMMER",
+        "seasonYear": 2026,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE HEROINES",
+         "english": "ONE PIECE HEROINES",
+         "native": "ONE PIECE HEROINES"
+        },
+        "synonyms": [
+         "ONE PIECE HEROINES episode: NAMI"
+        ],
+        "startDate": {
+         "year": 2026,
+         "month": 7,
+         "day": 5
+        },
+        "averageScore": 77,
+        "meanScore": 78,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "After buying a pair of shoes that end up hurting her feet, Nami returns to the shop feeling dissatisfied.\nThere, she meets Lebno, the designer, who tells her, “I’ll make you a brand-new pair from scratch—but only if you’ll be my model.”\nThe shoes are crafted by the artisan Miucha, leading to an unexpected and stylish encounter.\n<br><br>\n(Source: Toei Animation)\n<br><br>\n<i>Note: Adaptation of the \"episode : NAMI\" chapter from the \"ONE PIECE novel HEROINES\" light novel.</i>",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx197178-Ui8PY9HQbNgu.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx197178-Ui8PY9HQbNgu.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/197178-kVx0Zt3P0MvD.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 5252,
+        "idMal": 5252,
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 33,
+        "season": "FALL",
+        "seasonYear": 2008,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: ROMANCE DAWN STORY",
+         "english": "One Piece: Romance Dawn Story",
+         "native": "ONE PIECE ロマンス ドーン ストーリー"
+        },
+        "synonyms": [
+         "One Piece Prototype"
+        ],
+        "startDate": {
+         "year": 2008,
+         "month": 11,
+         "day": 24
+        },
+        "averageScore": 70,
+        "meanScore": 70,
+        "genres": [
+         "Action",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "The Straw Hat Pirates, searching for the great passage \"Grand Line\", are in trouble when their food runs out! Luffy, searching for food on his own, finds a ship belonging to the pirate, Gary, and takes it over!! He lands at a nearby town...<br><br>\nLuffy was attacked by a young girl, Silk, who mistook him for a member of the other pirate gang. As the two eat a meal, they tell their stories. Meanwhile, Gary and his band are burning with anger at Luffy, demanding payment from the town's defenseless citizens...!!<br><br>\n(Source: Jumpland)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/5252.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/5252.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/5252-tlTORLa2dR2u.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 21831,
+        "idMal": 33338,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 104,
+        "season": "SUMMER",
+        "seasonYear": 2016,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Heart of Gold",
+         "english": "One Piece: Heart of Gold",
+         "native": "ONE PIECE 〜ハートオブゴールド〜"
+        },
+        "synonyms": [],
+        "startDate": {
+         "year": 2016,
+         "month": 7,
+         "day": 16
+        },
+        "averageScore": 73,
+        "meanScore": 73,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "The Straw Hat Pirates meet Olga, a girl who has escaped the island Alchemi. Alchemi was known for its metal production, and for the creation of the extremely valuable Pure Gold, but the island disappeared two hundred years ago. Olga is now being pursued by Marines, interested in Pure Gold. Gildo Tesoro, who controls the Navy HQ and black market, hears of Olga and hires treasure hunter Mad Treasure to track her down. The Straw Hats join forces with Olga in search of the Pure Gold, while she plots to takes advantage of them and use the treasure to become rich herself.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21831-qj5IKYiPOupF.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21831-qj5IKYiPOupF.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21831-Xl4r2uBaaKU4.png",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 12859,
+        "idMal": 12859,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 107,
+        "season": "FALL",
+        "seasonYear": 2012,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE FILM: Z",
+         "english": "One Piece Film: Z",
+         "native": "ONE PIECE FILM Z"
+        },
+        "synonyms": [
+         "One Piece Film 12: Z",
+         "海贼王剧场版Z",
+         "One Piece Gold - Il film"
+        ],
+        "startDate": {
+         "year": 2012,
+         "month": 12,
+         "day": 15
+        },
+        "averageScore": 79,
+        "meanScore": 79,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama"
+        ],
+        "description": "Said to be comparable to the Ancient Weapons of old, the Marines’ trump card, the “Dyna Stones,” have suddenly been stolen by a group of renegade vigilantes. The terrifyingly powerful man responsible, former Marine Admiral “Z”, now stands in the path of Luffy and his Straw Hat Pirates. Can the Straw Hats defeat “Z” and his crew, or will the New World meet its end at the hands of this mad man? <br>\n<br>\n(Source: Funimation)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx12859-uQFENDPzMWz6.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx12859-uQFENDPzMWz6.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/12859-XjlBW6o2YwUb.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 141902,
+        "idMal": 50410,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 115,
+        "season": "SUMMER",
+        "seasonYear": 2022,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE FILM: RED",
+         "english": "One Piece Film: Red",
+         "native": "ONE PIECE FILM RED"
+        },
+        "synonyms": [
+         "One Piece Film 15",
+         "فيلم ون بيس: ريد",
+         "วันพีซ ฟิล์ม เรด"
+        ],
+        "startDate": {
+         "year": 2022,
+         "month": 8,
+         "day": 6
+        },
+        "averageScore": 78,
+        "meanScore": 78,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy",
+         "Music"
+        ],
+        "description": "<i>An almighty voice. With fiery red locks.</i><br><br>\nThe story takes place on an island where Uta, the world’s favorite diva, performs for the first time in public. Uta’s singing voice, which she sings with while concealing her true identity, has been described as “otherworldly,” and while the venue is filled with the Straw Hats led by Luffy, pirates, navy, and fans from all over the world who have come to enjoy her voice, Uta’s voice is heard in a new light. The curtain rises on the story with the shocking revelation that she is “Shanks’ daughter!“ \n<br><br>\n(Source: ONE PIECE FILM RED Website)\n",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx141902-fTyoTk8F8qOl.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx141902-fTyoTk8F8qOl.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/141902-SvnRSXnN7DWC.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 215855,
+        "idMal": 64858,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "NOT_YET_RELEASED",
+        "episodes": 1,
+        "duration": null,
+        "season": "SUMMER",
+        "seasonYear": 2027,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE FILM: GOD VALLEY",
+         "english": null,
+         "native": "ONE PIECE FILM GOD VALLEY"
+        },
+        "synonyms": [
+         "One Piece Film 16"
+        ],
+        "startDate": {
+         "year": 2027,
+         "month": null,
+         "day": null
+        },
+        "averageScore": null,
+        "meanScore": null,
+        "genres": [],
+        "description": null,
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b215855-z86bqRqVcr13.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b215855-z86bqRqVcr13.png"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 464,
+        "idMal": 464,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 91,
+        "season": "SPRING",
+        "seasonYear": 2005,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE THE MOVIE: Omatsuri Danshaku to Himitsu no Shima",
+         "english": "One Piece: Baron Omatsuri and the Secret Island",
+         "native": "ONE PIECE THE MOVIE オマツリ男爵と秘密の島"
+        },
+        "synonyms": [
+         "One Piece Movie 6",
+         "One Piece: El barón Omatsuri y la isla de los secretos",
+         "One Piece - L'isola segreta del barone Omatsuri"
+        ],
+        "startDate": {
+         "year": 2005,
+         "month": 3,
+         "day": 5
+        },
+        "averageScore": 78,
+        "meanScore": 78,
+        "genres": [
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "The Straw Hat crew obtain an advertisement for a recreational island on the Grand Line run by the Baron Omatsuri. Luffy decides to take this opportunity to kick back and relax. Unfortunately, when they arrive at the island, they are asked to compete in contests through unity for access to relaxation. However, there seems to be a mysterious air on the island, as the Straw Hat Pirates begin to fight amongst themselves, while Robin, Chopper, and Luffy individually search for the secret behind Baron Omatsuri's island.<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx464-g4wcZPjbhY5j.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx464-g4wcZPjbhY5j.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/464-wmQoE1Ywxghs.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 21335,
+        "idMal": 31490,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 120,
+        "season": "SUMMER",
+        "seasonYear": 2016,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE FILM: GOLD",
+         "english": "One Piece Film: Gold",
+         "native": "ONE PIECE FILM GOLD"
+        },
+        "synonyms": [
+         "One Piece Film 13",
+         "航海王之黄金城"
+        ],
+        "startDate": {
+         "year": 2016,
+         "month": 7,
+         "day": 23
+        },
+        "averageScore": 77,
+        "meanScore": 77,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "In One Piece Film Gold, The Straw Hats are at it again in an all-new high-flying adventure! A gripping tale unfolds in the spectacular city of Gran Tesoro, where Luffy and his crew are drawn by dreams of hitting the jackpot. With so much luck, Luffy's winning streak can't possibly end. But behind the gilded curtains lies a powerful king whose deep pockets and deeper ambitions spell disaster for all.\n<br><br>\n(Source: FUNimation)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx21335-XsXdE0AeOkkZ.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx21335-XsXdE0AeOkkZ.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21335-ps20iVSGUXbD.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 215856,
+        "idMal": 64859,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "NOT_YET_RELEASED",
+        "episodes": 1,
+        "duration": null,
+        "season": null,
+        "seasonYear": null,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE FILM: BAAD",
+         "english": null,
+         "native": "ONE PIECE FILM BAAD"
+        },
+        "synonyms": [
+         "One Piece Film 17"
+        ],
+        "startDate": {
+         "year": 2029,
+         "month": null,
+         "day": null
+        },
+        "averageScore": null,
+        "meanScore": null,
+        "genres": [],
+        "description": null,
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b215856-0V3mzYbhODqZ.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b215856-0V3mzYbhODqZ.png"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 4155,
+        "idMal": 4155,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 113,
+        "season": "FALL",
+        "seasonYear": 2009,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE FILM: STRONG WORLD",
+         "english": "One Piece Film: Strong World",
+         "native": "ONE PIECE FILM STRONG WORLD"
+        },
+        "synonyms": [
+         "One Piece Film 10",
+         "ワンピース ストロング ワールド",
+         "One Piece: Strong World",
+         "One Piece - Avventura sulle isole volanti"
+        ],
+        "startDate": {
+         "year": 2009,
+         "month": 12,
+         "day": 12
+        },
+        "averageScore": 78,
+        "meanScore": 78,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "20 years after his escape from Impel Down, the legendary pirate Shiki \"the Golden Lion\" reappears causing massive upheaval to the Marines. During his long seclusion, he was able to come up with a scheme to bring the World Government to its knees. On his way to execute the plan, Shiki crosses paths with the Straw Hat Pirates and becomes so impressed with Nami's knowledge of meteorology that he abducts her to forcedly enlist her into his crew. Luffy and the gang end up on a strange land populated with monstrous beasts as they desperately search for Shiki and Nami.\n<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx4155-P5TDf6t6qFwX.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx4155-P5TDf6t6qFwX.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/4155-2PkLjTHddz2s.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 465,
+        "idMal": 465,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 94,
+        "season": "SPRING",
+        "seasonYear": 2006,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE THE MOVIE: Karakuri-jou no Mecha Kyohei",
+         "english": "One Piece: Mega Mecha Soldier of Karakuri Castle",
+         "native": "ONE PIECE THE MOVIE カラクリ城のメカ巨兵"
+        },
+        "synonyms": [
+         "One Piece: Karakuri Shiro no Mecha Kyohei",
+         "One Piece Movie 07",
+         "One Piece: El gran soldado mecánico del castillo Karakuri",
+         "The Giant Mechanical Soldier of Karakuri Castle",
+         "One Piece: Schloss Karakuris Metall-Soldaten",
+         "One Piece - I misteri dell'isola meccanica"
+        ],
+        "startDate": {
+         "year": 2006,
+         "month": 3,
+         "day": 4
+        },
+        "averageScore": 68,
+        "meanScore": 68,
+        "genres": [
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "The crew salvages a treasure chest from a sinking wreck, but inside turns out to be an old lady hiding. To get the Straw Hat Pirates to take her home, she promises them the treasure of a golden crown on her island, Mecha Island. When they arrive, their ship is first attacked by the lord of the island. But later he decides to use the pirates to help him solve the riddle of the Golden Crown.<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx465-qSRr0MKYhS0I.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx465-qSRr0MKYhS0I.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/465-dYMZ6SHNeOkL.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 3848,
+        "idMal": 3848,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 113,
+        "season": "SPRING",
+        "seasonYear": 2008,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE THE MOVIE: Episode of Chopper Plus - Fuyu ni Saku, Kiseki no Sakura",
+         "english": "One Piece: Episode Of Chopper +: The Miracle Winter Cherry Blossom",
+         "native": "ONE PIECE THE MOVIE エピソードオブチョッパー+ 冬に咲く、奇跡の桜"
+        },
+        "synonyms": [
+         "Miracle Sakura",
+         "One Piece: Episodio de Chopper + El milagro del cerezo en invierno",
+         "One Piece: Episode of Chopper Plus - Bloom in the Winter, Miracle Sakura",
+         "One Piece Movie 09",
+         "One Piece - Il miracolo dei ciliegi in fiore"
+        ],
+        "startDate": {
+         "year": 2008,
+         "month": 3,
+         "day": 1
+        },
+        "averageScore": 71,
+        "meanScore": 71,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "The movie is a retelling of the Drum Island arc with new music and animation. Vivi has been removed from the plot while both Nico Robin and Franky, who joined the crew after the Drum Island arc, have been added. The movie also has the Straw Hat's new ship, the Thousand Sunny. It has been stated that Oda will be creating a new character for this movie, Wapol's older brother, Mushul, who also appears to be a Devil Fruit user. <br>",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx3848-SCnYGTn34Llt.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx3848-SCnYGTn34Llt.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/3848-LXsSQtSFu4e9.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 2107,
+        "idMal": 2107,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 90,
+        "season": "SPRING",
+        "seasonYear": 2007,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Episode of Alabasta - Sabaku no Oujo to Kaizoku-tachi",
+         "english": "One Piece: The Desert Princess and the Pirates, Adventures in Alabasta",
+         "native": "ONE PIECE エピソードオブアラバスタ 砂漠の王女と海賊たち"
+        },
+        "synonyms": [
+         "One Piece Movie 8: Episode of Alabasta - The Desert Princess and the Pirates",
+         "One Piece Película 8: La saga del Arabasta - Los piratas y la princesa del desierto",
+         "One Piece Movie 08",
+         "One Piece - Un'amicizia oltre i confini del mare"
+        ],
+        "startDate": {
+         "year": 2007,
+         "month": 3,
+         "day": 3
+        },
+        "averageScore": 71,
+        "meanScore": 71,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Fantasy"
+        ],
+        "description": "A retelling of the Alabasta arc. <br><br>\nRevolution is brewing in the desert country of Alabasta, but the Straw Hats and Princess Vivi know the truth: it's all a plot cooked up by Crocodile. <br><br>\n(Source: Netflix)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx2107-H8bRuRRbhCIJ.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx2107-H8bRuRRbhCIJ.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/2107-Je0JIEoxx1VF.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 460,
+        "idMal": 460,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 55,
+        "season": "SPRING",
+        "seasonYear": 2001,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Nejimaki-jima no Bouken",
+         "english": "One Piece: Clockwork Island Adventure",
+         "native": "ONE PIECE ねじまき島の冒険"
+        },
+        "synonyms": [
+         "One Piece Movie 02",
+         "วันพีซ เดอะมูฟวี่ 2 การผจญภัยบนเกาะแห่งฟันเฟือง",
+         "Vua Hải Tặc: Cuộc phiêu lưu đến đảo máy đồng hồ ",
+         "One Piece - Avventura all'Isola Spirale"
+        ],
+        "startDate": {
+         "year": 2001,
+         "month": 3,
+         "day": 3
+        },
+        "averageScore": 67,
+        "meanScore": 67,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "Informed by the Thief Brothers his ship has been stolen by the Trump Kyoudai (Trump Siblings) who have set up base on Clockwork Island. Monkey D. Luffy, Captain of the Going Merry and aspiring Pirate King works with his crew - Ussop, Zoro, Sanji and Nami to battle their way up Clockwork Island to reclaim their ship.<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx460-p9HObfGUhWn0.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx460-p9HObfGUhWn0.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/460-mWAlHAJ5MuBg.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 461,
+        "idMal": 461,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 55,
+        "season": "SPRING",
+        "seasonYear": 2002,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Chinjuu-jima no Chopper Oukoku",
+         "english": "One Piece: Chopper’s Kingdom on the Island of Strange Animals",
+         "native": "ONE PIECE 珍獣島のチョッパー王国"
+        },
+        "synonyms": [
+         "One Piece Movie 03",
+         "วันพีซ เดอะมูฟวี่ 3 เกาะแห่งสรรพสัตว์และราชันย์ช็อปเปอร์ ",
+         "Vua Hải Tặc: Vương quốc Chopper trên đảo của những sinh vật lạ",
+         "One Piece: Chopper Kingdom of Strange Animal Island",
+         "One Piece - Il tesoro del re"
+        ],
+        "startDate": {
+         "year": 2002,
+         "month": 3,
+         "day": 2
+        },
+        "averageScore": 64,
+        "meanScore": 64,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "The crew comes upon Crown Island where the animals can talk and they makes Chopper their new king. But there are human hunters there also looking for the legendary horns that will give the person who consumes it immense power. Luffy and friends must stop them from destroying this animal kingdom.<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx461-DC9fMDl3AaK1.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx461-DC9fMDl3AaK1.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/461-0pvcIaXC0p70.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 462,
+        "idMal": 462,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 95,
+        "season": "SPRING",
+        "seasonYear": 2003,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE THE MOVIE: Dead End no Bouken",
+         "english": "One Piece The Movie: The Dead End Adventure",
+         "native": "ONE PIECE THE MOVIE デッドエンドの冒険"
+        },
+        "synonyms": [
+         "One Piece Movie 04",
+         "One Piece: La Aventura sin Salida",
+         "The Adventure of Deadend",
+         "One Piece: Dead End",
+         "วันพีซ เดอะมูฟวี่ 4 การผจญภัยที่เดดเอนด์",
+         "Vua Hải Tặc: Cuộc đua tử thần",
+         "One Piece - Trappola mortale"
+        ],
+        "startDate": {
+         "year": 2003,
+         "month": 3,
+         "day": 1
+        },
+        "averageScore": 72,
+        "meanScore": 72,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "Luffy and crew arrive at the harbour of Anabaru. The local casino is holding a competition in which the winner will obtain a huge monetary reward if he reaches the finishing line first. Nami is elated and decides to participate in the competition. However, there is a conspiracy going behind the competition and the mastermind is an ex-military commander, Gasparde. His plan is to lure all the pirates to the military base and send them to their deaths. Luffy and gang have to overcome the numerous tests and tribulations along the way to complete this dead-end adventure. <br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx462-Ig8zfdsFWcql.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx462-Ig8zfdsFWcql.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/462-Z074owEvilUu.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 463,
+        "idMal": 463,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 95,
+        "season": "SPRING",
+        "seasonYear": 2004,
+        "isAdult": false,
+        "title": {
+         "romaji": "ONE PIECE: Norowareta Seiken",
+         "english": "One Piece: The Curse of the Sacred Sword",
+         "native": "ONE PIECE 呪われた聖剣"
+        },
+        "synonyms": [
+         "One Piece Movie 05",
+         "One Piece: La Maldición de la Espada Sagrada",
+         "One Piece: The Cursed Holy Sword",
+         "One Piece : La malédiction de l'épée sacrée",
+         "วันพีซ เดอะมูฟวี่ 5 วันดวลดาบ ต้องสาปมรณะ ",
+         "Vua Hải Tặc: Thánh kiếm bị nguyền rủa",
+         "One Piece - Der Fluch des heiligen Schwerts",
+         "One Piece - La spada delle sette stelle"
+        ],
+        "startDate": {
+         "year": 2004,
+         "month": 3,
+         "day": 6
+        },
+        "averageScore": 67,
+        "meanScore": 67,
+        "genres": [
+         "Action",
+         "Adventure",
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "Luffy and crew go to an island searching for a legendary sword, said to be the most expensive in the world. Soon attacking marines and beautiful maidens split the crew. Zoro betrays the crew to help an old friend, Luffy and Usopp wander through a cave, and the rest help a village fight marines. When Zoro defeats Sanji he takes the sacred pearls that are the only defense against the evil sword that will plunge the world into darkness. <br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx463-QDnETPoHp9oD.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx463-QDnETPoHp9oD.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/463-zgU5XjUCR7Kv.jpg",
+        "nextAiringEpisode": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "kind": "media",
+   "variables": {
+    "idMal": 21
+   },
+   "response": {
+    "data": {
+     "Media": {
+      "id": 21,
+      "idMal": 21,
+      "type": "ANIME",
+      "format": "TV",
+      "status": "RELEASING",
+      "episodes": null,
+      "duration": 24,
+      "season": "FALL",
+      "seasonYear": 1999,
+      "isAdult": false,
+      "title": {
+       "romaji": "ONE PIECE",
+       "english": "ONE PIECE",
+       "native": "ONE PIECE"
+      },
+      "synonyms": [
+       "ワンピース",
+       "海贼王",
+       "וואן פיס",
+       "ون بيس",
+       "วันพีซ",
+       "Vua Hải Tặc",
+       "All'arrembaggio!",
+       "Tutti all'arrembaggio!",
+       "Ντρέηκ, το Κυνήγι του Θησαυρού",
+       "OP",
+       "Ван-Пис"
+      ],
+      "startDate": {
+       "year": 1999,
+       "month": 10,
+       "day": 20
+      },
+      "averageScore": 87,
+      "meanScore": 87,
+      "genres": [
+       "Action",
+       "Adventure",
+       "Comedy",
+       "Drama",
+       "Fantasy"
+      ],
+      "description": "Gold Roger was known as the Pirate King, the strongest and most infamous being to have sailed the Grand Line. The capture and death of Roger by the World Government brought a change throughout the world. His last words before his death revealed the location of the greatest treasure in the world, One Piece. It was this revelation that brought about the Grand Age of Pirates, men who dreamed of finding One Piece (which promises an unlimited amount of riches and fame), and quite possibly the most coveted of titles for the person who found it, the title of the Pirate King.<br><br>\nEnter Monkey D. Luffy, a 17-year-old boy that defies your standard definition of a pirate. Rather than the popular persona of a wicked, hardened, toothless pirate who ransacks villages for fun, Luffy’s reason for being a pirate is one of pure wonder; the thought of an exciting adventure and meeting new and intriguing people, along with finding One Piece, are his reasons of becoming a pirate. Following in the footsteps of his childhood hero, Luffy and his crew travel across the Grand Line, experiencing crazy adventures, unveiling dark mysteries and battling strong enemies, all in order to reach One Piece.<br><br>\n<b>*This includes the following special episodes:</b><br>\n- Chopperman to the Rescue! Protect the TV Station by the Shore! (Episode 336)<br>\n- The Strongest Tag-Team! Luffy and Toriko's Hard Struggle! (Episode 492)<br>\n- Team Formation! Save Chopper (Episode 542)<br>\n- History's Strongest Collaboration vs. Glutton of the Sea (Episode 590)<br>\n- 20th Anniversary! Special Romance Dawn (Episode 907)",
+      "coverImage": {
+       "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-ELSYx3yMPcKM.jpg",
+       "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-ELSYx3yMPcKM.jpg"
+      },
+      "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21-wf37VakJmZqs.jpg",
+      "nextAiringEpisode": {
+       "episode": 1181,
+       "airingAt": 1798985760
+      },
+      "relations": {
+       "edges": [
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 466,
+          "idMal": 466,
+          "type": "ANIME",
+          "format": "OVA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 1094,
+          "idMal": 1094,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 1237,
+          "idMal": 1237,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 1238,
+          "idMal": 1238,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 2020,
+          "idMal": 2020,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 2386,
+          "idMal": 2386,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 2490,
+          "idMal": 2490,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 12001,
+          "idMal": 12001,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 16239,
+          "idMal": 16239,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 16468,
+          "idMal": 16468,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 15323,
+          "idMal": 15323,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 19123,
+          "idMal": 19123,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 20835,
+          "idMal": 25161,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 21230,
+          "idMal": 31289,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 21485,
+          "idMal": 32051,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 21831,
+          "idMal": 33338,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 99302,
+          "idMal": 36215,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 459,
+          "idMal": 459,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 460,
+          "idMal": 460,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 461,
+          "idMal": 461,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 462,
+          "idMal": 462,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 463,
+          "idMal": 463,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 464,
+          "idMal": 464,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 465,
+          "idMal": 465,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 2107,
+          "idMal": 2107,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 3848,
+          "idMal": 3848,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 4155,
+          "idMal": 4155,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 9999,
+          "idMal": 9999,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 12859,
+          "idMal": 12859,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 21335,
+          "idMal": 31490,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 96427,
+          "idMal": 94534,
+          "type": "MANGA",
+          "format": "NOVEL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 30013,
+          "idMal": 13,
+          "type": "MANGA",
+          "format": "MANGA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 101918,
+          "idMal": 37902,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 8740,
+          "idMal": 8740,
+          "type": "ANIME",
+          "format": "OVA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 105143,
+          "idMal": 38234,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 102639,
+          "idMal": 20871,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 106492,
+          "idMal": 23933,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 106572,
+          "idMal": 28683,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "OTHER",
+         "node": {
+          "id": 107110,
+          "idMal": 22661,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 107256,
+          "idMal": 23935,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 2385,
+          "idMal": 2385,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 101099,
+          "idMal": 35770,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 21880,
+          "idMal": 33606,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "ALTERNATIVE",
+         "node": {
+          "id": 5252,
+          "idMal": 5252,
+          "type": "ANIME",
+          "format": "OVA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 30793,
+          "idMal": 793,
+          "type": "MANGA",
+          "format": "MANGA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 113308,
+          "idMal": 52139,
+          "type": "ANIME",
+          "format": "MUSIC",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 114761,
+          "idMal": 40970,
+          "type": "ANIME",
+          "format": "MUSIC",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 10033,
+          "idMal": 10033,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 813,
+          "idMal": 813,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 126649,
+          "idMal": 38419,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 134184,
+          "idMal": null,
+          "type": "MANGA",
+          "format": "ONE_SHOT",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 141902,
+          "idMal": 50410,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "OTHER",
+         "node": {
+          "id": 143293,
+          "idMal": 59832,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "PREQUEL",
+         "node": {
+          "id": 167404,
+          "idMal": 56055,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "ALTERNATIVE",
+         "node": {
+          "id": 171630,
+          "idMal": 57557,
+          "type": "ANIME",
+          "format": null,
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "OTHER",
+         "node": {
+          "id": 177475,
+          "idMal": 58307,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 182469,
+          "idMal": 60022,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SUMMARY",
+         "node": {
+          "id": 183423,
+          "idMal": 60108,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "CHARACTER",
+         "node": {
+          "id": 187225,
+          "idMal": null,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 188668,
+          "idMal": 61293,
+          "type": "ANIME",
+          "format": "ONA",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 197178,
+          "idMal": 62233,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 187380,
+          "idMal": 60790,
+          "type": "ANIME",
+          "format": "SPECIAL",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SPIN_OFF",
+         "node": {
+          "id": 204432,
+          "idMal": null,
+          "type": "ANIME",
+          "format": "TV_SHORT",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 215855,
+          "idMal": 64858,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SIDE_STORY",
+         "node": {
+          "id": 215856,
+          "idMal": 64859,
+          "type": "ANIME",
+          "format": "MOVIE",
+          "isAdult": false
+         }
+        }
+       ]
+      },
+      "airingSchedule": {
+       "nodes": [
+        {
+         "episode": 1123,
+         "airingAt": 1743854400
+        },
+        {
+         "episode": 1124,
+         "airingAt": 1743948960
+        },
+        {
+         "episode": 1125,
+         "airingAt": 1744553760
+        },
+        {
+         "episode": 1126,
+         "airingAt": 1745158560
+        },
+        {
+         "episode": 1127,
+         "airingAt": 1745763360
+        },
+        {
+         "episode": 1128,
+         "airingAt": 1746368160
+        },
+        {
+         "episode": 1129,
+         "airingAt": 1747577760
+        },
+        {
+         "episode": 1130,
+         "airingAt": 1748182560
+        },
+        {
+         "episode": 1131,
+         "airingAt": 1748787360
+        },
+        {
+         "episode": 1132,
+         "airingAt": 1749392160
+        },
+        {
+         "episode": 1133,
+         "airingAt": 1749996960
+        },
+        {
+         "episode": 1134,
+         "airingAt": 1751206560
+        },
+        {
+         "episode": 1135,
+         "airingAt": 1751811360
+        },
+        {
+         "episode": 1136,
+         "airingAt": 1752416160
+        },
+        {
+         "episode": 1137,
+         "airingAt": 1753625760
+        },
+        {
+         "episode": 1138,
+         "airingAt": 1754230560
+        },
+        {
+         "episode": 1139,
+         "airingAt": 1754835360
+        },
+        {
+         "episode": 1140,
+         "airingAt": 1755440160
+        },
+        {
+         "episode": 1141,
+         "airingAt": 1756044960
+        },
+        {
+         "episode": 1142,
+         "airingAt": 1757254560
+        },
+        {
+         "episode": 1143,
+         "airingAt": 1757859360
+        },
+        {
+         "episode": 1144,
+         "airingAt": 1758464160
+        },
+        {
+         "episode": 1145,
+         "airingAt": 1759068960
+        },
+        {
+         "episode": 1146,
+         "airingAt": 1760883360
+        },
+        {
+         "episode": 1147,
+         "airingAt": 1761488160
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "kind": "media",
+   "variables": {
+    "id": 167404
+   },
+   "response": {
+    "data": {
+     "Media": {
+      "id": 167404,
+      "idMal": 56055,
+      "type": "ANIME",
+      "format": "ONA",
+      "status": "FINISHED",
+      "episodes": 1,
+      "duration": 25,
+      "season": "WINTER",
+      "seasonYear": 2024,
+      "isAdult": false,
+      "title": {
+       "romaji": "MONSTERS: Ippaku Sanjou Hiryuu Jigoku",
+       "english": "MONSTERS: 103 Mercies Dragon Damnation",
+       "native": "MONSTERS 一百三情飛龍侍極"
+      },
+      "synonyms": [
+       "الوحوش: لعنة التنين",
+       "Monsters: El infierno del dragón",
+       "Monsters 103: Emociones del dragón volador del samurái extremo",
+       "Монстры: Сто три милости — Проклятие дракона",
+       "Monsters ร้อยสาม จิตอาวรณ์ ขุนศึกผยอง มังกรทะยานฟ้า",
+       "Monstros: A Maldição do Dragão",
+       "MONSTERS 103 emoções! Inferno extremo do dragão voador"
+      ],
+      "startDate": {
+       "year": 2024,
+       "month": 1,
+       "day": 21
+      },
+      "averageScore": 76,
+      "meanScore": 76,
+      "genres": [
+       "Action",
+       "Comedy",
+       "Drama"
+      ],
+      "description": "<i>MONSTERS: 103 Mercies Dragon Damnation</i> by Eiichiro Oda tells the tale of Ryuuma, the legendary swordsman that hails from the Land of Wano in <i>One Piece</i>.<br><br> \n\nA samurai's path leads him to a young waitress whose hometown was destroyed by a dragon. He doesn't want any trouble - but it finds them anyway.<br><br>\n\n(Source: Netflix Anime, edited)",
+      "coverImage": {
+       "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx167404-QMZJVARntkbv.jpg",
+       "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx167404-QMZJVARntkbv.jpg"
+      },
+      "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/167404-Hhvbg3APdan0.jpg",
+      "nextAiringEpisode": null,
+      "relations": {
+       "edges": [
+        {
+         "relationType": "SOURCE",
+         "node": {
+          "id": 125826,
+          "idMal": null,
+          "type": "MANGA",
+          "format": "ONE_SHOT",
+          "isAdult": false
+         }
+        },
+        {
+         "relationType": "SEQUEL",
+         "node": {
+          "id": 21,
+          "idMal": 21,
+          "type": "ANIME",
+          "format": "TV",
+          "isAdult": false
+         }
+        }
+       ]
+      },
+      "airingSchedule": {
+       "nodes": [
+        {
+         "episode": 1,
+         "airingAt": 1705762800
+        }
+       ]
+      }
+     }
+    }
+   }
+  }
+ ]
+}

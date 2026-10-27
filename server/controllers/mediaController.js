@@ -49,7 +49,9 @@ function readQuery(req) {
 
 // Decide se pode servir/ingerir a obra: leitura de obra existente é pública; ingestão exige login e respeita o limite.
 async function resolveMedia(req, id) {
-  if (!mediaService.needsIngest(id)) return mediaService.findLocal(id);
+  // já está no catálogo (pelo próprio id ou por outro id da mesma obra, S13): público, sem ingestão
+  const existing = mediaService.resolveExisting(id);
+  if (existing) return existing;
   if (!mediaService.canIngest(id)) {
     return mediaService.ingest(id); // rejeita com 404 (fonte não suportada / fora das faixas)
   }
@@ -117,6 +119,25 @@ class MediaController {
       return res.json({ data: item });
     } catch (err) {
       return sendError(res, err, 'Erro ao buscar detalhes da obra.', 'media/getById');
+    }
+  }
+
+  // POST /api/media/:id/refresh (a rota já exige login) — busca episódios novos de uma obra do catálogo (S13). Respeita a validade
+  // por obra (6 h para "Em Exibição"; obra finalizada e filme nunca vencem); `?force=1` ignora a validade, no máximo 1 vez a cada
+  // 10 min por obra. Só a atualização que de fato consulta a fonte conta no limite de ingestões do usuário.
+  async refresh(req, res) {
+    try {
+      const id = parseId(req.params.id);
+      const force = req.query.force === '1' || req.query.force === 'true';
+      const check = mediaService.refreshCheck(id, { force });
+      if (check.run) {
+        const limit = ingestLimiter.hit(req.userId);
+        if (!limit.ok) throw mediaErrors.tooManyRequests(limit.retryAfterSec);
+      }
+      const result = await mediaService.refresh(id, { force });
+      return res.json({ success: true, refreshed: result.refreshed, ...(result.reason ? { reason: result.reason } : {}), newEpisodes: result.newEpisodes, data: result.item });
+    } catch (err) {
+      return sendError(res, err, 'Falha ao atualizar a obra.', 'media/refresh');
     }
   }
 

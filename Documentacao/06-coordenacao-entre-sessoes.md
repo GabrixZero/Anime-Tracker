@@ -72,7 +72,11 @@ git worktree add ../showvault-sNN feature/sNN-<slug>     # (crie a branch antes 
 
 `node_modules` pode ser ligado ao do projeto principal (junction/symlink) para não reinstalar. Remova o worktree no fim: `git worktree remove ../showvault-sNN`.
 
-## Modo subagente (D-23)
+## Modo subagente (D-23, D-30)
+
+- **Modelo e ritmo (D-30):** subagente de execução com `model: "sonnet"`; **um por vez** (no máximo dois, só se não tocarem os mesmos arquivos); buscas amplas com o agente Explore.
+  Prompt do subagente curto: leitura mínima + a seção + só as decisões que importam. Para continuar um subagente que foi interrompido em Opus, crie um novo em Sonnet
+  apontando para a mesma worktree (`.claude/worktrees/agent-…`) e a mesma branch, em vez de retomar o antigo.
 
 Quando a sessão principal dispara uma seção como **subagente** (worktree própria):
 

@@ -1,5 +1,7 @@
 // Testes da S06 (animes e busca): Jikan com respostas SIMULADAS (nenhuma requisição real), fila/throttle/429, deduplicação,
 // relevância, franquia (temporadas pelas relações Sequel/Prequel) e TMDB opcional. Nada escreve em server/data real.
+// Desde a S13 a AniList é a fonte principal de anime: aqui ela fica DESLIGADA (anilistEnabled: false) para exercitar a Jikan
+// como fonte única, do mesmo jeito que era na S06; AniList, reserva e dedupe estão em s13-anilist.test.js.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -118,7 +120,7 @@ function newService({ animes = [], searches = {}, epCount = {}, tvmaze = {}, tmd
   const jdb = jikanDb(animes, { searches, epCount });
   const svc = new MediaService({
     dataDir: newDir(), tvmazeBase: 'http://tvmaze.invalid', jikanBase: 'http://jikan.invalid/v4', tmdbBase: 'http://tmdb.invalid/3',
-    tmdbKey, sleep: async () => {}, jikan: { minIntervalMs: 0 }, ...extra
+    tmdbKey, sleep: async () => {}, jikan: { minIntervalMs: 0 }, anilistEnabled: false, ...extra
   });
   svc.urls = [];
   svc.fetchJson = async (url, opts) => {
@@ -496,9 +498,11 @@ test('TVMaze sem nota/imagem/gêneros também não inventa nada, e status vem em
 
 test('franquia (etapa 2): Attack on Titan vira UMA obra com temporadas na ordem de exibição; Summary/Side story ficam de fora', async () => {
   const svc = newService({ animes: AOT, epCount: { 99003: 0 } });
-  // pedir pelo meio da cadeia (Season 2) devolve a franquia inteira, gravada com o id pedido
+  // pedir pelo meio da cadeia (Season 2) devolve a franquia inteira. Attack on Titan é uma AMOSTRA do seed (id 1429, mal_id 16498):
+  // desde a S13 a obra real ocupa o lugar da amostra (mesmo id), em vez de virar uma segunda obra com o id pedido (D-S06-4).
   const work = await svc.ingest(toInternalId('jikan', 25777));
-  assert.equal(work.id, toInternalId('jikan', 25777));
+  assert.equal(work.id, 1429);
+  assert.equal(svc.findLocal(toInternalId('jikan', 25777)), null, 'nenhuma segunda obra com o id pedido');
   assert.equal(work.name, 'Attack on Titan', 'nome vem da 1ª entrada da franquia');
   assert.deepEqual(work.mal_ids.sort((a, b) => a - b), [16498, 25777, 35760, 38524, 40028, 99003, 99004].sort((a, b) => a - b));
   assert.deepEqual(work.seasons.map(s => s.season_number), [1, 2, 3, 4, 5, 6]);

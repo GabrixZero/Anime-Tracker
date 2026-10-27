@@ -43,10 +43,11 @@ Todas são opcionais em desenvolvimento. O modelo comentado está em `.env.examp
 | `TRUST_PROXY` | atrás de proxy/hospedagem: quantos proxies confiar (em geral `1`), para o limite de tentativas enxergar o IP real | vazio |
 | `CORS_ORIGINS` | outros sites autorizados a chamar a API (lista separada por vírgula); vazio = só o próprio site | vazio |
 | `GOOGLE_CLIENT_ID` | liga o login com Google (veja abaixo); sem ele o botão não aparece | vazio |
-| `TMDB_API_KEY` | liga a busca de filmes e séries do TMDB em português (chave grátis em themoviedb.org); sem ela o app usa o catálogo local, TVMaze (séries) e Jikan/MyAnimeList (animes) | vazio |
+| `TMDB_API_KEY` | liga a busca de filmes e séries do TMDB em português (chave grátis em themoviedb.org); sem ela o app usa o catálogo local, TVMaze (séries) e AniList/Jikan (animes) | vazio |
 | `SEED_DEMO_USER` | `1` cria a conta de demonstração (ignorado em produção) | desligado |
 | `AUTH_*` | ajustam os limites de tentativas de login/cadastro (`AUTH_LOGIN_MAX`, `AUTH_REGISTER_MAX`, ...; veja `server/config/config.js`) | veja o código |
-| `JIKAN_BASE_URL` | só para testes/desenvolvimento (aponta para uma Jikan falsa) | API oficial |
+| `JIKAN_BASE_URL`, `ANILIST_BASE_URL` | só para testes/desenvolvimento (apontam para uma Jikan/AniList falsa) | APIs oficiais |
+| `MEDIA_AIRING_TTL_HOURS`, `MEDIA_REFRESH_INTERVAL_MIN` | animes e séries "Em Exibição" buscam episódios novos sozinhos: validade da obra em horas e intervalo da conferência em minutos (0 desliga) | 6 h · 30 min |
 
 ### Armazenamento: arquivos JSON ou SQLite
 
@@ -96,9 +97,10 @@ Tudo em JSON. Erros vêm como `{ "error": "mensagem em português" }`. Rotas mar
 | `POST /api/auth/change-password` | sim | `{currentPassword, newPassword}` → novo token (os antigos deixam de valer) |
 | `DELETE /api/auth/account` | sim | exclui a conta e a biblioteca (pede a senha) |
 | `GET /api/media/trending?type=` | não | catálogo local; `type` = `all`, `tv`, `anime` ou `movie` |
-| `GET /api/media/search?q=&type=` | não | busca combinada (local, Jikan, TVMaze, TMDB) → `{count, data, warnings}`; 60 por minuto por IP |
+| `GET /api/media/search?q=&type=` | não | busca combinada (local, AniList → Jikan de reserva, TVMaze, TMDB) → `{count, data, warnings}`; 60 por minuto por IP |
 | `GET /api/media/:id` | só se for obra nova | detalhes (público se já está no catálogo; ingestão exige login) |
 | `POST /api/media/ingest` | sim | `{id}` traz a obra de uma fonte externa para o catálogo (30 por 10 min por usuário) |
+| `POST /api/media/:id/refresh` | sim | busca episódios novos de uma obra em exibição (respeita a validade; `?force=1` no máximo a cada 10 min) → `{refreshed, newEpisodes, data}` |
 | `GET /api/user/library` | sim | biblioteca da conta |
 | `PUT /api/user/library` | sim | `{data, stateVersion}` envia a biblioteca; o servidor **mescla** e devolve o resultado |
 | `DELETE /api/user/library` | sim | zera a biblioteca da conta (os outros aparelhos zeram ao sincronizar) |
@@ -115,7 +117,7 @@ server/
   routes/ controllers/    rotas e controladores (auth, media, user)
   middleware/             login (JWT) e limites de tentativas
   models/                 UserModel e LibraryModel (usuários e bibliotecas)
-  services/               catálogo e busca (mediaService), Jikan, TMDB, Google, exclusão de conta
+  services/               catálogo e busca (mediaService), AniList, Jikan, TMDB, Google, exclusão de conta
   storage/                adaptador de armazenamento: arquivos JSON ou SQLite, migração
   utils/                  validação, sanitização, ids, cache, jsonStore
   data/                   seed do catálogo (versionado); dados reais ficam fora do Git
@@ -192,6 +194,7 @@ Observação: contas Google nunca são fundidas automaticamente com uma conta de
    * **Resetar** apaga os dados deste aparelho (e, se você confirmar, a cópia da conta).
 
 6. **Catálogo e busca:**
-   * Catálogo inicial com 16 séries, animes e filmes (os de série/anime trazem poucos episódios de amostra), busca no TVMaze e na Jikan (MyAnimeList) e, com `TMDB_API_KEY`, no TMDB; adicionar uma obra nova à lista exige estar conectado.
-   * Animes aparecem agrupados por franquia (uma obra, várias temporadas).
+   * Catálogo inicial com 16 séries, animes e filmes (os de série/anime trazem poucos episódios de amostra), busca no TVMaze, na AniList (animes; a Jikan/MyAnimeList é a reserva) e, com `TMDB_API_KEY`, no TMDB; adicionar uma obra nova à lista exige estar conectado.
+   * Animes aparecem agrupados por franquia (uma obra, várias temporadas). A AniList não tem o título de cada episódio: aparece "Episódio N" (a Jikan completa os títulos quando está no ar).
+   * Na Minha Lista, **Remover exemplo** tira de uma vez os títulos do "Carregar exemplo" que você ainda não usou.
    * O que a fonte não informa aparece como **"Sem nota"**, **"Sem gênero"** ou uma imagem neutra, nunca como um valor de enfeite.

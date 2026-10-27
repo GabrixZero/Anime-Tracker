@@ -140,16 +140,18 @@ class AppController {
   }
 
   async addToList(showId) {
-    const numId = Number(showId);
-    const exists = window.appState.data.trackedShows.some(t => t.showId === numId);
-    if (exists) {
+    let numId = Number(showId);
+    const isTracked = id => window.appState.data.trackedShows.some(t => t.showId === id);
+    // S13: um resultado de busca pode ser a MESMA obra de uma que o catálogo já tem com outro id (amostra do seed trocada pela obra
+    // real): `catalog_id` diz qual. Quem já tem a obra na lista não a adiciona de novo.
+    const known = window.appState.getMedia(numId);
+    if (isTracked(numId) || (known && known.catalog_id && isTracked(known.catalog_id))) {
       this.showToast('Esta obra já está na sua lista!', 'info');
       return;
     }
 
     // Obra já completa no cache (filme ou com temporadas): não precisa buscar de novo. Senão pede o detalhe ao servidor:
     // obra que já está no catálogo é pública; obra nova é ingerida e isso exige login (S02).
-    const known = window.appState.getMedia(numId);
     // (resultado de busca externa — isExternal — e item leve da lista — light — nunca contam como completos: sem episódios no cache)
     const complete = known && !known.isExternal && !known.light && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
     if (!complete) {
@@ -158,6 +160,8 @@ class AppController {
         const res = await window.apiClient.getById(numId);
         if (res && res.data) {
           window.appState.cacheMediaDetail(res.data);
+          // S13: o servidor pode devolver a obra com OUTRO id (a mesma obra já estava no catálogo, ou ocupou o lugar da amostra do seed)
+          if (Number.isSafeInteger(res.data.id) && res.data.id > 0) numId = res.data.id;
         }
       } catch (e) {
         console.warn('Não foi possível ingerir a obra:', e.message);
@@ -166,11 +170,17 @@ class AppController {
       }
     }
 
+    if (isTracked(numId)) {
+      this.showToast('Esta obra já está na sua lista!', 'info');
+      this.refreshAll();
+      return;
+    }
+
     // Status inicial coerente com o progresso (Quero ver, ou Assistindo/Finalizado se já houver episódios marcados)
     window.appState.addShow(numId);
     this.showToast('Adicionado à sua lista!', 'success');
     this.refreshAll();
-    if (window.detailModalView.currentShowId === numId) {
+    if (window.detailModalView.currentShowId === numId || window.detailModalView.currentShowId === Number(showId)) {
       window.detailModalView.open(numId);
     }
   }
@@ -181,13 +191,37 @@ class AppController {
     await this.ensureDetails(window.appState.constructor.EXAMPLE_SHOW_IDS || []);
     const { added, missing } = window.appState.loadExample();
     if (added.length > 0) {
-      this.showToast(`Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Remova quando quiser.`, 'success');
+      this.showToast(`Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Para tirar tudo de uma vez, use "Remover exemplo" na Minha Lista.`, 'success');
     } else if (missing > 0) {
       this.showToast('O catálogo ainda não carregou. Tente de novo em instantes.', 'error');
     } else {
       this.showToast('Os títulos de exemplo já estão na sua lista.', 'info');
     }
     this.refreshAll();
+  }
+
+  // S13: "Remover exemplo" em 1 clique — tira só as obras do exemplo que continuam intocadas (as que você já usou ficam).
+  removeExample() {
+    const button = document.getElementById('btn-remove-example');
+    const hadFocus = !!button && document.activeElement === button;
+    const { removed, kept } = window.appState.removeExample();
+    if (removed.length > 0) {
+      const plural = removed.length === 1 ? 'título' : 'títulos';
+      this.showToast(`Exemplo removido: ${removed.length} ${plural}.${kept.length ? ' O que você já usou ficou na lista.' : ''}`, 'success');
+    } else if (kept.length > 0) {
+      this.showToast('Os títulos de exemplo que estão na lista já têm progresso ou anotações, então ficaram.', 'info');
+    } else {
+      this.showToast('Não há títulos de exemplo na sua lista.', 'info');
+    }
+    this.refreshAll();
+    // a faixa some junto com o botão: o foco vai para o título da tela, em vez de cair no <body>
+    if (hadFocus) {
+      const heading = document.querySelector('#view-watchlist h2');
+      if (heading) {
+        heading.setAttribute('tabindex', '-1');
+        heading.focus();
+      }
+    }
   }
 
   removeFromList(showId) {

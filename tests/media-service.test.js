@@ -26,7 +26,7 @@ function newDir() {
 }
 
 function newService(dir = newDir(), extra = {}) {
-  const svc = new MediaService({ dataDir: dir, tvmazeBase: 'http://tvmaze.invalid', sleep: async () => {}, jikanEnabled: false, tmdbKey: '', ...extra });
+  const svc = new MediaService({ dataDir: dir, tvmazeBase: 'http://tvmaze.invalid', sleep: async () => {}, jikanEnabled: false, anilistEnabled: false, tmdbKey: '', ...extra });
   svc.calls = [];
   return svc;
 }

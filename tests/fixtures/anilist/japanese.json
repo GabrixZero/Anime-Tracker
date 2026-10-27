@@ -1,0 +1,906 @@
+{
+ "_comment": "Respostas REAIS da AniList (https://graphql.anilist.co) capturadas uma vez em 2026-10-27 para os testes offline da S13.",
+ "capturedAt": "2026-10-27T15:12:34.526Z",
+ "requests": [
+  {
+   "kind": "search",
+   "variables": {
+    "search": "進撃の巨人",
+    "perPage": 25
+   },
+   "response": {
+    "data": {
+     "Page": {
+      "media": [
+       {
+        "id": 16498,
+        "idMal": 16498,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 25,
+        "duration": 24,
+        "season": "SPRING",
+        "seasonYear": 2013,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin",
+         "english": "Attack on Titan",
+         "native": "進撃の巨人"
+        },
+        "synonyms": [
+         "SnK",
+         "AoT",
+         "Ataque a los Titanes",
+         "Ataque dos Titãs",
+         "L'Attacco dei Giganti",
+         "מתקפת הטיטאנים",
+         "进击的巨人",
+         "L’Attaque des Titans",
+         "الهجوم على العمالقة",
+         "ผ่าพิภพไททัน",
+         "حمله به تایتان",
+         "Ataque de Titãs",
+         "Atak Tytanów",
+         "Атака титанов",
+         "Đại Chiến Titan"
+        ],
+        "startDate": {
+         "year": 2013,
+         "month": 4,
+         "day": 7
+        },
+        "averageScore": 85,
+        "meanScore": 85,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "Several hundred years ago, humans were nearly exterminated by titans. Titans are typically several stories tall, seem to have no intelligence, devour human beings and, worst of all, seem to do it for the pleasure rather than as a food source. A small percentage of humanity survived by walling themselves in a city protected by extremely high walls, even taller than the biggest of titans.<br><br>\r\nFlash forward to the present and the city has not seen a titan in over 100 years. Teenage boy Eren and his foster sister Mikasa witness something horrific as the city walls are destroyed by a colossal titan that appears out of thin air. As the smaller titans flood the city, the two kids watch in horror as their mother is eaten alive. Eren vows that he will murder every single titan and take revenge for all of mankind.<br><br>\r\n(Source: MangaHelpers)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-buvcRTBx4NSm.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/16498-8jpFCOcDmneX.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 110277,
+        "idMal": 40028,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 16,
+        "duration": 24,
+        "season": "WINTER",
+        "seasonYear": 2021,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: The Final Season",
+         "english": "Attack on Titan Final Season",
+         "native": "進撃の巨人 The Final Season"
+        },
+        "synonyms": [
+         "SnK 4",
+         "AoT 4",
+         "Shingeki no Kyojin 4",
+         "進撃の巨人4",
+         "Attack on Titan Season 4",
+         "진격의 거인 더 파이널 시즌",
+         "מתקפת הטיטאנים העונה האחרונה",
+         "L'Attaque des Titans Saison Finale",
+         "L'Attacco dei Giganti 4",
+         "L'Attacco dei Giganti - La Stagione Finale",
+         "حمله به تایتان فصل 4 ",
+         " ผ่าพิภพไททัน ไฟนอล ซีซั่น",
+         "ผ่าพิภพไททัน Final Season",
+         "ผ่าพิภพไททัน ภาค 4",
+         "هجوم العملاقة الجزء الأخير",
+         "Атака Титанов: Финал"
+        ],
+        "startDate": {
+         "year": 2020,
+         "month": 12,
+         "day": 7
+        },
+        "averageScore": 87,
+        "meanScore": 87,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "It’s been four years since the Scout Regiment reached the shoreline, and the world looks different now. Things are heating up as the fate of the Scout Regiment—and the people of Paradis—are determined at last. However, Eren is missing. Will he reappear before age-old tensions between Marleyans and Eldians result in the war of all wars?<br>\n<br>\n(Source: Crunchyroll)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx110277-sKUNXAsWMNFw.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx110277-sKUNXAsWMNFw.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/110277-iuGn6F5bK1U1.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 20958,
+        "idMal": 25777,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 12,
+        "duration": 25,
+        "season": "SPRING",
+        "seasonYear": 2017,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Season 2",
+         "english": "Attack on Titan Season 2",
+         "native": "進撃の巨人 Season２"
+        },
+        "synonyms": [
+         "SnK 2",
+         "AoT 2",
+         "+מתקפת הטיטאנים עונה 2",
+         "L'Attacco dei Giganti 2",
+         "L'Attacco dei Giganti - Seconda Stagione",
+         "ผ่าพิภพไททัน ภาค 2",
+         "حمله به تایتان فصل 2",
+         "Атака титанов 2"
+        ],
+        "startDate": {
+         "year": 2017,
+         "month": 4,
+         "day": 1
+        },
+        "averageScore": 85,
+        "meanScore": 85,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "Eren Jaeger swore to wipe out every last Titan, but in a battle for his life he wound up becoming the thing he hates most. With his new powers, he fights for humanity's freedom facing the monsters that threaten his home. After a bittersweet victory against the Female Titan, Eren finds no time to rest—a horde of Titans is approaching Wall Rose and the battle for humanity continues!<br><br>\n\n(Source: Funimation)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20958-HuFJyr54Mmir.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20958-HuFJyr54Mmir.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20958-Y7eQdz9VENBD.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 119113,
+        "idMal": 42091,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 120,
+        "season": "SUMMER",
+        "seasonYear": 2020,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: Chronicle",
+         "english": "Attack on Titan ~Chronicle~",
+         "native": "進撃の巨人 〜クロニクル〜"
+        },
+        "synonyms": [
+         "ผ่าพิภพไททัน Chronicle"
+        ],
+        "startDate": {
+         "year": 2020,
+         "month": 7,
+         "day": 17
+        },
+        "averageScore": 77,
+        "meanScore": 77,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "Movie compiling the first 3 seasons of <i>Shingeki no Kyojin</i>.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx119113-IzVI5oZ0og8O.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx119113-IzVI5oZ0og8O.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/119113-J6nd0aoRSTAA.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 18397,
+        "idMal": 18397,
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "FINISHED",
+        "episodes": 3,
+        "duration": 25,
+        "season": "FALL",
+        "seasonYear": 2013,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin OVA",
+         "english": "Attack on Titan OVA",
+         "native": "進撃の巨人 OVA"
+        },
+        "synonyms": [
+         "Attack on Titan: Ilse's Journal",
+         "Attack on Titan: A Sudden Visitor",
+         "ผ่าพิภพไททัน OAD",
+         "Атака титанов OVA"
+        ],
+        "startDate": {
+         "year": 2013,
+         "month": 12,
+         "day": 9
+        },
+        "averageScore": 77,
+        "meanScore": 77,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "OVA 1: An old journal is found by Levi and Erwin when they conduct the surveillance operation outside the wall. The contents of \"Ilse's Journal\" result in some unexpected actions from Hange.\n<br>\nOVA 2: Another story of the 104th Trainee Squad.\n<br>\nOVA 3: Will depict a \"memorable episode before the 104th Training Corps became unified.\"\n<br><br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx18397-AnpwhLkSjYL1.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx18397-AnpwhLkSjYL1.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/18397-rG4Vpg67Kr0j.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 99147,
+        "idMal": 35760,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 12,
+        "duration": 24,
+        "season": "SUMMER",
+        "seasonYear": 2018,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Season 3",
+         "english": "Attack on Titan Season 3",
+         "native": "進撃の巨人 Season３"
+        },
+        "synonyms": [
+         "SnK 3",
+         "AoT 3",
+         "מתקפת הטיטאנים עונה 3",
+         "L'Attacco dei Giganti 3",
+         "L'Attacco dei Giganti - Terza Stagione",
+         "ผ่าพิภพไททัน ภาค 3",
+         "حمله به تایتان فصل 3",
+         "ผ่าพิภพไททัน ภาค 3 Part 1",
+         "Атака титанов 3"
+        ],
+        "startDate": {
+         "year": 2018,
+         "month": 7,
+         "day": 23
+        },
+        "averageScore": 86,
+        "meanScore": 86,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "Eren and his companions in the 104th are assigned to the newly-formed Levi Squad, whose assignment is to keep Eren and Historia safe given Eren's newly-discovered power and Historia's knowledge and pedigree. Levi and Erwin have good reason to be concerned, because the priest of the Church that Hanji had hidden away was found tortured to death, making it clear that the Military Police are involved with the cover-up. Things get more harrowing when the MPs make a move on Erwin and the Levi Squad narrowly avoids capture. Eren is also having problems with his Titan transformation, and a deadly killer has been hired to secure Eren and Historia, one Levi knows all too well from his youth.<br>\n<br>\n(Source: Anime News Network)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99147-AiPDD8cwlCfi.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99147-AiPDD8cwlCfi.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99147-HACsFVrynFf5.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 99634,
+        "idMal": 36106,
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "FINISHED",
+        "episodes": 3,
+        "duration": 25,
+        "season": "FALL",
+        "seasonYear": 2017,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: LOST GIRLS",
+         "english": "Attack on Titan: Lost Girls",
+         "native": "進撃の巨人 LOST GIRLS"
+        },
+        "synonyms": [
+         "Episode 16.5A: Wall Sina. Goodbye",
+         "Episode 16.5B: Wall Sina. Goodbye",
+         "SnK",
+         "AoT",
+         "ผ่าพิภพไททัน OAD",
+         "ผ่าพิภพไททัน ภาค OAD Lost Girls",
+         "Атака титанов: Потерянные девушки"
+        ],
+        "startDate": {
+         "year": 2017,
+         "month": 12,
+         "day": 8
+        },
+        "averageScore": 77,
+        "meanScore": 77,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "A three-part OVA adapting the \"Shingeki no Kyojin: Lost Girls\" spinoff novel that will be bundled with the 24th, 25th and 26th limited edition volumes of the manga.<br>\n<br>\n<strong>Wall Sina, Goodbye:</strong><br>\nAnnie Leonhart has a job to do—and a resulting absence that must stay off her record at all costs. With no one else to turn to, she asks her comrade Hitch Dreyse to cover for her. She agrees but puts forward a single condition: Annie must solve the fruitless missing person case Hitch was assigned. The case revolves around Carly Stratmann, a university graduate and the daughter of wealthy businessman Elliot Stratmann. With only a single day to solve the case and the underground of the Stohess District crawling with thugs, Annie must put her all into finding this girl. Yet, every answer she uncovers only leads to further questions—how has the illegal drug coderoin found its way to Stohess, what is Elliot hiding, and where has Carly disappeared to?<br>\n<br>\n<strong>Lost in the Cruel World:</strong><br>\nWith worry for Eren Yeager gripping her heart, Mikasa Ackerman begins to remember. She remembers her conversations with Armin Arlert, her concern for her friends, and most painfully, the time she had almost lost everything. As fear takes control, she begins to experience an alternate version of her past—some things can be changed, but are there events so inescapable that she can't even prevent them in her dreams?\n",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx99634-9u4hdvWwmC2s.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx99634-9u4hdvWwmC2s.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/99634-m8hKbCnDL2ue.png",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 104578,
+        "idMal": 38524,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 10,
+        "duration": 24,
+        "season": "SPRING",
+        "seasonYear": 2019,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Season 3 Part 2",
+         "english": "Attack on Titan Season 3 Part 2",
+         "native": "進撃の巨人 Season３ Part.2"
+        },
+        "synonyms": [
+         "SnK 3",
+         "AoT 3",
+         "Shingeki no Kyojin Season 3 (2019)",
+         "L'Attaco dei Giganti 3 Parte 2",
+         "L'Attacco dei Giganti - Terza Stagione Parte 2",
+         "מתקפת הטיטאנים עונה 3 חלק 2",
+         "L'Attaque des Titans Saison 3 Partie 2 ",
+         "ผ่าพิภพไททัน ภาค 3 Part 2",
+         "ผ่าพิภพไททัน ภาค 3 พาร์ท 2",
+         "حمله به تایتان فصل 3"
+        ],
+        "startDate": {
+         "year": 2019,
+         "month": 4,
+         "day": 29
+        },
+        "averageScore": 89,
+        "meanScore": 89,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "The battle to retake Wall Maria begins now! With Eren’s new hardening ability, the Scouts are confident they can seal the wall and take back Shiganshina District. If they succeed, Eren can finally unlock the secrets of the basement—and the world. But danger lies in wait as Reiner, Bertholdt, and the Beast Titan have plans of their own. Could this be humanity’s final battle for survival?<br>\n<br>\n(Source: Funimation)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx104578-k61nx3LPjvgd.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx104578-k61nx3LPjvgd.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/104578-z7SadpYEuAsy.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 131681,
+        "idMal": 48583,
+        "type": "ANIME",
+        "format": "TV",
+        "status": "FINISHED",
+        "episodes": 12,
+        "duration": 24,
+        "season": "WINTER",
+        "seasonYear": 2022,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: The Final Season Part 2",
+         "english": "Attack on Titan Final Season Part 2",
+         "native": "進撃の巨人 The Final Season Part 2"
+        },
+        "synonyms": [
+         "SnK 4",
+         "AoT 4",
+         "L'attaque des titans Saison Finale Partie 2",
+         "Shingeki no Kyojin: The Final Season (2022)",
+         "اتک عن تایتان",
+         "حمله به غول ها",
+         "حمله به تایتان فصل 4 ",
+         " ผ่าพิภพไททัน ไฟนอล ซีซั่น Part 2",
+         "ผ่าพิภพไททัน ภาค 4",
+         "L'Attacco dei Giganti 4 Parte 2",
+         "Атака титанов: Финал. Часть 2"
+        ],
+        "startDate": {
+         "year": 2022,
+         "month": 1,
+         "day": 10
+        },
+        "averageScore": 87,
+        "meanScore": 87,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery",
+         "Psychological"
+        ],
+        "description": "The war for Paradis zeroes in on Shiganshina just as Jaegerists have seized control. After taking a huge blow from a surprise attack led by Eren, Marley swiftly acts to return the favor. With Zeke’s true plan revealed and a military forced under new rule, this battle might be fought on two fronts. Does Eren intend on fulfilling his half-brother’s wishes or does he have a plan of his own?<br>\n<br>\n(Source: Funimation)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx131681-5ooUqvqNtee1.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx131681-5ooUqvqNtee1.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/131681-3tNurPRsqsfz.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 123078,
+        "idMal": null,
+        "type": "ANIME",
+        "format": "ONA",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 1,
+        "season": null,
+        "seasonYear": null,
+        "isAdult": false,
+        "title": {
+         "romaji": "Animegatari × Shingeki no Kyojin Collab Eizou",
+         "english": null,
+         "native": "「アニメガタリ」×「進撃の巨人」コラボ映像"
+        },
+        "synonyms": [],
+        "startDate": {
+         "year": 2015,
+         "month": 7,
+         "day": 11
+        },
+        "averageScore": 51,
+        "meanScore": 52,
+        "genres": [
+         "Comedy",
+         "Slice of Life"
+        ],
+        "description": "A collaboration work between Animegatari and Attack on Titan to promote the movie Attack on Titan Part II: Wings of Freedom.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx123078-NnFwfTJRTMYA.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx123078-NnFwfTJRTMYA.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/123078-9odRkik3zad1.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 139754,
+        "idMal": 49627,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 2,
+        "duration": 5,
+        "season": "SUMMER",
+        "seasonYear": 2021,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: Chimi Kyara Gekijou - Final",
+         "english": "Attack On Titan: The Final Season Specials",
+         "native": "「進撃の巨人」ちみキャラ劇場 \"ファイナル\""
+        },
+        "synonyms": [
+         "Shingeki no Kyojin: The Final Season Specials"
+        ],
+        "startDate": {
+         "year": 2021,
+         "month": 7,
+         "day": 7
+        },
+        "averageScore": 78,
+        "meanScore": 79,
+        "genres": [
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "<i>Shingeki no Kyojin: The Final Season</i> DVD/BD specials. They are chibi parody shorts; 2 video was included on the DVD/BDs. Each video contained 8 stories (essentially chibi parody short episode 60–75) which continued the chibi parody story from the previous chibi parody specials included on the DVD/BDs of the previous seasons.\n\n",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx139754-tws6cBmwEWPF.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx139754-tws6cBmwEWPF.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 162314,
+        "idMal": null,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 85,
+        "season": "FALL",
+        "seasonYear": 2023,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: The Final Season - Kanketsu-hen Kouhen",
+         "english": "Attack on Titan Final Season THE FINAL CHAPTERS Special 2",
+         "native": "進撃の巨人 The Final Season完結編 後編"
+        },
+        "synonyms": [
+         "Shingeki no Kyojin: The Final Season Final Edition",
+         "Attack on Titan Final Season Part 3 Final Arc Part 2",
+         "Attack on Titan: The Final Season Part 4",
+         "Shingeki no Kyojin: The Final Season Part 4",
+         "SnK 4",
+         "AoT 4"
+        ],
+        "startDate": {
+         "year": 2023,
+         "month": 11,
+         "day": 5
+        },
+        "averageScore": 87,
+        "meanScore": 87,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Psychological",
+         "Romance"
+        ],
+        "description": "Eren, as the Founding Titan, advances on Fort Salta with countless other Titans. Appearing before the refugees, who stand on the brink of despair, are Mikasa, Armin, Jean, Conny, Reiner, Pieck, and Levi, who narrowly escaped from the rumbling. The battle between former comrades and childhood friends with Eren concludes here.\n<br><br>\n(Source: Crunchyroll)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx162314-qIWdAAFtvY8J.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx162314-qIWdAAFtvY8J.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/162314-N5M4XMz6O1j4.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 146984,
+        "idMal": 51535,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 61,
+        "season": "WINTER",
+        "seasonYear": 2023,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: The Final Season - Kanketsu-hen Zenpen",
+         "english": "Attack on Titan Final Season THE FINAL CHAPTERS Special 1",
+         "native": "進撃の巨人 The Final Season完結編 前編"
+        },
+        "synonyms": [
+         "Shingeki no Kyojin: The Final Season Final Edition",
+         "Shingeki no Kyojin: The Final Season Part 3",
+         "ผ่าพิภพไททัน ภาค 4",
+         "ผ่าพิภพไททัน ไฟนอล ซีซั่น Part 3",
+         "Attack on Titan Final Season Part 3 Final Arc Part 1",
+         "Attack on Titan The Final Season The Final Part Special",
+         "Attack on Titan The Final Season The Final Part Part 1",
+         "حمله به تایتان فصل آخر قسمت ویژه 1 ",
+         "SnK 4",
+         "AoT 4"
+        ],
+        "startDate": {
+         "year": 2023,
+         "month": 3,
+         "day": 4
+        },
+        "averageScore": 87,
+        "meanScore": 87,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery",
+         "Psychological"
+        ],
+        "description": "The fate of the world hangs in the balance as Eren unleashes the ultimate power of the Titans. With a burning determination to eliminate all who threaten Eldia, he leads an unstoppable army of Colossal Titans towards Marley. Now a motley crew of his former comrades and enemies scramble to halt his deadly mission, the only question is, can they stop him?<br>\n<br>\n(Source: Crunchyroll)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx146984-GXrLeT6vQqyP.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx146984-GXrLeT6vQqyP.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/146984-yAkTtW2AExVj.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 20811,
+        "idMal": 25781,
+        "type": "ANIME",
+        "format": "OVA",
+        "status": "FINISHED",
+        "episodes": 2,
+        "duration": 28,
+        "season": "WINTER",
+        "seasonYear": 2015,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Gaiden: Kuinaki Sentaku",
+         "english": "Attack on Titan: No Regrets",
+         "native": "進撃の巨人 外伝 悔いなき選択"
+        },
+        "synonyms": [
+         "SnK",
+         "AoT",
+         "ผ่าพิภพไททัน ภาค OAD No Regret",
+         "ผ่าพิภพไททัน OAD ",
+         "Атака титанов: Выбор без сожалений"
+        ],
+        "startDate": {
+         "year": 2014,
+         "month": 12,
+         "day": 9
+        },
+        "averageScore": 83,
+        "meanScore": 83,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "This prequel to megahit Attack on Titan answers the questions: How did Captain Levi of the Survey Corps go from street thug to humanity's strongest soldier? And how did Commander Erwin become a cold, calculating leader, ready to sacrifice anything to save the human race? The fires that forged this bond of loyalty and trust were intense indeed!\n<br><br>\n(Source: Anime News Network, revised)",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20811-IvXLdxZkYNcP.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20811-IvXLdxZkYNcP.jpg"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20811-LpRmeR6sDtX1.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 20692,
+        "idMal": 23777,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 120,
+        "season": "SPRING",
+        "seasonYear": 2015,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Kouhen: Jiyuu no Tsubasa",
+         "english": "Attack on Titan Part II: Wings of Freedom",
+         "native": "劇場版「進撃の巨人」後編～自由の翼～"
+        },
+        "synonyms": [
+         "Attack on Titan: Asas da Liberdade"
+        ],
+        "startDate": {
+         "year": 2015,
+         "month": 6,
+         "day": 27
+        },
+        "averageScore": 77,
+        "meanScore": 77,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "A recompilation of the anime series. The new films will feature new dubbing and a 5.1ch remaster with returning voice cast members. The second film will cover 14 through 25.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20692-fSDEpfDtDg9u.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20692-fSDEpfDtDg9u.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20692.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 108942,
+        "idMal": 39477,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 4,
+        "duration": 2,
+        "season": "FALL",
+        "seasonYear": 2018,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: Chimi Kyara Gekijou - Rivai-han",
+         "english": null,
+         "native": "｢進撃の巨人｣ちみキャラ劇場”新生リヴァイ班”"
+        },
+        "synonyms": [
+         "Attack on Titan Season 3 Picture Drama",
+         "Shingeki no Kyojin Chimi Kyara Gekijou Tonde Ke! Shinsei Levi-han",
+         "Shingeki no Kyojin Season 3 Specials"
+        ],
+        "startDate": {
+         "year": 2018,
+         "month": 10,
+         "day": 17
+        },
+        "averageScore": 75,
+        "meanScore": 76,
+        "genres": [
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "Shingeki no Kyojin Season 3 DVD/BD specials. They are chibi parody shorts; one video was included on each of the DVD/BDs for a total of four. Each video contained three stories (essentially chibi parody short episode 38–49) which continued the chibi parody story from the previous chibi parody specials included on the DVD/BDs of the previous seasons.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108942-UdPtw4CZUQmC.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx108942-UdPtw4CZUQmC.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 100465,
+        "idMal": 36702,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 120,
+        "season": "WINTER",
+        "seasonYear": 2018,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Season 2: Kakusei no Houkou",
+         "english": "Attack on Titan: The Roar of Awakening",
+         "native": "劇場版「進撃の巨人」Season 2～覚醒の咆哮～"
+        },
+        "synonyms": [
+         "AoT",
+         "SnK",
+         "Attack on Titan: O Rugido do Despertar"
+        ],
+        "startDate": {
+         "year": 2018,
+         "month": 1,
+         "day": 13
+        },
+        "averageScore": 78,
+        "meanScore": 78,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy",
+         "Mystery"
+        ],
+        "description": "A compilation film recapping the events of the anime series' second season.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx100465-ivKS0RqXg5dI.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/nx100465-ivKS0RqXg5dI.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/100465-DKP3jObknheV.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 20691,
+        "idMal": 23775,
+        "type": "ANIME",
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "episodes": 1,
+        "duration": 118,
+        "season": "FALL",
+        "seasonYear": 2014,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin Zenpen: Guren no Yumiya",
+         "english": "Attack on Titan Part I: Crimson Bow and Arrow",
+         "native": "劇場版「進撃の巨人」前編～紅蓮の弓矢～"
+        },
+        "synonyms": [
+         "Attack on Titan Teil I: Feuerroter Pfeil und Bogen",
+         "Attack on Titan: O Arco e Flecha Escarlate"
+        ],
+        "startDate": {
+         "year": 2014,
+         "month": 11,
+         "day": 22
+        },
+        "averageScore": 76,
+        "meanScore": 76,
+        "genres": [
+         "Action",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "A recompilation of the anime series. The new films will feature new dubbing and a 5.1ch remaster with returning voice cast members. The first film will cover episodes 1 through 13.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20691-dnv0rkpbgBDJ.png",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20691-dnv0rkpbgBDJ.png"
+        },
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20691-xKJkvnhezBb0.jpg",
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 120257,
+        "idMal": null,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 3,
+        "duration": 2,
+        "season": "SUMMER",
+        "seasonYear": 2019,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: Chimi Kyara Gekijou - Rivai-han Part 2",
+         "english": null,
+         "native": "｢進撃の巨人｣ちみキャラ劇場”新生リヴァイ班” Part 2"
+        },
+        "synonyms": [
+         "Attack on Titan Season 3 Picture Drama",
+         "Shingeki no Kyojin Chimi Kyara Gekijou Tonde Ke! Shinsei Levi-han Part 2",
+         "Shingeki no Kyojin Season 3 Part 2 Specials"
+        ],
+        "startDate": {
+         "year": 2019,
+         "month": 7,
+         "day": 24
+        },
+        "averageScore": 79,
+        "meanScore": 79,
+        "genres": [
+         "Comedy",
+         "Fantasy"
+        ],
+        "description": "Shingeki no Kyojin Season 3 Part 2 DVD/BD specials. They are chibi parody shorts; one video was included on each of the DVD/BDs for a total of three. Each video contained three stories, which continued the chibi parody story from the previous chibi parody specials included on the DVD/BDs of the previous seasons.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120257-eerywzUJdLzy.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx120257-eerywzUJdLzy.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       },
+       {
+        "id": 19391,
+        "idMal": 19391,
+        "type": "ANIME",
+        "format": "SPECIAL",
+        "status": "FINISHED",
+        "episodes": 9,
+        "duration": 11,
+        "season": "SUMMER",
+        "seasonYear": 2013,
+        "isAdult": false,
+        "title": {
+         "romaji": "Shingeki no Kyojin: Chimi Kyara Gekijou - Tondeke! Kunren Heidan",
+         "english": "Attack on Titan Picture Drama",
+         "native": "「進撃の巨人」ちみキャラ劇場\"とんでけ! 訓練兵団\""
+        },
+        "synonyms": [],
+        "startDate": {
+         "year": 2013,
+         "month": 7,
+         "day": 17
+        },
+        "averageScore": 63,
+        "meanScore": 63,
+        "genres": [
+         "Action",
+         "Comedy",
+         "Drama",
+         "Fantasy"
+        ],
+        "description": "Specials included in BD/DVD.",
+        "coverImage": {
+         "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/19391.jpg",
+         "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/19391.jpg"
+        },
+        "bannerImage": null,
+        "nextAiringEpisode": null
+       }
+      ]
+     }
+    }
+   }
+  }
+ ]
+}
