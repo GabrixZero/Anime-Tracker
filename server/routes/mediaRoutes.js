@@ -5,6 +5,8 @@ const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 router.get('/trending', mediaController.getTrending);
 router.get('/search', mediaController.search);
+// Detalhe completo de várias obras do catálogo (declarada antes de /:id). Sem ingestão: público.
+router.get('/batch', mediaController.getBatch);
 router.post('/ingest', requireAuth, mediaController.ingest);
 // Leitura de obra existente é pública; se a obra ainda não está no catálogo, a ingestão exige login (resolvido no controller).
 router.get('/:id', optionalAuth, mediaController.getById);

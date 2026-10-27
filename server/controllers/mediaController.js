@@ -3,9 +3,27 @@ const RateLimiter = require('../utils/rateLimiter');
 const { parseId } = require('../utils/ids');
 const { mediaErrors } = require('../utils/errors');
 const { sendError } = require('../utils/httpErrors');
+const { toListItem, toSearchItem } = require('../utils/mediaLight');
 
 const VALID_TYPES = ['all', 'tv', 'anime', 'movie'];
 const MAX_QUERY_LENGTH = 100;
+// Lista paginada (S09): 60 por página por padrão, no máximo 200.
+const DEFAULT_LIMIT = 60;
+const MAX_LIMIT = 200;
+const MAX_BATCH_IDS = 50;
+
+// Dados públicos que só mudam quando uma obra é ingerida: o navegador guarda, mas confere (ETag) antes de reutilizar.
+const revalidate = res => res.set('Cache-Control', 'no-cache');
+
+// Inteiro opcional na query (?limit=, ?offset=): ausente => padrão; repetido, não numérico ou fora da faixa => 400.
+function readInt(req, name, fallback, min, max) {
+  const raw = req.query[name];
+  if (raw === undefined) return fallback;
+  if (typeof raw !== 'string' || !/^\d{1,9}$/.test(raw)) throw mediaErrors.invalidQuery(`Parâmetro "${name}" inválido: use um número inteiro.`);
+  const n = Number(raw);
+  if (n < min || n > max) throw mediaErrors.invalidQuery(`Parâmetro "${name}" fora da faixa permitida (${min} a ${max}).`);
+  return n;
+}
 
 // Limite de ingestões por usuário (cada uma baixa uma obra inteira da fonte externa).
 const ingestLimiter = new RateLimiter({ windowMs: 10 * 60 * 1000, max: 30 });
@@ -44,8 +62,14 @@ async function resolveMedia(req, id) {
 class MediaController {
   async getTrending(req, res) {
     try {
-      const items = await mediaService.getTrending(readType(req));
-      return res.json({ count: items.length, data: items });
+      const type = readType(req);
+      const limit = readInt(req, 'limit', DEFAULT_LIMIT, 1, MAX_LIMIT);
+      const offset = readInt(req, 'offset', 0, 0, 1e9);
+      const all = await mediaService.getTrending(type);
+      // Lista LEVE e paginada: temporadas/episódios só no detalhe (GET /:id ou /batch).
+      const data = all.slice(offset, offset + limit).map(toListItem);
+      revalidate(res);
+      return res.json({ count: data.length, total: all.length, offset, limit, hasMore: offset + data.length < all.length, data });
     } catch (err) {
       return sendError(res, err, 'Erro ao buscar catálogo de destaques.', 'media/trending');
     }
@@ -62,15 +86,34 @@ class MediaController {
       }
       const { items, warnings } = await mediaService.searchDetailed(query, type);
       // warnings = fontes que falharam/não estão configuradas (a lista vem mesmo assim, com o que as outras fontes devolveram)
-      return res.json({ query, count: items.length, data: items, warnings });
+      revalidate(res);
+      return res.json({ query, count: items.length, data: items.map(toSearchItem), warnings });
     } catch (err) {
       return sendError(res, err, 'Erro na pesquisa de mídia.', 'media/search');
+    }
+  }
+
+  // GET /api/media/batch?ids=1,2,3 — detalhe completo (temporadas/episódios) de várias obras do catálogo de uma vez.
+  // Público e sem ingestão: ids que não estão completos no catálogo voltam em `missing`.
+  async getBatch(req, res) {
+    try {
+      const raw = req.query.ids;
+      if (typeof raw !== 'string' || !raw.trim()) throw mediaErrors.invalidQuery('Informe os ids separados por vírgula em ids.');
+      const parts = raw.split(',');
+      if (parts.length > MAX_BATCH_IDS) throw mediaErrors.invalidQuery(`Muitos ids de uma vez (máximo ${MAX_BATCH_IDS}).`);
+      const ids = [...new Set(parts.map(part => parseId(part.trim())))];
+      const { data, missing } = mediaService.getMany(ids);
+      revalidate(res);
+      return res.json({ count: data.length, data, missing });
+    } catch (err) {
+      return sendError(res, err, 'Erro ao buscar detalhes das obras.', 'media/batch');
     }
   }
 
   async getById(req, res) {
     try {
       const item = await resolveMedia(req, parseId(req.params.id));
+      revalidate(res);
       return res.json({ data: item });
     } catch (err) {
       return sendError(res, err, 'Erro ao buscar detalhes da obra.', 'media/getById');

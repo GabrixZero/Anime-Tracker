@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const path = require('path');
 
 const config = require('./config/config');
@@ -25,6 +26,9 @@ app.use(helmet({
   strictTransportSecurity: config.IS_PRODUCTION ? undefined : false, // HSTS só em produção (HTTPS)
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
 }));
+
+// Compressão gzip/deflate das respostas de texto (JSON da API, HTML, CSS, JS). Imagens/SVG pequenos não precisam. (S09)
+app.use(compression());
 
 // CORS: o site e a API são da mesma origem (não precisa de CORS). Só origens listadas em CORS_ORIGINS podem chamar de fora.
 app.use(cors({
@@ -56,7 +60,15 @@ app.use('/api', (req, res) => {
 });
 
 // Servidor de Arquivos Estáticos (Frontend MVC)
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// Cache (S09): ETag/Last-Modified sempre; HTML sempre conferido (no-cache); CSS/JS/imagens guardados por STATIC_MAX_AGE_SEC.
+app.use(express.static(path.join(__dirname, '..', 'public'), {
+  etag: true,
+  lastModified: true,
+  maxAge: config.STATIC_MAX_AGE_SEC * 1000,
+  setHeaders(res, filePath) {
+    if (/\.html?$/i.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
+  }
+}));
 
 // Fallback SPA
 app.use((req, res) => {

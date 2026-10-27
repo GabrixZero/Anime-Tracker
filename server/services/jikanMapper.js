@@ -61,7 +61,9 @@ function mapAnimeBase(a) {
   const name = stripHtml(a.title_english || a.title, 300);
   const romaji = stripHtml(a.title, 300);
   const img = a.images && a.images.jpg;
-  const poster = safeHttpUrl(img && (img.large_image_url || img.image_url), null);
+  // S09: pôster do cartão = imagem média (image_url); a grande (large_image_url) fica para o fundo do modal.
+  const poster = safeHttpUrl(img && (img.image_url || img.large_image_url), null);
+  const backdrop = safeHttpUrl(img && (img.large_image_url || img.image_url), null);
   const genres = stripHtmlList([...(a.genres || []), ...(a.themes || [])].map(g => g && g.name)).slice(0, 6);
   const score = Number(a.score);
   return {
@@ -73,7 +75,7 @@ function mapAnimeBase(a) {
     alt_titles: altTitles(a, [name]),
     overview: cleanSynopsis(a.synopsis),
     poster_path: poster,
-    backdrop_path: poster,
+    backdrop_path: backdrop,
     vote_average: Number.isFinite(score) && score > 0 ? score : null,
     first_air_date: isoDate(a.aired && a.aired.from),
     genres,

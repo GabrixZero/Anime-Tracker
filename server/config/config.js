@@ -50,6 +50,13 @@ module.exports = {
   CORS_ORIGINS: listFromEnv('CORS_ORIGINS'),
   TRUST_PROXY: parseTrustProxy(process.env.TRUST_PROXY),
 
+  // Cache dos arquivos de public/ (CSS, JS, imagens), em segundos. Em produção 1 h; fora dela 0 (sempre confere o ETag, para o
+  // desenvolvedor ver a edição na hora). O index.html nunca é guardado sem conferir. Ajustável com STATIC_MAX_AGE_SEC. (S09)
+  STATIC_MAX_AGE_SEC: (() => {
+    const n = Number.parseInt(process.env.STATIC_MAX_AGE_SEC, 10);
+    return Number.isFinite(n) && n >= 0 ? n : (IS_PRODUCTION ? 3600 : 0);
+  })(),
+
   // Conta de demonstração: só nasce se SEED_DEMO_USER=1 e nunca em produção (D-22).
   SEED_DEMO_USER: process.env.SEED_DEMO_USER === '1' && !IS_PRODUCTION,
 
