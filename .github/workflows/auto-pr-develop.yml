@@ -1,66 +1,60 @@
 name: Auto PR Develop to Main
 
+# Abre (uma vez) o PR develop -> main quando develop recebe um push.
+# (Antes rodava também ao fechar PRs, o que duplicava a execução: o merge no develop já gera um push.)
 on:
   push:
-    branches:
-      - 'develop'
-  pull_request:
-    types: [closed]
     branches:
       - 'develop'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
+
+concurrency:
+  group: auto-pr-develop
+  cancel-in-progress: false
 
 jobs:
   create-pr-to-main:
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    timeout-minutes: 5
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
       - name: Create Pull Request to main
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const branch = 'develop';
             const base = 'main';
+            const { owner, repo } = context.repo;
 
-            console.log('Verificando PR de develop para main...');
+            // "Nada a fazer" de verdade: sem commits novos ou PR já existente. Qualquer outro erro (permissão, rede, 5xx) falha o job.
+            const isBenign = (err) => {
+              if (err.status !== 422) return false;
+              const text = JSON.stringify(err.response?.data ?? err.message ?? '');
+              return /No commits between|pull request already exists/i.test(text);
+            };
+
+            const { data: existing } = await github.rest.pulls.list({
+              owner, repo, head: `${owner}:${branch}`, base, state: 'open'
+            });
+            if (existing.length > 0) {
+              console.log(`PR para main já aberta: #${existing[0].number}`);
+              return;
+            }
 
             try {
-              const { data: existingPrs } = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                head: `${context.repo.owner}:${branch}`,
-                base: base,
-                state: 'open'
-              });
-
-              if (existingPrs.length > 0) {
-                console.log(`PR para main já existe e está aberta: #${existingPrs[0].number}`);
-                return;
-              }
-
-              const { data: newPr } = await github.rest.pulls.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+              const { data: pr } = await github.rest.pulls.create({
+                owner, repo, head: branch, base,
                 title: 'Release: Merge develop into main',
-                head: branch,
-                base: base,
-                body: `### Pull Request Automática de Release\n\nBranch **\`develop\`** consolidada e pronta para produção.\n\nBasta clicar em **Merge pull request** para subir as novidades na branch principal **\`main\`**.`
+                body: `### Pull Request automática de release\n\nA branch **\`${branch}\`** está consolidada. Faça o merge para publicar em **\`${base}\`**.`
               });
-
-              console.log(`Pull Request de release criada com sucesso: #${newPr.number}`);
+              console.log(`PR de release criada: #${pr.number}`);
             } catch (err) {
-              if (err.message && (err.message.includes('No commits between') || err.status === 422)) {
-                console.log('Nenhum commit pendente entre develop e main. PR não necessária.');
+              if (isBenign(err)) {
+                console.log('Nada a abrir (develop e main iguais, ou PR já existe).');
               } else {
-                console.error('Erro na criação automática da PR para main:', err.message);
-                throw err;
+                core.setFailed(`Erro ao criar o PR de release: ${err.status ?? ''} ${err.message}`);
               }
             }

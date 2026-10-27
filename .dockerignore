@@ -1,0 +1,37 @@
+# Nada disto entra na imagem (principalmente segredos e dados de usuários).
+.git
+.github
+.claude
+node_modules
+npm-debug.log
+.env
+.env.*
+!.env.example
+
+# Dados de runtime e segredos: a imagem só leva o seed versionado
+server/data/users.json
+server/data/users.json.bak
+server/data/libraries
+server/data/jwt.secret
+server/data/mediaCatalog.runtime.json*
+server/data/mediaCatalog.json
+server/data/*.bak
+server/data/*.tmp
+server/data/*.corrupt-*
+server/data/backup-pre-sqlite-*
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# Não precisa em produção
+tests
+Documentacao
+scripts/status.js
+*.bat
+*.md
+Dockerfile
+docker-compose*.yml
+eslint.config.js
+prettier.config.js
+.prettierignore
+.nvmrc

@@ -1,28 +1,13 @@
 // Exclusão de conta: apaga o usuário (users.json) e TODOS os arquivos da biblioteca dele
 // (libraries/<id>.json, mais .bak, .corrupt-* e .tmp deixados pelo jsonStore).
-const fs = require('fs');
-const path = require('path');
+const storage = require('../storage');
 const UserModel = require('../models/UserModel');
 const LibraryModel = require('../models/LibraryModel');
 
+// Apaga o documento da biblioteca e as cópias dele (arquivos: .bak/.corrupt-*/.tmp; SQLite: a linha inteira, com a versão anterior).
 function deleteLibraryFiles(libraryModel, userId) {
   const main = libraryModel.filePathFor(userId); // valida o formato do id (sem path traversal)
-  const dir = path.dirname(main);
-  const base = path.basename(main);
-  let removed = 0;
-  let names = [];
-  try {
-    names = fs.readdirSync(dir);
-  } catch {
-    return removed; // pasta ainda não existe
-  }
-  for (const name of names) {
-    if (name === base || name.startsWith(`${base}.`)) {
-      fs.rmSync(path.join(dir, name), { force: true });
-      removed++;
-    }
-  }
-  return removed;
+  return storage.removeAll(main);
 }
 
 // Ordem: primeiro a conta, depois a biblioteca. Se a segunda etapa falhar, a conta já saiu e sobra só um arquivo órfão

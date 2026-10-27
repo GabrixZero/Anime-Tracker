@@ -1,7 +1,7 @@
-const fs = require('fs');
 const path = require('path');
 const config = require('../config/config');
-const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
+const storage = require('../storage');
+const { readJson, writeJsonAtomic } = storage;
 const { STATE_VERSION, migrateLibrary } = require('../../public/js/utils/migrations');
 const LibraryMerge = require('../../public/js/utils/libraryMerge');
 
@@ -151,12 +151,7 @@ class LibraryModel {
   // Migra todas as bibliotecas existentes (chamado na inicialização). Arquivos ilegíveis são pulados e reportados.
   migrateAll() {
     const summary = { migrated: 0, skipped: 0, failed: 0 };
-    let files = [];
-    try {
-      files = fs.readdirSync(this.dir).filter(f => /^usr_[A-Za-z0-9_]+\.json$/.test(f));
-    } catch {
-      return summary; // pasta ainda não existe
-    }
+    const files = storage.listNames(this.dir, /^usr_[A-Za-z0-9_]+\.json$/); // pasta inexistente = lista vazia
     for (const f of files) {
       try {
         const id = f.replace(/\.json$/, '');

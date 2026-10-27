@@ -1,12 +1,24 @@
 {
   "name": "antigravity-projeto",
   "version": "1.0.0",
-  "description": "> **Engenharia Reversa & Réplica Pessoal Blindada contra perda de dados.**",
-  "main": "app.js",
+  "private": true,
+  "description": "ShowVault: rastreador de séries, animes e filmes (Express + HTML/CSS/JS vanilla, sem build).",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=26.0.0"
+  },
   "scripts": {
-    "test": "node --test tests/",
     "start": "node server.js",
-    "status": "node scripts/status.js"
+    "start:env": "node --env-file=.env server.js",
+    "test": "node --test tests/",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write eslint.config.js prettier.config.js scripts/storage.js \"server/storage/**/*.js\" \"tests/storage-*.test.js\" tests/routes-http.test.js tests/auth-session.test.js",
+    "format:check": "prettier --check eslint.config.js prettier.config.js scripts/storage.js \"server/storage/**/*.js\" \"tests/storage-*.test.js\" tests/routes-http.test.js tests/auth-session.test.js",
+    "status": "node scripts/status.js",
+    "storage:migrate": "node scripts/storage.js migrate",
+    "storage:export": "node scripts/storage.js export"
   },
   "repository": {
     "type": "git",
@@ -15,7 +27,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/GabrixZero/Anime-Tracker/issues"
   },
@@ -27,5 +38,11 @@
     "google-auth-library": "^11.3.1",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10"
   }
 }
