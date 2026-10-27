@@ -125,8 +125,8 @@ class NextUpView {
         <h3 class="empty-title">Sua lista está vazia</h3>
         <p class="empty-text empty-text--narrow">Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar, ou carregue alguns títulos de exemplo para ver o app funcionando (você remove quando quiser).</p>
         <div class="empty-actions">
-          <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar</button>
-          <button class="btn btn-outline" onclick="window.appController.loadExample()">Carregar exemplo</button>
+          <button type="button" class="btn btn-primary" data-focus-key="empty:explore" onclick="window.appController.switchTab('explore')">Explorar</button>
+          <button type="button" class="btn btn-outline" data-focus-key="empty:example" onclick="window.appController.loadExample()">Carregar exemplo</button>
         </div>
       `;
       return;
@@ -153,7 +153,7 @@ class NextUpView {
       </div>
       <h3 class="empty-title">Você está em dia com tudo!</h3>
       <p class="empty-text empty-text--narrow">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
-      <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar</button>
+      <button type="button" class="btn btn-primary" data-focus-key="empty:explore" onclick="window.appController.switchTab('explore')">Explorar</button>
     `;
   }
 
