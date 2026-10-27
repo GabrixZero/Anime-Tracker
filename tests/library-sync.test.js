@@ -162,7 +162,7 @@ function makeDevice(model, { withViews = false, firstVisit = false } = {}) {
   };
   ctx.window = ctx;
   vm.createContext(ctx);
-  const files = ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
+  const files = ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/viewKit.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
 
   const userFromToken = () => {
     const tok = store.get('showvault_auth_token');

@@ -131,11 +131,11 @@ test('rótulos não vazam implementação nem prometem o que não existe', () =>
 });
 
 test('estado vazio tem chamada para explorar e "Carregar exemplo" (lista e A Seguir)', () => {
-  assert.match(html, /id="btn-watchlist-example"[^>]*loadExample\(\)/);
+  assert.match(html, /id="btn-watchlist-example"[^>]*data-action="load-example"/);
   assert.match(html, /id="watchlist-empty-title"/);
   const nextUp = read('js', 'views', 'nextUpView.js');
   assert.match(nextUp, /Carregar exemplo/);
-  assert.match(nextUp, /appController\.loadExample\(\)/);
+  assert.match(nextUp, /data-action="load-example"/);
 });
 
 test('o editor tem botão de histórico e painel de versões; o diário renderiza Markdown', () => {

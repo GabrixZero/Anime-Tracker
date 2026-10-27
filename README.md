@@ -147,7 +147,7 @@ Detalhes de cada arquivo: `Documentacao/01-visao-geral-e-arquitetura.md`.
 
 * **Contas:** cadastro e login por e-mail e senha (8 a 128 caracteres, guardada só como hash scrypt). Tentativas erradas de login são limitadas (10 por e-mail/IP em 15 min) e o cadastro também (20 por hora por IP). A API tem rotas para trocar a senha e excluir a conta e a biblioteca, ambas pedindo a senha (ainda sem tela no app).
 * **Sincronização:** com a conta logada, sua lista, episódios assistidos e anotações são enviados ao servidor (`libraries/<usuario>.json` ou o banco SQLite; nunca vão para o Git) e mesclados no próximo login. O navegador continua sendo a fonte primária (local-first); remoções se propagam entre aparelhos.
-* **Segurança:** o servidor usa `helmet` e CORS restrito; o texto vindo do catálogo/usuário é escapado antes de ir para a tela; o log de requisições mostra só método e endereço (nunca corpo, senha ou token). Ainda não há Content-Security-Policy estrita porque o HTML tem manipuladores `onclick` inline (planejado para a fase B da S10).
+* **Segurança:** o servidor usa `helmet` e CORS restrito; o texto vindo do catálogo/usuário é escapado antes de ir para a tela; o log de requisições mostra só método e endereço (nunca corpo, senha ou token). A **Content-Security-Policy** é estrita: scripts só de arquivos do próprio site (e do Google, se o login Google estiver ligado), sem `onclick`/`style` inline no HTML (a interação usa `data-action`, veja `public/js/utils/actions.js`). Só com `GOOGLE_CLIENT_ID` configurado a política aceita estilos inline, porque o botão do Google os injeta (scripts continuam estritos). A lista do que é liberado fica em `server/config/csp.js`.
 
 ### Login com Google (opcional) — passo a passo para criar o Client ID
 

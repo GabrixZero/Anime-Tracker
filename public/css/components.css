@@ -142,11 +142,13 @@
   margin-bottom: 2rem;
 }
 
-.type-pill-btn {
+/* Chips de filtro e abas de temporada (S10): UMA base compartilhada por .type-pill-btn (chip arredondado), .pill-btn (segmento dentro
+   de .filter-pills) e .season-tab-btn (aba retangular). Cada um só declara o que o diferencia (forma, tamanho, cor do ativo). */
+.type-pill-btn,
+.pill-btn,
+.season-tab-btn {
   background: var(--bg-surface);
   border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-full);
-  padding: 0.45rem 1rem;
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 700;
@@ -155,13 +157,20 @@
   transition: all var(--transition-fast);
 }
 
+.type-pill-btn {
+  border-radius: var(--radius-full);
+  padding: 0.45rem 1rem;
+}
+
 .type-pill-btn:hover {
   background: var(--bg-surface-elevated);
   color: var(--text-main);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.type-pill-btn.active {
+/* Estado ativo dos chips (filtros): destaque amarelo translúcido */
+.type-pill-btn.active,
+.pill-btn.active {
   background: rgba(255, 208, 0, 0.15);
   border-color: var(--tvtime-yellow);
   color: var(--tvtime-yellow);

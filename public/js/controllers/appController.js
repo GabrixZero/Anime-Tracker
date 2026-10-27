@@ -217,6 +217,8 @@ class AppController {
     this.renderTab(this.activeTab);
     this.updateBadges(this.activeTab);
     window.detailModalView.refreshStatusPicker();
+    // Explorar mostra "Adicionar" ou "Ver no Cofre" conforme a lista: redesenha os cartões já carregados (sem nova busca)
+    if (this.activeTab === 'explore' && window.exploreView) window.exploreView.refresh();
   }
 
   // Mudou algo de UMA obra (episódio marcado, status): atualiza só o cartão/linha dela na aba visível.

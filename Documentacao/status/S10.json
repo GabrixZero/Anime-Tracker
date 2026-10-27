@@ -2,9 +2,9 @@
   "secao": "S10",
   "titulo": "Qualidade, testes e deploy",
   "arquivo": "Documentacao/secoes/S10-qualidade-testes-deploy.md",
-  "status": "em-andamento",
+  "status": "concluida",
   "branch": "feature/s10-qualidade-testes-deploy",
-  "concluidaEm": "",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": "Fase A pronta (lint, CI, SQLite atras de adaptador, Docker, /health, testes, README, .bat). Falta a fase B (data-action no lugar de onclick, CSP, utilitario unico, a11y), que aguarda a S09 chegar ao develop."
+  "notas": "Fases A e B feitas: lint/CI/Docker/SQLite atras de adaptador/README/.bat e data-action no lugar de onclick, CSP estrita, ViewKit. Pendente: escolher hospedagem e primeiro docker build/CI real."
 }

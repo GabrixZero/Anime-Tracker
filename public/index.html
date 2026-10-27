@@ -29,7 +29,7 @@
     <!-- BARRA SUPERIOR / HEADER -->
     <header class="app-header">
       <div class="header-left">
-        <button type="button" class="brand" id="brand-logo" aria-label="ShowVault: ir para A Seguir" onclick="window.appController.switchTab('next-up')">
+        <button type="button" class="brand" id="brand-logo" aria-label="ShowVault: ir para A Seguir" data-action="goto-tab" data-goto="next-up">
           <span class="brand-badge">
             <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
@@ -137,7 +137,7 @@
           </div>
           <h3 class="empty-title">Você está em dia com tudo!</h3>
           <p class="empty-text">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
-          <button type="button" class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar</button>
+          <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
         </div>
       </section>
 
@@ -173,8 +173,8 @@
           <h3 class="empty-title" id="watchlist-empty-title">Sua lista está vazia</h3>
           <p class="empty-text" id="watchlist-empty-text">Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.</p>
           <div class="empty-actions">
-            <button type="button" class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar</button>
-            <button type="button" class="btn btn-outline" id="btn-watchlist-example" data-focus-key="empty:example" onclick="window.appController.loadExample()">Carregar exemplo</button>
+            <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
+            <button type="button" class="btn btn-outline" id="btn-watchlist-example" data-focus-key="empty:example" data-action="load-example">Carregar exemplo</button>
           </div>
         </div>
       </section>
@@ -362,7 +362,7 @@
           </form>
 
           <div class="tvtime-auth-footer">
-            <span id="tvtime-switch-link">Não tem conta? <button type="button" class="auth-switch-link" onclick="window.authView.switchMode('register')">Cadastre-se grátis</button></span>
+            <span id="tvtime-switch-link">Não tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">Cadastre-se grátis</button></span>
           </div>
         </div>
       </div>
@@ -520,9 +520,11 @@
 
   <!-- Scripts em Ordem de Dependência MVC -->
   <script src="js/utils/dom.js"></script>
+  <script src="js/utils/actions.js"></script>
   <script src="js/utils/emotions.js"></script>
   <script src="js/utils/markdown.js"></script>
   <script src="js/utils/mediaDisplay.js"></script>
+  <script src="js/utils/viewKit.js"></script>
   <script src="js/utils/dialog.js"></script>
   <script src="js/utils/a11y.js"></script>
   <script src="js/utils/libraryMerge.js"></script>
@@ -540,5 +542,6 @@
   <script src="js/views/exploreView.js"></script>
   <script src="js/views/detailModalView.js"></script>
   <script src="js/controllers/appController.js"></script>
+  <script src="js/controllers/actionHandlers.js"></script>
 </body>
 </html>

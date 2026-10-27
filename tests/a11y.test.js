@@ -47,7 +47,7 @@ test('o anel de foco (amarelo) tem contraste >= 3:1 com o fundo (WCAG 1.4.11)', 
 test('existe :focus-visible global e nenhum "outline: none" sem substituto', () => {
   const a11y = read('css', 'a11y.css');
   assert.ok(/:focus-visible\s*\{[^}]*outline:\s*3px solid/.test(a11y), 'falta :focus-visible global com anel');
-  const allowed = new Set(['.show-open-btn:focus-visible', '.app-main:focus']); // anel desenhado em ::after / alvo não interativo
+  const allowed = new Set(['.show-open-btn:focus-visible', '.next-up-card .link-btn:focus-visible', '.app-main:focus']); // anel desenhado em ::after / alvo não interativo
   for (const f of cssFiles) {
     const css = read('css', f);
     for (const m of css.matchAll(/([^{}]+)\{[^{}]*outline:\s*none/g)) {
@@ -121,14 +121,21 @@ test('modais e utilitários de acessibilidade estão ligados no HTML antes das v
   assert.ok(html.includes('css/a11y.css'));
 });
 
-test('nada clicável é <div>/<span>/<h*> com onclick, exceto duplicatas só-de-mouse marcadas', () => {
-  const allowed = ['next-up-thumb-wrap', 'next-up-show-name']; // o botão do título faz o mesmo para o teclado
+test('nada clicável é <div>/<span>/<h*>/<img>: só elementos focáveis (botão, select) levam data-action (sem exceções, S10)', () => {
   const sources = [html, ...viewFiles.map(f => read('js', 'views', f))];
   for (const src of sources) {
-    for (const m of src.matchAll(/<(div|span|h[1-6]|li|p|img)\b[^>]*\sonclick=[^>]*>/g)) {
-      assert.ok(allowed.some(c => m[0].includes(c)), `elemento não focável com onclick: ${m[0].slice(0, 100)}`);
+    for (const m of src.matchAll(/<(div|span|h[1-6]|li|p|img)\b[^>]*\sdata-(?:change-)?action=[^>]*>/g)) {
+      assert.fail(`elemento não focável com data-action: ${m[0].slice(0, 100)}`);
     }
   }
+});
+
+test('o botão do título do A Seguir cobre o cartão (substitui os cliques só-de-mouse da miniatura e do nome)', () => {
+  const css = read('css', 'a11y.css');
+  assert.ok(/\.next-up-card \.link-btn::after\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/.test(css));
+  assert.ok(/\.next-up-card \.next-up-footer\s*\{[^}]*z-index:\s*2/.test(css), 'botões Assistido/Anotar ficam por cima');
+  const view = read('js', 'views', 'nextUpView.js');
+  assert.ok(!/next-up-thumb-wrap[^>]*data-action/.test(view) && !/next-up-show-name[^>]*data-action/.test(view));
 });
 
 test('o círculo de marcar episódio é um checkbox acessível (button role=checkbox + aria-checked)', () => {

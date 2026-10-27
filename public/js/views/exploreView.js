@@ -112,7 +112,21 @@ class ExploreView {
       if (seq !== this.requestSeq) return;
       this.container.removeAttribute('aria-busy');
       this.container.innerHTML = `<div class="grid-message grid-message--error" role="alert">${escapeHtml(this.describeError(err))}
-        <div><button type="button" class="btn btn-sm btn-secondary" onclick="window.exploreView.loadMedia()">Tentar de novo</button></div></div>`;
+        <div><button type="button" class="btn btn-sm btn-secondary" data-action="retry-explore">Tentar de novo</button></div></div>`;
+    }
+  }
+
+  // Depois de adicionar/remover uma obra (S10, achado da S03): redesenha os cartões que já estão na tela, sem buscar de novo,
+  // para o botão virar "Ver no Cofre"/"+ Adicionar" e devolve o foco ao mesmo botão (o HTML é recriado).
+  refresh() {
+    if (!this.container || !Array.isArray(this.items) || this.items.length === 0) return;
+    if (this.container.querySelector('.grid-message--error')) return; // mostrando erro de busca: não há cartões
+    const active = document.activeElement;
+    const key = active && this.container.contains(active) ? active.getAttribute('data-focus-key') : null;
+    this.render(this.items, this.notice);
+    if (key) {
+      const again = this.container.querySelector(`[data-focus-key="${key}"]`);
+      if (again && again.focus) again.focus();
     }
   }
 
@@ -168,17 +182,12 @@ class ExploreView {
 
   render(items, notice = '') {
     const MD = window.MediaDisplay; // S08: "Sem nota"/"Sem gênero"/imagem local quando a fonte não informa
-    const fallbackPoster = MD.POSTER_PLACEHOLDER;
     const trackedIds = new Set(window.appState ? window.appState.data.trackedShows.map(t => t.showId) : []);
 
     this.container.innerHTML = notice + items.map(item => {
       const isTracked = trackedIds.has(item.id);
 
-      const typeBadge = item.type === 'movie'
-        ? `<span class="badge-type-tag badge-type-movie">Filme</span>`
-        : item.type === 'anime'
-        ? `<span class="badge-type-tag badge-type-anime">Anime</span>`
-        : `<span class="badge-type-tag badge-type-tv">Série</span>`;
+      const typeBadge = window.ViewKit.typeBadge(item.type);
 
       // Temporada/cour de exibição ("Outono 2023") quando a fonte informa; senão o ano.
       const when = item.season_label || MD.yearText(item.first_air_date);
@@ -188,10 +197,9 @@ class ExploreView {
         <div class="show-card">
           <div class="show-poster-wrap">
             <img class="show-poster"
-                 src="${safeSrc(item.poster_path) || fallbackPoster}"
+                 ${window.ViewKit.imgAttrs(item.poster_path, 'poster')}
                  alt="Pôster de ${escapeHtml(item.name)}"
-                 loading="lazy" decoding="async"
-                 onerror="this.onerror=null; this.src='${fallbackPoster}';">
+                 loading="lazy" decoding="async">
             <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(item.vote_average))}</div>
           </div>
 
@@ -201,7 +209,7 @@ class ExploreView {
               <span class="show-year">${escapeHtml(when)}</span>
             </div>
 
-            <h3 class="show-title" title="${escapeHtml(fullTitle)}"><button type="button" class="show-open-btn" data-focus-key="ex:${toInt(item.id)}:open" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</button></h3>
+            <h3 class="show-title" title="${escapeHtml(fullTitle)}"><button type="button" class="show-open-btn" data-focus-key="ex:${toInt(item.id)}:open" data-action="open-detail" data-show="${toInt(item.id)}">${escapeHtml(item.name)}</button></h3>
             <div class="show-meta-line">
               <span>${escapeHtml(this.metaText(item))}</span>
               <span>${escapeHtml(MD.genresText(item.genres, 2))}</span>
@@ -209,11 +217,11 @@ class ExploreView {
 
             <div class="show-card-actions">
               ${isTracked ? `
-                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" onclick="window.detailModalView.open(${toInt(item.id)})">
+                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" data-action="open-detail" data-show="${toInt(item.id)}">
                   Ver no Cofre
                 </button>
               ` : `
-                <button type="button" class="btn btn-sm btn-primary" data-focus-key="ex:${toInt(item.id)}:action" onclick="window.appController.addToList(${toInt(item.id)})">
+                <button type="button" class="btn btn-sm btn-primary" data-focus-key="ex:${toInt(item.id)}:action" data-action="add-to-list" data-show="${toInt(item.id)}">
                   + Adicionar à Lista
                 </button>
               `}
@@ -221,7 +229,7 @@ class ExploreView {
           </div>
         </div>
       `;
-    }).join('') + (this.hasMore ? `<div class="grid-message"><button type="button" class="btn btn-secondary" data-focus-key="ex:more:load" onclick="window.exploreView.loadMore()">Mostrar mais</button></div>` : '');
+    }).join('') + (this.hasMore ? `<div class="grid-message"><button type="button" class="btn btn-secondary" data-focus-key="ex:more:load" data-action="load-more">Mostrar mais</button></div>` : '');
   }
 }
 

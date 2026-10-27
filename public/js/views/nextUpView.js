@@ -115,7 +115,7 @@ class NextUpView {
       if (this.container) {
         this.container.innerHTML = failed
           ? `<div class="grid-message grid-message--error" role="alert">Não foi possível carregar os episódios das suas obras. Verifique a conexão.
-              <div><button type="button" class="btn btn-sm btn-secondary" data-focus-key="nuload:retry" onclick="window.appController.retryDetails()">Tentar de novo</button></div></div>`
+              <div><button type="button" class="btn btn-sm btn-secondary" data-focus-key="nuload:retry" data-action="retry-details">Tentar de novo</button></div></div>`
           : '<div class="grid-message grid-message--info" role="status">Carregando próximos episódios...</div>';
       }
       if (this.emptyState) this.emptyState.classList.add('hidden');
@@ -138,83 +138,76 @@ class NextUpView {
 
     // Caso 1: Usuário não possui nenhuma obra na lista
     if (trackedCount === 0) {
-      this.emptyState.innerHTML = `
-        <div class="empty-icon empty-icon--muted">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-        </div>
-        <h3 class="empty-title">Sua lista está vazia</h3>
-        <p class="empty-text empty-text--narrow">Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar, ou carregue alguns títulos de exemplo para ver o app funcionando (você remove quando quiser).</p>
-        <div class="empty-actions">
-          <button type="button" class="btn btn-primary" data-focus-key="empty:explore" onclick="window.appController.switchTab('explore')">Explorar</button>
-          <button type="button" class="btn btn-outline" data-focus-key="empty:example" onclick="window.appController.loadExample()">Carregar exemplo</button>
-        </div>
-      `;
+      this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
+        iconSvg: '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>',
+        title: 'Sua lista está vazia',
+        text: 'Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar, ou carregue alguns títulos de exemplo para ver o app funcionando (você remove quando quiser).',
+        narrow: true,
+        actionsHtml: `<div class="empty-actions">
+          <button type="button" class="btn btn-primary" data-focus-key="empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>
+          <button type="button" class="btn btn-outline" data-focus-key="empty:example" data-action="load-example">Carregar exemplo</button>
+        </div>`
+      });
       return;
     }
 
     // Caso 2: Filtro específico ativo sem resultados
     if (this.typeFilter !== 'all') {
       const typeLabel = this.typeFilter === 'tv' ? 'séries' : this.typeFilter === 'anime' ? 'animes' : 'filmes';
-      this.emptyState.innerHTML = `
-        <div class="empty-icon empty-icon--muted">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        </div>
-        <h3 class="empty-title">Nenhum título pendente em ${typeLabel}</h3>
-        <p class="empty-text">Todos os seus lançamentos desta categoria estão concluídos.</p>
-        <button class="btn btn-outline" onclick="document.querySelector('#view-next-up .type-pill-btn[data-type=all]').click()">Ver Todos os Títulos</button>
-      `;
+      this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
+        iconSvg: '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+        title: `Nenhum título pendente em ${typeLabel}`,
+        text: 'Todos os seus lançamentos desta categoria estão concluídos.',
+        actionsHtml: '<button type="button" class="btn btn-outline" data-focus-key="empty:all" data-action="show-all-types">Ver Todos os Títulos</button>'
+      });
       return;
     }
 
     // Caso 3: O usuário REALMENTE está com tudo em dia
-    this.emptyState.innerHTML = `
-      <div class="empty-icon empty-icon--success">
-        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      </div>
-      <h3 class="empty-title">Você está em dia com tudo!</h3>
-      <p class="empty-text empty-text--narrow">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
-      <button type="button" class="btn btn-primary" data-focus-key="empty:explore" onclick="window.appController.switchTab('explore')">Explorar</button>
-    `;
+    this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
+      iconSvg: '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      iconClass: 'empty-icon--success',
+      title: 'Você está em dia com tudo!',
+      text: 'Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.',
+      narrow: true,
+      actionsHtml: '<button type="button" class="btn btn-primary" data-focus-key="empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>'
+    });
   }
 
   renderCard(item) {
-    const typeBadge = item.type === 'movie' 
-      ? `<span class="badge-type-tag badge-type-movie">Filme</span>` 
-      : item.type === 'anime' 
-      ? `<span class="badge-type-tag badge-type-anime">Anime</span>`
-      : `<span class="badge-type-tag badge-type-tv">Série</span>`;
+    const typeBadge = window.ViewKit.typeBadge(item.type);
 
     const codeBadge = item.isMovie ? `FILME` : `T${item.seasonNumber}:E${item.episodeNumber}`;
-    const fallbackThumb = window.MediaDisplay.STILL_PLACEHOLDER;
+    // Os botões trazem o episódio em data-*; temporada/episódio ausentes (filme) ficam sem o atributo
+    const epAttrs = (toInt(item.seasonNumber) ? ` data-season="${toInt(item.seasonNumber)}"` : '') + (toInt(item.episodeNumber) ? ` data-episode="${toInt(item.episodeNumber)}"` : '');
 
     return `
       <div class="next-up-card" data-show-id="${toInt(item.showId)}">
-        <div class="next-up-thumb-wrap" aria-hidden="true" onclick="window.detailModalView.open(${toInt(item.showId)})">
+        <div class="next-up-thumb-wrap" aria-hidden="true">
           <img class="next-up-thumb"
-               src="${safeSrc(item.still_path) || fallbackThumb}"
+               ${window.ViewKit.imgAttrs(item.still_path, 'still')}
                alt=""
-               loading="lazy" decoding="async"
-               onerror="this.onerror=null; this.src='${fallbackThumb}';">
+               loading="lazy" decoding="async">
           <span class="next-up-badge">${escapeHtml(codeBadge)}</span>
           ${window.MediaDisplay.runtimeText(item.runtime) ? `<span class="next-up-runtime">${escapeHtml(window.MediaDisplay.runtimeText(item.runtime))}</span>` : ''}
         </div>
         
         <div class="next-up-info">
           <div class="next-up-info-top">
-            <span class="next-up-show-name" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.showName)}</span>
+            <span class="next-up-show-name">${escapeHtml(item.showName)}</span>
             ${typeBadge}
           </div>
 
-          <h3 class="next-up-ep-title"><button type="button" class="link-btn" data-focus-key="nu:${toInt(item.showId)}:open" onclick="window.detailModalView.open(${toInt(item.showId)})">${escapeHtml(item.title)}</button></h3>
+          <h3 class="next-up-ep-title"><button type="button" class="link-btn" data-focus-key="nu:${toInt(item.showId)}:open" data-action="open-detail" data-show="${toInt(item.showId)}">${escapeHtml(item.title)}</button></h3>
           <p class="next-up-overview">${escapeHtml(item.overview || 'Sem descrição cadastrada.')}</p>
           
           <div class="next-up-footer">
-            <button type="button" class="btn-check-episode" data-focus-key="nu:${toInt(item.showId)}:check" aria-label="Marcar como assistido: ${escapeHtml(item.showName)}, ${escapeHtml(codeBadge)}" onclick="window.appController.quickCheck(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})">
+            <button type="button" class="btn-check-episode" data-focus-key="nu:${toInt(item.showId)}:check" aria-label="Marcar como assistido: ${escapeHtml(item.showName)}, ${escapeHtml(codeBadge)}" data-action="quick-check" data-show="${toInt(item.showId)}"${epAttrs}>
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>
               <span>Assistido</span>
             </button>
             
-            <button type="button" class="btn-quick-note" data-focus-key="nu:${toInt(item.showId)}:note" aria-label="Anotar no diário: ${escapeHtml(item.showName)}, ${escapeHtml(codeBadge)}" onclick="window.detailModalView.openNote(${toInt(item.showId)}, ${toInt(item.seasonNumber) || null}, ${toInt(item.episodeNumber) || null})" title="Anotar no Diário">
+            <button type="button" class="btn-quick-note" data-focus-key="nu:${toInt(item.showId)}:note" aria-label="Anotar no diário: ${escapeHtml(item.showName)}, ${escapeHtml(codeBadge)}" data-action="open-note" data-show="${toInt(item.showId)}"${epAttrs} title="Anotar no Diário">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </button>
           </div>

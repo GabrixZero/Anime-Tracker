@@ -121,6 +121,24 @@
   z-index: 1;
 }
 
+/* A Seguir (S10): o botão do título também cobre o cartão (clicar na miniatura ou no nome abre os detalhes, sem div com clique) */
+.next-up-card .link-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.next-up-card .link-btn:focus-visible { outline: none; }
+.next-up-card .link-btn:focus-visible::after {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: -3px;
+  border-radius: var(--radius-md);
+}
+.next-up-card .next-up-footer {
+  position: relative;
+  z-index: 2;
+}
+
 /* O que precisa continuar clicável por cima do botão esticado */
 .show-card .status-select,
 .show-card-actions {

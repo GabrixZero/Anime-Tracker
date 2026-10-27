@@ -127,7 +127,6 @@ class WatchlistView {
   renderCard(t) {
     const state = window.appState;
     const MD = window.MediaDisplay;
-    const fallbackPoster = MD.POSTER_PLACEHOLDER;
     const media = state.getMedia(t.showId);
     if (!media) return '';
 
@@ -148,11 +147,7 @@ class WatchlistView {
       progressText = `${progress.watched}/${progress.total} eps (${percent}%)`;
     }
 
-    const typeBadge = media.type === 'movie'
-      ? `<span class="badge-type-tag badge-type-movie">Filme</span>`
-      : media.type === 'anime'
-      ? `<span class="badge-type-tag badge-type-anime">Anime</span>`
-      : `<span class="badge-type-tag badge-type-tv">Série</span>`;
+    const typeBadge = window.ViewKit.typeBadge(media.type);
 
     const seasonCount = Array.isArray(media.seasons) ? media.seasons.length : (Number(media.season_count) || 1);
 
@@ -160,10 +155,9 @@ class WatchlistView {
           <div class="show-card" data-show-id="${toInt(media.id)}">
             <div class="show-poster-wrap">
               <img class="show-poster"
-                   src="${safeSrc(media.poster_path) || fallbackPoster}"
+                   ${window.ViewKit.imgAttrs(media.poster_path, 'poster')}
                    alt="Pôster de ${escapeHtml(media.name)}"
-                   loading="lazy" decoding="async"
-                   onerror="this.onerror=null; this.src='${fallbackPoster}';">
+                   loading="lazy" decoding="async">
               <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(media.vote_average))}</div>
             </div>
 
@@ -173,13 +167,13 @@ class WatchlistView {
                 <span class="show-year">${escapeHtml(MD.yearText(media.first_air_date))}</span>
               </div>
 
-              <h3 class="show-title" title="${escapeHtml(media.name)}"><button type="button" class="show-open-btn" data-focus-key="wl:${toInt(media.id)}:open" onclick="window.detailModalView.open(${toInt(media.id)})">${escapeHtml(media.name)}</button></h3>
+              <h3 class="show-title" title="${escapeHtml(media.name)}"><button type="button" class="show-open-btn" data-focus-key="wl:${toInt(media.id)}:open" data-action="open-detail" data-show="${toInt(media.id)}">${escapeHtml(media.name)}</button></h3>
               <div class="show-meta-line">
                 <span>${isMovie ? escapeHtml(MD.runtimeText(media.runtime) || 'Filme') : `${seasonCount} temp.`}</span>
                 <span>${escapeHtml(MD.statusText(media.status))}</span>
               </div>
 
-              <select class="status-select status-select--card" data-focus-key="wl:${toInt(media.id)}:status" aria-label="Status de ${escapeHtml(media.name)}" onclick="event.stopPropagation()" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>
+              <select class="status-select status-select--card" data-focus-key="wl:${toInt(media.id)}:status" aria-label="Status de ${escapeHtml(media.name)}" data-change-action="set-status" data-show="${toInt(media.id)}">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>
 
               <div class="show-progress-wrap">
                 <div class="show-progress-info">
@@ -187,7 +181,7 @@ class WatchlistView {
                   <span>${progressText}</span>
                 </div>
                 <div class="show-progress-bar" aria-hidden="true">
-                  <div class="show-progress-fill ${percent === 100 ? 'complete' : ''}" style="width: ${percent}%;"></div>
+                  <div class="show-progress-fill ${percent === 100 ? 'complete' : ''} ${window.ViewKit.pctClass(percent)}"></div>
                 </div>
               </div>
             </div>

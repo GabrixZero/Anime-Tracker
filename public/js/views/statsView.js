@@ -16,18 +16,17 @@ class StatsView {
 
       totalWatchedEpisodes++;
 
-      if (key.includes('_movie')) {
-        const id = Number(key.replace('_movie', ''));
-        const media = state.getMedia(id);
+      const parsed = window.ViewKit.parseKey(key); // { showId, seasonNum, epNum, isMovie } ou null
+      if (!parsed) return;
+
+      if (parsed.isMovie) {
+        const media = state.getMedia(parsed.showId);
         if (media) {
           totalMinutes += (media.runtime || 120) * (item.rewatchCount || 1);
           (media.genres || []).forEach(g => { genresCount[g] = (genresCount[g] || 0) + 1; });
         }
       } else {
-        const parts = key.split('_');
-        const showId = Number(parts[0]);
-        const seasonNum = Number(parts[1].replace('s', ''));
-        const epNum = Number(parts[2].replace('e', ''));
+        const { showId, seasonNum, epNum } = parsed;
 
         const media = state.getMedia(showId);
         if (media) {
@@ -85,7 +84,7 @@ class StatsView {
           <span class="stat-bar-icon" aria-hidden="true">${emo.icon}</span>
           <span class="stat-bar-label">${emo.label}</span>
           <div class="stat-bar-track">
-            <div class="stat-bar-fill" style="width: ${pct}%;"></div>
+            <div class="stat-bar-fill ${window.ViewKit.pctClass(pct)}"></div>
           </div>
           <span class="stat-bar-count">${count}</span>
         </div>
@@ -104,7 +103,7 @@ class StatsView {
           <div class="stat-bar-row">
             <span class="stat-bar-label stat-bar-label--wide">${escapeHtml(genre)}</span>
             <div class="stat-bar-track">
-              <div class="stat-bar-fill stat-bar-fill--cyan" style="width: ${pct}%;"></div>
+              <div class="stat-bar-fill stat-bar-fill--cyan ${window.ViewKit.pctClass(pct)}"></div>
             </div>
             <span class="stat-bar-count">${count}</span>
           </div>
