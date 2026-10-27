@@ -6,18 +6,28 @@ const { parseId, describeId, toInternalId } = require('../utils/ids');
 const { mediaErrors, MediaError, DataCorruptionError } = require('../utils/errors');
 const { requestJson } = require('../utils/httpJson');
 const TtlCache = require('../utils/ttlCache');
-const { normalizeTitle, relevance, franchiseKey, sameWork } = require('../utils/titles');
+const { normalizeTitle, relevance, franchiseKey, sameWork, malIdsOf, anilistIdsOf } = require('../utils/titles');
+const AniListClient = require('./anilistClient');
 const JikanClient = require('./jikanClient');
 const TmdbClient = require('./tmdbClient');
+const anilistMapper = require('./anilistMapper');
 const jikanMapper = require('./jikanMapper');
+const { migrateLegacyCatalog } = require('./catalogMigration');
 
 const TVMAZE_BASE = 'https://api.tvmaze.com';
 const SEED_PATH = path.join(__dirname, '..', 'data', 'mediaCatalog.seed.json');
 const MAX_RESULTS = 30;
 const TVMAZE_STATUS_PT = { Running: 'Em Exibição', Ended: 'Finalizada', 'To Be Determined': 'A definir', 'In Development': 'Em desenvolvimento' };
+// Formatos da AniList cujos episódios a Jikan lista (títulos reais); filme = 1 episódio, sem consulta.
+const JIKAN_EPISODE_FORMATS = new Set(['TV', 'TV_SHORT', 'ONA', 'OVA', 'SPECIAL']);
+const AIRING_STATUS = 'Em Exibição';
+const UPCOMING_STATUS = 'Em breve';
+const FORCE_REFRESH_MIN_MS = 10 * 60 * 1000;      // atualização forçada da mesma obra: no máximo 1 vez a cada 10 min
+const REFRESH_RETRY_AFTER_FAILURE_MS = 30 * 60 * 1000; // a conferência automática não insiste numa obra que acabou de falhar
 
 // Catálogo de obras: seed versionado (somente leitura) + catálogo de runtime (ignorado pelo git) na pasta de dados.
-// Obras novas entram por ingestão sob demanda (Jikan/MyAnimeList para animes, TVMaze e TMDB para séries, TMDB para filmes).
+// Obras novas entram por ingestão sob demanda (AniList para animes, com a Jikan/MyAnimeList de reserva — D-26; TVMaze e TMDB para séries,
+// TMDB para filmes). Obras em exibição têm validade (TTL) e buscam episódios novos (refresh, S13).
 // Os ids seguem as faixas de utils/ids.js.
 class MediaService {
   constructor(opts = {}) {
@@ -30,11 +40,21 @@ class MediaService {
     this.sleep = opts.sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
     this.writeBlockedBy = null;       // preenchido se o catálogo de runtime estiver ilegível: leitura segue, gravação não
 
-    // Fontes externas. Jikan (animes) está sempre ligada; o TMDB (séries/filmes) só com TMDB_API_KEY (D-17).
+    // Fontes externas. Anime: AniList (principal) e Jikan (reserva), ambas sempre ligadas; o TMDB (séries/filmes) só com TMDB_API_KEY (D-17).
     const fetchJson = (url, o) => this.fetchJson(url, o);
+    this.anilistEnabled = opts.anilistEnabled !== false;
+    this.anilist = new AniListClient({ fetchJson, sleep: this.sleep, baseUrl: opts.anilistBase || config.ANILIST_BASE_URL || undefined, ...(opts.anilist || {}) });
     this.jikanEnabled = opts.jikanEnabled !== false;
     this.jikan = new JikanClient({ fetchJson, sleep: this.sleep, baseUrl: opts.jikanBase || process.env.JIKAN_BASE_URL, ...(opts.jikan || {}) });
     this.tmdb = new TmdbClient({ apiKey: opts.tmdbKey !== undefined ? opts.tmdbKey : config.TMDB_API_KEY, baseUrl: opts.tmdbBase, fetchJson });
+
+    // Atualização de obras em exibição (S13): validade por obra, tentativas recentes e orçamento de tempo dos títulos da Jikan.
+    this.airingTtlMs = opts.airingTtlMs ?? config.AIRING_TTL_MS;
+    this.upcomingTtlMs = opts.upcomingTtlMs ?? 24 * 60 * 60 * 1000;
+    this.enrichBudgetMs = opts.enrichBudgetMs ?? 15000;
+    this.refreshAttempts = new Map();   // id -> quando falhou a última atualização automática
+    this.refreshTimers = [];
+    this.refreshing = false;
 
     this.loadCatalog();
   }
@@ -76,20 +96,47 @@ class MediaService {
       return;
     }
 
-    const items = (runtime || []).filter(MediaService.isValidItem).map(m => this.withSeedHints(m));
+    let items = (runtime || []).filter(MediaService.isValidItem).map(m => this.withSeedHints(m));
     if (runtime && items.length !== runtime.length) {
       console.warn(`[MediaService] ${runtime.length - items.length} item(ns) inválido(s) ignorado(s) no catálogo de runtime.`);
     }
+
+    // S13: obras gravadas pelo mapper antigo (nota 8.0 / "Drama" / fotos do Unsplash inventadas) são limpas e marcadas para
+    // atualização. Idempotente (uma segunda partida não acha nada) e SEMPRE depois de um backup do arquivo como estava.
+    let migrated = false;
+    if (runtime) {
+      const result = migrateLegacyCatalog(items);
+      if (result.changed.length > 0 && this.backupBeforeMigration(runtime, result.changed)) {
+        items = result.items;
+        migrated = true;
+      }
+    }
+
     const known = new Set(items.map(m => m.id));
     const missing = seed.filter(m => !known.has(m.id));
     this.catalog = [...items, ...missing];
 
-    if (!runtime || missing.length > 0 || items.length !== (runtime || []).length) {
+    if (!runtime || missing.length > 0 || items.length !== (runtime || []).length || migrated) {
       try {
         this.saveCatalog(this.catalog);
       } catch (err) {
         console.error('[MediaService] Não foi possível gravar o catálogo de runtime (seguindo em memória):', err.message);
       }
+    }
+  }
+
+  // Cópia do catálogo de runtime COMO ESTAVA, antes da migração mexer em qualquer obra (mediaCatalog.backup-pre-s13-<data>.json, ao lado
+  // do original, ignorada pelo git). Sem a cópia a migração não acontece: tenta de novo na próxima partida.
+  backupBeforeMigration(original, changed) {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const file = path.join(path.dirname(this.catalogPath), `mediaCatalog.backup-pre-s13-${stamp}.json`);
+    try {
+      writeJsonAtomic(file, original);
+      console.log(`[MediaService] Migração S13: ${changed.length} obra(s) do catálogo antigo marcadas para atualização (backup: ${path.basename(file)}).`);
+      return true;
+    } catch (err) {
+      console.error('[MediaService] Migração S13 adiada: não foi possível gravar o backup do catálogo:', err.message);
+      return false;
     }
   }
 
@@ -118,7 +165,7 @@ class MediaService {
     const retries429 = opts.retries429 ?? 1;
     for (let attempt = 0; ; attempt++) {
       try {
-        return await this.requestJson(url, opts.headers);
+        return await this.requestJson(url, opts.headers, opts);
       } catch (err) {
         if (err.code === 'RATE_LIMITED' && attempt < retries429) {
           await this.sleep(Math.min(err.retryAfterMs || 1500, 5000));
@@ -129,8 +176,9 @@ class MediaService {
     }
   }
 
-  requestJson(url, headers) {
-    return requestJson(url, { headers });
+  // opts.method / opts.body: a AniList (GraphQL) é POST com corpo JSON; as outras fontes são GET.
+  requestJson(url, headers, opts = {}) {
+    return requestJson(url, { headers, method: opts.method, body: opts.body });
   }
 
   // --- Mapeamento TVMaze -> obra do catálogo (tudo passa pelo sanitizador da S01) -----------------
@@ -179,10 +227,40 @@ class MediaService {
       || !describeId(item.id).ingestable;
   }
 
+  // A obra já está no catálogo? Pelo próprio id (completa) ou por OUTRO id que cobre a mesma entrada da MAL/AniList (a franquia foi
+  // ingerida por outra temporada). Uma amostra do seed não conta por esse caminho: ela precisa ser trocada pela obra real (ingestão).
+  resolveExisting(id) {
+    const local = this.findLocal(id);
+    if (local && MediaService.isComplete(local)) return local;
+    const alias = this.findAlias(id);
+    return alias && !MediaService.isSeedSample(alias) ? alias : null;
+  }
+
   // O id pode virar uma obra nova no catálogo (precisa de login)?
   needsIngest(id) {
-    const existing = this.findLocal(id);
-    return !(existing && MediaService.isComplete(existing));
+    return !this.resolveExisting(id);
+  }
+
+  // Obra do catálogo, com id DIFERENTE, que já cobre a entrada da MAL (faixa da Jikan) ou da AniList (faixa própria) deste id.
+  findAlias(id, source = describeId(id)) {
+    let covers;
+    if (source.source === 'jikan') covers = m => malIdsOf(m).has(source.externalId);
+    else if (source.source === 'anilist') covers = m => anilistIdsOf(m).has(source.externalId);
+    else return null;
+    return this.catalog.find(m => m.id !== id && covers(m)) || null;
+  }
+
+  // Obra do catálogo (outro id) que já cobre alguma entrada da franquia recém-baixada: ids em comum, ou — só para amostras do seed —
+  // o mesmo tipo + título + ano (D-S06-4). Evita gravar a mesma franquia duas vezes quando dois pedidos correm ao mesmo tempo.
+  findTwin(work) {
+    const mal = malIdsOf(work);
+    const ani = anilistIdsOf(work);
+    return this.catalog.find((m) => {
+      if (m.id === work.id) return false;
+      for (const id of malIdsOf(m)) if (mal.has(id)) return true;
+      for (const id of anilistIdsOf(m)) if (ani.has(id)) return true;
+      return MediaService.isSeedSample(m) && sameWork(m, work);
+    }) || null;
   }
 
   canIngest(id) {
@@ -213,7 +291,7 @@ class MediaService {
   }
 
   // Busca combinada (S06):
-  //  anime -> Jikan (se cair, TVMaze só com o que é anime) · série -> TVMaze (+ TMDB com chave) · filme -> TMDB (com chave)
+  //  anime -> AniList (se falhar, Jikan; se as duas falharem, TVMaze só com o que é anime) · série -> TVMaze (+ TMDB com chave) · filme -> TMDB (com chave)
   //  todos -> tudo isso junto. Cada fonte tem cache; uma fonte que falha não derruba as outras (vira aviso em `warnings`).
   // Resultado = catálogo local + fontes, sem repetições (mesma obra por id da MAL ou título normalizado + títulos alternativos),
   // sem correspondências fracas (a consulta precisa aparecer no título ou em um título alternativo) e em ordem de relevância.
@@ -235,40 +313,49 @@ class MediaService {
     const wantsMovie = type === 'all' || type === 'movie';
     const warnings = [];
     const failures = [];
-    const note = (source, err) => {
+    // covered = fonte reserva que respondeu no lugar desta: o aviso fica na resposta (`fallback`), mas não conta como erro.
+    const note = (source, err, covered = null) => {
       const typed = err instanceof MediaError;
-      failures.push(err);
+      if (!covered) failures.push(err);
       warnings.push({
         source,
         code: typed ? err.code : 'UPSTREAM',
         message: typed ? err.message : 'Uma fonte externa está indisponível no momento.',
-        ...(typed && err.retryAfterMs ? { retryAfterSec: Math.ceil(err.retryAfterMs / 1000) } : {})
+        ...(typed && err.retryAfterMs ? { retryAfterSec: Math.ceil(err.retryAfterMs / 1000) } : {}),
+        ...(covered ? { fallback: covered } : {})
       });
       if (!typed) console.warn(`Busca externa (${source}) falhou:`, err && err.message);
     };
 
-    // Fase 1: tudo em paralelo (a fila da Jikan e os caches de cada fonte cuidam do ritmo).
+    // Fase 1: tudo em paralelo (as filas e os caches de cada fonte cuidam do ritmo). Anime: AniList e, se ela falhar, a Jikan.
     const jobs = [];
-    if (wantsAnime && this.jikanEnabled) jobs.push(['jikan', () => this.searchJikan(raw)]);
+    if (wantsAnime && (this.anilistEnabled || this.jikanEnabled)) jobs.push(['anime', () => this.searchAnimeSources(raw)]);
     if (wantsTv) jobs.push(['tvmaze', () => this.searchExternal(raw)]);
     if (wantsTv && this.tmdb.enabled) jobs.push(['tmdb', () => this.tmdb.searchTv(raw)]);
     if (wantsMovie && this.tmdb.enabled) jobs.push(['tmdb', () => this.tmdb.searchMovie(raw)]);
     const settled = await Promise.allSettled(jobs.map(([, run]) => run()));
 
-    const bySource = { jikan: [], tvmaze: [], tmdb: [] };
-    const jikanOk = { value: false };
+    const bySource = { anime: [], tvmaze: [], tmdb: [] };
+    let animeOk = false;
+    let animeSource = 'anilist';
     settled.forEach((res, i) => {
       const source = jobs[i][0];
-      if (res.status === 'fulfilled') {
-        bySource[source].push(...res.value.map(item => ({ ...item, isExternal: true })));
-        if (source === 'jikan') jikanOk.value = true;
-      } else {
-        note(source, res.reason);
+      if (res.status !== 'fulfilled') { note(source, res.reason); return; }
+      if (source === 'anime') {
+        const { items: found, source: used, failed } = res.value;
+        failed.forEach(f => note(f.source, f.err, found ? used : null));
+        if (found) {
+          animeOk = true;
+          animeSource = used;
+          bySource.anime.push(...found.map(item => ({ ...item, isExternal: true })));
+        }
+        return;
       }
+      bySource[source].push(...res.value.map(item => ({ ...item, isExternal: true })));
     });
 
-    // Fase 2: anime sem Jikan (desligada ou fora do ar) => o TVMaze serve de reserva, só com o que é anime.
-    const animeFallback = wantsAnime && !jikanOk.value;
+    // Fase 2: anime sem AniList nem Jikan (desligadas ou fora do ar) => o TVMaze serve de reserva, só com o que é anime.
+    const animeFallback = wantsAnime && !animeOk;
     if (animeFallback && !wantsTv) {
       try {
         bySource.tvmaze.push(...await this.searchExternal(raw));
@@ -287,7 +374,7 @@ class MediaService {
     });
 
     const external = [
-      ...MediaService.groupJikan(raw, bySource.jikan).map(item => ({ item, source: 'jikan' })),
+      ...MediaService.groupAnime(raw, bySource.anime).map(item => ({ item, source: animeSource })),
       ...bySource.tmdb.map(item => ({ item, source: 'tmdb' })),
       ...tvmaze.map(item => ({ item, source: 'tvmaze' }))
     ]
@@ -314,22 +401,24 @@ class MediaService {
     return score;
   }
 
-  // Ordem: relevância (maior primeiro); empate => local, depois Jikan, TMDB, TVMaze (ordem de entrada, estável).
+  // Ordem: relevância (maior primeiro); empate => local, depois AniList/Jikan, TMDB, TVMaze (ordem de entrada, estável).
   static sortCandidates(list) {
     return list.map((c, i) => ({ c, i })).sort((a, b) => (b.c.score - a.c.score) || (a.i - b.i)).map(x => x.c);
   }
 
-  // Tira as repetições (prioridade: local > Jikan > TMDB > TVMaze) e ordena por relevância.
-  // Exceção: uma obra de amostra do seed (anime com poucos episódios de exemplo) cede lugar à versão real da Jikan.
+  // Tira as repetições (prioridade: local > AniList = Jikan > TMDB > TVMaze) e ordena por relevância.
+  // Exceção: uma obra de amostra do seed (anime com poucos episódios de exemplo) cede lugar à versão real da AniList/Jikan, mas o
+  // resultado leva `catalog_id` = id da amostra: é a MESMA obra (quem já a tem na lista a vê como "na lista", e adicionar troca
+  // a amostra pela obra real, sem criar uma segunda — D-S06-4).
   mergeCandidates(candidates) {
-    const priority = { local: 0, jikan: 1, tmdb: 2, tvmaze: 3 };
+    const priority = { local: 0, anilist: 1, jikan: 1, tmdb: 2, tvmaze: 3 };
     const ordered = candidates.map((c, i) => ({ c, i })).sort((a, b) => (priority[a.c.source] - priority[b.c.source]) || (a.i - b.i)).map(x => x.c);
     const kept = [];
     for (const cand of ordered) {
       const dup = kept.findIndex(k => sameWork(k.item, cand.item));
       if (dup < 0) { kept.push(cand); continue; }
-      if (cand.source === 'jikan' && kept[dup].source === 'local' && MediaService.isSeedSample(kept[dup].item)) {
-        kept[dup] = { ...cand, score: Math.max(cand.score, kept[dup].score) };
+      if ((cand.source === 'anilist' || cand.source === 'jikan') && kept[dup].source === 'local' && MediaService.isSeedSample(kept[dup].item)) {
+        kept[dup] = { ...cand, item: { ...cand.item, catalog_id: kept[dup].item.id }, score: Math.max(cand.score, kept[dup].score) };
       }
     }
     return MediaService.sortCandidates(kept);
@@ -340,17 +429,44 @@ class MediaService {
     return item.type === 'anime' && !item.ingestedAt && describeId(item.id).source === 'seed' && Number.isSafeInteger(item.mal_id);
   }
 
-  // --- Jikan: busca ------------------------------------------------------------------------------
+  // --- Anime: busca (AniList principal, Jikan reserva) -----------------------------------------------
+
+  // Tenta a AniList; se ela falhar tenta a Jikan. Nunca lança: devolve {items (null = nenhuma respondeu), source, failed:[{source, err}]}.
+  // Uma lista vazia É uma resposta (a obra não existe): a reserva só entra quando a fonte principal FALHA.
+  async searchAnimeSources(q) {
+    const failed = [];
+    if (this.anilistEnabled) {
+      try {
+        return { items: await this.searchAniList(q), source: 'anilist', failed };
+      } catch (err) {
+        failed.push({ source: 'anilist', err });
+      }
+    }
+    if (this.jikanEnabled) {
+      try {
+        return { items: await this.searchJikan(q), source: 'jikan', failed };
+      } catch (err) {
+        failed.push({ source: 'jikan', err });
+      }
+    }
+    return { items: null, source: null, failed };
+  }
+
+  async searchAniList(q) {
+    const entries = await this.anilist.searchAnime(q, { limit: 25 });
+    return entries.map(anilistMapper.mapAnimeSearchEntry);
+  }
 
   async searchJikan(q) {
     const entries = await this.jikan.searchAnime(q, { limit: 25 });
     return entries.map(jikanMapper.mapAnimeSearchEntry);
   }
 
-  // Várias entradas da MAL da mesma franquia (temporadas/partes: mesma chave de título sem "Season 2", "Part 2", "Final Season"...)
+  // Várias entradas da MAL/AniList da mesma franquia (temporadas/partes: mesma chave de título sem "Season 2", "Part 2", "Final Season"...)
   // viram UM resultado: a entrada mais antiga (TV primeiro) com `related_count` e o conjunto de ids/títulos do grupo.
   // Receber um id do meio da cadeia também funciona: a ingestão caminha pelas relações Sequel/Prequel para os dois lados.
-  static groupJikan(query, items) {
+  // (Agrupador da S06, agora para as duas fontes de anime; entradas só da AniList não têm `mal_id`.)
+  static groupAnime(query, items) {
     const parent = items.map((_, i) => i);
     const find = i => (parent[i] === i ? i : (parent[i] = find(parent[i])));
     const keyOwner = new Map();
@@ -374,14 +490,16 @@ class MediaService {
       const scoreOf = it => relevance(query, it);
       const best = Math.max(...members.map(scoreOf));
       if (best === 0) continue;
-      const tvFirst = [...members].sort((a, b) => ((a.anime_kind ? 1 : 0) - (b.anime_kind ? 1 : 0)) || dateKey(a).localeCompare(dateKey(b)) || a.mal_id - b.mal_id);
+      const tvFirst = [...members].sort((a, b) => ((a.anime_kind ? 1 : 0) - (b.anime_kind ? 1 : 0)) || dateKey(a).localeCompare(dateKey(b)) || a.id - b.id);
       const rep = tvFirst[0];
       const alt = new Set(rep.alt_titles);
       members.forEach(m => [m.name, m.original_name, ...m.alt_titles].forEach(t => t && t !== rep.name && alt.add(t)));
+      const anilistIds = members.map(m => m.anilist_id).filter(Number.isSafeInteger);
       out.push({
         ...rep,
         alt_titles: [...alt].slice(0, 40),
-        mal_ids: members.map(m => m.mal_id),
+        mal_ids: members.map(m => m.mal_id).filter(Number.isSafeInteger),
+        ...(anilistIds.length ? { anilist_ids: anilistIds } : {}),
         related_count: members.length - 1,
         _order: Math.min(...members.map(m => items.indexOf(m)))
       });
@@ -407,12 +525,12 @@ class MediaService {
     return results;
   }
 
-  // Detalhes por id: obra do catálogo ou, se for de uma fonte ingerível, ingestão sob demanda.
+  // Detalhes por id: obra do catálogo (ou a mesma obra com outro id) ou, se for de uma fonte ingerível, ingestão sob demanda.
   // (O controller só chama a ingestão para usuários logados; aqui os erros sobem tipados.)
   async getById(id) {
     const numId = parseId(id);
-    const existing = this.findLocal(numId);
-    if (existing && MediaService.isComplete(existing)) return existing;
+    const existing = this.resolveExisting(numId);
+    if (existing) return existing;
     return this.ingest(numId);
   }
 
@@ -420,6 +538,8 @@ class MediaService {
 
   // Baixa a obra completa (todos os episódios) e grava de forma atômica no catálogo de runtime.
   // Chamadas simultâneas do mesmo id compartilham a mesma operação (um único download e uma única gravação).
+  // Anime que já existe no catálogo com outro id (a franquia foi ingerida por outra temporada) devolve a obra existente; anime que
+  // é uma AMOSTRA do seed (D-S06-4) é baixado e grava no lugar da amostra, com o MESMO id dela: nunca duas obras para um anime.
   ingest(id) {
     let numId;
     try {
@@ -436,12 +556,20 @@ class MediaService {
     if ((source.source === 'tmdb_tv' || source.source === 'tmdb_movie') && !this.tmdb.enabled) {
       return Promise.reject(mediaErrors.notConfigured('Séries e filmes do TMDB não estão habilitados neste servidor (falta a chave TMDB_API_KEY).'));
     }
+    if (source.source === 'anilist' && !this.anilistEnabled) {
+      return Promise.reject(mediaErrors.notConfigured('A AniList está desligada neste servidor.'));
+    }
     if (this.writeBlockedBy) return Promise.reject(mediaErrors.catalogUnavailable());
 
+    const alias = this.findAlias(numId, source);
+    if (alias && !MediaService.isSeedSample(alias)) return Promise.resolve(alias);
+
     if (this.inflight.has(numId)) return this.inflight.get(numId);
+    const targetId = alias ? alias.id : numId;
     const run = {
       tvmaze: () => this.ingestTvmaze(numId, source.externalId),
-      jikan: () => this.ingestJikan(numId, source.externalId),
+      jikan: () => this.ingestAnime(targetId, { malId: source.externalId }),
+      anilist: () => this.ingestAnime(targetId, { anilistId: source.externalId }),
       tmdb_tv: () => this.ingestTmdb(numId, () => this.tmdb.getTv(source.externalId)),
       tmdb_movie: () => this.ingestTmdb(numId, () => this.tmdb.getMovie(source.externalId))
     }[source.source];
@@ -462,7 +590,13 @@ class MediaService {
     return fullMedia;
   }
 
-  async ingestTvmaze(numId, tvmazeId) {
+  // Marcas de tempo de uma ingestão: `ingestedAt` = primeira vez (não muda nas atualizações); `refreshedAt` = última vez que os dados vieram da fonte.
+  static stamps(previous) {
+    const now = new Date().toISOString();
+    return { ingestedAt: (previous && previous.ingestedAt) || now, refreshedAt: now };
+  }
+
+  async ingestTvmaze(numId, tvmazeId, { previous = null } = {}) {
     const data = await this.fetchJson(`${this.tvmazeBase}/shows/${tvmazeId}?embed=episodes`);
 
     // O TVMaze responde {"name":"Not Found","status":404,...} em erros: só vale uma obra com o id pedido e um nome.
@@ -492,22 +626,225 @@ class MediaService {
     return this.commitIngested(numId, {
       ...MediaService.mapTvmazeShow(data),
       seasons: Array.from(seasonsMap.values()).sort((a, b) => a.season_number - b.season_number),
-      ingestedAt: new Date().toISOString()
+      ...MediaService.stamps(previous)
     });
   }
 
-  // Anime: a obra reúne a franquia inteira (cadeia Sequel/Prequel da MAL) como temporadas (D-18, etapa 2).
-  async ingestJikan(numId, malId) {
-    const franchise = await this.jikan.getFranchise(malId);
-    const work = jikanMapper.buildAnimeWork(numId, malId, franchise);
-    return this.commitIngested(numId, { ...work, ingestedAt: new Date().toISOString() });
+  // Anime: a obra reúne a franquia inteira (cadeia SEQUEL/PREQUEL) como temporadas (D-18). A AniList é a fonte principal (D-26); se ela
+  // falhar ou não conhecer a obra e houver id da MAL, a Jikan faz o mesmo trabalho. `req` = {malId} ou {anilistId}.
+  // `previous` (atualização): obra já gravada, de onde saem as marcas de tempo e os títulos de episódio que a Jikan já tinha dado.
+  async ingestAnime(targetId, req, { fresh = false, previous = null } = {}) {
+    const errors = [];
+    let work = null;
+    if (this.anilistEnabled) {
+      try {
+        work = await this.buildAnimeFromAniList(targetId, req, { fresh });
+      } catch (err) {
+        if (!(err instanceof MediaError) || !req.malId) throw err;   // sem id da MAL a Jikan não consegue ajudar
+        errors.push(err);
+      }
+    }
+    if (!work) {
+      if (!req.malId) throw errors[0] || mediaErrors.notConfigured('A AniList está desligada neste servidor.');
+      try {
+        work = await this.buildAnimeFromJikan(targetId, req.malId, { fresh });
+      } catch (err) {
+        errors.push(err);
+        throw MediaService.pickError(errors);
+      }
+    }
+
+    if (previous) {
+      work = anilistMapper.carryOverEpisodeData(previous, work);
+    } else {
+      // Dois pedidos podem baixar a mesma franquia ao mesmo tempo (por temporadas diferentes): o 2º a chegar devolve a obra do 1º.
+      const twin = this.findTwin(work);
+      if (twin && !MediaService.isSeedSample(twin)) return twin;
+      if (twin) work = { ...work, id: twin.id };
+    }
+    return this.commitIngested(work.id, { ...work, ...MediaService.stamps(previous) });
   }
 
-  async ingestTmdb(numId, load) {
+  async buildAnimeFromAniList(id, req, { fresh = false } = {}) {
+    const root = req.malId ? { idMal: req.malId } : { id: req.anilistId };
+    const franchise = await this.anilist.getFranchise(root, { fresh });
+    const titlesFor = await this.jikanTitles(franchise);
+    return anilistMapper.buildAnimeWork(id, req, franchise, { titlesFor });
+  }
+
+  async buildAnimeFromJikan(id, malId, { fresh = false } = {}) {
+    const franchise = await this.jikan.getFranchise(malId, { fresh });
+    return jikanMapper.buildAnimeWork(id, malId, franchise);
+  }
+
+  // Títulos de episódio (a AniList não os tem): pergunta à Jikan, entrada por entrada (as que têm idMal). Melhor esforço: Jikan fora do
+  // ar (disjuntor aberto), lenta (orçamento de tempo) ou com erro NUNCA atrapalha a ingestão; os episódios ficam "Episódio N".
+  async jikanTitles(franchise) {
+    const titles = new Map();
+    if (!this.jikanEnabled || this.jikan.breaker.isOpen) return titles;
+    const started = Date.now();
+    for (const a of franchise.nodes) {
+      if (!a.idMal || !JIKAN_EPISODE_FORMATS.has(a.format) || a.status === 'NOT_YET_RELEASED') continue;
+      if (Date.now() - started > this.enrichBudgetMs) break;
+      try {
+        titles.set(a.id, await this.jikan.getEpisodes(a.idMal));
+      } catch (err) {
+        if (err instanceof MediaError && err.code === 'NOT_FOUND') continue;   // essa entrada não tem lista na MAL: segue com as outras
+        console.warn(`[MediaService] Títulos de episódio da Jikan indisponíveis (${(err && err.code) || 'erro'}); seguindo só com a AniList.`);
+        break;
+      }
+    }
+    return titles;
+  }
+
+  // Dos erros das fontes, o mais útil para quem chamou: "aguarde" (429) > fonte fora do ar (502) > não encontrado (404).
+  static pickError(errors) {
+    const typed = errors.filter(e => e instanceof MediaError);
+    return typed.find(e => e.code === 'RATE_LIMITED') || typed.find(e => e.code === 'UPSTREAM') || typed[0] || errors[0];
+  }
+
+  async ingestTmdb(numId, load, { previous = null } = {}) {
     const media = await load();
-    return this.commitIngested(numId, { ...media, id: numId, ingestedAt: new Date().toISOString() });
+    return this.commitIngested(numId, { ...media, id: numId, ...MediaService.stamps(previous) });
+  }
+
+  // --- Atualização de obras em exibição (S13) -----------------------------------------------------------
+  // Obra "Em Exibição" ganha episódios novos: cada uma tem uma validade (TTL). Vencida, a conferência automática (startRefreshLoop) ou
+  // o endpoint POST /api/media/:id/refresh baixam tudo de novo da MESMA fonte. Obras finalizadas e filmes não vencem nunca.
+  // Obras marcadas pela migração do catálogo antigo (`needsRefresh`) vencem na hora.
+
+  // Validade da obra em ms (0 = vence agora, null = nunca vence).
+  refreshTtlMs(item) {
+    if (!item || !item.ingestedAt || item.type === 'movie') return null;
+    if (item.needsRefresh) return 0;
+    if (item.status === AIRING_STATUS) return this.airingTtlMs;
+    if (item.status === UPCOMING_STATUS) return this.upcomingTtlMs;
+    return null;
+  }
+
+  isRefreshDue(item, now = Date.now()) {
+    const ttl = this.refreshTtlMs(item);
+    if (ttl === null) return false;
+    if (!describeId(item.id).ingestable && !MediaService.isUpgradedSeed(item)) return false;
+    const last = Date.parse(item.refreshedAt || item.ingestedAt) || 0;
+    return now - last >= ttl;
+  }
+
+  // Obra do seed (id do TMDB) que já foi trocada pela versão real da AniList/Jikan: tem `ingestedAt` e id da MAL ou da AniList.
+  static isUpgradedSeed(item) {
+    return item.type === 'anime' && Boolean(item.ingestedAt) && describeId(item.id).source === 'seed' && Boolean(item.mal_id || item.anilist_id);
+  }
+
+  static countEpisodes(item) {
+    return (Array.isArray(item && item.seasons) ? item.seasons : []).reduce((n, s) => n + (Array.isArray(s && s.episodes) ? s.episodes.length : 0), 0);
+  }
+
+  // O que um pedido de atualização faria agora: {run: true} ou {run: false, reason: 'fresh' | 'recent'} (sem tocar na fonte).
+  refreshCheck(id, { force = false, now = Date.now() } = {}) {
+    const numId = parseId(id);
+    const item = this.findLocal(numId);
+    if (!item) throw mediaErrors.notFound();
+    if (!item.ingestedAt || (!describeId(numId).ingestable && !MediaService.isUpgradedSeed(item))) throw mediaErrors.unsupportedSource();
+    if (this.writeBlockedBy) throw mediaErrors.catalogUnavailable();
+    if (this.inflight.has(numId)) return { run: true, item };
+    const last = Date.parse(item.refreshedAt || item.ingestedAt) || 0;
+    if (force) {
+      return now - last < FORCE_REFRESH_MIN_MS ? { run: false, reason: 'recent', item } : { run: true, item };
+    }
+    return this.isRefreshDue(item, now) ? { run: true, item } : { run: false, reason: 'fresh', item };
+  }
+
+  // Atualiza UMA obra do catálogo. Devolve {refreshed, reason?, newEpisodes, item}. Falha da fonte sobe como erro tipado e a obra
+  // continua como estava. `force` ignora a validade (no máximo 1 vez a cada 10 min por obra).
+  async refresh(id, { force = false } = {}) {
+    const numId = parseId(id);
+    const check = this.refreshCheck(numId, { force });
+    if (!check.run) return { refreshed: false, reason: check.reason, newEpisodes: 0, item: check.item };
+    if (this.inflight.has(numId)) {
+      const item = await this.inflight.get(numId);
+      return { refreshed: true, newEpisodes: 0, item };
+    }
+
+    const before = MediaService.countEpisodes(check.item);
+    const promise = this.refreshWork(check.item).finally(() => this.inflight.delete(numId));
+    this.inflight.set(numId, promise);
+    const item = await promise;
+    this.refreshAttempts.delete(numId);
+    return { refreshed: true, newEpisodes: Math.max(0, MediaService.countEpisodes(item) - before), item };
+  }
+
+  // Baixa de novo pela fonte de origem da obra (a faixa do id, ou o id da MAL/AniList guardado na obra).
+  refreshWork(item) {
+    const source = describeId(item.id);
+    if (item.type === 'anime' && (item.mal_id || item.anilist_id) && ['jikan', 'anilist', 'seed'].includes(source.source)) {
+      const req = item.mal_id ? { malId: item.mal_id } : { anilistId: item.anilist_id };
+      return this.ingestAnime(item.id, req, { fresh: true, previous: item });
+    }
+    if (source.source === 'tvmaze') return this.ingestTvmaze(item.id, source.externalId, { previous: item });
+    if (source.source === 'tmdb_tv') return this.ingestTmdb(item.id, () => this.tmdb.getTv(source.externalId), { previous: item });
+    if (source.source === 'tmdb_movie') return this.ingestTmdb(item.id, () => this.tmdb.getMovie(source.externalId), { previous: item });
+    return Promise.reject(mediaErrors.unsupportedSource());
+  }
+
+  // Atualiza as obras vencidas, uma de cada vez e as mais antigas primeiro (no máximo `limit` por rodada). Quem falhou só é tentado
+  // de novo depois de 30 min. Devolve {checked, refreshed:[{id, name, newEpisodes}], failed:[{id, code}]}.
+  async refreshDueWorks({ limit = 5, now = Date.now() } = {}) {
+    const out = { checked: 0, refreshed: [], failed: [] };
+    if (this.writeBlockedBy) return out;
+    const lastOf = m => Date.parse(m.refreshedAt || m.ingestedAt) || 0;
+    const due = this.catalog
+      .filter(m => this.isRefreshDue(m, now) && now - (this.refreshAttempts.get(m.id) || 0) >= REFRESH_RETRY_AFTER_FAILURE_MS)
+      .sort((a, b) => lastOf(a) - lastOf(b))
+      .slice(0, limit);
+    for (const item of due) {
+      out.checked++;
+      try {
+        const res = await this.refresh(item.id);
+        if (res.refreshed) out.refreshed.push({ id: item.id, name: res.item.name, newEpisodes: res.newEpisodes });
+      } catch (err) {
+        this.refreshAttempts.set(item.id, now);
+        out.failed.push({ id: item.id, code: (err && err.code) || 'ERRO' });
+        if (err && (err.unreachable || err.breakerOpen || err.code === 'RATE_LIMITED')) break;   // fonte fora do ar/limitada: tenta depois
+      }
+    }
+    return out;
+  }
+
+  // Conferência automática: de tempos em tempos atualiza as obras vencidas. Só o servidor de verdade liga isto (server.js); os testes não.
+  startRefreshLoop({ intervalMs = 30 * 60 * 1000, initialDelayMs = 60 * 1000, limit = 5, log = console.log } = {}) {
+    this.stopRefreshLoop();
+    const tick = async () => {
+      if (this.refreshing) return;
+      this.refreshing = true;
+      try {
+        const res = await this.refreshDueWorks({ limit });
+        if (res.refreshed.length || res.failed.length) {
+          log(`[MediaService] Atualização de obras: ${res.refreshed.length} atualizada(s)${res.failed.length ? `, ${res.failed.length} com falha (tenta depois)` : ''}.`);
+        }
+      } catch (err) {
+        console.warn('[MediaService] Atualização de obras falhou:', err && err.message);
+      } finally {
+        this.refreshing = false;
+      }
+    };
+    const first = setTimeout(() => {
+      tick();
+      const every = setInterval(tick, intervalMs);
+      every.unref();
+      this.refreshTimers.push(every);
+    }, initialDelayMs);
+    first.unref();
+    this.refreshTimers.push(first);
+    return this;
+  }
+
+  stopRefreshLoop() {
+    for (const t of this.refreshTimers) { clearTimeout(t); clearInterval(t); }
+    this.refreshTimers = [];
   }
 }
+
+MediaService.groupJikan = MediaService.groupAnime; // nome antigo (S06)
 
 module.exports = new MediaService();
 module.exports.MediaService = MediaService;

@@ -46,8 +46,8 @@ class JikanClient extends SourceClient {
   }
 
   // /anime/{id}/full: dados completos + relações (Sequel/Prequel/...) numa única requisição.
-  async getAnimeFull(malId) {
-    const json = await this.get(`/anime/${malId}/full`, { ttlMs: this.detailTtlMs });
+  async getAnimeFull(malId, { fresh = false } = {}) {
+    const json = await this.get(`/anime/${malId}/full`, { ttlMs: this.detailTtlMs, fresh });
     // Em erro a Jikan responde {status, type, message}; só vale um objeto com o mal_id pedido e um título.
     const a = json && json.data;
     if (!a || a.mal_id !== malId || !(a.title || a.title_english)) throw mediaErrors.notFound();
@@ -55,10 +55,10 @@ class JikanClient extends SourceClient {
   }
 
   // Todas as páginas de episódios (100 por página). Devolve [{mal_id (= número do episódio), title, aired, duration, ...}].
-  async getEpisodes(malId) {
+  async getEpisodes(malId, { fresh = false } = {}) {
     const all = [];
     for (let page = 1; page <= this.maxEpisodePages; page++) {
-      const json = await this.get(`/anime/${malId}/episodes?page=${page}`, { ttlMs: this.episodesTtlMs });
+      const json = await this.get(`/anime/${malId}/episodes?page=${page}`, { ttlMs: this.episodesTtlMs, fresh });
       if (!json || !Array.isArray(json.data)) throw mediaErrors.upstream('Resposta inesperada da Jikan.');
       all.push(...json.data);
       const hasNext = json.pagination && json.pagination.has_next_page;
@@ -71,7 +71,7 @@ class JikanClient extends SourceClient {
   // o grafo da MAL é grande e misturaria obras diferentes). Busca em largura a partir do id pedido, no máximo maxNodes entradas.
   // Devolve {nodes:[full], episodes: Map(malId -> [ep]), visited:[malId], truncated}.
   // Erro em qualquer entrada (exceto 404 de uma entrada relacionada) aborta: melhor falhar do que gravar uma franquia pela metade.
-  async getFranchise(malId, { maxNodes = 12 } = {}) {
+  async getFranchise(malId, { maxNodes = 12, fresh = false } = {}) {
     const nodes = new Map();
     const seen = new Set([malId]);
     const queue = [malId];
@@ -82,7 +82,7 @@ class JikanClient extends SourceClient {
       const id = queue.shift();
       let full;
       try {
-        full = await this.getAnimeFull(id);
+        full = await this.getAnimeFull(id, { fresh });
       } catch (err) {
         if (id !== malId && err.code === 'NOT_FOUND') continue;
         throw err;
@@ -103,7 +103,7 @@ class JikanClient extends SourceClient {
     for (const full of nodes.values()) {
       // Filmes viram um episódio só; o que ainda não estreou não tem lista.
       if (full.type === 'Movie' || full.status === 'Not yet aired' || !EPISODE_TYPES.has(full.type)) continue;
-      episodes.set(full.mal_id, await this.getEpisodes(full.mal_id));
+      episodes.set(full.mal_id, await this.getEpisodes(full.mal_id, { fresh }));
     }
     return { nodes: [...nodes.values()], episodes, visited: [...nodes.keys()], truncated };
   }

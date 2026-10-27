@@ -42,12 +42,24 @@ function parseStorage(value) {
   return mode;
 }
 
+// Número >= 0 (aceita 0 = desligado) vindo do ambiente.
+const numFromEnv = (name, fallback) => {
+  const n = Number(process.env[name]);
+  return process.env[name] !== undefined && process.env[name] !== '' && Number.isFinite(n) && n >= 0 ? n : fallback;
+};
+
 module.exports = {
   PORT: process.env.PORT || 3000,
   IS_PRODUCTION,
   DATA_DIR,
   STORAGE: parseStorage(process.env.STORAGE),
   TMDB_API_KEY: process.env.TMDB_API_KEY || '',
+  // AniList (anime, fonte principal desde a S13; GraphQL, sem chave). Vazio = https://graphql.anilist.co. Só para testes/desenvolvimento.
+  ANILIST_BASE_URL: (process.env.ANILIST_BASE_URL || '').trim().replace(/\/+$/, ''),
+  // Atualização de obras em exibição (S13): de quantas em quantas horas uma obra "Em Exibição" busca episódios novos (padrão 6)
+  // e de quantos em quantos minutos o servidor confere o que está vencido (padrão 30; 0 desliga a conferência automática).
+  AIRING_TTL_MS: Math.round(numFromEnv('MEDIA_AIRING_TTL_HOURS', 6) * 60 * 60 * 1000),
+  REFRESH_INTERVAL_MIN: numFromEnv('MEDIA_REFRESH_INTERVAL_MIN', 30),
   DEFAULT_LANGUAGE: 'pt-BR',
   get JWT_SECRET() { return getJwtSecret().secret; },
   get JWT_SECRET_SOURCE() { return getJwtSecret().source; },

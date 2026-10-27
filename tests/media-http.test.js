@@ -23,16 +23,19 @@ let base;
 test.before(async () => {
   server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   base = `http://127.0.0.1:${server.address().port}/api/media`;
-  mediaService.jikan.minIntervalMs = 0;
-  mediaService.jikan.retries = 0;
+  for (const client of [mediaService.anilist, mediaService.jikan]) { client.minIntervalMs = 0; client.retries = 0; }
   mediaService.sleep = async () => {};
 });
 test.after(() => server.close());
-test.beforeEach(() => { mediaController.searchLimiter.reset(); mediaService.jikan.cache.clear(); mediaService.cache.clear(); });
+test.beforeEach(() => {
+  mediaController.searchLimiter.reset();
+  mediaService.cache.clear();
+  for (const client of [mediaService.anilist, mediaService.jikan]) { client.cache.clear(); client.breaker.success(); }
+});
 
 test('busca devolve resultados e a lista de avisos (fonte que falhou não derruba a resposta)', async () => {
   mediaService.fetchJson = async (url) => {
-    if (url.includes('jikan')) throw mediaErrors.upstream();
+    if (url.includes('anilist') || url.includes('jikan')) throw mediaErrors.upstream();
     return [{ show: { id: 77, name: 'Zzyzx Show', type: 'Scripted', genres: [], status: 'Running' } }];
   };
   const res = await fetch(`${base}/search?q=zzyzx&type=all`);
@@ -42,7 +45,8 @@ test('busca devolve resultados e a lista de avisos (fonte que falhou não derrub
   assert.equal(body.data[0].name, 'Zzyzx Show');
   assert.equal(body.data[0].status, 'Em Exibição');
   assert.equal(body.data[0].vote_average, null);
-  assert.equal(body.warnings[0].source, 'jikan');
+  assert.deepEqual(body.warnings.map(w => w.source), ['anilist', 'jikan'], 'AniList caiu, a reserva (Jikan) também: um aviso por fonte');
+  assert.ok(body.warnings.every(w => w.code === 'UPSTREAM' && !w.fallback));
 });
 
 test('todas as fontes limitadas (429) e nada local: HTTP 429 com mensagem em português e Retry-After', async () => {
