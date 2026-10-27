@@ -463,7 +463,7 @@ test('ingestão de anime de obra única: dados mapeados, nada inventado, episód
   assert.equal(work.seasons.length, 1);
   assert.equal(work.seasons[0].episodes.length, 250);
   assert.equal(work.seasons[0].episodes[0].runtime, 24);
-  assert.equal(work.seasons[0].name, 'Temporada 1 (Outono 1999)');
+  assert.equal(work.seasons[0].name, 'Temporada 1 · Outono 1999');
   assert.equal(svc.urls.filter(u => u.includes('/episodes')).length, 3, '250 episódios = 3 páginas');
   assert.ok(work.ingestedAt);
   assert.equal(JSON.parse(fs.readFileSync(svc.catalogPath, 'utf-8')).find(m => m.id === 10000021).name, 'One Piece');
@@ -503,8 +503,8 @@ test('franquia (etapa 2): Attack on Titan vira UMA obra com temporadas na ordem 
   assert.deepEqual(work.mal_ids.sort((a, b) => a - b), [16498, 25777, 35760, 38524, 40028, 99003, 99004].sort((a, b) => a - b));
   assert.deepEqual(work.seasons.map(s => s.season_number), [1, 2, 3, 4, 5, 6]);
   assert.deepEqual(work.seasons.map(s => s.name), [
-    'Temporada 1 (Primavera 2013)', 'Temporada 2 (Primavera 2017)', 'Temporada 3 (Verão 2018)', 'Temporada 4 (Primavera 2019)',
-    'Temporada 5 (Outono 2020)', 'Filme: Attack on Titan: The Last Attack'
+    'Temporada 1 · Primavera 2013', 'Temporada 2 · Primavera 2017', 'Temporada 3 · Verão 2018', 'Temporada 4 · Primavera 2019',
+    'Temporada 5 · Outono 2020', 'Filme: Attack on Titan: The Last Attack'
   ]);
   assert.deepEqual(work.seasons.map(s => s.episodes.length), [25, 12, 12, 10, 16, 1]);
   assert.equal(work.seasons[5].episodes[0].runtime, 85);

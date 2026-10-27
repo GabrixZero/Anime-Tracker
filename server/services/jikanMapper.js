@@ -150,7 +150,7 @@ function buildAnimeWork(numId, requestedMalId, franchise) {
     if (isTv) {
       tvIndex++;
       const label = seasonLabel(full);
-      name = `Temporada ${tvIndex}${label ? ` (${label})` : ''}`;
+      name = `Temporada ${tvIndex}${label ? ` · ${label}` : ''}`;
     } else {
       name = `${KIND_PT[full.type]}: ${title.slice(0, 40)}${title.length > 40 ? '…' : ''}`;
     }
