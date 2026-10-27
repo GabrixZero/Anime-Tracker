@@ -7,12 +7,13 @@ const { mediaErrors } = require('../utils/errors');
 
 const DEFAULTS = {
   baseUrl: 'https://graphql.anilist.co',
-  minIntervalMs: 700,        // ~85/min (o limite oficial é 90/min)
+  minIntervalMs: 350,        // uma franquia de 9 entradas sai em ~3 s; o teto por minuto (abaixo) é que respeita o limite oficial de 90/min
   perMinute: 80,
   maxQueue: 40,
   maxWaitMs: 25000,
   retries: 2,
   backoffMs: 1000,
+  timeoutMs: 6000,           // a AniList responde em ~0,2-1,5 s; sem resposta em 6 s a busca já cai para a reserva
   breakerCooldownMs: 30000,  // AniList fora do ar: 30 s de falha imediata (a busca cai para a Jikan) antes de tentar de novo
   pauseOnRateLimit: true,
   searchTtlMs: 10 * 60 * 1000,
@@ -76,7 +77,7 @@ class AniListClient extends SourceClient {
     const body = JSON.stringify({ query, variables });
     const json = await this.cached(body, ttlMs, async () => {
       // retries429: 0 => a espera/retentativa é decidida pela fila (o fetchJson não repete por conta própria)
-      const res = await this.fetchJson(this.baseUrl, { method: 'POST', body, headers: { 'Content-Type': 'application/json' }, retries429: 0 });
+      const res = await this.fetchJson(this.baseUrl, { method: 'POST', body, headers: { 'Content-Type': 'application/json' }, retries429: 0, timeoutMs: this.timeoutMs });
       return AniListClient.unwrap(res);
     }, { fresh });
     return json;

@@ -30,9 +30,10 @@ class JikanClient extends SourceClient {
   }
 
   // GET com fila, nova tentativa, disjuntor e erros tipados. Respostas boas ficam no cache; falhas nunca.
-  get(path, { ttlMs = this.searchTtlMs, fresh = false } = {}) {
+  // timeoutMs (opcional) encurta a espera por esta resposta: usado quando a Jikan é só um complemento (títulos de episódio, S13).
+  get(path, { ttlMs = this.searchTtlMs, fresh = false, timeoutMs } = {}) {
     // retries429: 0 => a espera/retentativa é decidida pela fila (o fetchJson não repete por conta própria)
-    return this.cached(path, ttlMs, () => this.fetchJson(`${this.baseUrl}${path}`, { retries429: 0 }), { fresh });
+    return this.cached(path, ttlMs, () => this.fetchJson(`${this.baseUrl}${path}`, { retries429: 0, ...(timeoutMs ? { timeoutMs } : {}) }), { fresh });
   }
 
   // --- Endpoints ------------------------------------------------------------------------------
@@ -55,10 +56,10 @@ class JikanClient extends SourceClient {
   }
 
   // Todas as páginas de episódios (100 por página). Devolve [{mal_id (= número do episódio), title, aired, duration, ...}].
-  async getEpisodes(malId, { fresh = false } = {}) {
+  async getEpisodes(malId, { fresh = false, timeoutMs } = {}) {
     const all = [];
     for (let page = 1; page <= this.maxEpisodePages; page++) {
-      const json = await this.get(`/anime/${malId}/episodes?page=${page}`, { ttlMs: this.episodesTtlMs, fresh });
+      const json = await this.get(`/anime/${malId}/episodes?page=${page}`, { ttlMs: this.episodesTtlMs, fresh, timeoutMs });
       if (!json || !Array.isArray(json.data)) throw mediaErrors.upstream('Resposta inesperada da Jikan.');
       all.push(...json.data);
       const hasNext = json.pagination && json.pagination.has_next_page;

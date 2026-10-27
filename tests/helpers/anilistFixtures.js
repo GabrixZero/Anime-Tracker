@@ -56,11 +56,11 @@ function makeService(MediaService, dir, { handlers = {}, extra = {} } = {}) {
   svc.fetchJson = async (url, opts = {}) => {
     if (url.startsWith(FAKE.anilist)) {
       const body = JSON.parse(opts.body);
-      svc.calls.push({ source: 'anilist', kind: body.query.includes('Page(') ? 'search' : 'media', variables: body.variables });
+      svc.calls.push({ source: 'anilist', kind: body.query.includes('Page(') ? 'search' : 'media', variables: body.variables, opts });
       return h.anilist(url, opts);
     }
     if (url.startsWith(FAKE.jikan)) {
-      svc.calls.push({ source: 'jikan', url });
+      svc.calls.push({ source: 'jikan', url, opts });
       return h.jikan(url, opts);
     }
     if (url.startsWith(FAKE.tvmaze)) {

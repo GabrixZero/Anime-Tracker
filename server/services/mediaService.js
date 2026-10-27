@@ -51,7 +51,8 @@ class MediaService {
     // Atualização de obras em exibição (S13): validade por obra, tentativas recentes e orçamento de tempo dos títulos da Jikan.
     this.airingTtlMs = opts.airingTtlMs ?? config.AIRING_TTL_MS;
     this.upcomingTtlMs = opts.upcomingTtlMs ?? 24 * 60 * 60 * 1000;
-    this.enrichBudgetMs = opts.enrichBudgetMs ?? 15000;
+    this.enrichBudgetMs = opts.enrichBudgetMs ?? 15000;     // quanto tempo, no total, a ingestão espera pelos títulos da Jikan
+    this.enrichTimeoutMs = opts.enrichTimeoutMs ?? 3000;    // e quanto espera por CADA resposta dela (Jikan fora do ar custa só isto, uma vez)
     this.refreshAttempts = new Map();   // id -> quando falhou a última atualização automática
     this.refreshTimers = [];
     this.refreshing = false;
@@ -178,7 +179,7 @@ class MediaService {
 
   // opts.method / opts.body: a AniList (GraphQL) é POST com corpo JSON; as outras fontes são GET.
   requestJson(url, headers, opts = {}) {
-    return requestJson(url, { headers, method: opts.method, body: opts.body });
+    return requestJson(url, { headers, method: opts.method, body: opts.body, timeoutMs: opts.timeoutMs });
   }
 
   // --- Mapeamento TVMaze -> obra do catálogo (tudo passa pelo sanitizador da S01) -----------------
@@ -687,7 +688,7 @@ class MediaService {
       if (!a.idMal || !JIKAN_EPISODE_FORMATS.has(a.format) || a.status === 'NOT_YET_RELEASED') continue;
       if (Date.now() - started > this.enrichBudgetMs) break;
       try {
-        titles.set(a.id, await this.jikan.getEpisodes(a.idMal));
+        titles.set(a.id, await this.jikan.getEpisodes(a.idMal, { timeoutMs: this.enrichTimeoutMs }));
       } catch (err) {
         if (err instanceof MediaError && err.code === 'NOT_FOUND') continue;   // essa entrada não tem lista na MAL: segue com as outras
         console.warn(`[MediaService] Títulos de episódio da Jikan indisponíveis (${(err && err.code) || 'erro'}); seguindo só com a AniList.`);

@@ -221,6 +221,8 @@ test('busca "Frieren" (Jikan fora do ar): as temporadas viram UMA obra, a amostr
   assert.equal(shorts.anime_kind, 'ONA', 'o spin-off em ONA continua separado');
   assert.equal(svc.callsTo('jikan').length, 0, 'a Jikan (reserva) não é consultada quando a AniList responde');
   assert.equal(svc.callsTo('anilist').length, 1);
+  const { opts } = svc.callsTo('anilist')[0];
+  assert.deepEqual([opts.method, opts.headers['Content-Type'], opts.retries429, opts.timeoutMs], ['POST', 'application/json', 0, 6000], 'GraphQL por POST, sem retry próprio, com limite de espera');
 });
 
 test('busca "Naruto": "Naruto" primeiro, cada entrada uma vez, sem duplicatas; depois de ingerir a franquia, Shippuden não reaparece', async () => {
@@ -396,6 +398,7 @@ test('ingestão: títulos de episódio vêm da Jikan quando ela responde (e só 
   assert.equal(s1[0].runtime, 24);
   assert.equal(work.seasons[1].episodes[9].name, 'Título 10');
   assert.ok(!svc.callsTo('jikan').some(c => c.url.includes('/63816/')), 'temporada anunciada não consulta a Jikan');
+  assert.ok(svc.callsTo('jikan').every(c => c.opts.timeoutMs === 3000), 'complemento: espera no máximo 3 s por resposta da Jikan (fora do ar custa pouco)');
 });
 
 test('ingestão: a Jikan com erro no meio não atrapalha (segue com "Episódio N") e uma entrada sem lista na MAL não derruba as outras', async () => {
