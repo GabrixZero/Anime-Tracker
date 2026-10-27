@@ -2,9 +2,9 @@
   "secao": "S07",
   "titulo": "Acessibilidade",
   "arquivo": "Documentacao/secoes/S07-acessibilidade.md",
-  "status": "em-andamento",
+  "status": "concluida",
   "branch": "feature/s07-acessibilidade",
-  "concluidaEm": "",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": ""
+  "notas": "Modais acessiveis (util dialog.js: foco, armadilha, Esc, inert), abas ARIA, divs clicaveis viraram button/checkbox, aria-pressed/aria-live, :focus-visible global, --text-muted com contraste AA. Teste: tests/a11y.test.js. Decisoes D-S07-1..6."
 }

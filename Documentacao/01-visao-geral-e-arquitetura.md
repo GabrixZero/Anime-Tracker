@@ -84,12 +84,14 @@ Nova migração = subir `STATE_VERSION` e acrescentar o passo em `migrateLibrary
 ## Mapa do frontend (`public/`)
 
 Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
-`utils/dom.js` → `utils/libraryMerge.js` → `utils/watchStatus.js` → `utils/backupValidator.js` → `utils/migrations.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
+`utils/dom.js` → `utils/dialog.js` → `utils/a11y.js` → `utils/libraryMerge.js` → `utils/watchStatus.js` → `utils/backupValidator.js` → `utils/migrations.js` → `apiClient.js` → `state.js` → `syncService.js` → `authView.js` → `nextUpView.js` → `watchlistView.js` → `diaryView.js` →
 `statsView.js` → `exploreView.js` → `detailModalView.js` → `appController.js`.
 
 | Arquivo | Papel |
 |---|---|
 | `js/utils/dom.js` | anti-XSS: `escapeHtml`, `safeUrl`/`safeSrc`, `cssUrl`, `toInt`, `formatRating`. **Todo valor de catálogo/usuário/erro interpolado em HTML passa por aqui** (também roda em Node nos testes) |
+| `js/utils/dialog.js` | (S07) `window.Dialog`: transforma os 4 modais em diálogos acessíveis (role/aria-modal, foco inicial, armadilha de Tab, Esc, `inert` no fundo, devolução do foco). Observa a classe `hidden` do overlay, então o código existente que abre/fecha modais não muda. Duplo (Node): fábrica `createDialogManager(doc)` testada com DOM simulado |
+| `js/utils/a11y.js` | (S07) liga tudo no `DOMContentLoaded`: registra os modais, espelha a classe `active` em `aria-selected`/`aria-pressed`, setas/Home/End nas abas, e preserva o foco quando uma view redesenha o HTML (`data-focus-key="<grupo>:<id>:<ação>"` nos botões dos templates). Ver D-S07-1..4 |
 | `js/utils/backupValidator.js` | `validateBackup`: valida o backup importado (espelha `LibraryModel.validate`; as duas usam `cleanTombstones`/`cleanStamp` de `libraryMerge.js`) |
 | `js/utils/libraryMerge.js` | (S03) funções **puras**, navegador + servidor: `merge(local, remote, {now})` com marcas de exclusão e `resetAt`, `replaceWith` (importar backup), `decideLogin` (isolamento por conta), `normalizeData`, `cleanTombstones`. Ver "Biblioteca, sync e remoções" |
 | `js/utils/watchStatus.js` | (S03) regra única do status por obra: `STATUS_LIST`, `computeProgress`, `effectiveStatus`, `initialStatus`, `statusAfterProgress`, `isQueueStatus`, `statusOptionsHtml` |
@@ -100,7 +102,7 @@ Ordem de carga em `public/index.html` (sem módulos ES; tudo via `window.*`):
 | `css/status.css` | (S03) seletor de status e estados do selo de sync (contrato de classes: `.status-picker`, `.status-select`, `.status-select--card`, `[data-sync-state]`) |
 | `js/views/*View.js` | telas: A Seguir, Minha Lista, Meu Diário, Estatísticas, Explorar, modal de detalhes, login |
 | `js/controllers/appController.js` | abas, toasts, backup/import/reset, `addToList`/`removeFromList`, `refreshAll()` (re-render geral) |
-| `css/` | `variables` (tokens, `--fs-meta`, reduced-motion), `components` (botões, cartões, modais base), **`views`** (telas e modais: diário, estatísticas, explorar, detalhes, anotação, backup — S05), `layout` (cabeçalho, navegação e **todos os breakpoints**; abas viram barra inferior ≤1024 px), `auth-tvtime` (login). O HTML quase não tem `style=` inline (só larguras dinâmicas); ver D-S05-1..4 |
+| `css/` | `variables` (tokens, `--fs-meta`, reduced-motion), `components` (botões, cartões, modais base), **`views`** (telas e modais: diário, estatísticas, explorar, detalhes, anotação, backup — S05), `layout` (cabeçalho, navegação e **todos os breakpoints**; abas viram barra inferior ≤1024 px), `auth-tvtime` (login), **`a11y`** (S07, carrega por último: `:focus-visible`, `.sr-only`, link de atalho, visual dos botões que eram `div`). O HTML quase não tem `style=` inline (só larguras dinâmicas); ver D-S05-1..4 |
 
 Formato do estado (ids de obra: ver "Esquema de ids"): chaves de episódio `"<id>_s<T>_e<E>"` e filmes `"<id>_movie"`. Ids de obra são **números** e o código usa `Number(id)` e
 injeta ids sem aspas em `onclick` em ~10 lugares (por isso ids de texto como `mal-123` quebrariam o app).
