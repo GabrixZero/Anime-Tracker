@@ -40,7 +40,9 @@ Todas são opcionais em desenvolvimento. O modelo comentado está em `.env.examp
 | `JWT_EXPIRES_IN` | validade do login | `7d` |
 | `STORAGE` | onde ficam usuários, bibliotecas e catálogo: `json` (arquivos) ou `sqlite` (um arquivo só) | `json` |
 | `SHOWVAULT_DATA_DIR` | pasta dos dados (e do arquivo SQLite). Em hospedagem, aponte para um **volume persistente** | `server/data` |
-| `TRUST_PROXY` | atrás de proxy/hospedagem: quantos proxies confiar (em geral `1`), para o limite de tentativas enxergar o IP real | vazio |
+| `HOST` | endereço em que o servidor escuta (só o endereço, sem porta). Vazio: em **produção** `127.0.0.1` (só o próprio computador; é o que o Tailscale Funnel precisa) e, fora dela, todas as interfaces. Docker/hospedagem: `0.0.0.0` (a imagem já define) | vazio |
+| `TRUST_PROXY` | atrás de proxy/hospedagem: quantos proxies confiar (em geral `1`; com o Tailscale Funnel é `1`), para o limite de tentativas enxergar o IP real. Nunca `true` | vazio |
+| `SHOWVAULT_BACKUP_DIR` | pasta dos backups do banco (`npm run backup`); vazio = `OneDrive\Documentos\ShowVault-Backups` quando há OneDrive | vazio |
 | `CORS_ORIGINS` | outros sites autorizados a chamar a API (lista separada por vírgula); vazio = só o próprio site | vazio |
 | `GOOGLE_CLIENT_ID` | liga o login com Google (veja abaixo); sem ele o botão não aparece | vazio |
 | `TMDB_API_KEY` | liga a busca de filmes e séries do TMDB em português (chave grátis em themoviedb.org); sem ela o app usa o catálogo local, TVMaze (séries) e AniList/Jikan (animes) | vazio |
@@ -54,8 +56,24 @@ Todas são opcionais em desenvolvimento. O modelo comentado está em `.env.examp
 * `STORAGE=json` (padrão): `server/data/users.json`, `server/data/libraries/<usuario>.json` e `server/data/mediaCatalog.runtime.json`. Gravação atômica, com cópia `.bak` da última versão válida. Bom para uso local.
 * `STORAGE=sqlite`: tudo isso vira **um único arquivo** `showvault.sqlite` dentro de `SHOWVAULT_DATA_DIR` (modo WAL, via `node:sqlite`, sem dependência nativa). É o modo da imagem Docker. Use **uma instância do servidor por arquivo**.
 * **Migração automática:** ao subir com `STORAGE=sqlite` numa pasta que ainda tem os JSON, o servidor importa tudo **uma única vez**, depois de copiar os arquivos para `backup-pre-sqlite-<data>/` dentro da pasta de dados. Os JSON originais **não são apagados**. Dá para rodar à mão: `npm run storage:migrate`.
+* **Migrar de outra pasta:** `npm run storage:migrate -- --from <pasta-com-os-JSON> [--dry-run]` lê os JSON de OUTRA pasta (ex.: `server\data` do projeto, com o banco indo para `%LOCALAPPDATA%\ShowVault\data`); `--dry-run` só mostra o que seria importado, sem gravar nada. Nunca sobrescreve o que o banco já tem.
 * **Voltar para arquivos:** `npm run storage:export -- <pasta-nova>` grava o conteúdo do banco como JSON (use essa pasta como `SHOWVAULT_DATA_DIR` com `STORAGE=json`).
-* Faça backup copiando a pasta de dados com o servidor parado (ou o volume do Docker).
+* **Backup do SQLite:** `npm run backup` faz uma foto consistente do banco (`VACUUM INTO`, pode rodar com o servidor ligado; nunca se copia o arquivo aberto), confere e guarda em `SHOWVAULT_BACKUP_DIR` com rotação (7 diários + 4 semanais). Restaurar: `npm run restore` (lista), `npm run restore -- ultimo --dry-run` (só confere) e `npm run restore -- ultimo` (pede confirmação, guarda uma cópia do banco atual e recusa com o app ligado). No Docker, faça backup do volume.
+
+---
+
+## Rodar no seu PC (Windows) e publicar com o Tailscale Funnel
+
+É o jeito gratuito escolhido para o dono e ~10 amigos (D-29): o app roda no seu PC em modo produção (SQLite, escutando só em `127.0.0.1`), sobe sozinho quando você entra no Windows e o **Tailscale Funnel** publica um link `https://<máquina>.<rede>.ts.net`. Os dados ficam fora do OneDrive e os backups diários dentro dele.
+
+```powershell
+npm run setup:pc                      # completa o .env do modo PC (nunca sobrescreve; gera o segredo sem mostrá-lo)
+npm run storage:migrate -- --from server\data --dry-run   # simulação; depois sem --dry-run
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\windows\install-autostart.ps1 -StartNow
+tailscale funnel --bg 3000            # depois de instalar o Tailscale e ligar o HTTPS no painel
+```
+
+Passo a passo completo (Tailscale, energia, backups, restauração, atualização, como desligar tudo e segurança): **[Documentacao/deploy-pc-tailscale.md](Documentacao/deploy-pc-tailscale.md)**. Scripts em `scripts/windows/` (`install-autostart`, `uninstall-autostart`, `start-showvault`, `status`, `update`, `backup-showvault`). Não compartilhe o link antes da seção S14 (cadastro por convite). Depois do `setup:pc`, para ligar à mão use `npm run start:env` (ou o `iniciar.bat`): o `npm start` **não lê o `.env`** e subiria em modo de desenvolvimento, com os dados em `server/data`.
 
 ---
 
@@ -74,7 +92,7 @@ docker run -d --name showvault -p 3000:3000 \
 
 Ou com o Compose: copie `docker-compose.example.yml` para `docker-compose.yml`, crie um `.env` com `JWT_SECRET=...` e rode `docker compose up -d --build`.
 
-* A imagem usa `NODE_ENV=production`, `STORAGE=sqlite`, dados em `/data` e roda sem root.
+* A imagem usa `NODE_ENV=production`, `HOST=0.0.0.0` (dentro do contêiner o servidor precisa escutar em tudo; fora do Docker, em produção, o padrão é `127.0.0.1`), `STORAGE=sqlite`, dados em `/data` e roda sem root.
 * **Verificação de saúde:** `GET /health` responde `{"status":"ok","storage":"sqlite","uptimeSec":...}` sem login (a imagem já traz o `HEALTHCHECK`; hospedagens costumam pedir esse caminho).
 * **HTTPS:** a hospedagem normalmente termina o HTTPS; informe `TRUST_PROXY=1`.
 * Sem plano gratuito com disco persistente, o SQLite perde os dados a cada reinício: escolha uma hospedagem com volume.
@@ -123,7 +141,7 @@ server/
   data/                   seed do catálogo (versionado); dados reais ficam fora do Git
 public/                   o app no navegador (index.html, css/, js/, img/)
 tests/                    testes automáticos (node --test)
-scripts/                  status das sessões (status.js) e ferramenta de armazenamento (storage.js)
+scripts/                  status das sessões (status.js), armazenamento (storage.js), modo PC (setup-pc.js, backup.js, restore.js) e windows/*.ps1
 Documentacao/             memória do projeto: arquitetura, decisões, diário, roadmap
 ```
 
