@@ -35,20 +35,22 @@ if (production && secretLength < 32) problems.push('JWT_SECRET ausente ou curto 
 // Endereço para conferir /health a partir deste computador (nunca "localhost": evita ::1 quando o app escuta em 127.0.0.1).
 const probeHost = host && !isAllInterfaces(host) ? urlHost(host) : '127.0.0.1';
 
-console.log(
-  JSON.stringify({
-    root,
-    envFile,
-    envFileExists: loaded,
-    production,
-    storage,
-    port,
-    host,
-    healthUrl: `http://${probeHost}:${port}/health`,
-    dataDir: resolveDataDir(env),
-    backupDir: resolveBackupDir(env),
-    jwtSecretLength: secretLength,
-    nodeVersion: process.version,
-    problems
-  })
-);
+// Só ASCII: o PowerShell 5.1 decodifica a saída do Node com a página de código do Windows e estragaria acentos em caminhos.
+const toAscii = text => text.replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+
+const info = {
+  root,
+  envFile,
+  envFileExists: loaded,
+  production,
+  storage,
+  port,
+  host,
+  healthUrl: `http://${probeHost}:${port}/health`,
+  dataDir: resolveDataDir(env),
+  backupDir: resolveBackupDir(env),
+  jwtSecretLength: secretLength,
+  nodeVersion: process.version,
+  problems
+};
+console.log(toAscii(JSON.stringify(info)));
