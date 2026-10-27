@@ -76,7 +76,7 @@ async function registerViaUi(page, user) {
   await page.locator('#input-tvtime-name').fill(user.name);
   await page.locator('#input-tvtime-email').fill(user.email);
   await page.locator('#input-tvtime-password').fill(user.password);
-  await page.locator('#btn-tvtime-auth-submit').click();
+  await tap(page.locator('#btn-tvtime-auth-submit'));
   await expect(page.locator('#tvtime-auth-modal')).toBeHidden();
   await waitForCloudIdle(page);
 }
@@ -87,7 +87,7 @@ async function loginViaUi(page, user) {
   await expect(page.locator('#tvtime-auth-modal')).toBeVisible();
   await page.locator('#input-tvtime-email').fill(user.email);
   await page.locator('#input-tvtime-password').fill(user.password);
-  await page.locator('#btn-tvtime-auth-submit').click();
+  await tap(page.locator('#btn-tvtime-auth-submit'));
   await expect(page.locator('#tvtime-auth-modal')).toBeHidden();
   await waitForCloudIdle(page);
 }

@@ -37,20 +37,20 @@ test.describe('contas', () => {
     await expect(page.locator('#btn-tvtime-auth-submit')).toHaveText('Cadastrar no Cofre');
 
     // validações do navegador (sem ir ao servidor)
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(authError(page)).toHaveText('Informe o e-mail.');
     await page.locator('#input-tvtime-email').fill('isto-nao-e-um-email');
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(authError(page)).toHaveText('E-mail inválido. Use o formato nome@exemplo.com.');
     await page.locator('#input-tvtime-email').fill(user.email);
     await page.locator('#input-tvtime-password').fill('1234567');
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(authError(page)).toHaveText('A senha precisa ter pelo menos 8 caracteres.');
     await page.locator('#input-tvtime-password').fill(user.password); // digitar de novo limpa o aviso
     await expect(authError(page)).toBeHidden();
 
     await page.locator('#input-tvtime-name').fill(user.name);
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(page.locator('#tvtime-auth-modal')).toBeHidden();
     await expect(toast(page, 'Conta criada com sucesso!')).toBeVisible();
     await expect(page.locator('#user-logged-profile')).toBeVisible();
@@ -87,10 +87,10 @@ test.describe('contas', () => {
     await page.locator('#btn-open-auth').click();
     await page.locator('#input-tvtime-email').fill(user.email);
     await page.locator('#input-tvtime-password').fill('senha-errada-123');
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(authError(page)).toHaveText('E-mail ou senha incorretos.');
     await page.locator('#input-tvtime-email').fill('ninguem-' + user.email);
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(authError(page)).toHaveText('E-mail ou senha incorretos.');
     await expect(page.locator('#tvtime-auth-modal')).toBeVisible();
     await expect(page.locator('#btn-open-auth')).toBeVisible(); // continua sem sessão
@@ -99,7 +99,7 @@ test.describe('contas', () => {
     await page.locator('#tvtime-tab-register').click();
     await page.locator('#input-tvtime-email').fill(user.email);
     await page.locator('#input-tvtime-password').fill(user.password);
-    await page.locator('#btn-tvtime-auth-submit').click();
+    await tap(page.locator('#btn-tvtime-auth-submit'));
     await expect(authError(page)).toHaveText(
       'Não foi possível criar a conta com esses dados. Se você já tem cadastro, use a aba "Entrar".'
     );
