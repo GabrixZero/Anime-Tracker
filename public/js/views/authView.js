@@ -269,7 +269,7 @@ class AuthView {
     } else {
       btnOpen.classList.remove('hidden');
       profile.classList.add('hidden');
-      window.syncService.setBaseLabel('Local-First');
+      window.syncService.setBaseLabel('Só neste aparelho');
     }
   }
 }
