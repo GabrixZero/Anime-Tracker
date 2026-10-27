@@ -30,7 +30,7 @@
   
   --text-main: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-muted: #8391a7; /* S07: >= 4,5:1 sobre todas as superficies escuras (era #64748b, ~4:1) */
 
   /* Bordas e Sombras */
   --radius-sm: 8px;

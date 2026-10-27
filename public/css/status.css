@@ -32,7 +32,6 @@
 .status-select:hover,
 .status-select:focus-visible {
   border-color: var(--bg-card-border-hover);
-  outline: none;
 }
 
 .status-select--card {
