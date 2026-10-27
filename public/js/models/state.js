@@ -267,13 +267,13 @@ class AppState {
     return entry;
   }
 
-  removeShow(showId) {
+  removeShow(showId, { save = true } = {}) {
     const id = Number(showId);
     const tracked = this.getTracked(id);
     if (!tracked) return;
     this.data.trackedShows = this.data.trackedShows.filter(t => t.showId !== id);
     this.markDeleted('shows', id, tracked.updatedAt || tracked.addedAt);
-    this.save();
+    if (save) this.save();
   }
 
   setShowStatus(showId, status) {
@@ -453,6 +453,33 @@ class AppState {
       if (this.addShow(id)) added.push(id);
     }
     return { added, missing };
+  }
+
+  // ----- remover o exemplo (S13) -----
+  // Obra do exemplo "intocada" = continua como "Quero ver", sem nenhum episódio marcado (nem filme assistido) e sem anotações.
+  // A chave de episódio/anotação começa com "<id>_" ("12_s1_e3", "12_movie"): o "_" evita confundir o id 12 com o 125.
+  isExampleUntouched(showId) {
+    const id = Number(showId);
+    const tracked = this.getTracked(id);
+    if (!tracked || tracked.status !== 'plan_to_watch') return false;
+    const prefix = `${id}_`;
+    const used = (obj) => Object.keys(obj || {}).some(key => key.startsWith(prefix));
+    return !used(this.data.watchedEpisodes) && !used(this.data.episodeNotes);
+  }
+
+  // Quais obras do exemplo estão na lista e quais delas dá para tirar sem perder nada do usuário.
+  exampleStatus() {
+    const inList = AppState.EXAMPLE_SHOW_IDS.filter(id => this.getTracked(id));
+    return { inList, removable: inList.filter(id => this.isExampleUntouched(id)) };
+  }
+
+  // "Remover exemplo": tira da lista SÓ as obras do exemplo ainda intocadas (as que o usuário já usou ficam). Grava uma vez só e
+  // deixa a marca de exclusão de cada uma (a remoção chega aos outros aparelhos). Devolve { removed, kept }.
+  removeExample() {
+    const { inList, removable } = this.exampleStatus();
+    removable.forEach(id => this.removeShow(id, { save: false }));
+    if (removable.length > 0) this.save();
+    return { removed: removable, kept: inList.filter(id => !removable.includes(id)) };
   }
 }
 
