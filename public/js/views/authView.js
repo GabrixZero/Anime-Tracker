@@ -135,7 +135,7 @@ class AuthView {
       passwordInput.setAttribute('autocomplete', 'new-password');
       tabRegister.classList.add('active');
       tabLogin.classList.remove('active');
-      footerLink.innerHTML = `Já tem conta? <button type="button" class="auth-switch-link" onclick="window.authView.switchMode('login')">Entrar agora</button>`;
+      footerLink.innerHTML = `Já tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="login">Entrar agora</button>`;
     } else {
       title.innerHTML = 'Bem-vindo ao <span>ShowVault</span>';
       submitBtn.textContent = 'Entrar na Conta';
@@ -144,7 +144,7 @@ class AuthView {
       passwordInput.setAttribute('autocomplete', 'current-password');
       tabLogin.classList.add('active');
       tabRegister.classList.remove('active');
-      footerLink.innerHTML = `Não tem conta? <button type="button" class="auth-switch-link" onclick="window.authView.switchMode('register')">Cadastre-se grátis</button>`;
+      footerLink.innerHTML = `Não tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">Cadastre-se grátis</button>`;
     }
   }
 

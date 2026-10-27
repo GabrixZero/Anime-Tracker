@@ -52,8 +52,11 @@ class DiaryView {
       const note = state.data.episodeNotes[key];
       if (!note || !note.text || !note.text.trim()) return;
 
-      if (key.includes('_movie')) {
-        const showId = Number(key.replace('_movie', ''));
+      const parsed = window.ViewKit.parseKey(key); // { showId, seasonNum, epNum, isMovie } ou null (chave fora do padrão)
+      if (!parsed) return;
+
+      if (parsed.isMovie) {
+        const showId = parsed.showId;
         const media = state.getMedia(showId);
         if (media) {
           entries.push({
@@ -69,10 +72,7 @@ class DiaryView {
           });
         }
       } else {
-        const parts = key.split('_');
-        const showId = Number(parts[0]);
-        const seasonNum = Number(parts[1].replace('s', ''));
-        const epNum = Number(parts[2].replace('e', ''));
+        const { showId, seasonNum, epNum } = parsed;
 
         const media = state.getMedia(showId);
         if (media) {
@@ -120,7 +120,6 @@ class DiaryView {
 
     this.emptyState.classList.add('hidden');
     // S08: rótulo e ícone vêm da tabela única de emoções (utils/emotions.js)
-    const fallbackThumb = window.MediaDisplay.STILL_PLACEHOLDER;
 
     this.container.innerHTML = filtered.map(e => {
       const formattedDate = new Date(e.updatedAt).toLocaleDateString('pt-BR', {
@@ -131,7 +130,7 @@ class DiaryView {
 
       return `
         <div class="diary-entry-card">
-          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackThumb}';" class="diary-thumb" loading="lazy" decoding="async">
+          <img ${window.ViewKit.imgAttrs(e.stillPath, 'still')} alt="" class="diary-thumb" loading="lazy" decoding="async">
           
           <div class="diary-body">
             <div class="diary-top">
@@ -147,7 +146,7 @@ class DiaryView {
 
             <div class="diary-foot">
               <span>Gravado em: ${formattedDate}</span>
-              <button type="button" class="btn btn-sm btn-ghost" data-focus-key="di:${toInt(e.showId)}-${toInt(e.seasonNum)}-${toInt(e.epNum)}:edit" aria-label="Editar anotação: ${headerText}" onclick="window.detailModalView.openNote(${toInt(e.showId)}, ${toInt(e.seasonNum) || null}, ${toInt(e.epNum) || null})">Editar</button>
+              <button type="button" class="btn btn-sm btn-ghost" data-focus-key="di:${toInt(e.showId)}-${toInt(e.seasonNum)}-${toInt(e.epNum)}:edit" aria-label="Editar anotação: ${headerText}" data-action="open-note" data-show="${toInt(e.showId)}"${toInt(e.seasonNum) ? ` data-season="${toInt(e.seasonNum)}"` : ''}${toInt(e.epNum) ? ` data-episode="${toInt(e.epNum)}"` : ''}>Editar</button>
             </div>
           </div>
         </div>
@@ -164,14 +163,13 @@ class DiaryView {
       const note = state.data.episodeNotes[key];
       if (!note || !note.text || !note.text.trim()) return;
 
-      if (key.includes('_movie')) {
-        const id = Number(key.replace('_movie', ''));
-        const media = state.getMedia(id);
+      const parsed = window.ViewKit.parseKey(key);
+      if (!parsed) return;
+      const media = state.getMedia(parsed.showId);
+      if (parsed.isMovie) {
         md += `## Filme: ${media ? media.name : 'Filme'}\n`;
       } else {
-        const parts = key.split('_');
-        const media = state.getMedia(Number(parts[0]));
-        md += `## ${media ? media.name : 'Série'} — ${parts[1]}:${parts[2]}\n`;
+        md += `## ${media ? media.name : 'Série'} — s${parsed.seasonNum}:e${parsed.epNum}\n`;
       }
 
       md += `**Data:** ${new Date(note.updatedAt).toLocaleDateString('pt-BR')}\n`;

@@ -6,6 +6,7 @@ const compression = require('compression');
 const path = require('path');
 
 const config = require('./config/config');
+const { buildCspDirectives } = require('./config/csp');
 const { requireActiveUser } = require('./middleware/auth');
 const authRoutes = require('./routes/authRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
@@ -19,10 +20,10 @@ const app = express();
 app.disable('x-powered-by');
 if (config.TRUST_PROXY !== false) app.set('trust proxy', config.TRUST_PROXY);
 
-// Cabeçalhos de segurança. Sem CSP por enquanto: o HTML ainda usa onclick inline (a CSP estrita entra na S10).
+// Cabeçalhos de segurança, com CSP estrita (sem 'unsafe-inline'; ver server/config/csp.js).
 // COOP "same-origin-allow-popups" é o que o popup do Login com Google exige.
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: { useDefaults: false, directives: buildCspDirectives({ isProduction: config.IS_PRODUCTION }) },
   strictTransportSecurity: config.IS_PRODUCTION ? undefined : false, // HSTS só em produção (HTTPS)
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
 }));
