@@ -8,3 +8,4 @@
 - **Docs:** seções S11–S19, `status/` e `grafo.json` criados; D-24…D-28, P-10 e P-11 registrados.
 - **Próximo passo:** Onda A (S12 + S13) por subagentes; S11 depois da confirmação da P-10.
 - **P-10 resolvida (D-29):** o Gabriel escolheu rodar no PC dele com Tailscale Funnel. Seção S11 reescrita para esse caminho (sem Render/Turso). S11 disparada em seguida.
+- **Fechamento da etapa (2026-10-27):** S13, S11 e S12 concluídas e no `main` (subagentes Sonnet, um por vez — D-30). Suíte: 421 unitários + 37 cenários E2E × 2 viewports no CI (JSON e SQLite). Próxima: **S14 (convites)** — recomendado abrir uma **sessão principal nova** (D-30).

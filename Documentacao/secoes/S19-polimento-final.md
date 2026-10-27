@@ -17,3 +17,7 @@ Lighthouse/axe sem problemas graves, repositório 100% formatado e com lint limp
 
 ## Fora de escopo
 Reescrever em framework.
+
+## Achados de outras seções (para esta)
+- **Foco (S12):** "Carregar exemplo" acionado pelo teclado no estado vazio de A Seguir deixa o foco no `body` — teste marcado `test.fixme` em `tests/e2e/09-teclado.spec.js`; corrigir e remover o `fixme`.
+- **Toast no celular (S12):** cobre o conteúdo e recebe o toque por 4,5 s; e o axe aponta `heading-order` (detalhes em `diario/2026-10-27-S12.md`).
