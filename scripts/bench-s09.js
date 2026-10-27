@@ -158,4 +158,8 @@ async function main() {
   console.log('Uso: node scripts/bench-s09.js seed <pasta> [atual|grande] | payload [atual|grande]');
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+module.exports = { buildCatalog, buildLibrary, PROFILES }; // reaproveitado por tests/s09-performance.test.js
+
+if (require.main === module) {
+  main().catch((err) => { console.error(err); process.exit(1); });
+}
