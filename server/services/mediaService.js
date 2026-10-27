@@ -34,7 +34,7 @@ class MediaService {
     // Fontes externas. Jikan (animes) está sempre ligada; o TMDB (séries/filmes) só com TMDB_API_KEY (D-17).
     const fetchJson = (url, o) => this.fetchJson(url, o);
     this.jikanEnabled = opts.jikanEnabled !== false;
-    this.jikan = new JikanClient({ fetchJson, sleep: this.sleep, baseUrl: opts.jikanBase, ...(opts.jikan || {}) });
+    this.jikan = new JikanClient({ fetchJson, sleep: this.sleep, baseUrl: opts.jikanBase || process.env.JIKAN_BASE_URL, ...(opts.jikan || {}) });
     this.tmdb = new TmdbClient({ apiKey: opts.tmdbKey !== undefined ? opts.tmdbKey : config.TMDB_API_KEY, baseUrl: opts.tmdbBase, fetchJson });
 
     this.loadCatalog();

@@ -200,6 +200,13 @@ function fakeClock() {
   return c;
 }
 
+test('Jikan: opções undefined (ex.: jikanBase não informada) não apagam os valores padrão', () => {
+  const client = new JikanClient({ fetchJson: async () => ({}), baseUrl: undefined, minIntervalMs: undefined });
+  assert.equal(client.baseUrl, 'https://api.jikan.moe/v4');
+  assert.equal(client.minIntervalMs, 400);
+  assert.equal(new MediaService({ dataDir: newDir() }).jikan.baseUrl, 'https://api.jikan.moe/v4');
+});
+
 test('Jikan: a fila espaça as requisições (respeita ~3 req/s) mesmo com pedidos simultâneos', async () => {
   const clock = fakeClock();
   const stamps = [];

@@ -25,7 +25,7 @@ class JikanClient {
   // fetchJson(url) => Promise<json>: injetado (o MediaService usa o dele, com timeout e erros tipados).
   constructor({ fetchJson, sleep, now, ...opts } = {}) {
     if (typeof fetchJson !== 'function') throw new Error('JikanClient precisa de fetchJson.');
-    Object.assign(this, DEFAULTS, opts);
+    Object.assign(this, DEFAULTS, Object.fromEntries(Object.entries(opts).filter(([, v]) => v !== undefined)));
     this.fetchJson = fetchJson;
     this.now = now || Date.now;
     this.sleep = sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
