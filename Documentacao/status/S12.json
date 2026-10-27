@@ -2,8 +2,8 @@
   "secao": "S12",
   "titulo": "Testes ponta a ponta (E2E)",
   "arquivo": "Documentacao/secoes/S12-testes-e2e.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s12-testes-e2e",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
