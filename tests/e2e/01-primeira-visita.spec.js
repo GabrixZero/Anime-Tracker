@@ -3,7 +3,7 @@
 'use strict';
 
 const { test, expect } = require('./support/fixtures');
-const { openApp, gotoTab, toast, loadExample, queueCard, listCard } = require('./support/helpers');
+const { openApp, gotoTab, toast, loadExample, queueCard, listCard, tap } = require('./support/helpers');
 
 const EXAMPLE_TITLES = ['Interestelar (Interstellar)', 'Oppenheimer', 'Breaking Bad', 'Attack on Titan (Shingeki no Kyojin)'];
 
@@ -62,7 +62,7 @@ test.describe('primeira visita', () => {
     await expect(page.locator('#badge-watchlist')).toHaveText('4');
 
     await gotoTab(page, 'watchlist');
-    await page.getByRole('button', { name: 'Remover exemplo' }).click();
+    await tap(page.getByRole('button', { name: 'Remover exemplo' }));
     await expect(toast(page, 'Exemplo removido: 4 títulos.')).toBeVisible();
     await expect(page.locator('#watchlist-container .show-card')).toHaveCount(0);
     await expect(page.locator('#watchlist-example-bar')).toBeHidden();
@@ -90,7 +90,7 @@ test.describe('primeira visita', () => {
     await expect(listCard(page, 'Breaking Bad').locator('select.status-select')).toHaveValue('watching');
     await expect(page.locator('#watchlist-example-text')).toContainText('3 títulos do exemplo ainda sem uso');
 
-    await page.getByRole('button', { name: 'Remover exemplo' }).click();
+    await tap(page.getByRole('button', { name: 'Remover exemplo' }));
     await expect(toast(page, 'Exemplo removido: 3 títulos. O que você já usou ficou na lista.')).toBeVisible();
     await expect(page.locator('#watchlist-container .show-card')).toHaveCount(1);
     await expect(listCard(page, 'Breaking Bad')).toBeVisible();

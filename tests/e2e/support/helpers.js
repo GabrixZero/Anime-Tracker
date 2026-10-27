@@ -34,6 +34,15 @@ async function gotoTab(page, id) {
   await expect(page.locator(`#view-${id}`)).toHaveClass(/active/);
 }
 
+// Clique "de gente": limpa os avisos (toasts) e rola o elemento para o MEIO da janela antes de clicar. No celular o aviso (4,5 s) fica
+// por cima do conteúdo e recebe o toque no lugar do botão: o Playwright repetia o clique a cada 500 ms até o aviso sumir (testes de 1 s
+// viravam 6 s). O texto do aviso já foi conferido antes; aqui só tiramos ele da frente. (Observação para a S19: `pointer-events: none`.)
+async function tap(locator) {
+  await locator.page().evaluate(() => document.querySelectorAll('#toast-container .toast').forEach(t => t.remove()));
+  await locator.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+  await locator.click();
+}
+
 const toast = (page, text) => page.locator('.toast', { hasText: text });
 
 // confirm()/prompt() do app: aceita o próximo diálogo (o Playwright recusa sozinho se ninguém ouvir).
@@ -148,6 +157,7 @@ module.exports = {
   openApp,
   waitForCloudIdle,
   gotoTab,
+  tap,
   toast,
   acceptNextDialog,
   listCard,
