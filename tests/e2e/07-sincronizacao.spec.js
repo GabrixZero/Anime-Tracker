@@ -131,4 +131,64 @@ test.describe('sincronização', () => {
     await gotoTab(laptop, 'watchlist');
     await expect(listCard(laptop, 'Breaking Bad').locator('.show-progress-info')).toContainText('1/3 eps');
   });
+
+  test('"Resetar" com conta: digitar errado não apaga; "só neste aparelho" volta da nuvem; apagar a nuvem zera os dois aparelhos', async ({
+    page: phone,
+    device
+  }, testInfo) => {
+    const user = newUser(testInfo, 'reset');
+    await signInWithApi(phone, user);
+    await loadExample(phone);
+    await expectServerTracks(phone, [INTERSTELAR, OPPENHEIMER, BREAKING_BAD, ATTACK_ON_TITAN]);
+    const { page: laptop } = await device();
+    await openApp(laptop);
+    await loginViaUi(laptop, user);
+    await expect(laptop.locator('#badge-watchlist')).toHaveText('4');
+
+    // Responde às perguntas do "Resetar" (1: apagar este aparelho? 2: apagar também a nuvem? 3: digite APAGAR) e conta o que foi perguntado.
+    const resetar = async (page, { nuvem, digitado }) => {
+      const perguntas = [];
+      const handler = dialog => {
+        perguntas.push(dialog.type());
+        if (dialog.type() === 'prompt') return dialog.accept(digitado);
+        if (perguntas.length === 2 && !nuvem) return dialog.dismiss(); // 2ª pergunta: "só neste aparelho"
+        return dialog.accept();
+      };
+      page.on('dialog', handler);
+      await tap(page.locator('#btn-open-backup'));
+      await tap(page.locator('#btn-reset-database'));
+      await expect.poll(() => perguntas.length).toBeGreaterThanOrEqual(nuvem ? 3 : 2);
+      page.off('dialog', handler);
+      return perguntas;
+    };
+
+    // 1) quer apagar a nuvem mas digita errado: NADA é apagado
+    expect(await resetar(phone, { nuvem: true, digitado: 'TALVEZ' })).toEqual(['confirm', 'confirm', 'prompt']);
+    await expect(toast(phone, 'Nada foi apagado.')).toBeVisible();
+    await expect(phone.locator('#badge-watchlist')).toHaveText('4');
+    expect(await trackedIds(phone)).toHaveLength(4);
+
+    // 2) "só neste aparelho": o aparelho zera, a nuvem não; ao recarregar, a lista volta da nuvem
+    expect(await resetar(phone, { nuvem: false })).toEqual(['confirm', 'confirm']);
+    await expect(toast(phone, 'Dados deste aparelho apagados. A cópia da nuvem volta no próximo login.')).toBeVisible();
+    await expect(phone.locator('#badge-watchlist')).toHaveText('0');
+    expect(await trackedIds(phone)).toHaveLength(4);
+    await phone.reload();
+    await waitForCloudIdle(phone);
+    await expect(phone.locator('#badge-watchlist')).toHaveText('4');
+
+    // 3) apagar a nuvem de verdade: este aparelho, a conta e o outro aparelho ficam vazios
+    expect(await resetar(phone, { nuvem: true, digitado: 'apagar' })).toEqual(['confirm', 'confirm', 'prompt']);
+    await expect(toast(phone, 'Dados apagados neste aparelho e na nuvem.')).toBeVisible();
+    await expect(phone.locator('#badge-watchlist')).toHaveText('0');
+    const cloud = await serverLibrary(phone);
+    expect(cloud.trackedShows).toEqual([]);
+    expect(cloud.resetAt, 'o servidor marca quando a conta foi zerada, para os outros aparelhos zerarem também').toBeTruthy();
+
+    await laptop.reload();
+    await waitForCloudIdle(laptop);
+    await expect(laptop.locator('#badge-watchlist')).toHaveText('0');
+    await gotoTab(laptop, 'watchlist');
+    await expect(laptop.locator('#watchlist-container .show-card')).toHaveCount(0);
+  });
 });

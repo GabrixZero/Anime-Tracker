@@ -6,7 +6,7 @@
 //   npm run test:e2e:headed    -> roda vendo o navegador
 //   npm run test:e2e:ui        -> modo interativo do Playwright (escolher/repetir testes, linha do tempo)
 //   npm run test:e2e:report    -> abre o relatório HTML da última execução
-//   node scripts/e2e.js test tests/e2e/explorar.spec.js --project=desktop   (qualquer argumento do Playwright)
+//   node scripts/e2e.js test tests/e2e/04-explorar.spec.js --project=desktop   (qualquer argumento do Playwright)
 //
 // PLAYWRIGHT_BROWSERS_PATH=0 = "baixe e procure os navegadores em node_modules/playwright-core/.local-browsers"
 // (nada vai para a pasta do usuário; apagar node_modules apaga o navegador junto). Se a variável já vier definida

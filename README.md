@@ -24,7 +24,7 @@ npm start            # sobe em http://localhost:3000
 * **Windows:** dê um duplo-clique em `iniciar.bat`. Ele instala as dependências na primeira vez, lê a porta do `.env` (ou usa 3000), espera o servidor ficar pronto e só então abre o navegador.
 * **Outra porta:** `PORT=3055 npm start` (no PowerShell: `$env:PORT=3055; npm start`).
 * **Com arquivo `.env`:** copie `.env.example` para `.env`, ajuste e use `npm run start:env` (equivale a `node --env-file=.env server.js`). O `.env` **nunca** vai para o Git.
-* **Testes e qualidade:** `npm test` · `npm run lint` · `npm run format:check` (veja "Qualidade e testes").
+* **Testes e qualidade:** `npm test` · `npm run lint` · `npm run format:check` · testes com navegador: `npm run test:e2e:install` (uma vez) e `npm run test:e2e` (veja "Qualidade e testes").
 
 ---
 
@@ -140,8 +140,9 @@ server/
   utils/                  validação, sanitização, ids, cache, jsonStore
   data/                   seed do catálogo (versionado); dados reais ficam fora do Git
 public/                   o app no navegador (index.html, css/, js/, img/)
-tests/                    testes automáticos (node --test)
-scripts/                  status das sessões (status.js), armazenamento (storage.js), modo PC (setup-pc.js, backup.js, restore.js) e windows/*.ps1
+tests/                    testes automáticos rápidos (node --test); tests/e2e/ = testes ponta a ponta com navegador (Playwright)
+playwright.config.js      configuração dos testes E2E (desktop e celular)
+scripts/                  status das sessões (status.js), armazenamento (storage.js), modo PC (setup-pc.js, backup.js, restore.js), windows/*.ps1 e e2e.js (roda o Playwright)
 Documentacao/             memória do projeto: arquitetura, decisões, diário, roadmap
 ```
 
@@ -154,8 +155,29 @@ Detalhes de cada arquivo: `Documentacao/01-visao-geral-e-arquitetura.md`.
 * `npm test` roda todos os testes (`node --test`). Eles usam pastas temporárias e **nunca** tocam em `server/data` real nem acessam a internet.
 * `npm run lint` (ESLint) deve terminar sem **erros**; avisos são toleráveis. `npm run lint:fix` corrige o que for automático.
 * `npm run format:check` / `npm run format` (Prettier) valem para os arquivos novos da S10; o restante do código será formatado depois que as sessões paralelas terminarem.
-* **CI (GitHub Actions)**, `.github/workflows/ci.yml`: a cada push e em todo PR para `main`/`develop` roda `npm ci`, lint, formatação e testes (Node 26) e faz o build da imagem Docker com um teste de `/health`.
+* **CI (GitHub Actions)**, `.github/workflows/ci.yml`: a cada push e em todo PR para `main`/`develop` roda `npm ci`, lint, formatação e testes (Node 26), faz o build da imagem Docker com um teste de `/health` e roda os **testes ponta a ponta** (job `e2e`, abaixo).
 * Os workflows `auto-pr-*` abrem sozinhos os PRs de `feature/*` para `develop` e de `develop` para `main`.
+
+### Testes ponta a ponta (E2E): o app de verdade num navegador (S12)
+
+Um robô (Playwright + Chromium) abre o ShowVault como uma pessoa abriria e clica, digita e navega pelo teclado, em **desktop (1280×800)** e **celular (375×812)**: primeira visita e "Carregar exemplo"/"Remover exemplo", cadastro e login, marcar episódios, status por obra, anotações com Markdown/spoiler e histórico, Explorar (busca, adicionar, "Mostrar mais"), backup, sair isolando contas e **sincronização entre dois aparelhos**. Além dos fluxos, todo teste falha se o navegador mostrar erro de console, violação da CSP ou tentar usar a internet, e há conferências de largura em 375 px, de teclado, de acessibilidade (axe-core) e do botão do Google.
+
+```bash
+npm run test:e2e:install   # UMA vez por instalação: baixa o Chromium (~440 MB) para dentro de node_modules
+npm run test:e2e           # roda tudo (≈ 1 minuto), sem janela
+npm run test:e2e:headed    # vendo o navegador trabalhar
+npm run test:e2e:ui        # modo interativo: escolher/repetir testes, linha do tempo, antes/depois de cada passo
+npm run test:e2e:report    # abre o relatório HTML da última execução (playwright-report/)
+npm run test:e2e -- --project=mobile                         # só o celular (ou --project=desktop)
+npm run test:e2e -- tests/e2e/05-conta.spec.js -g "isola"   # um arquivo / testes pelo nome
+```
+
+* **Não precisa de nada ligado:** os testes sobem o próprio servidor na porta **3012** (`E2E_PORT` troca) com uma pasta de dados **temporária** (apagada no fim) e um servidor falso no lugar do TVMaze, AniList, Jikan e TMDB (`TVMAZE_BASE_URL`, `ANILIST_BASE_URL`, `JIKAN_BASE_URL`, `TMDB_BASE_URL`). Não tocam em `server/data`, não usam a internet e não mexem no ShowVault da porta 3000.
+* **Outras opções:** `E2E_STORAGE=sqlite` roda no armazenamento de produção; `E2E_WORKERS=1` roda um teste por vez (útil para depurar); `E2E_AXE_VERBOSE=1` mostra tudo que o axe-core achou, inclusive o leve.
+* **Quando um teste falha:** o terminal diz qual passo e o que esperava; `test-results/<teste>/` guarda a captura de tela, o `trace.zip` (`npx playwright show-trace <arquivo>`: linha do tempo com a página, a rede e o console em cada passo) e `servidor-e2e.log` (o que o servidor de teste escreveu). Essas pastas não vão para o Git.
+* **Onde está cada coisa:** `playwright.config.js` (projetos, tempos) · `tests/e2e/*.spec.js` (os testes, em ordem de história) · `tests/e2e/support/` (subida do servidor, guarda de erros, atalhos) · `tests/e2e/fake-sources/` (as fontes falsas e seus dados fictícios) · `scripts/e2e.js` (guarda o navegador dentro do projeto). Decisões em `Documentacao/02-decisoes.md` (D-S12-1 a D-S12-8).
+* **No CI:** o job `e2e` roda tudo duas vezes (arquivos JSON e SQLite), com o Chromium em cache; relatório e `trace.zip` só são guardados (7 dias) quando algo falha.
+* `npm test` continua só com os testes rápidos (sem navegador).
 
 ## Fluxo de branches
 
