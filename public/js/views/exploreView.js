@@ -83,7 +83,7 @@ class ExploreView {
       } else {
         response = await window.apiClient.getTrending(this.typeFilter);
         if (seq !== this.requestSeq) return;
-        if (this.titleEl) this.titleEl.textContent = `Destaques da API (${response ? response.count : 0})`;
+        if (this.titleEl) this.titleEl.textContent = `Catálogo (${response ? response.count : 0})`;
       }
 
       const items = (response && response.data) ? response.data : [];
@@ -121,7 +121,7 @@ class ExploreView {
   // Linha de metadados do cartão: filme = duração (só se conhecida); obra já carregada = nº de temporadas;
   // anime ainda não carregado = tipo (Filme/OVA), temporada de exibição e quantas partes da franquia foram agrupadas.
   metaText(item) {
-    if (item.type === 'movie') return item.runtime ? `${item.runtime} min` : '';
+    if (item.type === 'movie') return window.MediaDisplay.runtimeText(item.runtime) || 'Filme';
     if (Array.isArray(item.seasons) && item.seasons.length > 0) {
       return `${item.seasons.length} ${item.seasons.length === 1 ? 'temporada' : 'temporadas'}`;
     }
@@ -133,7 +133,8 @@ class ExploreView {
   }
 
   render(items, notice = '') {
-    const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
+    const MD = window.MediaDisplay; // S08: "Sem nota"/"Sem gênero"/imagem local quando a fonte não informa
+    const fallbackPoster = MD.POSTER_PLACEHOLDER;
 
     this.container.innerHTML = notice + items.map(item => {
       const isTracked = window.appState ? window.appState.data.trackedShows.some(t => t.showId === item.id) : false;
@@ -145,7 +146,7 @@ class ExploreView {
         : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
       // Temporada/cour de exibição ("Outono 2023") quando a fonte informa; senão o ano.
-      const when = item.season_label || (item.first_air_date ? String(item.first_air_date).slice(0, 4) : '');
+      const when = item.season_label || MD.yearText(item.first_air_date);
       const fullTitle = item.original_name ? `${item.name} (${item.original_name})` : item.name;
 
       return `
@@ -156,7 +157,7 @@ class ExploreView {
                  alt="Pôster de ${escapeHtml(item.name)}"
                  loading="lazy"
                  onerror="this.onerror=null; this.src='${fallbackPoster}';">
-            <div class="show-rating-badge">★ ${formatRating(item.vote_average, '–')}</div>
+            <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(item.vote_average))}</div>
           </div>
 
           <div class="show-info">
@@ -168,7 +169,7 @@ class ExploreView {
             <h3 class="show-title" title="${escapeHtml(fullTitle)}"><button type="button" class="show-open-btn" data-focus-key="ex:${toInt(item.id)}:open" onclick="window.detailModalView.open(${toInt(item.id)})">${escapeHtml(item.name)}</button></h3>
             <div class="show-meta-line">
               <span>${escapeHtml(this.metaText(item))}</span>
-              <span>${escapeHtml((item.genres || []).slice(0, 2).join(', '))}</span>
+              <span>${escapeHtml(MD.genresText(item.genres, 2))}</span>
             </div>
 
             <div class="show-card-actions">

@@ -180,7 +180,7 @@ test('replaceWith: importar backup — o que sumiu vira marca de exclusão, o im
   assert.deepEqual(merged.watchedEpisodes, {});
 });
 
-test('decideLogin: mesma conta mescla; conta diferente substitui (e manda arquivar); visitante mescla; demo cede ao servidor', () => {
+test('decideLogin: mesma conta mescla; conta diferente substitui (e manda arquivar); visitante mescla; estado inicial nunca editado cede ao servidor', () => {
   const local = lib({ trackedShows: [show(1, 'watching', -5)] });
   const remote = lib({ trackedShows: [show(2, 'watching', -5)] });
 

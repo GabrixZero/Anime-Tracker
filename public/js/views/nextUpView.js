@@ -48,7 +48,7 @@ class NextUpView {
             showName: media.name,
             type: media.type,
             title: "Filme Completo",
-            runtime: media.runtime || 120,
+            runtime: media.runtime,
             overview: media.overview,
             still_path: media.backdrop_path || media.poster_path
           });
@@ -71,7 +71,7 @@ class NextUpView {
                 seasonNumber: season.season_number,
                 episodeNumber: ep.episode_number,
                 title: ep.name,
-                runtime: ep.runtime || 45,
+                runtime: ep.runtime,
                 overview: ep.overview,
                 still_path: ep.still_path || media.backdrop_path || media.poster_path
               });
@@ -123,8 +123,11 @@ class NextUpView {
           <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
         </div>
         <h3 class="empty-title">Sua lista está vazia</h3>
-        <p class="empty-text empty-text--narrow">Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar sua maratona.</p>
-        <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo</button>
+        <p class="empty-text empty-text--narrow">Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar, ou carregue alguns títulos de exemplo para ver o app funcionando (você remove quando quiser).</p>
+        <div class="empty-actions">
+          <button type="button" class="btn btn-primary" data-focus-key="empty:explore" onclick="window.appController.switchTab('explore')">Explorar</button>
+          <button type="button" class="btn btn-outline" data-focus-key="empty:example" onclick="window.appController.loadExample()">Carregar exemplo</button>
+        </div>
       `;
       return;
     }
@@ -150,7 +153,7 @@ class NextUpView {
       </div>
       <h3 class="empty-title">Você está em dia com tudo!</h3>
       <p class="empty-text empty-text--narrow">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
-      <button class="btn btn-primary" onclick="window.appController.switchTab('explore')">Explorar Catálogo</button>
+      <button type="button" class="btn btn-primary" data-focus-key="empty:explore" onclick="window.appController.switchTab('explore')">Explorar</button>
     `;
   }
 
@@ -162,7 +165,7 @@ class NextUpView {
       : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
     const codeBadge = item.isMovie ? `FILME` : `T${item.seasonNumber}:E${item.episodeNumber}`;
-    const fallbackThumb = 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=80';
+    const fallbackThumb = window.MediaDisplay.STILL_PLACEHOLDER;
 
     return `
       <div class="next-up-card">
@@ -173,7 +176,7 @@ class NextUpView {
                loading="lazy"
                onerror="this.onerror=null; this.src='${fallbackThumb}';">
           <span class="next-up-badge">${escapeHtml(codeBadge)}</span>
-          <span class="next-up-runtime">${escapeHtml(item.runtime)} min</span>
+          ${window.MediaDisplay.runtimeText(item.runtime) ? `<span class="next-up-runtime">${escapeHtml(window.MediaDisplay.runtimeText(item.runtime))}</span>` : ''}
         </div>
         
         <div class="next-up-info">

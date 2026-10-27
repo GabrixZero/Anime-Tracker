@@ -24,7 +24,7 @@ class SyncService {
     this.dirty = false;      // há alterações locais ainda não confirmadas pelo servidor
     this.dirtyVersion = 0;
     this.status = 'idle';    // 'idle' | 'syncing' | 'offline' | 'error' | 'auth'
-    this.baseLabel = 'Local-First';
+    this.baseLabel = 'Só neste aparelho'; // visitante: os dados ficam apenas no navegador
     this.bindStatusClick();
   }
 

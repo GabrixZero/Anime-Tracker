@@ -7,7 +7,7 @@ class StatsView {
     const state = window.appState;
     let totalMinutes = 0;
     let totalWatchedEpisodes = 0;
-    const emotionsCount = { awesome: 0, fun: 0, mindblown: 0, sad: 0, disappointed: 0 };
+    const emotionsCount = window.Emotions.emptyCounts(); // tabela única de emoções (utils/emotions.js)
     const genresCount = {};
 
     Object.keys(state.data.watchedEpisodes).forEach(key => {
@@ -75,13 +75,7 @@ class StatsView {
     document.getElementById('stat-notes-count').textContent = totalNotes;
 
     // Emoções
-    const emotionConfig = [
-      { key: 'awesome', icon: '😍', label: 'Adorei' },
-      { key: 'fun', icon: '😂', label: 'Divertido' },
-      { key: 'mindblown', icon: '😱', label: 'Chocado' },
-      { key: 'sad', icon: '😢', label: 'Triste' },
-      { key: 'disappointed', icon: '😡', label: 'Ruim' }
-    ];
+    const emotionConfig = window.Emotions.LIST.map(e => ({ key: e.id, icon: e.icon, label: e.label }));
 
     const maxEmotion = Math.max(...Object.values(emotionsCount), 1);
     document.getElementById('stats-emotions-chart').innerHTML = emotionConfig.map(emo => {

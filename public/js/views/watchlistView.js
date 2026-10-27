@@ -79,11 +79,22 @@ class WatchlistView {
     if (filtered.length === 0) {
       if (this.container) this.container.innerHTML = '';
       if (this.emptyState) this.emptyState.classList.remove('hidden');
+      // S08: lista realmente vazia = chamada para explorar + "Carregar exemplo"; com obras mas sem resultado no filtro = aviso do filtro
+      const noItems = trackedList.length === 0;
+      const title = document.getElementById('watchlist-empty-title');
+      const text = document.getElementById('watchlist-empty-text');
+      const exampleBtn = document.getElementById('btn-watchlist-example');
+      if (title) title.textContent = noItems ? 'Sua lista está vazia' : 'Nenhuma obra neste filtro';
+      if (text) text.textContent = noItems
+        ? 'Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.'
+        : 'Troque o filtro de status ou de categoria para ver as outras obras da sua lista.';
+      if (exampleBtn) exampleBtn.classList.toggle('hidden', !noItems);
       return;
     }
 
     if (this.emptyState) this.emptyState.classList.add('hidden');
-    const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
+    const MD = window.MediaDisplay;
+    const fallbackPoster = MD.POSTER_PLACEHOLDER;
 
     if (this.container) {
       this.container.innerHTML = filtered.map(t => {
@@ -125,19 +136,19 @@ class WatchlistView {
                    alt="Pôster de ${escapeHtml(media.name)}" 
                    loading="lazy"
                    onerror="this.onerror=null; this.src='${fallbackPoster}';">
-              <div class="show-rating-badge">★ ${formatRating(media.vote_average, '–')}</div>
+              <div class="show-rating-badge">${escapeHtml(MD.ratingBadge(media.vote_average))}</div>
             </div>
             
             <div class="show-info">
               <div class="show-info-top">
                 ${typeBadge}
-                <span class="show-year">${escapeHtml(media.first_air_date ? String(media.first_air_date).slice(0, 4) : '')}</span>
+                <span class="show-year">${escapeHtml(MD.yearText(media.first_air_date))}</span>
               </div>
 
               <h3 class="show-title" title="${escapeHtml(media.name)}"><button type="button" class="show-open-btn" data-focus-key="wl:${toInt(media.id)}:open" onclick="window.detailModalView.open(${toInt(media.id)})">${escapeHtml(media.name)}</button></h3>
               <div class="show-meta-line">
-                <span>${isMovie ? `${escapeHtml(media.runtime)} min` : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
-                <span>${escapeHtml(media.status || '')}</span>
+                <span>${isMovie ? escapeHtml(MD.runtimeText(media.runtime) || 'Filme') : `${media.seasons ? media.seasons.length : 1} temp.`}</span>
+                <span>${escapeHtml(MD.statusText(media.status))}</span>
               </div>
 
               <select class="status-select status-select--card" data-focus-key="wl:${toInt(media.id)}:status" aria-label="Status de ${escapeHtml(media.name)}" onclick="event.stopPropagation()" onchange="window.appController.setStatus(${toInt(media.id)}, this.value)">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>

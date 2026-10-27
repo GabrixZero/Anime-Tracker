@@ -48,7 +48,7 @@ class DetailModalView {
     });
 
     // Toolbar de Markdown
-    document.querySelectorAll('.tool-btn').forEach(btn => {
+    document.querySelectorAll('.tool-btn[data-insert]').forEach(btn => {
       btn.addEventListener('click', () => {
         const ins = btn.getAttribute('data-insert');
         const start = textarea.selectionStart;
@@ -67,6 +67,18 @@ class DetailModalView {
         this.triggerAutoSave();
       });
     });
+
+    // ===== S08: histórico de versões da anotação =====
+    const historyBtn = document.getElementById('btn-note-history');
+    if (historyBtn) historyBtn.addEventListener('click', () => this.toggleHistory());
+    const historyList = document.getElementById('note-history-list');
+    if (historyList) {
+      historyList.addEventListener('click', (e) => {
+        const btn = e.target.closest ? e.target.closest('[data-restore]') : null;
+        if (btn) this.restoreVersion(Number(btn.getAttribute('data-restore')));
+      });
+    }
+    // ===== fim S08 =====
 
     // Toggle de Assistido dentro do Diário
     document.getElementById('note-watched-toggle').addEventListener('change', () => {
@@ -109,21 +121,22 @@ class DetailModalView {
       : `<span class="badge-type-tag badge-type-tv">Série</span>`;
 
     const tracked = window.appState.getTracked(media.id);
-    const fallbackPoster = 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=80';
+    const MD = window.MediaDisplay;
+    const fallbackPoster = MD.POSTER_PLACEHOLDER;
     header.style.backgroundImage = cssUrl(safeUrl(media.backdrop_path) || media.poster_path);
+    // S08: nada de nota/gênero/ano inventados; o que a fonte não informa aparece como "Sem nota"/"Sem gênero" ou some
+    const metaParts = [
+      MD.hasRating(media.vote_average) ? `<span>★ <strong>${escapeHtml(Number(media.vote_average).toFixed(1))}</strong></span>` : '<span>Sem nota</span>',
+      MD.yearText(media.first_air_date) ? `<span>${escapeHtml(MD.yearText(media.first_air_date))}</span>` : '',
+      `<span>${escapeHtml(MD.genresText(media.genres))}</span>`,
+      MD.runtimeText(media.runtime) ? `<span>${escapeHtml(MD.runtimeText(media.runtime))}</span>` : ''
+    ].filter(Boolean).join('<span>•</span>');
     header.innerHTML = `
       <img class="modal-poster" src="${safeSrc(media.poster_path) || fallbackPoster}" alt="Pôster de ${escapeHtml(media.name)}" onerror="this.onerror=null; this.src='${fallbackPoster}';">
       <div class="modal-header-info">
         <div class="modal-type-row">${typeBadge}</div>
         <h2 class="modal-title" id="detail-modal-title">${escapeHtml(media.name)}</h2>
-        <div class="modal-meta">
-          <span>★ <strong>${formatRating(media.vote_average)}</strong></span>
-          <span>•</span>
-          <span>${escapeHtml(media.first_air_date ? String(media.first_air_date).slice(0, 4) : '')}</span>
-          <span>•</span>
-          <span>${escapeHtml((media.genres || []).join(', '))}</span>
-          ${media.runtime ? `<span>•</span><span>${escapeHtml(media.runtime)} min</span>` : ''}
-        </div>
+        <div class="modal-meta">${metaParts}</div>
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
         
         <div class="modal-actions">
@@ -152,8 +165,10 @@ class DetailModalView {
         <div class="movie-actions-box">
           <div>
             <h4>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h4>
-            <p>Duração: ${escapeHtml(media.runtime || 120)} minutos computados nas estatísticas de vida ao marcar.</p>
-            ${hasNote ? `<p class="movie-quote">"${escapeHtml(note.text.slice(0, 75))}..."</p>` : ''}
+            <p>${window.MediaDisplay.knownRuntime(media.runtime)
+              ? `Duração: ${escapeHtml(window.MediaDisplay.knownRuntime(media.runtime))} minutos, contados nas estatísticas ao marcar.`
+              : 'Duração não informada pela fonte; as estatísticas usam 120 min como estimativa.'}</p>
+            ${hasNote ? `<p class="movie-quote">"${escapeHtml(this.notePreview(note.text, 75))}"</p>` : ''}
           </div>
 
           <div class="movie-btn-group">
@@ -238,7 +253,7 @@ class DetailModalView {
 
     summary.innerHTML = `Progresso da Temporada: <strong>${watched}/${season.episodes.length} assistidos</strong>`;
 
-    const fallbackEpisodeThumb = 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';
+    const fallbackEpisodeThumb = window.MediaDisplay.STILL_PLACEHOLDER;
 
     container.innerHTML = season.episodes.map(ep => {
       const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
@@ -251,12 +266,12 @@ class DetailModalView {
             <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
           </button>
 
-          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" class="episode-thumb" loading="lazy">
+          <img src="${safeSrc(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path) || fallbackEpisodeThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackEpisodeThumb}';" class="episode-thumb" loading="lazy">
 
           <div class="episode-info">
-            <span class="episode-code">E${escapeHtml(ep.episode_number)} · ${escapeHtml(ep.air_date ? String(ep.air_date).slice(0, 10) : '')}</span>
+            <span class="episode-code">E${escapeHtml(ep.episode_number)}${ep.air_date ? ` · ${escapeHtml(String(ep.air_date).slice(0, 10))}` : ''}</span>
             <div class="episode-name">${escapeHtml(ep.name)}</div>
-            <span class="episode-runtime">${escapeHtml(ep.runtime || 45)} min</span>
+            ${window.MediaDisplay.runtimeText(ep.runtime) ? `<span class="episode-runtime">${escapeHtml(window.MediaDisplay.runtimeText(ep.runtime))}</span>` : ''}
             ${hasNote ? `<span class="episode-note-tag">Anotação salva</span>` : ''}
           </div>
 
@@ -282,7 +297,7 @@ class DetailModalView {
     if (isMovie) {
       epCode.textContent = 'FILME';
       epTitle.textContent = media.name;
-      showTitle.textContent = `Duração: ${media.runtime || 120} min`;
+      showTitle.textContent = window.MediaDisplay.runtimeText(media.runtime) ? `Duração: ${window.MediaDisplay.runtimeText(media.runtime)}` : 'Filme';
     } else {
       const season = media.seasons ? media.seasons.find(s => s.season_number === seasonNum) : null;
       const ep = season ? season.episodes.find(e => e.episode_number === epNum) : null;
@@ -299,7 +314,8 @@ class DetailModalView {
     document.getElementById('note-textarea').value = note.text || '';
 
     this.updateWordCount(note.text || '');
-    this.updateSaveBadge('Salvo no disco');
+    this.updateSaveBadge('Salvo neste aparelho');
+    this.renderHistory(false);
 
     document.querySelectorAll('#note-emotion-selector .emotion-btn').forEach(btn => {
       if (btn.getAttribute('data-emotion') === note.emotion) btn.classList.add('active');
@@ -326,24 +342,102 @@ class DetailModalView {
   triggerAutoSave() {
     this.updateSaveBadge('Salvando...', true);
     if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
-
-    this.autoSaveTimer = setTimeout(() => {
-      const text = document.getElementById('note-textarea').value;
-      const character = document.getElementById('note-character-input').value;
-      const activeEmo = document.querySelector('#note-emotion-selector .emotion-btn.active');
-      const emotion = activeEmo ? activeEmo.getAttribute('data-emotion') : null;
-
-      window.appState.saveNote(this.currentNoteEp.showId, this.currentNoteEp.seasonNum, this.currentNoteEp.epNum, {
-        text,
-        character,
-        emotion
-      });
-
-      const now = new Date().toLocaleTimeString('pt-BR');
-      this.updateSaveBadge(`Salvo no disco às ${now}`, false);
-      document.getElementById('note-last-saved').textContent = `Última edição: ${now}`;
-    }, 350);
+    this.autoSaveTimer = setTimeout(() => this.saveNow(), 350);
   }
+
+  saveNow() {
+    this.autoSaveTimer = null;
+    const text = document.getElementById('note-textarea').value;
+    const character = document.getElementById('note-character-input').value;
+    const activeEmo = document.querySelector('#note-emotion-selector .emotion-btn.active');
+    const emotion = activeEmo ? activeEmo.getAttribute('data-emotion') : null;
+
+    window.appState.saveNote(this.currentNoteEp.showId, this.currentNoteEp.seasonNum, this.currentNoteEp.epNum, {
+      text,
+      character,
+      emotion
+    });
+
+    const now = new Date().toLocaleTimeString('pt-BR');
+    this.updateSaveBadge(`Salvo neste aparelho às ${now}`, false);
+    document.getElementById('note-last-saved').textContent = `Última edição: ${now}`;
+    this.renderHistory(null);
+  }
+
+  // Grava já o que estiver pendente no timer (antes de abrir/restaurar o histórico).
+  flushAutoSave() {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.saveNow();
+    }
+  }
+
+  // ===== S08: histórico de versões da anotação (D-19) =====
+  // Prévia curta em texto puro (sem marcas de Markdown e sem vazar spoiler).
+  notePreview(text, max) {
+    const plain = window.NoteMarkdown.toPlainText(String(text || '')).replace(/\s+/g, ' ').trim();
+    return plain.length > max ? `${plain.slice(0, max)}…` : plain;
+  }
+
+  // open: true abre o painel, false fecha, null mantém como está. Também atualiza o botão "Histórico (n)".
+  renderHistory(open = null) {
+    const btn = document.getElementById('btn-note-history');
+    const panel = document.getElementById('note-history-panel');
+    const list = document.getElementById('note-history-list');
+    if (!btn || !panel || !list) return;
+
+    const { showId, seasonNum, epNum } = this.currentNoteEp;
+    const versions = window.appState.getNoteVersions(showId, seasonNum, epNum);
+    btn.classList.toggle('hidden', versions.length === 0);
+    btn.textContent = `Histórico (${versions.length})`;
+
+    const show = versions.length > 0 && (open === null ? !panel.classList.contains('hidden') : open);
+    panel.classList.toggle('hidden', !show);
+    btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+    if (!versions.length) { list.innerHTML = ''; return; }
+
+    list.innerHTML = versions.map((v, i) => {
+      const when = Date.parse(v.updatedAt)
+        ? new Date(v.updatedAt).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : 'Data desconhecida';
+      return `
+        <li class="note-history-item">
+          <div class="note-history-info">
+            <span class="note-history-when">${escapeHtml(when)}</span>
+            <span class="note-history-text">${escapeHtml(this.notePreview(v.text, 220) || '(texto vazio)')}</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline" data-restore="${toInt(i)}" data-focus-key="history:${toInt(i)}:restore" aria-label="Restaurar a versão de ${escapeHtml(when)}">Restaurar</button>
+        </li>
+      `;
+    }).join('');
+  }
+
+  toggleHistory() {
+    this.flushAutoSave();
+    const panel = document.getElementById('note-history-panel');
+    this.renderHistory(panel ? panel.classList.contains('hidden') : false);
+  }
+
+  restoreVersion(index) {
+    this.flushAutoSave(); // o texto atual precisa estar gravado: ele vira uma versão nova do histórico
+    const { showId, seasonNum, epNum } = this.currentNoteEp;
+    const restored = window.appState.restoreNoteVersion(showId, seasonNum, epNum, index);
+    if (restored === null) {
+      window.appController.showToast('Não foi possível restaurar esta versão.', 'error');
+      return;
+    }
+    document.getElementById('note-textarea').value = restored;
+    this.updateWordCount(restored);
+    const now = new Date().toLocaleTimeString('pt-BR');
+    this.updateSaveBadge(`Salvo neste aparelho às ${now}`, false);
+    document.getElementById('note-last-saved').textContent = `Última edição: ${now}`;
+    this.renderHistory(true);
+    // a lista foi redesenhada (o botão clicado não existe mais): devolve o foco para o botão "Histórico"
+    const historyBtn = document.getElementById('btn-note-history');
+    if (historyBtn && !historyBtn.classList.contains('hidden') && historyBtn.focus) historyBtn.focus();
+    window.appController.showToast('Versão restaurada. O texto anterior ficou no histórico.', 'success');
+  }
+  // ===== fim S08 =====
 
 }
 

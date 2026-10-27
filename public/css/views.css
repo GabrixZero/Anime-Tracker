@@ -834,3 +834,107 @@
 }
 
 .backup-reset h4 { color: var(--accent-rose); font-size: 0.88rem; margin-bottom: 0.5rem; }
+
+/* ================================================================
+   S08 · Markdown das anotações, spoiler, histórico de versões e estado vazio
+   ================================================================ */
+
+/* Botões lado a lado no estado vazio (Explorar + Carregar exemplo) */
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+/* Texto renderizado (utils/markdown.js): só estas tags/classes existem */
+.diary-text strong { color: #ffffff; font-weight: 800; }
+.diary-text em { font-style: italic; }
+
+.md-quote {
+  margin: 0.35rem 0;
+  padding: 0.3rem 0.8rem;
+  border-left: 3px solid var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.07);
+  color: var(--text-secondary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Spoiler: escondido até clicar (ou Enter/Espaço); clicar de novo esconde */
+.md-spoiler {
+  background: #2b3144;
+  color: transparent;
+  border-radius: 4px;
+  padding: 0 0.3em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.md-spoiler * { color: transparent; }
+
+.md-spoiler:hover { background: #38405a; }
+
+.md-spoiler:focus-visible {
+  outline: 2px solid var(--tvtime-yellow);
+  outline-offset: 2px;
+}
+
+.md-spoiler.revealed {
+  background: rgba(255, 208, 0, 0.14);
+  color: inherit;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.md-spoiler.revealed * { color: inherit; }
+
+.md-spoiler.revealed strong { color: #ffffff; }
+
+/* Histórico de versões da anotação */
+.tool-btn--history { color: var(--tvtime-yellow); border-color: rgba(255, 208, 0, 0.3); }
+
+.note-history {
+  border-top: 1px solid var(--bg-card-border);
+  background: rgba(0, 0, 0, 0.18);
+  padding: 0.85rem 1rem;
+}
+
+.note-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 0.6rem;
+  color: var(--text-main);
+  font-size: 0.88rem;
+}
+
+.note-history-head span { font-size: var(--fs-meta); color: var(--text-muted); }
+
+.note-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.note-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+}
+
+.note-history-info { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.note-history-when { font-size: var(--fs-meta); font-weight: 700; color: var(--text-secondary); }
+.note-history-text { font-size: 0.88rem; color: var(--text-main); overflow-wrap: anywhere; }
+.note-history-item .btn { flex-shrink: 0; }

@@ -105,15 +105,8 @@ class DiaryView {
     }
 
     this.emptyState.classList.add('hidden');
-    const emotionLabels = {
-      awesome: '😍 Adorei',
-      fun: '😂 Engraçado',
-      mindblown: '😱 Chocado',
-      sad: '😢 Triste',
-      disappointed: '😡 Decepcionado'
-    };
-
-    const fallbackThumb = 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';
+    // S08: rótulo e ícone vêm da tabela única de emoções (utils/emotions.js)
+    const fallbackThumb = window.MediaDisplay.STILL_PLACEHOLDER;
 
     this.container.innerHTML = filtered.map(e => {
       const formattedDate = new Date(e.updatedAt).toLocaleDateString('pt-BR', {
@@ -124,19 +117,19 @@ class DiaryView {
 
       return `
         <div class="diary-entry-card">
-          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600';" class="diary-thumb" loading="lazy">
+          <img src="${safeSrc(e.stillPath) || fallbackThumb}" alt="" onerror="this.onerror=null; this.src='${fallbackThumb}';" class="diary-thumb" loading="lazy">
           
           <div class="diary-body">
             <div class="diary-top">
               <span class="diary-code">${headerText}</span>
-              ${e.emotion ? `<span class="diary-emotion">${escapeHtml(emotionLabels[e.emotion] || e.emotion)}</span>` : ''}
+              ${e.emotion ? `<span class="diary-emotion">${escapeHtml(window.Emotions.withIcon(e.emotion))}</span>` : ''}
             </div>
 
             <h4 class="diary-title">${escapeHtml(e.epTitle)}</h4>
 
             ${e.character ? `<div class="diary-highlight">Destaque: ${escapeHtml(e.character)}</div>` : ''}
 
-            <div class="diary-text">${escapeHtml(e.text)}</div>
+            <div class="diary-text">${window.NoteMarkdown.render(e.text)}</div>
 
             <div class="diary-foot">
               <span>Gravado em: ${formattedDate}</span>
@@ -168,7 +161,7 @@ class DiaryView {
       }
 
       md += `**Data:** ${new Date(note.updatedAt).toLocaleDateString('pt-BR')}\n`;
-      if (note.emotion) md += `**Reação:** ${note.emotion}\n`;
+      if (note.emotion) md += `**Reação:** ${window.Emotions.label(note.emotion)}\n`;
       if (note.character) md += `**Destaque:** ${note.character}\n`;
       md += `\n${note.text}\n\n---\n\n`;
     });

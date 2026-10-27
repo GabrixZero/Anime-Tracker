@@ -139,7 +139,7 @@ const MOVIE = { id: 200, type: 'movie', name: 'Filme B', genres: ['Ação'], run
 const OTHER = { id: 300, type: 'tv', name: 'Série C', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] };
 
 // Um aparelho = um navegador (localStorage próprio) com os scripts reais do app carregados.
-function makeDevice(model, { withViews = false, demo = false } = {}) {
+function makeDevice(model, { withViews = false, firstVisit = false } = {}) {
   const store = new Map();
   const elements = new Map();
   const el = (id) => {
@@ -162,7 +162,7 @@ function makeDevice(model, { withViews = false, demo = false } = {}) {
   };
   ctx.window = ctx;
   vm.createContext(ctx);
-  const files = ['utils/dom.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
+  const files = ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
 
   const userFromToken = () => {
     const tok = store.get('showvault_auth_token');
@@ -189,8 +189,8 @@ function makeDevice(model, { withViews = false, demo = false } = {}) {
       return { resetAt: cleared.resetAt, updatedAt: cleared.updatedAt };
     }
   };
-  // navegador "já usado" (estado vazio salvo): sem a lista de exemplo, que só aparece na primeira visita
-  if (!demo) store.set('showvault_state_mvc_v1', JSON.stringify(empty()));
+  // navegador "já usado" (estado vazio salvo); `firstVisit` = nada salvo ainda (S08: a primeira visita também é vazia, mas `seeded`)
+  if (!firstVisit) store.set('showvault_state_mvc_v1', JSON.stringify(empty()));
   for (const f of files) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf-8'), ctx, { filename: f });
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'models/state.js'), 'utf-8'), ctx, { filename: 'state.js' });
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'services/syncService.js'), 'utf-8'), ctx, { filename: 'syncService.js' });
@@ -575,4 +575,174 @@ test('importar backup propaga a substituição aos outros aparelhos', async () =
   await B.sync.pullAndMerge();
   assert.deepEqual(B.ids(), [300], 'o que não estava no backup sumiu também no outro aparelho');
   assert.equal(B.state.getTracked(300).status, 'completed');
+});
+
+// ---------------------------------------------------------------- S08: estado inicial vazio, "Carregar exemplo" e histórico de versões da nota
+
+const EXAMPLE_ITEMS = [
+  { id: 157336, type: 'movie', name: 'Filme de exemplo 1', genres: [], runtime: 120 },
+  { id: 872585, type: 'movie', name: 'Filme de exemplo 2', genres: [] },
+  { id: 1396, type: 'tv', name: 'Série de exemplo', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] },
+  { id: 1429, type: 'anime', name: 'Anime de exemplo', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] }
+];
+
+test('primeira visita: lista vazia, sem obras/datas/anotações de enfeite e nada gravado até o usuário agir', () => {
+  const dev = makeDevice(tmpModel(), { firstVisit: true });
+  assert.equal(dev.state.seeded, true);
+  assert.deepEqual(dev.ids(), []);
+  assert.deepEqual(plain(dev.state.data.watchedEpisodes), {});
+  assert.deepEqual(plain(dev.state.data.episodeNotes), {});
+  assert.equal(dev.store.get('showvault_state_mvc_v1'), undefined, 'ler o estado inicial não grava nada');
+  dev.state.addShow(100);
+  assert.equal(dev.state.seeded, false, 'depois da 1ª ação o estado é do usuário');
+  assert.deepEqual(dev.ids(), [100]);
+});
+
+test('visitante vazio que entra numa conta recebe a nuvem (sem herdar nada) e quem já agiu como visitante leva o que fez', async () => {
+  const model = tmpModel();
+  const A = makeDevice(model);
+  await A.login('usr_s08a');
+  A.state.addShow(100);
+  A.state.saveNote(100, 1, 1, { text: 'minha anotação na nuvem', emotion: 'fun', character: '' });
+  await tick();
+  await A.sync.push();
+
+  const fresh = makeDevice(model, { firstVisit: true }); // navegador novo, visitante que nunca fez nada
+  await fresh.login('usr_s08a');
+  assert.deepEqual(fresh.ids(), [100]);
+  assert.equal(fresh.state.getNote(100, 1, 1).text, 'minha anotação na nuvem');
+
+  const newAccount = makeDevice(model, { firstVisit: true });
+  await newAccount.login('usr_s08b'); // conta nova: continua vazia, sem exemplo nenhum
+  assert.deepEqual(newAccount.ids(), []);
+  assert.deepEqual(model.get('usr_s08b').trackedShows, []);
+
+  const guest = makeDevice(model, { firstVisit: true });
+  guest.state.addShow(300); // visitante que usou o app antes de entrar
+  await guest.login('usr_s08a');
+  assert.deepEqual(guest.ids(), [100, 300], 'une o que fez como visitante com a conta');
+});
+
+test('"Carregar exemplo": só obras do catálogo, como Quero ver, sem episódios, datas ou anotações; repetir não duplica', () => {
+  const dev = makeDevice(tmpModel(), { firstVisit: true });
+  const state = dev.state;
+
+  const none = state.loadExample(); // catálogo ainda não chegou: nada entra (não cria obra sem dados)
+  assert.deepEqual(plain(none.added), []);
+  assert.equal(none.missing, 4);
+  assert.deepEqual(dev.ids(), []);
+
+  state.cacheMediaList(EXAMPLE_ITEMS);
+  const out = state.loadExample();
+  assert.deepEqual(plain(out.added), [157336, 872585, 1396, 1429]);
+  assert.deepEqual(plain(state.data.trackedShows.map(t => t.status)), ['plan_to_watch', 'plan_to_watch', 'plan_to_watch', 'plan_to_watch']);
+  assert.deepEqual(plain(state.data.watchedEpisodes), {});
+  assert.deepEqual(plain(state.data.episodeNotes), {});
+  assert.equal(state.seeded, false);
+
+  const again = state.loadExample();
+  assert.deepEqual(plain(again.added), []);
+  assert.equal(state.data.trackedShows.length, 4);
+
+  // exemplo é lista comum: remover vale e o resto do exemplo fica
+  state.removeShow(1396);
+  assert.deepEqual(dev.ids(), [1429, 157336, 872585]);
+});
+
+test('histórico de versões: nova sessão de edição guarda a versão anterior; digitar seguido não enche o histórico', () => {
+  const dev = makeDevice(tmpModel());
+  const state = dev.state;
+  const key = '100_s1_e1';
+  const older = (minutes) => { state.data.episodeNotes[key].updatedAt = new Date(Date.now() - minutes * 60000).toISOString(); };
+
+  state.saveNote(100, 1, 1, { text: 'v1 texto', emotion: 'fun', character: 'Ana' });
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1)), [], 'primeira gravação não tem versão anterior');
+
+  // digitando: várias gravações automáticas seguidas = uma sessão só
+  state.saveNote(100, 1, 1, { text: 'v1 texto mais', emotion: 'fun', character: 'Ana' });
+  state.saveNote(100, 1, 1, { text: 'v1 texto mais um pouco', emotion: 'fun', character: 'Ana' });
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1)), []);
+
+  older(60); // anotação parada há uma hora: a próxima edição começa uma sessão nova
+  state.saveNote(100, 1, 1, { text: 'v2 texto', emotion: 'sad', character: 'Ana' });
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)), ['v1 texto mais um pouco']);
+
+  state.saveNote(100, 1, 1, { text: 'v2 texto editado', emotion: 'sad', character: 'Ana' });
+  assert.equal(state.getNoteVersions(100, 1, 1).length, 1, 'ainda a mesma sessão');
+
+  older(60);
+  state.saveNote(100, 1, 1, { text: 'v3 texto', emotion: 'sad', character: 'Ana' });
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)), ['v2 texto editado', 'v1 texto mais um pouco']);
+
+  // só emoção/personagem mudou, texto igual: nada de versão nova
+  older(60);
+  state.saveNote(100, 1, 1, { text: 'v3 texto', emotion: 'awesome', character: 'Bia' });
+  assert.equal(state.getNoteVersions(100, 1, 1).length, 2);
+
+  // limite de 5 (as mais novas ficam)
+  for (let i = 4; i <= 9; i++) { older(60); state.saveNote(100, 1, 1, { text: `v${i} texto`, emotion: null, character: '' }); }
+  const texts = state.getNoteVersions(100, 1, 1).map(v => v.text);
+  assert.equal(texts.length, 5);
+  assert.equal(texts[0], 'v8 texto');
+  assert.equal(texts[4], 'v4 texto');
+});
+
+test('histórico de versões: restaurar em 1 clique troca o texto, guarda o atual como nova versão e não perde as demais', async () => {
+  const model = tmpModel();
+  const dev = makeDevice(model);
+  const state = dev.state;
+  const key = '100_s1_e1';
+  const older = () => { state.data.episodeNotes[key].updatedAt = new Date(Date.now() - 3600000).toISOString(); };
+  state.saveNote(100, 1, 1, { text: 'primeira versão da anotação', emotion: 'fun', character: 'Ana' });
+  for (const t of ['segunda versão da anotação', 'terceira versão da anotação', 'quarta versão da anotação']) {
+    older();
+    state.saveNote(100, 1, 1, { text: t, emotion: 'sad', character: 'Ana' });
+  }
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)),
+    ['terceira versão da anotação', 'segunda versão da anotação', 'primeira versão da anotação']);
+
+  const restored = state.restoreNoteVersion(100, 1, 1, 2); // a mais antiga
+  assert.equal(restored, 'primeira versão da anotação');
+  assert.equal(state.getNote(100, 1, 1).text, 'primeira versão da anotação');
+  assert.equal(state.getNote(100, 1, 1).emotion, 'sad', 'emoção e personagem não mudam');
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)),
+    ['quarta versão da anotação', 'terceira versão da anotação', 'segunda versão da anotação'],
+    'o texto que valia virou a versão mais nova; as outras continuam');
+
+  // restaurar de novo traz de volta o que estava valendo (desfazer)
+  state.restoreNoteVersion(100, 1, 1, 0);
+  assert.equal(state.getNote(100, 1, 1).text, 'quarta versão da anotação');
+  assert.equal(state.getNoteVersions(100, 1, 1)[0].text, 'primeira versão da anotação');
+  assert.equal(state.getNoteVersions(100, 1, 1).length, 3);
+
+  // índices inválidos não mexem em nada
+  const before = JSON.stringify(state.getNote(100, 1, 1));
+  for (const bad of [-1, 3, 99, 1.5, null, undefined, '0']) assert.equal(state.restoreNoteVersion(100, 1, 1, bad), null, String(bad));
+  assert.equal(state.restoreNoteVersion(100, 1, 7, 0), null, 'anotação inexistente');
+  assert.equal(JSON.stringify(state.getNote(100, 1, 1)), before);
+
+  // com o limite cheio (5), restaurar mantém 5 (a restaurada sai, a atual entra)
+  for (let i = 0; i < 4; i++) { older(); state.saveNote(100, 1, 1, { text: `rascunho número ${i}`, emotion: null, character: '' }); }
+  assert.equal(state.getNoteVersions(100, 1, 1).length, 5);
+  state.restoreNoteVersion(100, 1, 1, 4);
+  assert.equal(state.getNoteVersions(100, 1, 1).length, 5);
+
+  // o histórico viaja com a anotação na sincronização
+  await dev.login('usr_s08c');
+  await tick();
+  await dev.sync.push();
+  const cloud = model.get('usr_s08c').episodeNotes[key];
+  assert.equal(cloud.snapshots.length, 5);
+  assert.equal(cloud.text, state.getNote(100, 1, 1).text);
+});
+
+test('histórico de versões: restaurar texto de filme usa a chave do filme e conta como edição mais recente', () => {
+  const dev = makeDevice(tmpModel());
+  const state = dev.state;
+  state.saveNote(200, null, null, { text: 'opinião inicial sobre o filme', emotion: null, character: '' });
+  state.data.episodeNotes['200_movie'].updatedAt = new Date(Date.now() - 3600000).toISOString();
+  state.saveNote(200, null, null, { text: 'opinião nova sobre o filme', emotion: null, character: '' });
+  const stampBefore = state.getNote(200).updatedAt;
+  assert.equal(state.restoreNoteVersion(200, null, null, 0), 'opinião inicial sobre o filme');
+  assert.ok(Date.parse(state.getNote(200).updatedAt) > Date.parse(stampBefore), 'a restauração vence no sync');
 });
