@@ -20,7 +20,9 @@ const TMP_PREFIX = 'showvault-e2e-';
 const SCRUB = [
   'NODE_ENV',
   'PORT',
+  'HOST',
   'SHOWVAULT_DATA_DIR',
+  'SHOWVAULT_BACKUP_DIR',
   'STORAGE',
   'SQLITE_FILE',
   'JWT_SECRET',
@@ -28,11 +30,19 @@ const SCRUB = [
   'TMDB_API_KEY',
   'GOOGLE_CLIENT_ID',
   'JIKAN_BASE_URL',
+  'ANILIST_BASE_URL',
+  'TVMAZE_BASE_URL',
+  'TMDB_BASE_URL',
+  'MEDIA_AIRING_TTL_HOURS',
+  'MEDIA_REFRESH_INTERVAL_MIN',
   'CORS_ORIGINS',
   'TRUST_PROXY',
   'SEED_DEMO_USER',
   'STATIC_MAX_AGE_SEC'
 ];
+
+// Chave do TMDB só dos testes (o TMDB falso exige alguma; não é uma chave de verdade e nada sai da máquina).
+const FAKE_TMDB_KEY = 'chave-de-teste-e2e-nao-e-segredo';
 
 // Obras fictícias acrescentadas ao catálogo (depois das 16 do seed) para a lista do Explorar ter mais de uma página (60 por página).
 const EXTRA_CATALOG_SIZE = 50;
@@ -90,7 +100,7 @@ function portIsFree(port) {
   return new Promise(resolve => {
     const probe = net.createServer();
     probe.once('error', () => resolve(false));
-    probe.listen(port, () => probe.close(() => resolve(true)));
+    probe.listen(port, '127.0.0.1', () => probe.close(() => resolve(true)));
   });
 }
 
@@ -118,9 +128,13 @@ function getHealth(url) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// Sobe `node server.js` com a guarda de rede e espera o /health. Devolve { url, port, dataDir, stop() }.
-async function startApp({ port, dataDir, fakeSourcesUrl, env = {}, logFile, timeoutMs = 30000 }) {
-  if (!fakeSourcesUrl) throw new Error('[e2e] startApp precisa da URL do servidor falso das fontes.');
+// Sobe `node server.js` com a rede de segurança e espera o /health. Devolve { url, port, dataDir, stop() }.
+// O servidor falso das fontes (global-setup) deixa a URL e as variáveis *_BASE_URL em E2E_FAKE_SOURCES_URL e E2E_FAKE_ENV (JSON).
+async function startApp({ port, dataDir, env = {}, logFile, timeoutMs = 30000 }) {
+  const fakeSourcesUrl = process.env.E2E_FAKE_SOURCES_URL;
+  if (!fakeSourcesUrl)
+    throw new Error('[e2e] O servidor falso das fontes não está no ar (E2E_FAKE_SOURCES_URL vazio): suba-o no global-setup.');
+  const fakeEnv = JSON.parse(process.env.E2E_FAKE_ENV || '{}');
   if (!(await portIsFree(port))) {
     throw new Error(`[e2e] A porta ${port} já está em uso. Feche o outro servidor (ou rode com E2E_PORT=<outra porta>).`);
   }
@@ -129,10 +143,13 @@ async function startApp({ port, dataDir, fakeSourcesUrl, env = {}, logFile, time
   for (const key of Object.keys(childEnv)) if (SCRUB.includes(key) || key.startsWith('AUTH_')) delete childEnv[key];
   Object.assign(childEnv, {
     PORT: String(port),
+    HOST: '127.0.0.1', // só neste computador (e o Windows não pergunta do firewall)
     SHOWVAULT_DATA_DIR: dataDir,
     STORAGE: process.env.E2E_STORAGE || 'json',
+    MEDIA_REFRESH_INTERVAL_MIN: '0', // sem a conferência automática de obras em exibição (os testes controlam o que acontece)
+    TMDB_API_KEY: FAKE_TMDB_KEY,
+    ...fakeEnv,
     E2E_FAKE_SOURCES_URL: fakeSourcesUrl,
-    JIKAN_BASE_URL: `${fakeSourcesUrl}/externo/api.jikan.moe/v4`,
     // Limites de tentativas de login/cadastro bem altos: todos os testes usam o mesmo IP (127.0.0.1).
     AUTH_REGISTER_MAX: '100000',
     AUTH_LOGIN_MAX: '100000',

@@ -14,14 +14,40 @@ const commonRules = {
 };
 
 module.exports = [
-  { ignores: ['node_modules/**', 'server/data/**', 'Documentacao/**', '.claude/**', 'coverage/**'] },
+  {
+    ignores: [
+      'node_modules/**',
+      'server/data/**',
+      'Documentacao/**',
+      '.claude/**',
+      'coverage/**',
+      'test-results/**',
+      'playwright-report/**',
+      'blob-report/**'
+    ]
+  },
   js.configs.recommended,
 
   // Servidor, scripts e testes: Node (CommonJS)
   {
-    files: ['server.js', 'server/**/*.js', 'scripts/**/*.js', 'tests/**/*.js', 'eslint.config.js', 'prettier.config.js'],
+    files: [
+      'server.js',
+      'server/**/*.js',
+      'scripts/**/*.js',
+      'tests/**/*.js',
+      'eslint.config.js',
+      'prettier.config.js',
+      'playwright.config.js'
+    ],
     languageOptions: { ecmaVersion: 2023, sourceType: 'commonjs', globals: { ...globals.node, fetch: 'readonly' } },
     rules: commonRules
+  },
+
+  // Testes E2E (S12): o código roda no Node, mas as funções passadas a page.evaluate()/waitForFunction() rodam DENTRO do navegador
+  // (window, document, localStorage...), então os dois conjuntos de globais valem aqui.
+  {
+    files: ['tests/e2e/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } }
   },
 
   // Frontend: scripts clássicos no navegador. Os arquivos conversam por `window.*` e por variáveis globais declaradas

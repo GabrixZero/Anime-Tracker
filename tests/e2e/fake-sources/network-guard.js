@@ -1,10 +1,11 @@
-// Guarda de rede do SERVIDOR nos testes E2E (S12). Carregado com `node --require` apenas no processo do app que os testes
+// REDE DE SEGURANÇA do SERVIDOR nos testes E2E (S12). Carregado com `node --require` apenas no processo do app que os testes
 // sobem (nunca no app de verdade; nenhum arquivo do app é alterado).
 //
-// Qualquer pedido http/https/fetch para fora de 127.0.0.1/localhost é reescrito para o servidor falso das fontes:
-//   https://api.tvmaze.com/search/shows?q=x  ->  http://127.0.0.1:<porta>/externo/api.tvmaze.com/search/shows?q=x
-// Motivo: o app ainda não tem variável de URL para o TVMaze (só JIKAN_BASE_URL existe). Quando houver (TVMAZE_BASE_URL etc.),
-// basta apontá-la para o servidor falso. Hosts que o servidor falso não conhece respondem 503 e falham a execução no fim.
+// As quatro fontes (TVMaze, AniList, Jikan, TMDB) já apontam para o servidor falso pelas variáveis *_BASE_URL (D-S12-3). Isto aqui
+// só garante que NADA mais saia do computador por engano: qualquer pedido http/https/fetch para fora de 127.0.0.1/localhost é
+// reescrito para o servidor falso, que responde 503 e anota o host:
+//   https://exemplo.com/x?y=1  ->  http://127.0.0.1:<porta>/externo/exemplo.com/x?y=1
+// No fim da execução, qualquer host anotado falha os testes (ver global-setup.js). Em condições normais nunca dispara.
 //
 // Também encerra o servidor se o processo que o abriu (Playwright) morrer, para nunca sobrar servidor órfão.
 'use strict';

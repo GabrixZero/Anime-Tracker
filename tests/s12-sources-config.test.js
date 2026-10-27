@@ -31,7 +31,8 @@ function inspect(extraEnv) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-s12cfg-'));
   try {
     const env = { ...process.env };
-    for (const key of ['TVMAZE_BASE_URL', 'TMDB_BASE_URL', 'ANILIST_BASE_URL', 'JIKAN_BASE_URL', 'TMDB_API_KEY', 'STORAGE', 'NODE_ENV']) delete env[key];
+    for (const key of ['TVMAZE_BASE_URL', 'TMDB_BASE_URL', 'ANILIST_BASE_URL', 'JIKAN_BASE_URL', 'TMDB_API_KEY', 'STORAGE', 'NODE_ENV'])
+      delete env[key];
     Object.assign(env, { SHOWVAULT_DATA_DIR: dir, MEDIA_REFRESH_INTERVAL_MIN: '0' }, extraEnv);
     const run = spawnSync(process.execPath, ['-e', SCRIPT], { cwd: REPO, env, encoding: 'utf-8', timeout: 20000 });
     assert.equal(run.status, 0, `o processo filho falhou:\n${run.stderr}`);
@@ -69,7 +70,12 @@ test('TVMAZE_BASE_URL e TMDB_BASE_URL trocam o endereço das fontes (sem a barra
 test('o que o código passa explicitamente (testes unitários) vence a variável de ambiente', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-s12cfg-'));
   try {
-    const env = { ...process.env, SHOWVAULT_DATA_DIR: dir, TVMAZE_BASE_URL: 'http://127.0.0.1:4010/tvmaze', TMDB_BASE_URL: 'http://127.0.0.1:4010/tmdb' };
+    const env = {
+      ...process.env,
+      SHOWVAULT_DATA_DIR: dir,
+      TVMAZE_BASE_URL: 'http://127.0.0.1:4010/tvmaze',
+      TMDB_BASE_URL: 'http://127.0.0.1:4010/tmdb'
+    };
     const script = `
       const MediaService = require('./server/services/mediaService').MediaService;
       const svc = new MediaService({ dataDir: process.env.SHOWVAULT_DATA_DIR, tvmazeBase: 'http://x.invalid/a', tmdbBase: 'http://x.invalid/b', tmdbKey: 'k' });
