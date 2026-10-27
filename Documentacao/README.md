@@ -3,15 +3,19 @@
 Esta pasta é a **memória do projeto**. Toda sessão do Claude começa por aqui e termina atualizando
 estes arquivos, para o Gabriel nunca precisar explicar o projeto do zero.
 
-## Ordem de leitura (toda sessão)
+## Leitura mínima (toda sessão) — D-30
 
-1. [01-visao-geral-e-arquitetura.md](01-visao-geral-e-arquitetura.md) — o que é o projeto, como rodar, mapa do código, histórico de segurança.
-2. [02-decisoes.md](02-decisoes.md) — decisões já tomadas (não reabrir sem motivo) e decisões pendentes.
-3. [03-protocolo-de-sessao.md](03-protocolo-de-sessao.md) — como abrir, executar e **encerrar** uma sessão (inclui o fluxo git até o `main`).
-4. [04-roadmap.md](04-roadmap.md) — as 10 seções em ordem de prioridade (o status fica em `status/`).
-5. [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md) — sessões em paralelo: quadro de status (`npm run status`), dependências, conflitos.
-6. O arquivo da seção da sessão atual em [secoes/](secoes/) (ex.: `S01-xss-frontend.md`).
-7. [diario/](diario/) (um arquivo por sessão) e [05-diario-de-sessoes.md](05-diario-de-sessoes.md) (sessão 0) — o que cada sessão fez e deixou pendente.
+1. Este arquivo.
+2. O bloco **"Regras vigentes"** no topo de [02-decisoes.md](02-decisoes.md) (o resto do arquivo é histórico: consulte só a decisão citada).
+3. O arquivo da seção em [secoes/](secoes/) e `npm run status -- SNN`.
+
+## Sob demanda (leia só quando a tarefa pedir)
+
+- [01-visao-geral-e-arquitetura.md](01-visao-geral-e-arquitetura.md) — mapa do código, armazenamento, faixas de ids, segurança (ao mexer em arquitetura ou num arquivo que não conhece).
+- [03-protocolo-de-sessao.md](03-protocolo-de-sessao.md) — abertura, execução e **encerramento** com o fluxo git até o `main` (ao começar e ao terminar uma seção).
+- [04-roadmap.md](04-roadmap.md) — todas as seções e a ordem de prioridade.
+- [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md) — quadro de status, dependências, modo subagente, conflitos.
+- [diario/](diario/) e [05-diario-de-sessoes.md](05-diario-de-sessoes.md) — histórico por sessão (só o diário da seção que você vai continuar ou que a seção citar).
 
 ## Regras da documentação
 

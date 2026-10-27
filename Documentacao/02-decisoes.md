@@ -3,6 +3,21 @@
 Formato: **D-nn** · data · decisão · motivo. Decisões novas das sessões usam **D-SNN-n** (ex.: D-S02-1) para não colidir entre sessões paralelas. Decisões *tomadas* não devem ser reabertas sem fato novo.
 Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recomendação) na sessão indicada.
 
+## Regras vigentes (resumo — leia isto; o resto do arquivo é histórico)
+
+- **Segredos:** nunca commitar `users.json`, `libraries/`, `.env`, `jwt.secret`, `*.sqlite`, catálogo de runtime; nada de e-mails/senhas/tokens reais em código, testes ou docs (D-01).
+- **Fluxo:** uma seção por vez em `feature/sNN-<slug>` a partir de `origin/develop`; termina com testes + docs + `status/SNN.json`; integração `feature → develop → main` sem force push (D-07, D-23).
+- **Economia (D-30):** subagentes de execução em Sonnet, um por vez; leitura mínima; verificação por testes/CI/E2E, navegador só para mudança visual.
+- **Auth:** JWT HS256 (`sub` = id), `requireAuth`/`requireActiveUser`, validação centralizada, rate limit, mensagens neutras; Google só com `GOOGLE_CLIENT_ID` (D-02, D-S04-n, D-27).
+- **Dados:** sempre pelo adaptador `server/storage` (JSON padrão; `STORAGE=sqlite`); escrita atômica; leitura corrompida nunca vira "vazio" (D-S02-n, D-S10-n).
+- **Catálogo e ids:** seed versionado + catálogo de runtime ignorado; ids numéricos por faixa: seed TMDB < 1M · TVMaze 1M+ · MAL/Jikan 10M+ · TMDB série 20M+ · TMDB filme 30M+ · AniList sem MAL 40M+ (D-11, D-12, D-26).
+- **Fontes:** anime = AniList (principal) → Jikan (reserva) → local/TVMaze; TMDB opcional (`TMDB_API_KEY`); o backend nunca inventa nota/gênero/imagem (`null` → "Sem nota"/"Sem gênero" via `mediaDisplay`) (D-17, D-26, D-S06-n, D-S08-n).
+- **API de mídia:** lista leve e paginada × detalhe sob demanda (`/trending`, `/search`, `/batch`, `/:id`); ingestão exige login (D-S02-n, D-S09-1).
+- **Biblioteca:** local-first; merge puro com tombstones; isolamento por conta; `stateVersion`; `LibraryModel.validate` e `backupValidator` espelhados (D-03, D-13, D-S03-n).
+- **Frontend:** CSP estrita — nada de `onclick`/`style=`/script inline (use `data-action` + `actionHandlers`, `ViewKit`, `mediaDisplay`); escape sempre (`utils/dom.js`); a11y (`<button type="button">`, aria, `data-focus-key`); fontes ≥ 0,8rem (D-S01..S10).
+- **Testes:** `npm test` (nunca toca `server/data` real; use `SHOWVAULT_DATA_DIR` temporário), `npm run lint`, `format:check`; E2E com Playwright `npm run test:e2e` (D-25).
+- **Hospedagem:** PC do Gabriel + Tailscale Funnel; dados fora do OneDrive, backups dentro; link para amigos só depois da S14 (D-29).
+
 ## Tomadas
 
 - **D-01 · 2026-10-25 · Segredos e dados de usuário fora do git.** `users.json`, `libraries/`, `.env`, `.env.*` (exceto `.env.example`) ficam no `.gitignore`.
@@ -158,6 +173,11 @@ Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). N
   O app roda em modo produção no Windows (`NODE_ENV=production`, `STORAGE=sqlite`, escutando só em `127.0.0.1`), com dados **fora do OneDrive** (o OneDrive pode travar/corromper um SQLite em uso) e backups diários **dentro** do OneDrive (cópia fora da máquina).
   O Funnel publica `https://<máquina>.<tailnet>.ts.net`; só funciona com o PC ligado e acordado. Instalar o Tailscale, criar a conta, registrar a tarefa de inicialização e mudar opções de energia do Windows ficam com o Gabriel (os scripts e o guia são da S11).
   Compartilhar o link com amigos só depois da S14 (cadastro por convite), para estranhos não criarem conta.
+
+- **D-30 · 2026-10-27 · Política de economia** (após três interrupções por limite de uso da conta Pro; cada subagente Opus gastou ~220–470 mil tokens):
+  subagentes de execução com `model: "sonnet"`; Opus só na sessão principal para planejar/revisar; buscas com o agente Explore; **uma seção por vez** (no máximo duas sem arquivos em comum);
+  leitura mínima (`CLAUDE.md` + "Regras vigentes" + arquivo da seção); verificação por testes/CI/E2E, navegador só para mudanças visuais; sessão principal nova a cada rodada.
+  Regras gerais de economia no `~/.claude/CLAUDE.md` do Gabriel (vale para todos os projetos). Subagente interrompido em Opus → continuar com um novo em Sonnet na mesma worktree.
 
 ### Pendentes da rodada 2
 
