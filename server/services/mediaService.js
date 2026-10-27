@@ -1,8 +1,7 @@
-const fs = require('fs');
 const path = require('path');
 const config = require('../config/config');
 const { stripHtml, stripHtmlList, safeHttpUrl } = require('../utils/sanitize');
-const { readJson, writeJsonAtomic } = require('../utils/jsonStore');
+const { readJson, writeJsonAtomic } = require('../storage');
 const { parseId, describeId, toInternalId } = require('../utils/ids');
 const { mediaErrors, MediaError, DataCorruptionError } = require('../utils/errors');
 const { requestJson } = require('../utils/httpJson');

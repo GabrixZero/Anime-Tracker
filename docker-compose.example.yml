@@ -1,0 +1,38 @@
+# Exemplo para subir o ShowVault com Docker Compose e dados persistentes.
+#
+#   1. Copie para docker-compose.yml:   cp docker-compose.example.yml docker-compose.yml
+#   2. Crie um .env ao lado com (veja .env.example):  JWT_SECRET=<segredo longo e aleatório>
+#      Gere um com:  node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+#   3. docker compose up -d --build        e abra http://localhost:3000
+#
+# Os dados ficam no volume "showvault-data" (arquivo SQLite em /data). Faça backup do volume antes de atualizar a imagem.
+services:
+  showvault:
+    build: .
+    image: showvault:latest
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      STORAGE: sqlite
+      SHOWVAULT_DATA_DIR: /data
+      # Obrigatório em produção (32+ caracteres); o compose recusa subir sem ele.
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no arquivo .env}
+      # Atrás de proxy/HTTPS da hospedagem: quantos proxies confiar para saber o IP real (limite de tentativas de login).
+      TRUST_PROXY: ${TRUST_PROXY:-}
+      # Opcionais
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+    volumes:
+      - showvault-data:/data
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  showvault-data:

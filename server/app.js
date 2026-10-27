@@ -37,6 +37,12 @@ app.use(cors({
   }
 }));
 
+// Verificação de saúde para a hospedagem/Docker (sem login, sem dados do usuário, sem tocar no disco).
+app.get('/health', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ status: 'ok', storage: config.STORAGE, uptimeSec: Math.round(process.uptime()) });
+});
+
 // Rotas de autenticação recebem corpo pequeno (16 KB) e ficam ANTES do parser global de 2 MB.
 app.use('/api/auth', express.json({ limit: '16kb' }));
 app.use(express.json({ limit: '2mb' }));
@@ -70,9 +76,9 @@ app.use(express.static(path.join(__dirname, '..', 'public'), {
   }
 }));
 
-// Fallback SPA
+// Fallback SPA (com `root`, uma pasta com ponto no caminho, como .claude/worktrees, não é tratada como arquivo oculto)
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  res.sendFile('index.html', { root: path.join(__dirname, '..', 'public') });
 });
 
 // Erros não tratados (ex.: JSON malformado ou corpo grande demais)

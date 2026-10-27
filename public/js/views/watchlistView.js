@@ -134,7 +134,7 @@ class WatchlistView {
     const isMovie = media.type === 'movie';
     const detailed = state.hasDetail(media.id);
     let percent = 0;
-    let progressText = '';
+    let progressText;
 
     if (isMovie) {
       const watched = state.isWatched(media.id);

@@ -4,30 +4,152 @@
 
 Os dados ficam no seu navegador (e, se você criar uma conta, também numa cópia no servidor para usar em vários aparelhos). O primeiro acesso começa com a lista **vazia**: explore o catálogo, ou use "Carregar exemplo" para ver o app com alguns títulos (sem progresso nem anotações de mentira).
 
+Stack: Node.js + Express (API REST) e HTML/CSS/JavaScript puro no navegador (sem framework e sem etapa de build). Interface em português do Brasil.
+
 ---
 
-## ⚡ Como Rodar o Projeto
+## Requisitos
 
-1. **Opção 1 (Direto pelo Windows):**
-   * Dê um duplo-clique no arquivo `iniciar.bat`.
-   * Ele abrirá seu navegador padrão automaticamente em `http://localhost:3000`.
+* **Node.js 26 ou mais novo** (o projeto usa o módulo `node:sqlite`, embutido no Node; `.nvmrc` indica a versão). Baixe em https://nodejs.org.
+* Git, só se for mexer no código.
+* Docker é opcional (para publicar; veja "Publicar").
 
-2. **Opção 2 (Via Terminal):**
-   ```bash
-   node server.js
-   ```
-   * Acesse `http://localhost:3000` no seu navegador.
+## Instalação e uso rápido
 
-### Configuração e testes
+```bash
+npm install          # uma vez (baixa as dependências)
+npm start            # sobe em http://localhost:3000
+```
 
-* **Variáveis de ambiente** (veja `.env.example`; para carregar um `.env`: `node --env-file=.env server.js`):
-  * `JWT_SECRET` assina os tokens de login. Em desenvolvimento pode ficar vazio: o servidor gera um segredo único na primeira execução e o guarda em `server/data/jwt.secret` (ignorado pelo Git; não apague, ou todo mundo precisará entrar de novo). Com `NODE_ENV=production` ele é **obrigatório** (mínimo 32 caracteres aleatórios) e o servidor não sobe sem ele.
-  * `GOOGLE_CLIENT_ID` liga o login com Google (veja abaixo). Sem ele o botão do Google não aparece.
-  * `CORS_ORIGINS` (lista separada por vírgula) libera outros sites para chamar a API; vazio = só o próprio site. `TRUST_PROXY` (ex.: `1`) é necessário atrás de proxy/hospedagem para o limite de tentativas enxergar o IP real.
-  * `SEED_DEMO_USER=1` cria a conta de demonstração do `users.example.json` (ignorado em produção). Por padrão **ninguém** vem cadastrado.
-* **Contas:** cadastro e login por e-mail e senha (senha de 8 a 128 caracteres, guardada só como hash scrypt). Tentativas erradas de login são limitadas (10 por e-mail/IP em 15 min) e o cadastro também (20 por hora por IP). A API tem rotas para trocar a senha (`POST /api/auth/change-password`) e excluir a conta e a biblioteca (`DELETE /api/auth/account`), ambas pedindo a senha.
+* **Windows:** dê um duplo-clique em `iniciar.bat`. Ele instala as dependências na primeira vez, lê a porta do `.env` (ou usa 3000), espera o servidor ficar pronto e só então abre o navegador.
+* **Outra porta:** `PORT=3055 npm start` (no PowerShell: `$env:PORT=3055; npm start`).
+* **Com arquivo `.env`:** copie `.env.example` para `.env`, ajuste e use `npm run start:env` (equivale a `node --env-file=.env server.js`). O `.env` **nunca** vai para o Git.
+* **Testes e qualidade:** `npm test` · `npm run lint` · `npm run format:check` (veja "Qualidade e testes").
 
-#### Login com Google (opcional) — passo a passo para criar o Client ID
+---
+
+## Configuração (variáveis de ambiente)
+
+Todas são opcionais em desenvolvimento. O modelo comentado está em `.env.example`.
+
+| Variável | Para que serve | Padrão |
+|---|---|---|
+| `PORT` | porta do servidor | `3000` |
+| `NODE_ENV` | `production` liga as proteções de produção (HSTS e `JWT_SECRET` obrigatório) | vazio |
+| `JWT_SECRET` | segredo que assina os tokens de login. **Obrigatório em produção** (32+ caracteres aleatórios; o servidor não sobe sem ele). Fora de produção, se vazio, o servidor gera um segredo único em `server/data/jwt.secret` (ignorado pelo Git; apagar = todo mundo entra de novo). Gere um com `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` | gerado |
+| `JWT_EXPIRES_IN` | validade do login | `7d` |
+| `STORAGE` | onde ficam usuários, bibliotecas e catálogo: `json` (arquivos) ou `sqlite` (um arquivo só) | `json` |
+| `SHOWVAULT_DATA_DIR` | pasta dos dados (e do arquivo SQLite). Em hospedagem, aponte para um **volume persistente** | `server/data` |
+| `TRUST_PROXY` | atrás de proxy/hospedagem: quantos proxies confiar (em geral `1`), para o limite de tentativas enxergar o IP real | vazio |
+| `CORS_ORIGINS` | outros sites autorizados a chamar a API (lista separada por vírgula); vazio = só o próprio site | vazio |
+| `GOOGLE_CLIENT_ID` | liga o login com Google (veja abaixo); sem ele o botão não aparece | vazio |
+| `TMDB_API_KEY` | liga a busca de filmes e séries do TMDB em português (chave grátis em themoviedb.org); sem ela o app usa o catálogo local, TVMaze (séries) e Jikan/MyAnimeList (animes) | vazio |
+| `SEED_DEMO_USER` | `1` cria a conta de demonstração (ignorado em produção) | desligado |
+| `AUTH_*` | ajustam os limites de tentativas de login/cadastro (`AUTH_LOGIN_MAX`, `AUTH_REGISTER_MAX`, ...; veja `server/config/config.js`) | veja o código |
+| `JIKAN_BASE_URL` | só para testes/desenvolvimento (aponta para uma Jikan falsa) | API oficial |
+
+### Armazenamento: arquivos JSON ou SQLite
+
+* `STORAGE=json` (padrão): `server/data/users.json`, `server/data/libraries/<usuario>.json` e `server/data/mediaCatalog.runtime.json`. Gravação atômica, com cópia `.bak` da última versão válida. Bom para uso local.
+* `STORAGE=sqlite`: tudo isso vira **um único arquivo** `showvault.sqlite` dentro de `SHOWVAULT_DATA_DIR` (modo WAL, via `node:sqlite`, sem dependência nativa). É o modo da imagem Docker. Use **uma instância do servidor por arquivo**.
+* **Migração automática:** ao subir com `STORAGE=sqlite` numa pasta que ainda tem os JSON, o servidor importa tudo **uma única vez**, depois de copiar os arquivos para `backup-pre-sqlite-<data>/` dentro da pasta de dados. Os JSON originais **não são apagados**. Dá para rodar à mão: `npm run storage:migrate`.
+* **Voltar para arquivos:** `npm run storage:export -- <pasta-nova>` grava o conteúdo do banco como JSON (use essa pasta como `SHOWVAULT_DATA_DIR` com `STORAGE=json`).
+* Faça backup copiando a pasta de dados com o servidor parado (ou o volume do Docker).
+
+---
+
+## Publicar (Docker)
+
+O projeto vem **preparado**, mas não publicado em nenhuma hospedagem (a escolha é sua). Você precisa de qualquer lugar que rode contêineres e ofereça um **volume persistente** (disco que sobrevive a reinícios).
+
+```bash
+docker build -t showvault .
+docker run -d --name showvault -p 3000:3000 \
+  -v showvault-data:/data \
+  -e JWT_SECRET=<segredo longo e aleatorio> \
+  -e TRUST_PROXY=1 \
+  showvault
+```
+
+Ou com o Compose: copie `docker-compose.example.yml` para `docker-compose.yml`, crie um `.env` com `JWT_SECRET=...` e rode `docker compose up -d --build`.
+
+* A imagem usa `NODE_ENV=production`, `STORAGE=sqlite`, dados em `/data` e roda sem root.
+* **Verificação de saúde:** `GET /health` responde `{"status":"ok","storage":"sqlite","uptimeSec":...}` sem login (a imagem já traz o `HEALTHCHECK`; hospedagens costumam pedir esse caminho).
+* **HTTPS:** a hospedagem normalmente termina o HTTPS; informe `TRUST_PROXY=1`.
+* Sem plano gratuito com disco persistente, o SQLite perde os dados a cada reinício: escolha uma hospedagem com volume.
+* Passo a passo e checklist de segurança: `Documentacao/01-visao-geral-e-arquitetura.md`.
+
+---
+
+## API REST
+
+Tudo em JSON. Erros vêm como `{ "error": "mensagem em português" }`. Rotas marcadas com **login** exigem `Authorization: Bearer <token>`.
+
+| Método e caminho | Login? | O que faz |
+|---|---|---|
+| `GET /health` | não | estado do servidor (para hospedagem/Docker) |
+| `GET /api/auth/config` | não | `{googleClientId}` (ou `null`) |
+| `POST /api/auth/register` | não | cadastro `{email, password, name?, avatar?}` → `{user, token}`; 400 entrada inválida, 409 e-mail já usado, 429 muitas tentativas |
+| `POST /api/auth/login` | não | `{email, password}` → `{user, token}`; 401 para qualquer credencial errada |
+| `POST /api/auth/google` | não | `{credential}` (ID token do Google); 501 se `GOOGLE_CLIENT_ID` não estiver configurado |
+| `GET /api/auth/me` | sim | dados da conta |
+| `POST /api/auth/change-password` | sim | `{currentPassword, newPassword}` → novo token (os antigos deixam de valer) |
+| `DELETE /api/auth/account` | sim | exclui a conta e a biblioteca (pede a senha) |
+| `GET /api/media/trending?type=` | não | catálogo local; `type` = `all`, `tv`, `anime` ou `movie` |
+| `GET /api/media/search?q=&type=` | não | busca combinada (local, Jikan, TVMaze, TMDB) → `{count, data, warnings}`; 60 por minuto por IP |
+| `GET /api/media/:id` | só se for obra nova | detalhes (público se já está no catálogo; ingestão exige login) |
+| `POST /api/media/ingest` | sim | `{id}` traz a obra de uma fonte externa para o catálogo (30 por 10 min por usuário) |
+| `GET /api/user/library` | sim | biblioteca da conta |
+| `PUT /api/user/library` | sim | `{data, stateVersion}` envia a biblioteca; o servidor **mescla** e devolve o resultado |
+| `DELETE /api/user/library` | sim | zera a biblioteca da conta (os outros aparelhos zeram ao sincronizar) |
+
+---
+
+## Estrutura do projeto
+
+```
+server.js                 abre a porta (e migra JSON -> SQLite se STORAGE=sqlite)
+server/
+  app.js                  monta o Express (helmet, CORS, rotas, /health, estáticos)
+  config/                 variáveis de ambiente e segredo JWT
+  routes/ controllers/    rotas e controladores (auth, media, user)
+  middleware/             login (JWT) e limites de tentativas
+  models/                 UserModel e LibraryModel (usuários e bibliotecas)
+  services/               catálogo e busca (mediaService), Jikan, TMDB, Google, exclusão de conta
+  storage/                adaptador de armazenamento: arquivos JSON ou SQLite, migração
+  utils/                  validação, sanitização, ids, cache, jsonStore
+  data/                   seed do catálogo (versionado); dados reais ficam fora do Git
+public/                   o app no navegador (index.html, css/, js/, img/)
+tests/                    testes automáticos (node --test)
+scripts/                  status das sessões (status.js) e ferramenta de armazenamento (storage.js)
+Documentacao/             memória do projeto: arquitetura, decisões, diário, roadmap
+```
+
+Detalhes de cada arquivo: `Documentacao/01-visao-geral-e-arquitetura.md`.
+
+---
+
+## Qualidade e testes
+
+* `npm test` roda todos os testes (`node --test`). Eles usam pastas temporárias e **nunca** tocam em `server/data` real nem acessam a internet.
+* `npm run lint` (ESLint) deve terminar sem **erros**; avisos são toleráveis. `npm run lint:fix` corrige o que for automático.
+* `npm run format:check` / `npm run format` (Prettier) valem para os arquivos novos da S10; o restante do código será formatado depois que as sessões paralelas terminarem.
+* **CI (GitHub Actions)**, `.github/workflows/ci.yml`: a cada push e em todo PR para `main`/`develop` roda `npm ci`, lint, formatação e testes (Node 26) e faz o build da imagem Docker com um teste de `/health`.
+* Os workflows `auto-pr-*` abrem sozinhos os PRs de `feature/*` para `develop` e de `develop` para `main`.
+
+## Fluxo de branches
+
+`main` = versão publicada · `develop` = integração · `feature/sNN-...` = uma seção do roadmap por vez. Cada trabalho nasce de `develop`, é enviado com `git push -u origin feature/...` (use `push-github.bat` para enviar a branch atual) e chega a `develop` e depois a `main` por merge, **sem force push**. O protocolo completo está em `Documentacao/03-protocolo-de-sessao.md`.
+
+---
+
+## Configuração e contas
+
+* **Contas:** cadastro e login por e-mail e senha (8 a 128 caracteres, guardada só como hash scrypt). Tentativas erradas de login são limitadas (10 por e-mail/IP em 15 min) e o cadastro também (20 por hora por IP). A API tem rotas para trocar a senha e excluir a conta e a biblioteca, ambas pedindo a senha (ainda sem tela no app).
+* **Sincronização:** com a conta logada, sua lista, episódios assistidos e anotações são enviados ao servidor (`libraries/<usuario>.json` ou o banco SQLite; nunca vão para o Git) e mesclados no próximo login. O navegador continua sendo a fonte primária (local-first); remoções se propagam entre aparelhos.
+* **Segurança:** o servidor usa `helmet` e CORS restrito; o texto vindo do catálogo/usuário é escapado antes de ir para a tela; o log de requisições mostra só método e endereço (nunca corpo, senha ou token). Ainda não há Content-Security-Policy estrita porque o HTML tem manipuladores `onclick` inline (planejado para a fase B da S10).
+
+### Login com Google (opcional) — passo a passo para criar o Client ID
 
 O app já traz o login com Google pronto (Google Identity Services no navegador + validação do token no servidor). Falta só você criar o "Client ID" gratuito:
 
@@ -36,11 +158,9 @@ O app já traz o login com Google pronto (Google Identity Services no navegador 
 3. Menu **APIs e serviços → Credenciais → Criar credenciais → ID do cliente OAuth**, tipo **Aplicativo da Web**.
 4. Em **Origens JavaScript autorizadas** adicione `http://localhost:3000` (e, quando publicar, o endereço do site). Não precisa de "URI de redirecionamento".
 5. Copie o **ID do cliente** (termina em `.apps.googleusercontent.com`) e coloque no `.env`: `GOOGLE_CLIENT_ID=...`. O ID do cliente **não é segredo**; nunca é preciso o "segredo do cliente".
-6. Reinicie o servidor (`node --env-file=.env server.js`): o botão "Continuar com Google" aparece no cadastro/login.
+6. Reinicie o servidor (`npm run start:env`): o botão "Continuar com Google" aparece no cadastro/login.
 
 Observação: contas Google nunca são fundidas automaticamente com uma conta de e-mail/senha que já use o mesmo e-mail.
-* **Sincronização:** com a conta logada, sua lista, episódios assistidos e anotações são enviados ao servidor (`server/data/libraries/<usuario>.json`, ignorado pelo Git) e mesclados no próximo login. O navegador continua sendo a fonte primária (local-first).
-* **Testes:** `npm test`
 
 ---
 
@@ -72,5 +192,6 @@ Observação: contas Google nunca são fundidas automaticamente com uma conta de
    * **Resetar** apaga os dados deste aparelho (e, se você confirmar, a cópia da conta).
 
 6. **Catálogo e busca:**
-   * Catálogo inicial com 16 séries, animes e filmes (os de série/anime trazem poucos episódios de amostra) e busca no TVMaze para ampliar; adicionar uma obra nova à lista exige estar conectado.
+   * Catálogo inicial com 16 séries, animes e filmes (os de série/anime trazem poucos episódios de amostra), busca no TVMaze e na Jikan (MyAnimeList) e, com `TMDB_API_KEY`, no TMDB; adicionar uma obra nova à lista exige estar conectado.
+   * Animes aparecem agrupados por franquia (uma obra, várias temporadas).
    * O que a fonte não informa aparece como **"Sem nota"**, **"Sem gênero"** ou uma imagem neutra, nunca como um valor de enfeite.

@@ -2,9 +2,9 @@
   "secao": "S09",
   "titulo": "Performance",
   "arquivo": "Documentacao/secoes/S09-performance.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s09-performance",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": ""
+  "notas": "Lista leve x detalhe (/trending e /search leves, paginacao, /batch), compression e cache de estaticos, cache de progresso, render incremental (so a aba visivel, cartao/linha alterado), imagens medias. Payload da lista 18x-118x menor; marcar episodio 21 ms -> 2 ms (modal com 1.100 eps: 188 -> 4 ms). D-S09-1..7. PWA fora (D-20); Lighthouse nao executado."
 }

@@ -297,7 +297,7 @@ test('Google: sem GOOGLE_CLIENT_ID a rota fica desligada e a configuração púb
     const res = await call('POST', '/auth/google', { body: { credential: 'qualquer' } });
     assert.equal(res.status, 501);
     // o perfil fixo/simulado antigo não funciona mais
-    const old = await call('POST', '/auth/google', { body: { email: 'gabriel.tvtime@gmail.com', name: 'x' } });
+    const old = await call('POST', '/auth/google', { body: { email: 'perfil.antigo@gmail.test', name: 'x' } });
     assert.equal(old.status, 501);
   } finally {
     config.GOOGLE_CLIENT_ID = saved;
