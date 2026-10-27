@@ -6,5 +6,5 @@
   "branch": "feature/s10-qualidade-testes-deploy",
   "concluidaEm": "",
   "commit": "",
-  "notas": "Fase A (infra, CI, SQLite, Docker, testes, README) em andamento; fase B (limpeza do frontend/CSP) aguarda a S09."
+  "notas": "Fase A pronta (lint, CI, SQLite atras de adaptador, Docker, /health, testes, README, .bat). Falta a fase B (data-action no lugar de onclick, CSP, utilitario unico, a11y), que aguarda a S09 chegar ao develop."
 }

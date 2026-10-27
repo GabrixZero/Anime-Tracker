@@ -7,8 +7,8 @@ progresso episódio por episódio, tempo total assistido, diário de anotações
 
 - Repositório: https://github.com/GabrixZero/Anime-Tracker (público)
 - Pasta local: `C:\Users\Gabri\OneDrive\Documentos\Antigravity Projeto` (dentro do OneDrive; pode causar lock/conflito em escrita de arquivos)
-- Stack: Node 20+ (máquina usa v26) + Express 5 (backend REST) + HTML/CSS/JS vanilla no frontend (sem build, sem framework, sem Tailwind).
-- Dependências: `express`, `cors`, `jsonwebtoken`, `helmet`, `express-rate-limit`, `google-auth-library`. Testes: `node --test` (`npm test`).
+- Stack: Node 26+ (`engines`, `.nvmrc`; D-S10-1) + Express 5 (backend REST) + HTML/CSS/JS vanilla no frontend (sem build, sem framework, sem Tailwind).
+- Dependências: `express`, `cors`, `jsonwebtoken`, `helmet`, `express-rate-limit`, `google-auth-library`. Testes: `node --test` (`npm test`). Ferramentas (devDependencies, S10): `eslint`, `prettier`. Persistência opcional em SQLite com o módulo embutido `node:sqlite` (sem pacote extra).
 - Idioma da interface e do código de domínio: português (pt-BR).
 
 ## Como rodar
@@ -18,7 +18,11 @@ npm install
 npm start            # node server.js  -> http://localhost:3000
 PORT=3055 node server.js   # porta alternativa (útil para testes em paralelo)
 npm test
+npm run lint               # ESLint: erros quebram, avisos são tolerados (S10)
+STORAGE=sqlite SHOWVAULT_DATA_DIR=<pasta> npm start   # dados num único arquivo SQLite (S10, D-S10-2); importa os JSON antigos uma vez, com backup
 ```
+
+Publicação: `Dockerfile` + `docker-compose.example.yml` (sem hospedagem escolhida; D-S10-5), `GET /health`, CI em `.github/workflows/ci.yml`. Passo a passo no `README.md`.
 
 `JWT_SECRET` vem do ambiente (veja `.env.example`). Sem ele, fora de produção, o servidor **gera um segredo único por instalação** em `server/data/jwt.secret` (ignorado pelo git) e o reaproveita nas próximas partidas (não existe mais segredo padrão público).
 Com `NODE_ENV=production` o servidor se recusa a iniciar sem `JWT_SECRET` (mín. 32 caracteres, e nunca o valor do exemplo). Outras variáveis (CORS, proxy, Google, conta demo): README e `.env.example`.
@@ -27,9 +31,11 @@ Com `NODE_ENV=production` o servidor se recusa a iniciar sem `JWT_SECRET` (mín.
 
 | Arquivo | Papel |
 |---|---|
-| `server.js` | só abre a porta (`PORT`) e roda `LibraryModel.migrateAll()` na partida |
-| `server/app.js` | monta o Express: `helmet` (sem CSP até a S10; HSTS só em produção; COOP `same-origin-allow-popups` por causa do popup do Google), sem `x-powered-by`, CORS por lista (`CORS_ORIGINS`), `/api/auth` (corpo máx. 16 KB), `/api/media`, `/api/user` (atrás de `requireActiveUser`), 404 JSON em `/api/*`, handler de erro JSON, estáticos de `public/`, fallback SPA (sem `listen`: os testes de rotas usam este arquivo) |
-| `server/config/config.js` + `jwtSecret.js` | `PORT`, `DATA_DIR` (padrão `server/data`; **`SHOWVAULT_DATA_DIR`** aponta para outra pasta, usada pelos testes), `JWT_SECRET` (lido sob demanda: env > `jwt.secret` local gerado > memória), `JWT_EXPIRES_IN`, `IS_PRODUCTION`, `GOOGLE_CLIENT_ID`, `CORS_ORIGINS`, `TRUST_PROXY`, `SEED_DEMO_USER`, `RATE_LIMITS` |
+| `server.js` | com `STORAGE=sqlite` importa os JSON antigos (uma vez, com backup) **antes** de carregar o app; abre a porta (`PORT`), roda `LibraryModel.migrateAll()` na partida e fecha o banco em SIGTERM/SIGINT |
+| `server/storage/` | (S10) adaptador de armazenamento: `index.js` (escolhe por `STORAGE`; roteia só `users.json`, `libraries/usr_*.json` e `mediaCatalog.runtime.json` para o banco), `fileStore.js` (jsonStore + `stamp`/`listNames`/`removeAll`), `sqliteStore.js` (`node:sqlite`, tabelas `documents`/`corrupt`/`meta`), `migrate.js` (JSON ⇄ SQLite). Ver D-S10-2..4 |
+| `scripts/storage.js` | (S10) `npm run storage:migrate` e `npm run storage:export -- <pasta>` |
+| `server/app.js` | monta o Express: `helmet` (sem CSP até a S10; HSTS só em produção; COOP `same-origin-allow-popups` por causa do popup do Google), sem `x-powered-by`, CORS por lista (`CORS_ORIGINS`), `GET /health` (S10: `{status, storage, uptimeSec}`, sem login), `/api/auth` (corpo máx. 16 KB), `/api/media`, `/api/user` (atrás de `requireActiveUser`), 404 JSON em `/api/*`, handler de erro JSON, estáticos de `public/`, fallback SPA (sem `listen`: os testes de rotas usam este arquivo) |
+| `server/config/config.js` + `jwtSecret.js` | `PORT`, `STORAGE` (`json` padrão | `sqlite`), `DATA_DIR` (padrão `server/data`; **`SHOWVAULT_DATA_DIR`** aponta para outra pasta, usada pelos testes), `JWT_SECRET` (lido sob demanda: env > `jwt.secret` local gerado > memória), `JWT_EXPIRES_IN`, `IS_PRODUCTION`, `GOOGLE_CLIENT_ID`, `CORS_ORIGINS`, `TRUST_PROXY`, `SEED_DEMO_USER`, `RATE_LIMITS` |
 | `server/middleware/auth.js` | `issueToken(user)` (JWT HS256, claim `sub`), `requireAuth` (só confere assinatura/validade; define `req.userId`), `requireActiveUser` (= `requireAuth` + a conta ainda existe + token posterior à última troca de senha; usado em `/me`, trocar senha, excluir conta e em todo `/api/user`) e `optionalAuth` (visitante passa) |
 | `server/middleware/rateLimit.js` | limites de tentativas (`express-rate-limit`): login por IP+e-mail e por IP (só falhas contam), cadastro por IP, Google por IP, trocar senha/excluir conta por usuário |
 | `server/controllers/authController.js` + `routes/authRoutes.js` | `GET /config` (Client ID público do Google ou `null`), `POST /register`, `POST /login`, `POST /google` (ID token validado no servidor; 501 sem `GOOGLE_CLIENT_ID`), `GET /me`, `POST /change-password`, `DELETE /account` (exige a senha ou, em conta Google, credencial recente) |
@@ -59,6 +65,8 @@ Dados em disco (`server/data/`):
 | `jwt.secret` | **não** (ignorado) | segredo JWT local gerado na primeira execução sem `JWT_SECRET` (apagar = todos precisam entrar de novo) |
 | `users.json`, `libraries/` | **não** | contas e bibliotecas (nunca commitar) |
 | `*.bak`, `*.corrupt-*`, `*.tmp` | **não** | cópias de segurança/erro geradas pelo `jsonStore` |
+| `showvault.sqlite` (+ `-wal`, `-shm`) | **não** | (S10, `STORAGE=sqlite`) substitui `users.json`, `libraries/` e `mediaCatalog.runtime.json`; fica em `SHOWVAULT_DATA_DIR` (volume persistente no Docker) |
+| `backup-pre-sqlite-<data>/` | **não** | cópia dos JSON feita antes da migração para SQLite (os originais também ficam) |
 
 Nunca apague um `.corrupt-*` sem olhar: é a única cópia do arquivo que quebrou. Para os testes e servidores de teste use `SHOWVAULT_DATA_DIR=<pasta temporária>`.
 
@@ -119,7 +127,7 @@ first_air_date, genres[], status, runtime? (filmes), seasons: [{season_number, n
 ## Git e ambientes
 
 - `main` = release/produção; `develop` = integração (branch padrão de trabalho); `feature/*` = escopo específico.
-- Workflows em `.github/workflows/` só **abrem PRs** automaticamente (feature→develop, develop→main). Não rodam testes.
+- Workflows em `.github/workflows/`: `ci.yml` (S10: `npm ci`, lint, `format:check`, testes e build Docker em push/PR) e `auto-pr-*` (abrem PRs feature→develop e develop→main; permissões mínimas, ações fixadas por hash; D-S10-7).
 - Fluxo de encerramento de sessão (push até o `main`): veja [03-protocolo-de-sessao.md](03-protocolo-de-sessao.md).
 
 ## Histórico de segurança (não repetir)
@@ -129,6 +137,10 @@ first_air_date, genres[], status, runtime? (filmes), seasons: [{season_number, n
 - 2026-10-26: o login deixou de usar `token_<id>` (forjável) e passou a JWT assinado; biblioteca por usuário no servidor.
 - Regras fixas: nunca commitar `users.json`, `libraries/`, `.env`; nunca colocar e-mail/senha reais em código, testes ou docs;
   testes não devem escrever em `server/data` real (use diretório temporário).
+
+### Revisão de segurança da S10 (fase A, 2026-10-27)
+
+Conferido (checklist das regras fixas acima): nenhum `users.json`, `libraries/`, `.env`, `jwt.secret` ou `*.sqlite` rastreado pelo git (`git ls-files`); `.gitignore` e `.dockerignore` cobrem bancos e backups de migração; nenhum e-mail real nos testes (um e-mail do perfil Google simulado antigo em `auth-http.test.js` virou `perfil.antigo@gmail.test`); nenhum segredo literal nos arquivos rastreados; `npm audit` sem vulnerabilidades (incluindo `--omit=dev`); o SQLite só usa instruções preparadas com parâmetros (as chaves vêm de `locate()`, que só aceita `users.json`, `mediaCatalog.runtime.json` e `libraries/usr_[A-Za-z0-9_]+.json`; o `userId` já era validado por regex no `LibraryModel`); `/health` só devolve estado, modo de armazenamento e tempo de atividade; os testes provam que `/server/data/users.json`, `/server.js` e `/package.json` não são servidos; a imagem Docker roda sem root, sem segredos embutidos e exige `JWT_SECRET` (produção sem ele não sobe: simulado). Pendente para a fase B: CSP via `helmet` (depende de remover os `onclick`/`onerror` inline).
 
 ## Estado atual do produto (resumo honesto)
 
