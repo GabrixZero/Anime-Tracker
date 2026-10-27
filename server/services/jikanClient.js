@@ -1,8 +1,9 @@
-// Cliente da Jikan v4 (API não oficial do MyAnimeList): https://api.jikan.moe/v4
-// Limites da Jikan: ~3 requisições/s e 60/min. Aqui: fila com espaçamento mínimo + teto por minuto, cache com validade,
-// nova tentativa com espera crescente em 429/5xx, e erros tipados (utils/errors.js). Nada é inventado: o que a fonte não trouxer fica nulo.
-const TtlCache = require('../utils/ttlCache');
-const { mediaErrors, MediaError } = require('../utils/errors');
+// Cliente da Jikan v4 (API não oficial do MyAnimeList): https://api.jikan.moe/v4 — fonte RESERVA de anime desde a S13 (a AniList é a principal).
+// Limites da Jikan: ~3 requisições/s e 60/min. A fila com espaçamento mínimo + teto por minuto, o cache com validade, a nova tentativa
+// com espera crescente em 429/5xx e o disjuntor vêm de sourceClient.js; aqui ficam só os endpoints. Erros tipados (utils/errors.js).
+// Nada é inventado: o que a fonte não trouxer fica nulo.
+const SourceClient = require('./sourceClient');
+const { mediaErrors } = require('../utils/errors');
 
 // Tipos da MAL cujos episódios valem a pena buscar (Movie = 1 episódio, sem requisição; Music/CM/PV ficam de fora).
 const EPISODE_TYPES = new Set(['TV', 'ONA', 'OVA', 'Special', 'TV Special']);
@@ -13,85 +14,25 @@ const DEFAULTS = {
   perMinute: 50,             // teto por minuto (a Jikan aceita 60)
   maxQueue: 40,              // pedidos esperando na fila; acima disso responde "tente de novo" em vez de acumular
   maxWaitMs: 25000,          // quanto um pedido aceita esperar na fila antes de desistir (RATE_LIMITED)
-  retries: 2,                // novas tentativas em 429/5xx/timeout (além da primeira)
+  retries: 2,                // novas tentativas em 429/5xx (além da primeira); timeout/conexão não repete (disjuntor)
   backoffMs: 1000,           // espera inicial entre tentativas (dobra a cada uma, respeitando Retry-After)
+  breakerCooldownMs: 60000,  // Jikan fora do ar (timeout/conexão): 60 s de falha imediata antes de tentar de novo
   searchTtlMs: 10 * 60 * 1000,
   detailTtlMs: 6 * 60 * 60 * 1000,
   episodesTtlMs: 60 * 60 * 1000,
   maxEpisodePages: 30        // 30 x 100 episódios
 };
 
-class JikanClient {
+class JikanClient extends SourceClient {
   // fetchJson(url) => Promise<json>: injetado (o MediaService usa o dele, com timeout e erros tipados).
-  constructor({ fetchJson, sleep, now, ...opts } = {}) {
-    if (typeof fetchJson !== 'function') throw new Error('JikanClient precisa de fetchJson.');
-    Object.assign(this, DEFAULTS, Object.fromEntries(Object.entries(opts).filter(([, v]) => v !== undefined)));
-    this.fetchJson = fetchJson;
-    this.now = now || Date.now;
-    this.sleep = sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
-    this.cache = new TtlCache({ max: 400, now: this.now });
-    this.inflight = new Map();   // mesma URL pedida ao mesmo tempo = uma única requisição
-    this.tail = Promise.resolve();
-    this.pending = 0;
-    this.lastAt = 0;
-    this.stamps = [];
-    this.requestCount = 0;       // quantas requisições reais foram feitas (diagnóstico e testes)
+  constructor(opts = {}) {
+    super({ name: 'jikan', label: 'A Jikan (MyAnimeList)', defaults: DEFAULTS, ...opts });
   }
 
-  // Espera a vez na fila (espaçamento + teto por minuto). Rejeita se a espera for longa demais.
-  _slot() {
-    if (this.pending >= this.maxQueue) return Promise.reject(mediaErrors.rateLimited(this.minIntervalMs * this.pending));
-    this.pending++;
-    const run = this.tail.then(async () => {
-      try {
-        const t0 = this.now();
-        this.stamps = this.stamps.filter(t => t0 - t < 60000);
-        let wait = Math.max(0, this.lastAt + this.minIntervalMs - t0);
-        if (this.stamps.length >= this.perMinute) wait = Math.max(wait, this.stamps[0] + 60000 - t0);
-        if (wait > this.maxWaitMs) throw mediaErrors.rateLimited(wait);
-        if (wait > 0) await this.sleep(wait);
-        const t1 = this.now();
-        this.lastAt = t1;
-        this.stamps.push(t1);
-      } finally {
-        this.pending--;
-      }
-    });
-    this.tail = run.catch(() => {});
-    return run;
-  }
-
-  // GET com fila, nova tentativa e erros tipados. Respostas boas ficam no cache; falhas nunca.
-  async get(path, { ttlMs = this.searchTtlMs } = {}) {
-    const cached = this.cache.get(path, ttlMs);
-    if (cached !== undefined) return cached;
-    if (this.inflight.has(path)) return this.inflight.get(path);
-
-    const promise = this._getWithRetry(path).then((data) => {
-      this.cache.set(path, data);
-      return data;
-    }).finally(() => this.inflight.delete(path));
-    this.inflight.set(path, promise);
-    return promise;
-  }
-
-  async _getWithRetry(path) {
-    let lastErr;
-    for (let attempt = 0; attempt <= this.retries; attempt++) {
-      await this._slot();
-      this.requestCount++;
-      try {
-        // retries429: 0 => a espera/retentativa é decidida aqui (o fetchJson não repete por conta própria)
-        return await this.fetchJson(`${this.baseUrl}${path}`, { retries429: 0 });
-      } catch (err) {
-        lastErr = err;
-        const retryable = err instanceof MediaError && (err.code === 'RATE_LIMITED' || err.code === 'UPSTREAM');
-        if (!retryable || attempt === this.retries) break;
-        const wait = Math.max(err.retryAfterMs || 0, this.backoffMs * 2 ** attempt);
-        await this.sleep(Math.min(wait, 8000));
-      }
-    }
-    throw lastErr;
+  // GET com fila, nova tentativa, disjuntor e erros tipados. Respostas boas ficam no cache; falhas nunca.
+  get(path, { ttlMs = this.searchTtlMs, fresh = false } = {}) {
+    // retries429: 0 => a espera/retentativa é decidida pela fila (o fetchJson não repete por conta própria)
+    return this.cached(path, ttlMs, () => this.fetchJson(`${this.baseUrl}${path}`, { retries429: 0 }), { fresh });
   }
 
   // --- Endpoints ------------------------------------------------------------------------------

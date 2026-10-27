@@ -1,4 +1,5 @@
-// GET JSON com timeout, limite de tamanho e status HTTP tratado em erros tipados (usado por todas as fontes externas).
+// Requisição JSON com timeout, limite de tamanho e status HTTP tratado em erros tipados (usado por todas as fontes externas).
+// GET por padrão; POST com `body` (texto JSON) para a AniList (GraphQL, S13).
 // 404 => NOT_FOUND, 429 => RATE_LIMITED (com Retry-After), 401/403 => UPSTREAM (chave recusada), resto fora de 2xx => UPSTREAM.
 const http = require('http');
 const https = require('https');
@@ -7,10 +8,16 @@ const { mediaErrors } = require('./errors');
 const MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
 const DEFAULT_TIMEOUT_MS = 8000;
 
-function requestJson(url, { headers = {}, timeoutMs = DEFAULT_TIMEOUT_MS, maxBytes = MAX_RESPONSE_BYTES } = {}) {
+function requestJson(url, { headers = {}, timeoutMs = DEFAULT_TIMEOUT_MS, maxBytes = MAX_RESPONSE_BYTES, method = 'GET', body } = {}) {
   return new Promise((resolve, reject) => {
     const client = url.startsWith('http://') ? http : https;
-    const req = client.get(url, { headers: { 'User-Agent': 'ShowVault/2.0', Accept: 'application/json', ...headers } }, (res) => {
+    const payload = body === undefined || body === null ? null : Buffer.from(String(body), 'utf-8');
+    const reqHeaders = { 'User-Agent': 'ShowVault/2.0', Accept: 'application/json', ...headers };
+    if (payload) {
+      reqHeaders['Content-Length'] = payload.length;
+      if (!reqHeaders['Content-Type']) reqHeaders['Content-Type'] = 'application/json';
+    }
+    const req = client.request(url, { method, headers: reqHeaders }, (res) => {
       const status = res.statusCode || 0;
       if (status === 404) { res.resume(); return reject(mediaErrors.notFound()); }
       if (status === 429) {
@@ -46,11 +53,13 @@ function requestJson(url, { headers = {}, timeoutMs = DEFAULT_TIMEOUT_MS, maxByt
       });
       res.on('error', () => reject(mediaErrors.upstream()));
     });
-    req.on('error', () => reject(mediaErrors.upstream()));
+    req.on('error', () => reject(mediaErrors.upstream(undefined, { unreachable: true })));
     req.setTimeout(timeoutMs, () => {
       req.destroy();
-      reject(mediaErrors.upstream('Tempo esgotado na fonte externa.'));
+      reject(mediaErrors.upstream('Tempo esgotado na fonte externa.', { unreachable: true }));
     });
+    if (payload) req.write(payload);
+    req.end();
   });
 }
 
