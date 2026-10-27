@@ -14,6 +14,7 @@
 'use strict';
 
 const { spawn } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 if (!process.env.PLAYWRIGHT_BROWSERS_PATH) process.env.PLAYWRIGHT_BROWSERS_PATH = '0';
@@ -24,6 +25,20 @@ try {
 } catch {
   console.error('O Playwright não está instalado. Rode "npm install" e depois "npm run test:e2e:install".');
   process.exit(1);
+}
+
+// Quem acabou de clonar o projeto ainda não baixou o navegador: em vez do aviso do Playwright (que manda rodar `npx playwright install`,
+// e isso baixaria para OUTRA pasta, que estes scripts não olham), diz o comando certo.
+if (process.argv[2] === 'test') {
+  try {
+    const { chromium } = require('playwright-core');
+    if (!fs.existsSync(chromium.executablePath())) {
+      console.error('O Chromium dos testes ainda não foi baixado. Rode uma vez: npm run test:e2e:install');
+      process.exit(1);
+    }
+  } catch {
+    // sem como conferir: deixa o Playwright dizer o que falta
+  }
 }
 
 const child = spawn(process.execPath, [cli, ...process.argv.slice(2)], {
