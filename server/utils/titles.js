@@ -20,6 +20,14 @@ function titlesOf(item) {
   for (const t of raw) {
     const n = normalizeTitle(t);
     if (n) out.add(n);
+    // "Ruptura (Severance)" também é conhecida como "Ruptura" e como "Severance"
+    const paren = /^(.*?)\(([^)]+)\)\s*(.*)$/.exec(String(t ?? ''));
+    if (paren) {
+      for (const part of [`${paren[1]} ${paren[3]}`, paren[2]]) {
+        const p = normalizeTitle(part);
+        if (p) out.add(p);
+      }
+    }
   }
   return [...out];
 }

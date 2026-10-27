@@ -172,7 +172,7 @@ function buildAnimeWork(numId, requestedMalId, franchise) {
     mal_id: requestedMalId,
     mal_ids: [...new Set(franchise.visited)],
     alt_titles: alt.length ? alt : base.alt_titles,
-    status: airing ? 'Em Exibição' : (kept.length ? 'Finalizada' : base.status),
+    status: airing ? 'Em Exibição' : (kept.length && kept.every(f => f.status === 'Finished Airing') ? 'Finalizada' : base.status),
     seasons,
     franchise: { entries, truncated: Boolean(franchise.truncated) }
   };

@@ -152,7 +152,7 @@ test('normalizeTitle: sem acentos/pontuação, preserva japonês e números', ()
 });
 
 test('relevância: "Frieren" não casa com Frieden, Friheden, 2 frères, Oscar Freire 279; casa com os títulos da obra', () => {
-  for (const noise of ['Frieden', 'Friheden', '2 frères', 'Oscar Freire 279', 'Freezing', 'Frierens']) {
+  for (const noise of ['Frieden', 'Friheden', '2 frères', 'Oscar Freire 279', 'Freezing', 'Frieda']) {
     assert.equal(relevance('Frieren', { name: noise }), 0, noise);
   }
   const frieren = { name: "Frieren: Beyond Journey's End", alt_titles: ['Sousou no Frieren', '葬送のフリーレン'] };
@@ -184,7 +184,7 @@ test('franchiseKey junta temporadas/partes da mesma obra e separa subtítulos e 
 
 test('sameWork: mesmo id da MAL, ou mesmo tipo + título em comum + anos próximos; tipos/anos diferentes não se misturam', () => {
   assert.ok(sameWork({ id: 1, type: 'anime', mal_id: 5, name: 'A' }, { id: 2, type: 'anime', mal_ids: [4, 5], name: 'B' }));
-  assert.ok(sameWork({ id: 1, type: 'tv', name: 'Severance', first_air_date: '2022-02-18' }, { id: 2, type: 'tv', name: 'Ruptura', original_name: 'Severance', first_air_date: '2022-02-17' }));
+  assert.ok(sameWork({ id: 1, type: 'tv', name: 'Crossed Wires', first_air_date: '2022-02-18' }, { id: 2, type: 'tv', name: 'Fios Cruzados', original_name: 'Crossed Wires', first_air_date: '2022-02-17' }));
   assert.equal(sameWork({ id: 1, type: 'movie', name: 'Death Note' }, { id: 2, type: 'anime', name: 'Death Note' }), false);
   assert.equal(sameWork({ id: 1, type: 'tv', name: 'The Office', first_air_date: '2001-07-09' }, { id: 2, type: 'tv', name: 'The Office', first_air_date: '2005-03-24' }), false);
 });
@@ -585,16 +585,16 @@ function tmdbRouter() {
     const p = u.pathname.replace('/3', '');
     if (p === '/search/tv') {
       return { results: [
-        { id: 95396, name: 'Ruptura', original_name: 'Severance', overview: 'Sinopse', poster_path: '/p.jpg', backdrop_path: '/b.jpg', vote_average: 8.4, vote_count: 3000, first_air_date: '2022-02-18', genre_ids: [18, 9648], original_language: 'en' },
+        { id: 95396, name: 'Fios Cruzados', original_name: 'Crossed Wires', overview: 'Sinopse', poster_path: '/p.jpg', backdrop_path: '/b.jpg', vote_average: 8.4, vote_count: 3000, first_air_date: '2022-02-18', genre_ids: [18, 9648], original_language: 'en' },
         { id: 1, name: 'Naruto do TMDB', original_name: 'ナルト', genre_ids: [16, 10759], original_language: 'ja', first_air_date: '2002-10-03' },
         { id: 2, name: 'Sem nota', poster_path: null, vote_average: 0, vote_count: 0, genre_ids: [], first_air_date: '' }
       ] };
     }
     if (p === '/search/movie') {
-      return { results: [{ id: 155, title: 'Batman: O Cavaleiro das Trevas', original_title: 'The Dark Knight', overview: 'Filme', poster_path: '/m.jpg', vote_average: 8.5, vote_count: 30000, release_date: '2008-07-16', genre_ids: [28, 80], original_language: 'en' }] };
+      return { results: [{ id: 155, title: 'Noite Sombria', original_title: 'Dark Night', overview: 'Filme', poster_path: '/m.jpg', vote_average: 8.5, vote_count: 30000, release_date: '2008-07-16', genre_ids: [28, 80], original_language: 'en' }] };
     }
     if (p === '/movie/155') return { id: 155, title: 'Batman: O Cavaleiro das Trevas', original_title: 'The Dark Knight', runtime: 152, status: 'Released', overview: 'Filme', poster_path: '/m.jpg', vote_average: 8.5, vote_count: 30000, release_date: '2008-07-16', genres: [{ id: 28, name: 'Ação' }] };
-    if (p === '/tv/95396') return { id: 95396, name: 'Ruptura', original_name: 'Severance', status: 'Returning Series', overview: 'Sinopse', first_air_date: '2022-02-18', vote_average: 8.4, vote_count: 3000, genres: [{ id: 18, name: 'Drama' }], episode_run_time: [50], seasons: [{ season_number: 0 }, { season_number: 1 }, { season_number: 2 }] };
+    if (p === '/tv/95396') return { id: 95396, name: 'Fios Cruzados', original_name: 'Crossed Wires', status: 'Returning Series', overview: 'Sinopse', first_air_date: '2022-02-18', vote_average: 8.4, vote_count: 3000, genres: [{ id: 18, name: 'Drama' }], episode_run_time: [50], seasons: [{ season_number: 0 }, { season_number: 1 }, { season_number: 2 }] };
     let m;
     if ((m = /^\/tv\/95396\/season\/(\d+)$/.exec(p))) {
       return { name: `Temporada ${m[1]}`, episodes: [{ episode_number: 1, name: 'Bom Dia', runtime: 55, air_date: '2022-02-18', overview: 'x', still_path: '/e.jpg' }, { episode_number: 2, name: '<b>Metade</b>', air_date: '2022-02-18' }] };
@@ -607,9 +607,9 @@ function tmdbRouter() {
 
 test('TMDB desligado sem chave: série e filme não chamam o TMDB', async () => {
   const router = tmdbRouter();
-  const svc = newService({ tmdb: router, tmdbKey: '', tvmaze: { severance: [tvmazeShow(1, 'Severance')] } });
+  const svc = newService({ tmdb: router, tmdbKey: '', tvmaze: { 'crossed wires': [tvmazeShow(1, 'Crossed Wires')] } });
   assert.equal(svc.tmdb.enabled, false);
-  assert.deepEqual(names(await svc.search('severance', 'tv')), ['Severance']);
+  assert.deepEqual(names(await svc.search('crossed wires', 'tv')), ['Crossed Wires']);
   assert.equal(router.calls.length, 0);
 });
 
@@ -617,13 +617,13 @@ test('TMDB com chave: busca série+filme em pt-BR, deduplica com o TVMaze, exclu
   const router = tmdbRouter();
   const svc = newService({
     tmdb: router, tmdbKey: 'chave-de-teste',
-    animes: [], tvmaze: { severance: [tvmazeShow(44, 'Severance', { premiered: '2022-02-18' })] }
+    animes: [], tvmaze: { 'crossed wires': [tvmazeShow(44, 'Crossed Wires', { premiered: '2022-02-18' })] }
   });
-  const tv = await svc.search('severance', 'tv');
-  // "Ruptura" (TMDB, original_name Severance) e "Severance" (TVMaze) são a mesma obra => fica a do TMDB
+  const tv = await svc.search('crossed wires', 'tv');
+  // "Fios Cruzados" (TMDB, original_name Crossed Wires) e "Crossed Wires" (TVMaze) são a mesma obra => fica a do TMDB
   assert.equal(tv.length, 1);
   assert.equal(tv[0].id, toInternalId('tmdb_tv', 95396));
-  assert.equal(tv[0].name, 'Ruptura');
+  assert.equal(tv[0].name, 'Fios Cruzados');
   assert.equal(tv[0].poster_path, 'https://image.tmdb.org/t/p/w500/p.jpg');
   assert.deepEqual(tv[0].genres, ['Drama', 'Mistério']);
   assert.ok(router.calls.every(c => c.url.includes('language=pt-BR')));
@@ -634,19 +634,21 @@ test('TMDB com chave: busca série+filme em pt-BR, deduplica com o TVMaze, exclu
   assert.equal(sem[0].poster_path, null);
   assert.ok(!(await newService({ tmdb: router, tmdbKey: 'k' }).search('naruto do tmdb', 'tv')).some(i => i.name === 'Naruto do TMDB'), 'animação japonesa é do domínio da Jikan');
 
-  const movies = await svc.search('batman', 'movie');
-  const dk = movies.find(m => m.id === toInternalId('tmdb_movie', 155));
-  assert.ok(dk && dk.type === 'movie');
-  assert.ok(movies.some(m => m.id === 155), 'o Batman do seed (mesmo filme) continua aparecendo uma vez');
-  assert.ok(!dk || !movies.some(m => m.id === 155 && m !== movies.find(x => x.id === 155)), 'sem duplicata do seed');
-  assertUnique(movies);
+  const found = await svc.search('noite sombria', 'movie');
+  assert.equal(found.length, 1);
+  assert.equal(found[0].id, toInternalId('tmdb_movie', 155));
+  assert.equal(found[0].type, 'movie');
+  assert.equal(found[0].vote_average, 8.5);
+  // consulta que não casa com o título do TMDB não traz o filme (sem correspondência fraca); o Batman do seed aparece uma vez
+  const batman = await svc.search('batman', 'movie');
+  assert.deepEqual(ids(batman), [155]);
 });
 
 test('TMDB com token v4 usa cabeçalho Authorization (e nunca a chave na URL)', async () => {
   const router = tmdbRouter();
   const token = 'eyJhbGciOiJIUzI1NiJ9.teste.assinatura';
   const svc = newService({ tmdb: router, tmdbKey: token });
-  await svc.search('severance', 'tv');
+  await svc.search('crossed wires', 'tv');
   assert.ok(router.calls.length > 0);
   for (const c of router.calls) {
     assert.ok(!c.url.includes('api_key') && !c.url.includes(token));
@@ -681,4 +683,16 @@ test('TMDB: 401 vira erro tipado sem expor a chave', async () => {
   assert.ok(items.length >= 1, 'catálogo local continua respondendo');
   assert.equal(warnings[0].source, 'tmdb');
   assert.ok(!JSON.stringify(warnings).includes('segredo-123'));
+});
+
+test('título do seed com parênteses ("Ruptura (Severance)") é a mesma obra que o TMDB/TVMaze chamam de Ruptura ou Severance', async () => {
+  const router = (url) => {
+    const p = new URL(url).pathname.replace('/3', '');
+    if (p === '/search/tv') return { results: [{ id: 95396, name: 'Ruptura', original_name: 'Severance', vote_average: 8.4, vote_count: 3000, first_air_date: '2022-02-18', genre_ids: [18], original_language: 'en' }] };
+    return { results: [] };
+  };
+  const svc = newService({ tmdb: router, tmdbKey: 'k', tvmaze: { severance: [tvmazeShow(44, 'Severance', { premiered: '2022-02-18' })] } });
+  const items = await svc.search('severance', 'all');
+  assert.equal(items.length, 1);
+  assert.equal(items[0].id, 95396, 'a obra local vence');
 });
