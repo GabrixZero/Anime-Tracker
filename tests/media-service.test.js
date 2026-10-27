@@ -26,7 +26,7 @@ function newDir() {
 }
 
 function newService(dir = newDir(), extra = {}) {
-  const svc = new MediaService({ dataDir: dir, tvmazeBase: 'http://tvmaze.invalid', sleep: async () => {}, ...extra });
+  const svc = new MediaService({ dataDir: dir, tvmazeBase: 'http://tvmaze.invalid', sleep: async () => {}, jikanEnabled: false, tmdbKey: '', ...extra });
   svc.calls = [];
   return svc;
 }
@@ -165,10 +165,14 @@ test('ingestão do TVMaze não colide com o seed: TVMaze 155 é 1000155 e o Batm
   assert.equal(svc.findLocal(155).name.includes('Batman'), true);
 });
 
-test('anime: tipo Animation vira anime', async () => {
+test('anime no caminho TVMaze: animação japonesa ou gênero Anime; desenho ocidental continua série', async () => {
   const svc = newService();
-  mockFetch(svc, () => tvmazeShow(7, { type: 'Animation' }));
+  mockFetch(svc, () => tvmazeShow(7, { type: 'Animation', language: 'Japanese' }));
   assert.equal((await svc.ingest(1000007)).type, 'anime');
+  mockFetch(svc, () => tvmazeShow(8, { type: 'Animation', language: 'English', network: { country: { code: 'US' } } }));
+  assert.equal((await svc.ingest(1000008)).type, 'tv');
+  mockFetch(svc, () => tvmazeShow(9, { type: 'Scripted', genres: ['Anime', 'Action'] }));
+  assert.equal((await svc.ingest(1000009)).type, 'anime');
 });
 
 test('404 do TVMaze (corpo de erro ou exceção) não grava nada', async () => {
@@ -215,7 +219,6 @@ test('ids inválidos ou sem fonte ingerível são rejeitados sem tocar na rede',
     await assert.rejects(svc.ingest(bad), err => err.code === 'INVALID_ID', `id ${String(bad)}`);
   }
   await assert.rejects(svc.ingest(999), err => err.code === 'UNSUPPORTED_SOURCE'); // faixa do seed, fora do catálogo
-  await assert.rejects(svc.ingest(10000020), err => err.code === 'UNSUPPORTED_SOURCE'); // Jikan ainda não existe (S06)
   await assert.rejects(svc.ingest(5000000), err => err.code === 'NOT_FOUND');          // fora de qualquer faixa
   assert.equal(svc.calls.length, 0);
 });
@@ -349,8 +352,9 @@ test('busca externa usa cache com TTL, mapeia ids para a faixa do TVMaze e não 
 
   const failing = newService();
   failing.fetchJson = async () => { failing.calls.push(1); throw new Error('rede caiu'); };
-  assert.deepEqual(await failing.search('abcdef', 'all'), []);
-  await failing.search('abcdef', 'all');
+  // Sem nenhum resultado e com a fonte caída: erro tipado (a interface mostra a mensagem), não "nenhuma obra".
+  await assert.rejects(failing.search('abcdef', 'all'), err => err.code === 'UPSTREAM' && err.httpStatus === 502);
+  await assert.rejects(failing.search('abcdef', 'all'), err => err.code === 'UPSTREAM');
   assert.equal(failing.calls.length, 2, 'falha não é cacheada');
 });
 

@@ -81,7 +81,8 @@ class AppController {
 
     // Obra já completa no cache (filme ou com temporadas): não precisa ingerir. Senão a ingestão exige login (S02).
     const known = window.appState.getMedia(numId);
-    const complete = known && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
+    // (resultado de busca externa — isExternal — nunca conta como completo, nem filme: ainda não está no catálogo do servidor)
+    const complete = known && !known.isExternal && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
     if (!complete) {
       try {
         this.showToast('Buscando os episódios da obra...', 'info');

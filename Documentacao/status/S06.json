@@ -2,9 +2,9 @@
   "secao": "S06",
   "titulo": "Animes e busca (Jikan)",
   "arquivo": "Documentacao/secoes/S06-animes-e-busca.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s06-animes-e-busca",
+  "concluidaEm": "2026-10-27",
   "commit": "",
-  "notas": ""
+  "notas": "Jikan (fila/throttle/cache/429) com franquia por Sequel/Prequel, busca combinada Jikan+TVMaze+TMDB(opcional) com dedupe e relevancia, backend sem valores inventados (null), exploreView com debounce/erros. Jikan real nao testada (timeout na maquina de dev)."
 }

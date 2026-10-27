@@ -20,6 +20,8 @@ const mediaErrors = {
   upstream: msg => new MediaError('UPSTREAM', msg || 'A fonte externa está indisponível no momento.', 502),
   catalogUnavailable: () => new MediaError('CATALOG_UNAVAILABLE', 'O catálogo está temporariamente somente leitura (arquivo de dados ilegível). Avise o administrador.', 503),
   tooManyRequests: retryAfterSec => new MediaError('TOO_MANY_REQUESTS', 'Muitas obras adicionadas em pouco tempo. Aguarde um pouco e tente de novo.', 429, { retryAfterSec }),
+  notConfigured: msg => new MediaError('SOURCE_NOT_CONFIGURED', msg || 'Esta fonte de dados não está configurada neste servidor.', 503),
+  tooManySearches: retryAfterSec => new MediaError('TOO_MANY_REQUESTS', 'Muitas buscas em pouco tempo. Aguarde alguns segundos e tente de novo.', 429, { retryAfterSec }),
   loginRequired: () => new MediaError('LOGIN_REQUIRED', 'Entre na sua conta para adicionar novas obras ao catálogo.', 401)
 };
 

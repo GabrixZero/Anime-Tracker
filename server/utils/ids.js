@@ -9,11 +9,11 @@ const SOURCES = {
   seed:       { min: 1,        max: 999999,   offset: 0,        ingestable: false },
   // Ingestão sob demanda do TVMaze (séries): id interno = 1_000_000 + id do TVMaze.
   tvmaze:     { min: 1000000,  max: 1999999,  offset: 1000000,  ingestable: true },
-  // Reservado para a S06 (Jikan/MAL): 10_000_000 + mal_id.
-  jikan:      { min: 10000000, max: 19999999, offset: 10000000, ingestable: false },
-  // Reservado (TMDB externo, D-17). Séries e filmes têm faixas separadas porque no TMDB os dois tipos reutilizam os mesmos números.
-  tmdb_tv:    { min: 20000000, max: 29999999, offset: 20000000, ingestable: false },
-  tmdb_movie: { min: 30000000, max: 39999999, offset: 30000000, ingestable: false }
+  // Animes (Jikan/MyAnimeList, S06): id interno = 10_000_000 + mal_id. A obra gravada com esse id reúne a franquia inteira (temporadas).
+  jikan:      { min: 10000000, max: 19999999, offset: 10000000, ingestable: true },
+  // TMDB externo (D-17, S06; exige TMDB_API_KEY). Séries e filmes têm faixas separadas porque no TMDB os dois tipos reutilizam os mesmos números.
+  tmdb_tv:    { min: 20000000, max: 29999999, offset: 20000000, ingestable: true },
+  tmdb_movie: { min: 30000000, max: 39999999, offset: 30000000, ingestable: true }
 };
 
 // Aceita número ou string de dígitos; devolve inteiro positivo seguro ou lança MediaError(400).

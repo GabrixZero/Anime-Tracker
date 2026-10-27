@@ -3,7 +3,8 @@ const { MediaError, DataCorruptionError } = require('./errors');
 
 function sendError(res, err, fallbackMessage, logLabel) {
   if (err instanceof MediaError) {
-    if (err.retryAfterSec) res.set('Retry-After', String(err.retryAfterSec));
+    const retryAfterSec = err.retryAfterSec || (err.retryAfterMs ? Math.max(1, Math.ceil(err.retryAfterMs / 1000)) : 0);
+    if (retryAfterSec) res.set('Retry-After', String(retryAfterSec));
     return res.status(err.httpStatus).json({ error: err.message, code: err.code });
   }
   if (err instanceof DataCorruptionError || (err && err.code === 'DATA_CORRUPT')) {

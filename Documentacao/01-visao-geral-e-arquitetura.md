@@ -38,7 +38,10 @@ Com `NODE_ENV=production` o servidor se recusa a iniciar sem `JWT_SECRET` (mín.
 | `server/models/UserModel.js` | usuários em `server/data/users.json` (scrypt **assíncrono** `salt:hash`, migra senha legada no login; `create`/`updatePassword`/`verifyPassword` são `async`; e-mail único checado na gravação; `passwordChangedAt`; `authInfo` em cache por mtime; conta demo só com `SEED_DEMO_USER=1`); leitura/escrita via `jsonStore` (arquivo ilegível = `DataCorruptionError`, nunca lista vazia) |
 | `server/models/LibraryModel.js` | biblioteca por usuário em `server/data/libraries/<userId>.json`; valida, grava de forma atômica (com `.bak`) mescla no `save` (`LibraryMerge.merge`, quando o cliente envia `tombstones`), tem `clear()` e aplica a migração de versão do estado (`schemaVersion`) no `get`, no `save` (cliente sem `stateVersion`) e em `migrateAll()` |
 | `server/controllers/userController.js` + `routes/userRoutes.js` | `GET/PUT/DELETE /api/user/library` (exigem login). `PUT` de cliente da S03 **mescla** com o servidor e devolve `{updatedAt, data}`; `DELETE` zera a conta (`resetAt`) |
-| `server/services/mediaService.js` | catálogo = seed versionado + runtime (`mediaCatalog.runtime.json`); busca TVMaze com cache TTL (10 min); `ingest(id)` com trava por id (promessas em andamento), validação da resposta e gravação atômica; `fetchJson` com timeout, limite de tamanho, erros tipados e 1 nova tentativa em 429 (dados externos passam por `utils/sanitize.js`) |
+| `server/services/mediaService.js` | catálogo = seed versionado + runtime (`mediaCatalog.runtime.json`); **busca combinada** (`searchDetailed`: local + Jikan + TVMaze + TMDB, relevância estrita, deduplicação, `warnings` por fonte — ver "Busca e ingestão (S06)"); `ingest(id)` despacha pela faixa do id (TVMaze, Jikan, TMDB), com trava por id e gravação atômica; `fetchJson(url, {retries429, headers})` com timeout, limite de tamanho e erros tipados (dados externos passam por `utils/sanitize.js`) |
+| `server/services/jikanClient.js`, `jikanMapper.js` | (S06) cliente da Jikan v4 (fila/throttle, cache, retentativa em 429/5xx, `getFranchise`) e mapeamento MAL → obra (temporadas, status em PT, nulos) |
+| `server/services/tmdbClient.js` | (S06) TMDB opcional (`TMDB_API_KEY`): busca de séries/filmes em pt-BR e detalhes com temporadas; desligado sem chave |
+| `server/utils/titles.js`, `ttlCache.js`, `httpJson.js` | (S06) normalização/relevância/chave de franquia/"mesma obra?" · cache com validade · GET JSON com erros tipados |
 | `server/utils/ids.js` | faixas de ids por fonte (`SOURCES`), `parseId`, `describeId`, `toInternalId` (ver "Esquema de ids") |
 | `server/utils/jsonStore.js` | `readJson` / `writeJsonAtomic`: tmp + rename (com tentativas por causa do OneDrive), `.bak` da última versão válida, cópia `.corrupt-*` de arquivo quebrado |
 | `server/utils/errors.js`, `httpErrors.js` | `MediaError` (código + status HTTP), `DataCorruptionError` e `sendError` (resposta JSON em português; corrupção = 503) |
@@ -67,12 +70,12 @@ Ids continuam **numéricos**; cada fonte tem uma **faixa própria** (código em 
 |---|---|---|---|
 | Seed (TMDB, curado) | 1 – 999.999 | id nativo do TMDB, sem deslocamento (ex.: Breaking Bad 1396, Batman 155) | ativo (não ingerível: só existe se estiver no seed) |
 | TVMaze | 1.000.000 – 1.999.999 | 1.000.000 + id do TVMaze (ex.: Naruto 495 → 1.000.495) | ativo (ingestão sob demanda) |
-| Jikan / MAL (anime) | 10.000.000 – 19.999.999 | 10.000.000 + `mal_id` | reservado para a S06 |
-| TMDB externo — séries | 20.000.000 – 29.999.999 | 20.000.000 + id de série do TMDB | reservado (D-17) |
-| TMDB externo — filmes | 30.000.000 – 39.999.999 | 30.000.000 + id de filme do TMDB | reservado (D-17) |
+| Jikan / MAL (anime) | 10.000.000 – 19.999.999 | 10.000.000 + `mal_id` | **ativo (S06)**: ingestão sob demanda; a obra reúne a franquia (ver abaixo) |
+| TMDB externo — séries | 20.000.000 – 29.999.999 | 20.000.000 + id de série do TMDB | ativo só com `TMDB_API_KEY` (S06) |
+| TMDB externo — filmes | 30.000.000 – 39.999.999 | 30.000.000 + id de filme do TMDB | ativo só com `TMDB_API_KEY` (S06) |
 
 Séries e filmes do TMDB têm faixas separadas porque o TMDB reutiliza os mesmos números nos dois tipos. As faixas 2–9,99 milhões e acima de 40 milhões estão livres.
-Para ativar uma fonte nova (S06): ajustar `ingestable: true` em `SOURCES`, escrever a ingestão no `MediaService` e mapear com `toInternalId('jikan', mal_id)`. Chaves de episódio (`<id>_s1_e1`, `<id>_movie`) e `Number(id)` no frontend seguem funcionando (todos os ids são inteiros seguros).
+Para ativar uma fonte nova: ajustar `ingestable: true` em `SOURCES`, escrever a ingestão no `MediaService` e mapear com `toInternalId(fonte, id)` (feito para Jikan e TMDB na S06). Chaves de episódio (`<id>_s1_e1`, `<id>_movie`) e `Number(id)` no frontend seguem funcionando (todos os ids são inteiros seguros).
 
 ## Versão do estado e migrações
 
@@ -143,3 +146,12 @@ Frágil/falso/incompleto: veja as 10 seções em [04-roadmap.md](04-roadmap.md).
 - **Servidor mescla no PUT** (se o corpo traz `tombstones`); clientes antigos (sem o campo) continuam em snapshot completo/last-write-wins. O `PUT` devolve a biblioteca mesclada e o cliente a aplica.
 - **Isolamento por conta**: o estado local tem dono (`showvault_last_user`). Login de outra conta = arquivar (`showvault_archive_<dono>`) e começar do remoto, nunca mesclar; logout envia o que falta (se não der, arquiva) e limpa o navegador; visitante que entra numa conta leva o que fez antes; a próxima entrada da mesma conta recupera o arquivo.
 - **Status por obra** (`watchStatus.js`): `watching`, `plan_to_watch`, `paused`, `completed`, `dropped`. Lista, estatísticas e "A Seguir" usam `appState.getStatus`. Adicionar = Quero ver (ou Assistindo/Finalizado se já houver progresso); marcar episódio = Assistindo; último episódio = Finalizado; desmarcar um Finalizado = Assistindo/Quero ver. Pausado/Desisti não entram em "A Seguir".
+
+## Busca e ingestão (S06)
+
+- **Fluxo da busca** (`GET /api/media/search?q=&type=`): catálogo local (título/alternativos; sinopse só como relevância fraca) → em paralelo Jikan (anime), TVMaze (série; reserva de anime se a Jikan cair) e TMDB (série/filme, só com chave) → descarta o que não contém a consulta em nenhum título → agrupa temporadas da mesma franquia (Jikan) → deduplica (prioridade local > Jikan > TMDB > TVMaze) → ordena por relevância (máx. 30). A resposta é `{query, count, data, warnings:[{source, code, message, retryAfterSec?}]}`. Tudo falhou e nada local casou = erro tipado (429/502). 60 buscas/min por IP.
+- **Resultado externo** (`isExternal: true`) ainda não está no catálogo; anime traz `season_label` ("Outono 2023"), `anime_kind` ("Filme", "OVA"...), `related_count` (partes da franquia agrupadas), `episode_count`, `mal_ids`.
+- **Ingestão** (`POST /api/media/ingest` ou `GET /:id`, exige login): TVMaze = obra + episódios; **Jikan = franquia inteira** (`/anime/{id}/full` traz as relações; segue Sequel/Prequel até 12 entradas; `/episodes?page=` por entrada) gravada com o id pedido; TMDB = detalhes + temporadas. Campos extras nas obras de anime: `mal_id`, `mal_ids`, `original_name`, `alt_titles`, `franchise:{entries, truncated}`. Uma ingestão de franquia grande leva alguns segundos (fila da Jikan).
+- **Sem valores inventados:** quando a fonte não traz, `vote_average`/imagens = `null`, `genres` = `[]`, `runtime` = `null`, `status` = `''` (o frontend decide como exibir: S08).
+- **Variáveis:** `TMDB_API_KEY` (opcional, `.env.example`), `JIKAN_BASE_URL` (só testes/dev).
+- **Frontend (`exploreView.js`):** busca ao digitar com debounce de 400 ms (mín. 2 letras; Enter/botão buscam na hora), só a resposta da busca mais recente é exibida, indicador "Buscando...", mensagens de erro/limite em português com "Tentar de novo" e avisos de fontes indisponíveis.
