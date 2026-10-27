@@ -116,6 +116,20 @@ class ExploreView {
     }
   }
 
+  // Depois de adicionar/remover uma obra (S10, achado da S03): redesenha os cartões que já estão na tela, sem buscar de novo,
+  // para o botão virar "Ver no Cofre"/"+ Adicionar" e devolve o foco ao mesmo botão (o HTML é recriado).
+  refresh() {
+    if (!this.container || !Array.isArray(this.items) || this.items.length === 0) return;
+    if (this.container.querySelector('.grid-message--error')) return; // mostrando erro de busca: não há cartões
+    const active = document.activeElement;
+    const key = active && this.container.contains(active) ? active.getAttribute('data-focus-key') : null;
+    this.render(this.items, this.notice);
+    if (key) {
+      const again = this.container.querySelector(`[data-focus-key="${key}"]`);
+      if (again && again.focus) again.focus();
+    }
+  }
+
   // "Mostrar mais": próxima página da lista leve do catálogo (só na lista sem busca).
   async loadMore() {
     if (!this.hasMore || this.loadingMore) return;

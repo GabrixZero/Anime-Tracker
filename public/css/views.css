@@ -66,25 +66,16 @@
   border: 1px solid var(--bg-card-border);
 }
 
+/* Segmento dentro de .filter-pills: base em components.css (.type-pill-btn/.pill-btn/.season-tab-btn), aqui só a forma */
 .pill-btn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
   padding: 0.45rem 0.9rem;
-  font-family: var(--font-body);
   font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
 }
 
 .pill-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
-
-.pill-btn.active {
-  background: rgba(255, 208, 0, 0.15);
-  color: var(--tvtime-yellow);
-}
 
 /* ---------- Cartões de obra: linha de tipo + ano ---------- */
 .show-info-top {
@@ -493,17 +484,11 @@
   border-bottom: 1px solid var(--bg-card-border);
 }
 
+/* Aba de temporada: base em components.css; aqui a forma retangular e o ativo sólido */
 .season-tab-btn {
   flex-shrink: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--bg-card-border);
   border-radius: var(--radius-sm);
   padding: 0.55rem 1rem;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  cursor: pointer;
 }
 
 .season-tab-btn.active {

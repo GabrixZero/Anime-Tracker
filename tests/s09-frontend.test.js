@@ -623,11 +623,38 @@ test('Explorar: a lista leve mostra o nº de temporadas e o "Mostrar mais" acres
   assert.equal(ev.metaText({ type: 'movie', runtime: 120 }), w.MediaDisplay.runtimeText(120));
 });
 
+test('Explorar redesenha os cartões já carregados depois de adicionar/remover uma obra (S10), sem nova busca', async () => {
+  const app = makeApp({ catalog: clone(catalogFor()) });
+  const w = app.window;
+  const ev = w.exploreView;
+  ev.container = app.els.get('explore-container') || (app.els.set('explore-container', makeEl('explore-container')), app.els.get('explore-container'));
+  ev.titleEl = makeEl('title');
+  await ev.loadMedia();
+  const id = ev.items[0].id;
+  assert.match(ev.container.innerHTML, new RegExp(`data-action="add-to-list" data-show="${id}"`));
+  const calls = app.apiCalls.length;
+
+  app.state.addShow(id);
+  ev.refresh();
+  assert.doesNotMatch(ev.container.innerHTML, new RegExp(`data-action="add-to-list" data-show="${id}"`), 'agora é "Ver no Cofre"');
+  assert.match(ev.container.innerHTML, new RegExp(`data-focus-key="ex:${id}:action" data-action="open-detail" data-show="${id}"`));
+
+  app.state.removeShow(id);
+  ev.refresh();
+  assert.match(ev.container.innerHTML, new RegExp(`data-action="add-to-list" data-show="${id}"`));
+  assert.equal(app.apiCalls.length, calls, 'não buscou de novo');
+
+  ev.items = [];
+  ev.container.innerHTML = 'mensagem';
+  ev.refresh(); // sem cartões: não mexe
+  assert.equal(ev.container.innerHTML, 'mensagem');
+});
+
 // ---------------------------------------------------------------- compatibilidade
 
-test('o HTML carrega os scripts na mesma ordem e nenhuma view nova usa style= em template (só as larguras dinâmicas de antes)', () => {
+test('nenhuma view usa style= em template (S10: as larguras dinâmicas viraram classes .pct-N) e imagens lazy têm decoding async', () => {
   const views = ['nextUpView', 'watchlistView', 'diaryView', 'statsView', 'exploreView', 'detailModalView'];
-  const allowed = { watchlistView: 1, statsView: 2 };
+  const allowed = {}; // S10: nenhuma view usa style= (as larguras viraram classes .pct-N)
   for (const v of views) {
     const code = fs.readFileSync(path.join(ROOT, 'views', `${v}.js`), 'utf8');
     const styles = (code.match(/\sstyle="/g) || []).length;

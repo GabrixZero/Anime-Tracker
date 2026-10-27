@@ -229,6 +229,15 @@ test('CSP: sem unsafe-inline/unsafe-eval em scripts e estilos; só o necessário
   }
 });
 
+test('CSP: com login Google configurado, só ESTILOS inline são aceitos (scripts continuam estritos)', () => {
+  const off = buildCspDirectives({ isProduction: false });
+  const on = buildCspDirectives({ isProduction: false, googleEnabled: true });
+  assert.ok(!off.styleSrc.includes("'unsafe-inline'"));
+  assert.ok(on.styleSrc.includes("'unsafe-inline'"));
+  assert.deepEqual(on.scriptSrc, off.scriptSrc);
+  assert.ok(!on.scriptSrc.some(v => /unsafe-/.test(v)));
+});
+
 test('CSP: o servidor envia o cabeçalho em páginas e na API, e o HTML servido cabe nela', async t => {
   const app = require('../server/app');
   const server = await new Promise(resolve => {

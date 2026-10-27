@@ -29,17 +29,17 @@ Execução em duas fases (a S09 roda em paralelo e mexe em views/`appController`
 - [x] Revisão de segurança com a checklist de `01-visao-geral-e-arquitetura.md` (registrada lá e no diário). Refazer depois da fase B (CSP).
 - [x] Achado extra: o fallback da SPA (`res.sendFile`) devolvia 404 quando o caminho do projeto tem uma pasta com ponto (ex.: `.claude/worktrees`); corrigido com a opção `root`.
 
-**Fase B (aguarda a S09 em `develop`)**
-- [ ] Frontend: delegação de eventos (`data-action`) no lugar de TODOS os `onclick`/`onerror` inline em `index.html` e nos templates das views; mover estilos inline restantes para CSS; módulo utilitário único (badge de tipo, fallbacks, parsing da chave `id_sN_eM`, telas vazias); considerar módulos ES (`type="module"`).
-- [ ] CSP (via `helmet`) sem `unsafe-inline` (scripts e estilos) depois da limpeza; testar o app inteiro com a CSP ativa (Google Sign-In opcional, SVGs/imagens externas das fontes).
-- [ ] Unificar `type-pill-btn`/`pill-btn`/`season-tab-btn`; atualizar a lista de exceções de `tests/a11y.test.js` (`.next-up-thumb-wrap` e `.next-up-show-name` podem sair); Explorar redesenhar após adicionar/remover obra (achado da S03); corrigir os avisos de lint nas views.
-- [ ] Repetir a revisão de segurança (agora com CSP).
+**Fase B (feita em 2026-10-27, depois da S09 em `develop`)**
+- [x] Frontend: delegação de eventos (`data-action`) no lugar de TODOS os `onclick`/`onchange`/`onerror` inline do `index.html` e dos templates; `style=` inline eliminado (barras = classes `.pct-N`); módulo utilitário `viewKit.js` (selo de tipo, imagem+reserva, chave `id_sN_eM`, tela vazia). Módulos ES: não adotados (D-S10-10).
+- [x] CSP (via `helmet`) sem `unsafe-inline` em scripts e estilos; app testado inteiro no navegador com a CSP ativa, com e sem Google Sign-In (exceção de `style-src` só com `GOOGLE_CLIENT_ID`, D-S10-11).
+- [x] `type-pill-btn`/`pill-btn`/`season-tab-btn` com base de CSS única; exceções do `a11y.test.js` removidas (e o A Seguir ganhou botão de título esticado); Explorar redesenha ao adicionar/remover obra; avisos de lint nas views corrigidos (`npm run lint`: 0 erros e 0 avisos).
+- [x] Revisão de segurança repetida com a CSP (em `01-visao-geral-e-arquitetura.md`).
 
 ## Decisões (já resolvidas — não pergunte de novo)
 **Resolvida:** D-21 (preparar sem publicar: Dockerfile, `/health`, env documentadas, persistência SQLite com migração dos JSON).
 
 ## Critério de pronto
-Zero `onclick`/estilo inline relevante; CSP ativa; CI verde no GitHub; README correto; app publicável com persistência e variáveis de ambiente documentadas.
+Zero `onclick`/estilo inline relevante; CSP ativa; CI verde no GitHub (ainda não rodou lá: conferir o primeiro push); README correto; app publicável com persistência e variáveis de ambiente documentadas (falta escolher a hospedagem e fazer o primeiro `docker build` real).
 
 ## Fora de escopo
 Reescrever em framework (React/Vue); novas funcionalidades (backlog).

@@ -7,11 +7,19 @@
 //    (e http, que em produção o `upgrade-insecure-requests` troca por https). Imagem não executa nada; o frontend ainda
 //    filtra as URLs (`safeUrl`);
 //  - Login com Google (opcional): script, iframe do botão, requisições e estilo vêm de accounts.google.com/gsi/.
-function buildCspDirectives({ isProduction }) {
+function buildCspDirectives({ isProduction, googleEnabled = false }) {
   return {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'", 'https://accounts.google.com/gsi/client'],
-    styleSrc: ["'self'", 'https://fonts.googleapis.com', 'https://accounts.google.com/gsi/style'],
+    // O botão do Google (GSI) injeta um <style> e atributos style no próprio botão (testado: sem isso ele aparece sem estilo, com o
+    // logotipo gigante). Por isso, SÓ quando GOOGLE_CLIENT_ID está configurado, estilos inline são aceitos (scripts continuam estritos).
+    // Sem o login Google a política não tem nenhum inline, nem de estilo.
+    styleSrc: [
+      "'self'",
+      'https://fonts.googleapis.com',
+      'https://accounts.google.com/gsi/style',
+      ...(googleEnabled ? ["'unsafe-inline'"] : [])
+    ],
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],
     imgSrc: ["'self'", 'data:', 'https:', 'http:'],
     connectSrc: ["'self'", 'https://accounts.google.com/gsi/'],
