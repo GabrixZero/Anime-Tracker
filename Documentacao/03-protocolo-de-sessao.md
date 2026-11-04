@@ -33,18 +33,15 @@ leia também [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md).
    - `01-visao-geral-e-arquitetura.md`: se a arquitetura/mapa de arquivos mudou;
    - **`Documentacao/diario/AAAA-MM-DD-SNN.md`**: entrada da sessão (modelo abaixo).
 3. Commit final na branch da feature.
-4. Levar até o `main` **sem force push**:
+4. Rodar a checagem de segurança (skill `seguranca`), mostrar ao Gabriel o resumo (arquivos, testes) e **esperar a aprovação dele** (D-31). Com o "sim", levar até a `develop` **sem force push**:
    ```bash
    git push -u origin feature/sNN-<slug>
+   gh pr create --base develop --head feature/sNN-<slug> --title "sNN <título curto>" --body "<resumo>"
+   gh pr merge --merge                          # só com os testes da PR passando; conflito? fetch, merge de origin/develop, testes, de novo
    git checkout develop && git pull --ff-only origin develop
-   git merge --ff-only feature/sNN-<slug>      # se não for possível: git merge origin/develop na feature, testar, e repetir
-   git push origin develop                      # rejeitado? outra sessão chegou antes: fetch, merge, testes, de novo
-   git checkout main && git pull --ff-only origin main
-   git merge --no-ff develop -m "release: sNN <título curto>"
-   git push origin main
-   git checkout develop
    ```
-5. Confirmar `git status` limpo, e `npm run status`: sua seção **concluída**; anotar quais seções ficaram liberadas. O workflow `auto-pr-develop` pode abrir um PR `develop → main` vazio: é só fechar.
+   **Nunca** fazer merge ou push no `main`: o merge `develop → main` é do Gabriel.
+5. Confirmar `git status` limpo, e `npm run status`: sua seção **concluída**; anotar quais seções ficaram liberadas. O workflow `auto-pr-develop` pode abrir um PR `develop → main`: deixe para o Gabriel decidir.
 6. Responder ao Gabriel com: o que mudou (linguagem simples), como ver funcionando, o que ficou pendente, **quais seções foram liberadas** e a frase de abertura pronta para elas.
 
 ### Modelo de entrada do diário (`Documentacao/diario/AAAA-MM-DD-SNN.md`)
@@ -52,7 +49,7 @@ leia também [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md).
 ```
 # AAAA-MM-DD · SNN · <título> · branch feature/sNN-<slug>
 - Feito: ...
-- Commits/push: ... (chegou ao main? sim/não)
+- Commits/PR: ... (chegou à develop? sim/não)
 - Pendente / próximos passos: ...
 - Descobertas fora do escopo: ...
 - Decisões: D-SNN-n criadas / P-nn resolvidas
@@ -62,12 +59,12 @@ leia também [06-coordenacao-entre-sessoes.md](06-coordenacao-entre-sessoes.md).
 ## 4. Prompt curto para abrir uma sessão (o Gabriel só cola isto, trocando S0X)
 
 ```
-Leia CLAUDE.md e Documentacao/README.md e execute a sessão S0X conforme Documentacao/secoes/S0X-<slug>.md. Siga o protocolo de sessão (rode o npm run status antes de começar) e termine com push até o main.
+Leia CLAUDE.md e Documentacao/README.md e execute a sessão S0X conforme Documentacao/secoes/S0X-<slug>.md. Siga o protocolo de sessão (rode o npm run status antes de começar) e termine com a PR até a develop, depois da minha aprovação.
 ```
 
 ## 5. Regras de ouro
 
 - Não reabrir decisões tomadas (`02-decisoes.md`) sem fato novo; decisões pendentes → perguntar ao Gabriel.
 - Não pular a atualização da documentação nem o `status/SNN.json`: sem eles as outras sessões trabalham cegas.
-- Nunca `git push --force` em `main`/`develop`. Nunca `--no-verify`.
+- Nunca `git push --force` em `main`/`develop`. Nunca `--no-verify`. Nunca push nem merge no `main` (D-31).
 - Ações destrutivas (apagar dados reais, reescrever histórico) só com pedido explícito do Gabriel.
