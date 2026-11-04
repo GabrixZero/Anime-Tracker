@@ -9,15 +9,15 @@ A API de trocar senha e excluir conta existe (S04), mas não há telas. O app é
 - [ ] Tela "Minha conta" (perfil, trocar senha, excluir conta com confirmação por senha; conta Google: confirmação pelo Google) usando `POST /api/auth/change-password` e `DELETE /api/auth/account`.
 - [ ] **Cadastro por convite**: `INVITE_CODE` (ou lista de códigos) no `.env`; sem código válido, cadastro recusado com mensagem clara. Desligado quando a variável não existe (uso local).
 - [ ] Encerrar sessão no servidor: "sair de todos os aparelhos" (reaproveitar o carimbo de `requireActiveUser` da S04).
-- [ ] Recuperação de senha **sem e-mail** (P-11, padrão): script do dono `npm run user:reset-password -- <email>` que gera senha temporária e obriga troca no próximo login. Se a P-11 mudar para e-mail, usar um provedor (ex.: Resend) com chave no `.env`.
+- [ ] "Perdi a senha": só enfeite com aviso "em breve" (P-11 reaberta: e-mail fica para depois; sem script do dono, sem envio, sem chave).
 - [ ] Testes HTTP + E2E (se a S12 já estiver no `develop`).
 
 ## Decisões
-- **P-11 (pendente, padrão "sem e-mail"):** serviço de e-mail para recuperação de senha.
+- **P-11 (reaberta):** recuperação por e-mail depois; avaliar serviços sem custo antes. **D-S14-1:** convites de uso único.
 - Já resolvidas: D-15, D-16, D-S04-n (validação, rate limit, Google, conta demo).
 
 ## Critério de pronto
-Usuário troca senha e exclui conta pela interface; cadastro exige convite quando configurado; "sair de todos os aparelhos" invalida tokens antigos; dono consegue redefinir a senha de um amigo; testes verdes.
+Usuário troca senha e exclui conta pela interface; cadastro exige convite quando configurado; "sair de todos os aparelhos" invalida tokens antigos; botão "Perdi a senha" visível com aviso "em breve"; testes verdes.
 
 ## Fora de escopo
 Verificação de e-mail obrigatória; papéis/admin além do script do dono.

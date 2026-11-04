@@ -184,7 +184,9 @@ Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). N
 
 ### Pendentes da rodada 2
 
-- **P-11 · S14 · Recuperação de senha:** padrão sem serviço de e-mail (script do dono para redefinir a senha de um amigo); e-mail só se o Gabriel pedir.
+- **P-11 · S14 · Recuperação de senha (REABERTA em 2026-11-04):** o Gabriel quer o fluxo clássico "Perdi a senha" → código por e-mail → nova senha. Como e-mail exige serviço externo, na S14 o botão fica só como enfeite ("em breve", sem enviar nada, sem script do dono). As opções de serviço de e-mail serão avaliadas depois; nada pago nem chave sem aprovação dele.
+- **D-S14-2 · 2026-11-04 · "Sair de todos os aparelhos" usa `tokenVersion`** (contador na conta + campo `tv` no JWT), não `passwordChangedAt`: o token só guarda segundos e um token emitido no mesmo segundo do carimbo continuaria valendo. Token sem `tv` = versão 0.
+- **D-S14-1 · 2026-11-04 · Convites:** `INVITE_CODES` no `.env` (lista), cada código vale uma única vez; usados ficam em `server/storage` (fora do git); sem a variável, cadastro livre (uso local). `.env.example` só com a variável vazia.
 
 ### Decisões da S13 (AniList e qualidade do catálogo)
 

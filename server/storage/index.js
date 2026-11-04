@@ -3,7 +3,7 @@
 // Os modelos continuam pedindo "leia/grave este arquivo" (mesma interface do jsonStore); o adaptador decide onde isso vive:
 //   STORAGE=json    (padrão)  arquivos JSON em server/data, como sempre (jsonStore).
 //   STORAGE=sqlite            um único arquivo `showvault.sqlite` dentro da pasta de dados (SHOWVAULT_DATA_DIR), pronto para volume persistente.
-// Só três tipos de documento vão para o SQLite: users.json, libraries/usr_*.json e mediaCatalog.runtime.json.
+// Só estes tipos de documento vão para o SQLite: users.json, invites.json, libraries/usr_*.json e mediaCatalog.runtime.json.
 // Qualquer outro caminho (seed do catálogo, users.example.json, jwt.secret...) continua sendo arquivo normal.
 // Chaves no SQLite = caminho relativo à pasta de dados ("users.json", "libraries/usr_x.json", "mediaCatalog.runtime.json").
 
@@ -13,7 +13,7 @@ const { SqliteStore } = require('./sqliteStore');
 
 const DB_FILE_NAME = 'showvault.sqlite';
 const LIBRARY_FILE_RE = /^usr_[A-Za-z0-9_]+\.json$/;
-const TOP_LEVEL_DOCS = new Set(['users.json', 'mediaCatalog.runtime.json']);
+const TOP_LEVEL_DOCS = new Set(['users.json', 'mediaCatalog.runtime.json', 'invites.json']); // invites.json (S14): códigos de convite já usados
 
 // Que documento é este arquivo? { dataDir, key } se vai para o banco, null se continua sendo arquivo comum.
 function locate(file) {

@@ -6,7 +6,7 @@
 progresso episódio por episódio, tempo total assistido, diário de anotações e explorar títulos novos.
 
 - Repositório: https://github.com/GabrixZero/Anime-Tracker (público)
-- Pasta local: `C:\Users\Gabri\OneDrive\Documentos\Antigravity Projeto` (dentro do OneDrive; pode causar lock/conflito em escrita de arquivos)
+- Pasta local: `C:\Users\Gabri\Documents\Projetos\ShowVault` (fora do OneDrive desde 04/11/2026; os backups do banco continuam dentro do OneDrive, de propósito)
 - Stack: Node 26+ (`engines`, `.nvmrc`; D-S10-1) + Express 5 (backend REST) + HTML/CSS/JS vanilla no frontend (sem build, sem framework, sem Tailwind).
 - Dependências: `express`, `cors`, `jsonwebtoken`, `helmet`, `compression`, `express-rate-limit`, `google-auth-library`. Testes rápidos: `node --test` (`npm test`). Testes ponta a ponta (devDependencies, S12): `@playwright/test` + `@axe-core/playwright` (`npm run test:e2e`). Ferramentas (devDependencies, S10): `eslint`, `prettier`. Persistência opcional em SQLite com o módulo embutido `node:sqlite` (sem pacote extra).
 - Idioma da interface e do código de domínio: português (pt-BR).
@@ -84,7 +84,7 @@ Nunca apague um `.corrupt-*` sem olhar: é a única cópia do arquivo que quebro
 
 ## Modo PC (S11, D-29) — o app no PC do Gabriel, publicado pelo Tailscale Funnel
 
-**Pastas:** código na pasta do projeto (no OneDrive) · `.env` ao lado do código (ignorado pelo git; guarda o `JWT_SECRET`) · **dados ao vivo em `%LOCALAPPDATA%\ShowVault\data`** (fora do OneDrive: ele pode travar/corromper um SQLite em uso e os `-wal`/`-shm`) ·
+**Pastas:** código na pasta do projeto (fora do OneDrive) · `.env` ao lado do código (ignorado pelo git; guarda o `JWT_SECRET`) · **dados ao vivo em `%LOCALAPPDATA%\ShowVault\data`** (fora do OneDrive: ele pode travar/corromper um SQLite em uso e os `-wal`/`-shm`) ·
 **backups em `<OneDrive>\Documentos\ShowVault-Backups`** (arquivos fechados, a cópia fora da máquina) · logs em `%LOCALAPPDATA%\ShowVault\logs` (`showvault.log`, `supervisor.log`, `backup.log`; gira aos 5 MB).
 
 **Configuração (`npm run setup:pc` completa o `.env`, sem nunca sobrescrever o que existe):** `NODE_ENV=production`, `JWT_SECRET` (gerado, nunca impresso), `STORAGE=sqlite`, `SHOWVAULT_DATA_DIR`, `SHOWVAULT_BACKUP_DIR`, `PORT=3000`, `HOST=127.0.0.1`, `TRUST_PROXY=1`. `HOST` vazio em produção = `127.0.0.1` (só este computador: o Funnel conecta localmente e nada fica exposto na rede local; sem a pergunta do firewall do Windows); em Docker, `HOST=0.0.0.0`.
