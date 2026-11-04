@@ -6,7 +6,7 @@ Decisões *pendentes* devem ser levadas ao Gabriel (pergunte; ofereça uma recom
 ## Regras vigentes (resumo — leia isto; o resto do arquivo é histórico)
 
 - **Segredos:** nunca commitar `users.json`, `libraries/`, `.env`, `jwt.secret`, `*.sqlite`, catálogo de runtime; nada de e-mails/senhas/tokens reais em código, testes ou docs (D-01).
-- **Fluxo:** uma seção por vez em `feature/sNN-<slug>` a partir de `origin/develop`; termina com testes + docs + `status/SNN.json`; integração `feature → develop → main` sem force push (D-07, D-23).
+- **Fluxo:** uma seção por vez em `feature/sNN-<slug>` a partir de `origin/develop`; termina com testes + docs + `status/SNN.json`; integração `feature → develop` por PR após aprovação do Gabriel, e `develop → main` **só pelo Gabriel**, sem force push (D-07, D-23, D-31).
 - **Economia (D-30):** subagentes de execução em Sonnet, um por vez; leitura mínima; verificação por testes/CI/E2E, navegador só para mudança visual.
 - **Auth:** JWT HS256 (`sub` = id), `requireAuth`/`requireActiveUser`, validação centralizada, rate limit, mensagens neutras; Google só com `GOOGLE_CLIENT_ID` (D-02, D-S04-n, D-27).
 - **Dados:** sempre pelo adaptador `server/storage` (JSON padrão; `STORAGE=sqlite`); escrita atômica; leitura corrompida nunca vira "vazio" (D-S02-n, D-S10-n).
@@ -178,6 +178,9 @@ Todas as pendências P-01 a P-09 foram resolvidas em 2026-10-26 (D-11 a D-21). N
   subagentes de execução com `model: "sonnet"`; Opus só na sessão principal para planejar/revisar; buscas com o agente Explore; **uma seção por vez** (no máximo duas sem arquivos em comum);
   leitura mínima (`CLAUDE.md` + "Regras vigentes" + arquivo da seção); verificação por testes/CI/E2E, navegador só para mudanças visuais; sessão principal nova a cada rodada.
   Regras gerais de economia no `~/.claude/CLAUDE.md` do Gabriel (vale para todos os projetos). Subagente interrompido em Opus → continuar com um novo em Sonnet na mesma worktree.
+
+- **D-31 · 2026-11-04 · Fluxo de Git até a `develop` (altera D-07 e D-23):** a sessão **não** leva mais a seção até o `main`. Ao final: testes + checagem de segurança, mostrar o resumo ao Gabriel e **esperar aprovação**; com o "sim", push da branch, PR para `develop` e merge na `develop`, e avisar o Gabriel. O merge `develop → main` é feito **só por ele**.
+  Motivo: o Gabriel quer controlar o que chega à `main`. Detalhes no `03-protocolo-de-sessao.md`; vale para todos os projetos pela skill pessoal `git-fluxo`.
 
 ### Pendentes da rodada 2
 
