@@ -196,7 +196,7 @@ class DetailModalView {
       movieBody.innerHTML = `
         <div class="movie-actions-box">
           <div>
-            <h4>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h4>
+            <h3>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h3>
             <p>${
               window.MediaDisplay.knownRuntime(media.runtime)
                 ? `Duração: ${escapeHtml(window.MediaDisplay.knownRuntime(media.runtime))} minutos, contados nas estatísticas ao marcar.`

@@ -819,7 +819,7 @@
   border-radius: var(--radius-sm);
 }
 
-.movie-actions-box h4 {
+.movie-actions-box h3 {
   color: #ffffff;
   font-size: 1.05rem;
   margin-bottom: 0.25rem;

@@ -369,14 +369,14 @@ class AppState {
   // ----- episódios e notas -----
   isWatched(showId, seasonNum, epNum) {
     const show = this.getMedia(showId);
-    const key = show && show.type === 'movie' ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+    const key = window.ViewKit.makeKey(showId, seasonNum, epNum, !!(show && show.type === 'movie'));
     return !!(this.data.watchedEpisodes[key] && this.data.watchedEpisodes[key].watched);
   }
 
   toggleWatched(showId, seasonNum, epNum) {
     const show = this.getMedia(showId);
     const isMovie = show && show.type === 'movie';
-    const key = isMovie ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+    const key = window.ViewKit.makeKey(showId, seasonNum, epNum, !!isMovie);
 
     const current = this.data.watchedEpisodes[key];
     const isNowWatched = !current || !current.watched;
@@ -408,7 +408,7 @@ class AppState {
     if (!season) return;
 
     season.episodes.forEach(ep => {
-      const key = `${showId}_s${seasonNum}_e${ep.episode_number}`;
+      const key = window.ViewKit.makeKey(showId, seasonNum, ep.episode_number);
       const current = this.data.watchedEpisodes[key];
       if (shouldWatch) {
         const at = this.stampFor('watched', key, current && current.updatedAt);
@@ -433,7 +433,7 @@ class AppState {
   // Chave da anotação: "<id>_movie" para filme, "<id>_s<T>_e<E>" para episódio.
   noteKey(showId, seasonNum, epNum) {
     const show = this.getMedia(showId);
-    return show && show.type === 'movie' ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+    return window.ViewKit.makeKey(showId, seasonNum, epNum, !!(show && show.type === 'movie'));
   }
 
   // ----- anotações e histórico de versões (S08, D-19) -----

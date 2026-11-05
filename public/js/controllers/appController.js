@@ -205,6 +205,8 @@ class AppController {
 
   // S08 (D-22): "Carregar exemplo" no estado vazio. Só põe obras do catálogo na lista (Quero ver), sem progresso nem notas.
   async loadExample() {
+    const emptyBtn = document.querySelector('#next-up-empty [data-action="load-example"]');
+    const hadFocus = !!emptyBtn && document.activeElement === emptyBtn;
     // as obras de exemplo precisam do catálogo em memória: busca o detalhe delas em lote (a lista não traz mais o catálogo inteiro)
     await this.ensureDetails(window.appState.constructor.EXAMPLE_SHOW_IDS || []);
     const { added, missing } = window.appState.loadExample();
@@ -219,6 +221,14 @@ class AppController {
       this.showToast('Os títulos de exemplo já estão na sua lista.', 'info');
     }
     this.refreshAll();
+    // S19: o botão "Carregar exemplo" some junto com o estado vazio; o foco vai para a fila (ou o título da tela), nunca para o <body>
+    if (hadFocus) {
+      const target = document.querySelector('#next-up-container button') || document.querySelector('#view-next-up h2');
+      if (target) {
+        if (target.tagName !== 'BUTTON') target.setAttribute('tabindex', '-1');
+        target.focus();
+      }
+    }
   }
 
   // S13: "Remover exemplo" em 1 clique — tira só as obras do exemplo que continuam intocadas (as que você já usou ficam).
@@ -426,7 +436,9 @@ class AppController {
     const text = document.createElement('span');
     text.textContent = String(message);
     toast.append(icon, text);
+    toast.addEventListener('click', () => toast.remove()); // S19: um toque fecha o aviso
     container.appendChild(toast);
+    const narrow = !!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
     setTimeout(
       () => {
         toast.style.opacity = '0';
@@ -434,7 +446,7 @@ class AppController {
         toast.style.transition = 'all 0.25s ease';
         setTimeout(() => toast.remove(), 250);
       },
-      type === 'error' ? 7000 : 4500
+      type === 'error' ? (narrow ? 5000 : 7000) : narrow ? 2800 : 4500
     ); // um pouco mais de tempo para ler (acessibilidade)
   }
 }

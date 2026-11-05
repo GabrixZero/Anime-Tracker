@@ -2,9 +2,9 @@
   "secao": "S19",
   "titulo": "Acessibilidade real e polimento",
   "arquivo": "Documentacao/secoes/S19-polimento-final.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s19-polimento-final",
+  "concluidaEm": "2026-11-04",
   "commit": "",
-  "notas": ""
+  "notas": "Prettier no repo todo, chave id_sN_eM unificada, foco/toast/e-mail, axe com conta, seed sem dados inventados. Pendentes: modulos ES, excluir conta Google, Lighthouse/NVDA, Jikan real (host inacessivel desta rede)."
 }

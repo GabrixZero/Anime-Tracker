@@ -316,7 +316,7 @@
       }
       const list = e.isMovie ? [{ season: null, episode: null, at: e.movieAt || '' }] : e.episodes;
       for (const ep of list) {
-        const key = e.isMovie ? `${e.showId}_movie` : `${e.showId}_s${ep.season}_e${ep.episode}`;
+        const key = (isNode ? require('./viewKit') : root.ViewKit).makeKey(e.showId, ep.season, ep.episode, e.isMovie);
         if (out.watchedEpisodes[key] && out.watchedEpisodes[key].watched) {
           report.episodesExisting++;
           continue;

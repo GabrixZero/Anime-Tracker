@@ -283,10 +283,7 @@
           {
             "episode_number": 1,
             "name": "Crueldade",
-            "runtime": 24,
-            "air_date": "2019-04-06",
-            "overview": "O destino trágico da família Kamado.",
-            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/538/1347450.jpg"
+            "air_date": "2019-04-06"
           }
         ]
       }
@@ -321,10 +318,7 @@
           {
             "episode_number": 1,
             "name": "Ryomen Sukuna",
-            "runtime": 24,
-            "air_date": "2020-10-03",
-            "overview": "Itadori desperta poderes ao ingerir o talismã.",
-            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/542/1355130.jpg"
+            "air_date": "2020-10-03"
           }
         ]
       }
@@ -396,10 +390,7 @@
           {
             "episode_number": 1,
             "name": "Renascimento",
-            "runtime": 23,
-            "air_date": "2006-10-04",
-            "overview": "Light Yagami encontra o Death Note do shinigami Ryuk.",
-            "still_path": "https://static.tvmaze.com/uploads/images/medium_landscape/535/1338363.jpg"
+            "air_date": "2006-10-04"
           }
         ]
       }

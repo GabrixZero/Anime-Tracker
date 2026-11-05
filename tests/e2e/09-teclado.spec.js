@@ -84,12 +84,8 @@ test.describe('teclado', () => {
     expect(await page.evaluate(() => document.querySelector('#main-content').hasAttribute('inert'))).toBe(false);
   });
 
-  // BUG REAL ENCONTRADO (S12, não corrigido aqui: a S12 não mexe no app; ver o diário): ao apertar Enter em "Carregar exemplo" no estado
-  // vazio de "A Seguir", o botão some (a fila ocupa o lugar) e o foco cai no <body> — quem usa teclado ou leitor de tela perde o lugar.
-  // O `wrapRender` do a11y.js só guarda o foco que está DENTRO de #next-up-container; o botão estava em #next-up-empty. O "Remover
-  // exemplo" já trata isso (appController.removeExample manda o foco para o título da tela); o "Carregar exemplo" não.
-  // Quando for corrigido, tire o `fixme` (o teste já descreve o comportamento esperado: o foco fica em algum elemento da tela).
-  test.fixme('BUG: depois de "Carregar exemplo" pelo teclado o foco não pode cair no <body>', async ({ page }) => {
+  // (S19) Corrigido: depois de "Carregar exemplo" o foco vai para a fila de A Seguir.
+  test('depois de "Carregar exemplo" pelo teclado o foco não pode cair no <body>', async ({ page }) => {
     await openApp(page);
     await tabTo(page, '#next-up-empty [data-action="load-example"]');
     await page.keyboard.press('Enter');

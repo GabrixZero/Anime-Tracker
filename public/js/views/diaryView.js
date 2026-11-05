@@ -145,7 +145,7 @@ class DiaryView {
               ${e.emotion ? `<span class="diary-emotion">${escapeHtml(window.Emotions.withIcon(e.emotion))}</span>` : ''}
             </div>
 
-            <h4 class="diary-title">${escapeHtml(e.epTitle)}</h4>
+            <h3 class="diary-title">${escapeHtml(e.epTitle)}</h3>
 
             ${e.character ? `<div class="diary-highlight">Destaque: ${escapeHtml(e.character)}</div>` : ''}
 

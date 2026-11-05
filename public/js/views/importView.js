@@ -425,7 +425,7 @@ class ImportView {
   watchedCount(showId, season, total) {
     let n = 0;
     for (const ep of season.episodes || []) {
-      const w = window.appState.data.watchedEpisodes[`${showId}_s${season.season_number}_e${ep.episode_number}`];
+      const w = window.appState.data.watchedEpisodes[window.ViewKit.makeKey(showId, season.season_number, ep.episode_number)];
       if (w && w.watched) n++;
     }
     return Math.min(n, total);

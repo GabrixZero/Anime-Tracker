@@ -68,7 +68,15 @@ class AccountView {
     this.user = user;
     const isGoogle = user.provider === 'google';
     document.getElementById('account-name').textContent = user.name || '';
-    document.getElementById('account-email').textContent = user.email || '';
+    // e-mail longo quebra depois de @ e de pontos (<wbr>), não no meio de uma palavra; textContent mantém o escape
+    const emailEl = document.getElementById('account-email');
+    emailEl.replaceChildren();
+    String(user.email || '')
+      .split(/(?=[@.])/)
+      .forEach((part, i) => {
+        if (i > 0) emailEl.appendChild(document.createElement('wbr'));
+        emailEl.appendChild(document.createTextNode(part));
+      });
     document.getElementById('account-provider').textContent = isGoogle ? 'Google' : 'E-mail e senha';
     const created = user.createdAt ? new Date(user.createdAt) : null;
     document.getElementById('account-created').textContent =
