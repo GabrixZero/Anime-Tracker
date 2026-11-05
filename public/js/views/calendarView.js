@@ -211,7 +211,9 @@ class CalendarView {
   renderItem(item) {
     const id = toInt(item.showId);
     const isMovie = item.type === 'movie';
-    const code = isMovie ? 'FILME' : `T${toInt(item.seasonNumber)}:E${toInt(item.episodeNumber)}`;
+    // Extra de anime (filme/OVA dentro da obra): rótulo no lugar de "T:E", mas a marcação grava id_sN_eM como qualquer episódio.
+    const extraLabel = item.extra ? (item.extraKind === 'movie' ? 'FILME' : 'OVA/ESPECIAL') : '';
+    const code = isMovie ? 'FILME' : extraLabel || `T${toInt(item.seasonNumber)}:E${toInt(item.episodeNumber)}`;
     const epAttrs = isMovie ? '' : ` data-season="${toInt(item.seasonNumber)}" data-episode="${toInt(item.episodeNumber)}"`;
     const key = isMovie ? `${id}-m` : `${id}-${toInt(item.seasonNumber)}-${toInt(item.episodeNumber)}`;
     const title = item.title || (isMovie ? 'Filme' : `Episódio ${toInt(item.episodeNumber)}`);

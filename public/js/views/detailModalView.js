@@ -145,7 +145,7 @@ class DetailModalView {
         this.mode === 'full' &&
         keepSeason !== this.currentSeasonNum &&
         Array.isArray(media.seasons) &&
-        media.seasons.some(s => s.season_number === keepSeason)
+        window.WatchStatus.mainSeasons(media).some(s => s.season_number === keepSeason)
       )
         this.switchSeason(keepSeason);
     } else if (window.appState.hasEpisodes(showId)) {
@@ -159,6 +159,7 @@ class DetailModalView {
     document.getElementById('show-seasons-tabs').innerHTML = '';
     document.getElementById('season-stats-summary').innerHTML = '';
     document.getElementById('show-episodes-container').innerHTML = `<p class="muted" role="status">${escapeHtml(message)}</p>`;
+    document.getElementById('show-extras-container').innerHTML = '';
   }
 
   // Ajusta o HTML fixo do quadro ao modo (abas, resumo e botões de temporada só existem no completo) e, ao trocar de modo,
@@ -185,6 +186,7 @@ class DetailModalView {
       document.getElementById('season-stats-summary').innerHTML = '';
       container.innerHTML = '';
       document.getElementById('movie-detail-body').innerHTML = '';
+      document.getElementById('show-extras-container').innerHTML = '';
     }
   }
 
@@ -274,10 +276,12 @@ class DetailModalView {
         );
       } else {
         if (!explore) {
-          this.currentSeasonNum = media.seasons.length > 0 ? media.seasons[0].season_number : 1;
+          const main = window.WatchStatus.mainSeasons(media);
+          this.currentSeasonNum = main.length > 0 ? main[0].season_number : 1;
           this.renderSeasonTabs();
         }
         this.renderEpisodes();
+        this.renderExtras(media);
       }
     }
 
@@ -355,8 +359,9 @@ class DetailModalView {
       container.innerHTML = `<p class="muted">Nenhum episódio cadastrado.</p>`;
       return;
     }
-    container.innerHTML = media.seasons.map((season, i) => this.seasonHtml(season, i === 0)).join('');
-    this.observeMore(media.seasons[0].season_number);
+    const main = window.WatchStatus.mainSeasons(media);
+    container.innerHTML = main.map((season, i) => this.seasonHtml(season, i === 0)).join('');
+    this.observeMore(main[0].season_number);
   }
 
   seasonTitle(season) {
@@ -474,7 +479,7 @@ class DetailModalView {
     if (!media || !media.seasons) return;
 
     const bar = document.getElementById('show-seasons-tabs');
-    bar.innerHTML = media.seasons
+    bar.innerHTML = window.WatchStatus.mainSeasons(media)
       .map(s => {
         return `
         <button type="button" class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" id="season-tab-${toInt(s.season_number)}" data-focus-key="season:${toInt(s.season_number)}:tab" role="tab" aria-selected="${s.season_number === this.currentSeasonNum}" tabindex="${s.season_number === this.currentSeasonNum ? 0 : -1}" aria-controls="show-episodes-container"
@@ -502,6 +507,7 @@ class DetailModalView {
     if (this.mode !== 'full') return;
     const media = window.appState.getMedia(this.currentShowId);
     if (!media || !Array.isArray(media.seasons)) return;
+    this.syncExtras();
     if (Number(seasonNum) === this.currentSeasonNum) {
       const row = document.getElementById('show-episodes-container').querySelector(`[data-ep="${toInt(epNum)}"]`);
       if (row) this.paintRow(row, window.appState.isWatched(media.id, seasonNum, epNum));
@@ -514,6 +520,7 @@ class DetailModalView {
     if (this.mode !== 'full') return;
     const media = window.appState.getMedia(this.currentShowId);
     if (!media || !Array.isArray(media.seasons)) return;
+    this.syncExtras();
     const rows = document.getElementById('show-episodes-container').querySelectorAll('[data-ep]');
     rows.forEach(row =>
       this.paintRow(row, window.appState.isWatched(media.id, this.currentSeasonNum, Number(row.getAttribute('data-ep'))))
@@ -650,6 +657,71 @@ class DetailModalView {
       .join('');
   }
   // ===== fim do modo completo =====
+
+  // Animes: filmes e OVAs/especiais ficam fora das abas, em seções próprias abaixo (só quando a obra tem temporada normal;
+  // obra só de extras mantém a lista normal). Modo completo: caixa de assistido por item (sem cascata); Explorar: só texto.
+  renderExtras(media) {
+    const box = document.getElementById('show-extras-container');
+    const seasons = Array.isArray(media.seasons) ? media.seasons : [];
+    const WS = window.WatchStatus;
+    if (!seasons.some(s => !WS.isExtraSeason(s))) {
+      box.innerHTML = '';
+      return;
+    }
+    const section = (category, title) => {
+      const items = seasons.filter(s => WS.seasonCategory(s) === category);
+      if (items.length === 0) return '';
+      return `<section class="extras-section" aria-labelledby="extras-title-${category}"><h3 class="extras-title" id="extras-title-${category}">${title}</h3><ul class="extras-list">${items.map(s => this.extraItemHtml(media, s)).join('')}</ul></section>`;
+    };
+    box.innerHTML = section('movie', 'Filmes') + section('special', 'OVAs e especiais');
+  }
+
+  extraTitle(season) {
+    const ep = (season.episodes || [])[0];
+    if (ep && ep.name) return ep.name;
+    const name = String(season.name || '').replace(/^[^:]{1,20}:\s*/, '');
+    return name || `Temporada ${season.season_number}`;
+  }
+
+  // Data no formato dd/mm/aaaa (como no Explorar); sem data válida => "Sem data".
+  extraDate(season) {
+    const ep = (season.episodes || [])[0];
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String((ep && ep.air_date) || season.air_date || ''));
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : 'Sem data';
+  }
+
+  extraItemHtml(media, season) {
+    const ep = (season.episodes || [])[0];
+    const title = this.extraTitle(season);
+    const date = `<span class="extra-date">${escapeHtml(this.extraDate(season))}</span>`;
+    const text = `<span class="extra-title">${escapeHtml(title)}</span>`;
+    if (this.mode === 'explore' || !ep) return `<li class="extra-item">${text} · ${date}</li>`;
+    const sn = toInt(season.season_number);
+    const en = toInt(ep.episode_number);
+    const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
+    return `<li class="extra-item${isWatched ? ' watched' : ''}" data-extra-season="${sn}" data-extra-ep="${en}">
+          <button type="button" class="episode-check" role="checkbox" aria-checked="${isWatched}" data-focus-key="extra:${sn}:${en}:check" aria-label="Assistido: ${escapeHtml(title)}" data-action="quick-check" data-show="${toInt(media.id)}" data-season="${sn}" data-episode="${en}">
+            <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
+          </button>
+          ${text} · ${date}
+        </li>`;
+  }
+
+  // Repinta as caixas dos extras (marcou/desmarcou algo com o modal aberto).
+  syncExtras() {
+    if (this.mode !== 'full') return;
+    const media = window.appState.getMedia(this.currentShowId);
+    const box = document.getElementById('show-extras-container');
+    if (!media || !box || !box.querySelectorAll) return;
+    box
+      .querySelectorAll('[data-extra-season]')
+      .forEach(row =>
+        this.paintRow(
+          row,
+          window.appState.isWatched(media.id, Number(row.getAttribute('data-extra-season')), Number(row.getAttribute('data-extra-ep')))
+        )
+      );
+  }
 
   openNote(showId, seasonNum = null, epNum = null) {
     const media = window.appState.getMedia(showId);

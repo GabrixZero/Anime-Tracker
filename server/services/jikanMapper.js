@@ -2,6 +2,7 @@
 // Regra da S06: o que a fonte não traz fica NULO/vazio (nada de nota 8.0, gênero "Drama" ou foto de banco de imagens inventados).
 const { stripHtml, stripHtmlList, safeHttpUrl } = require('../utils/sanitize');
 const { toInternalId } = require('../utils/ids');
+const { categoryOf, reclassifyWork } = require('./animeSeasons');
 
 const STATUS_PT = {
   'Finished Airing': 'Finalizada',
@@ -150,7 +151,7 @@ function buildAnimeWork(numId, requestedMalId, franchise) {
   for (const full of ordered) {
     const eps = episodesFor(full, franchise.episodes.get(full.mal_id));
     if (eps.length === 0) continue; // ainda sem episódios (anunciada/sem dados): fica de fora
-    const isTv = full.type === 'TV' || full.type === 'ONA';
+    const isTv = categoryOf(full.type, eps.length) === 'season'; // ONA de 1 episódio e 'TV Special' são extras
     const title = stripHtml(full.title_english || full.title, 300);
     let name;
     if (isTv) {
@@ -172,7 +173,7 @@ function buildAnimeWork(numId, requestedMalId, franchise) {
   const alt = [];
   for (const full of kept) for (const t of altTitles(full, [base.name])) if (!alt.includes(t) && alt.length < 40) alt.push(t);
 
-  return {
+  return reclassifyWork({
     ...base,
     id: numId,
     mal_id: requestedMalId,
@@ -181,7 +182,7 @@ function buildAnimeWork(numId, requestedMalId, franchise) {
     status: airing ? 'Em Exibição' : kept.length && kept.every(f => f.status === 'Finished Airing') ? 'Finalizada' : base.status,
     seasons,
     franchise: { entries, truncated: Boolean(franchise.truncated) }
-  };
+  });
 }
 
 module.exports = { mapAnimeBase, mapAnimeSearchEntry, buildAnimeWork, parseDurationMin, cleanSynopsis, seasonLabel, KEPT_TYPES, STATUS_PT };
