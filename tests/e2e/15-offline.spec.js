@@ -2,7 +2,7 @@
 'use strict';
 
 const { test, expect } = require('./support/fixtures');
-const { openApp, loadExample } = require('./support/helpers');
+const { openApp, seedLibrary } = require('./support/helpers');
 
 // o resto da suíte bloqueia service workers (playwright.config.js); este arquivo precisa deles
 test.use({ serviceWorkers: 'allow' });
@@ -11,7 +11,7 @@ test.describe('modo offline', () => {
   test('registra o service worker e a lista continua aparecendo sem internet', async ({ page, context, guard }) => {
     await openApp(page);
     await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
-    await loadExample(page);
+    await seedLibrary(page);
     // espera o service worker assumir o controle da página
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;

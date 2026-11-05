@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const { test, expect } = require('./support/fixtures');
-const { openApp, gotoTab, toast, loadExample, queueCard, listCard, tap } = require('./support/helpers');
+const { openApp, gotoTab, toast, seedLibrary, queueCard, listCard, tap } = require('./support/helpers');
 
 const backupModal = page => page.locator('#modal-backup');
 
@@ -16,7 +16,7 @@ async function openBackup(page) {
 test.describe('backup', () => {
   test.beforeEach(async ({ page }) => {
     await openApp(page);
-    await loadExample(page);
+    await seedLibrary(page);
     // progresso: 2 episódios de Breaking Bad + uma anotação no primeiro
     const check = queueCard(page, 'Breaking Bad').getByRole('button', { name: /^Marcar como assistido: Breaking Bad/ });
     await tap(check);

@@ -9,7 +9,7 @@ const {
   openApp,
   gotoTab,
   toast,
-  loadExample,
+  seedLibrary,
   queueCard,
   listCard,
   newUser,
@@ -126,10 +126,10 @@ test.describe('contas', () => {
     const beto = newUser(testInfo, 'beto');
     await openApp(page);
 
-    // Ana cadastra, carrega o exemplo e assiste ao 1º episódio de Breaking Bad
+    // Ana cadastra, semeia a biblioteca e assiste ao 1º episódio de Breaking Bad
     await registerViaUi(page, ana);
     await gotoTab(page, 'next-up');
-    await loadExample(page);
+    await seedLibrary(page);
     await tap(queueCard(page, 'Breaking Bad').getByRole('button', { name: /^Marcar como assistido: Breaking Bad/ }));
     await expect(toast(page, 'Marcado como assistido!')).toBeVisible();
     await expect.poll(async () => Object.keys((await serverLibrary(page)).watchedEpisodes)).toEqual(['1396_s1_e1']); // já está na nuvem

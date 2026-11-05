@@ -78,19 +78,6 @@ class WatchlistView {
     });
   }
 
-  // S13: faixa "Remover exemplo" — aparece enquanto houver obras do exemplo (Carregar exemplo) ainda sem uso na lista.
-  updateExampleBar() {
-    const bar = document.getElementById('watchlist-example-bar');
-    const state = window.appState;
-    if (!bar || !state || !state.data) return;
-    const { removable } = state.exampleStatus();
-    bar.classList.toggle('hidden', removable.length === 0);
-    const text = document.getElementById('watchlist-example-text');
-    if (text && removable.length > 0) {
-      text.textContent = `Você tem ${removable.length} ${removable.length === 1 ? 'título' : 'títulos'} do exemplo ainda sem uso na lista. Dá para tirar tudo de uma vez; o que você já marcou ou anotou fica.`;
-    }
-  }
-
   // Só o número da aba (barato): usado quando a aba está oculta e não será redesenhada.
   refreshBadge() {
     const state = window.appState;
@@ -112,24 +99,21 @@ class WatchlistView {
     if (!state || !state.data) return;
     const trackedList = state.data.trackedShows || [];
     this.updateCounts();
-    this.updateExampleBar();
 
     const filtered = trackedList.filter(t => this.matchesFilters(t));
 
     if (filtered.length === 0) {
       if (this.container) this.container.innerHTML = '';
       if (this.emptyState) this.emptyState.classList.remove('hidden');
-      // S08: lista realmente vazia = chamada para explorar + "Carregar exemplo"; com obras mas sem resultado no filtro = aviso do filtro
+      // S08: lista realmente vazia = chamada para explorar; com obras mas sem resultado no filtro = aviso do filtro
       const noItems = trackedList.length === 0;
       const title = document.getElementById('watchlist-empty-title');
       const text = document.getElementById('watchlist-empty-text');
-      const exampleBtn = document.getElementById('btn-watchlist-example');
       if (title) title.textContent = noItems ? 'Sua lista está vazia' : 'Nenhuma obra neste filtro';
       if (text)
         text.textContent = noItems
-          ? 'Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.'
+          ? 'Explore o catálogo e adicione títulos para registrar seu progresso e suas notas.'
           : 'Troque o filtro de status ou de categoria para ver as outras obras da sua lista.';
-      if (exampleBtn) exampleBtn.classList.toggle('hidden', !noItems);
       return;
     }
 
@@ -148,7 +132,6 @@ class WatchlistView {
     const card = this.container ? this.container.querySelector(`[data-show-id="${id}"]`) : null;
     if (!tracked || !card || !this.matchesFilters(tracked)) return this.render();
     this.updateCounts();
-    this.updateExampleBar();
     card.outerHTML = this.renderCard(tracked);
   }
 

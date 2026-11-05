@@ -293,6 +293,15 @@
               <h2>Minha Lista</h2>
               <p>Seu cofre pessoal de séries, filmes e animes com progresso detalhado.</p>
             </div>
+          </div>
+
+          <div class="watchlist-filters-row">
+            <div class="type-filter-row" role="group" aria-label="Filtrar a lista por tipo">
+              <button type="button" class="type-pill-btn active" data-cat="all" aria-pressed="true">Todos</button>
+              <button type="button" class="type-pill-btn" data-cat="tv" aria-pressed="false">Séries</button>
+              <button type="button" class="type-pill-btn" data-cat="anime" aria-pressed="false">Animes</button>
+              <button type="button" class="type-pill-btn" data-cat="movie" aria-pressed="false">Filmes</button>
+            </div>
 
             <div class="filter-pills" id="watchlist-filters" role="group" aria-label="Filtrar a lista por status">
               <button type="button" class="pill-btn active" data-filter="all" aria-pressed="true">
@@ -308,26 +317,6 @@
                 Quero Ver (<span id="count-plan">0</span>)
               </button>
             </div>
-          </div>
-
-          <div class="type-filter-row" role="group" aria-label="Filtrar a lista por tipo">
-            <button type="button" class="type-pill-btn active" data-cat="all" aria-pressed="true">Todos</button>
-            <button type="button" class="type-pill-btn" data-cat="tv" aria-pressed="false">Séries</button>
-            <button type="button" class="type-pill-btn" data-cat="anime" aria-pressed="false">Animes</button>
-            <button type="button" class="type-pill-btn" data-cat="movie" aria-pressed="false">Filmes</button>
-          </div>
-
-          <div class="example-bar hidden" id="watchlist-example-bar">
-            <p class="example-bar-text" id="watchlist-example-text"></p>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline"
-              id="btn-remove-example"
-              data-action="remove-example"
-              aria-describedby="watchlist-example-text"
-            >
-              Remover exemplo
-            </button>
           </div>
 
           <div class="shows-grid" id="watchlist-container"></div>
@@ -350,20 +339,10 @@
             </div>
             <h3 class="empty-title" id="watchlist-empty-title">Sua lista está vazia</h3>
             <p class="empty-text" id="watchlist-empty-text">
-              Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns
-              títulos de exemplo.
+              Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar.
             </p>
             <div class="empty-actions">
               <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
-              <button
-                type="button"
-                class="btn btn-outline"
-                id="btn-watchlist-example"
-                data-focus-key="empty:example"
-                data-action="load-example"
-              >
-                Carregar exemplo
-              </button>
             </div>
           </div>
         </section>

@@ -203,61 +203,6 @@ class AppController {
     }
   }
 
-  // S08 (D-22): "Carregar exemplo" no estado vazio. Só põe obras do catálogo na lista (Quero ver), sem progresso nem notas.
-  async loadExample() {
-    const emptyBtn = document.querySelector('#next-up-empty [data-action="load-example"]');
-    const hadFocus = !!emptyBtn && document.activeElement === emptyBtn;
-    // as obras de exemplo precisam do catálogo em memória: busca o detalhe delas em lote (a lista não traz mais o catálogo inteiro)
-    await this.ensureDetails(window.appState.constructor.EXAMPLE_SHOW_IDS || []);
-    const { added, missing } = window.appState.loadExample();
-    if (added.length > 0) {
-      this.showToast(
-        `Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Para tirar tudo de uma vez, use "Remover exemplo" na Minha Lista.`,
-        'success'
-      );
-    } else if (missing > 0) {
-      this.showToast('O catálogo ainda não carregou. Tente de novo em instantes.', 'error');
-    } else {
-      this.showToast('Os títulos de exemplo já estão na sua lista.', 'info');
-    }
-    this.refreshAll();
-    // S19: o botão "Carregar exemplo" some junto com o estado vazio; o foco vai para a fila (ou o título da tela), nunca para o <body>
-    if (hadFocus) {
-      const target = document.querySelector('#next-up-container button') || document.querySelector('#view-next-up h2');
-      if (target) {
-        if (target.tagName !== 'BUTTON') target.setAttribute('tabindex', '-1');
-        target.focus();
-      }
-    }
-  }
-
-  // S13: "Remover exemplo" em 1 clique — tira só as obras do exemplo que continuam intocadas (as que você já usou ficam).
-  removeExample() {
-    const button = document.getElementById('btn-remove-example');
-    const hadFocus = !!button && document.activeElement === button;
-    const { removed, kept } = window.appState.removeExample();
-    if (removed.length > 0) {
-      const plural = removed.length === 1 ? 'título' : 'títulos';
-      this.showToast(
-        `Exemplo removido: ${removed.length} ${plural}.${kept.length ? ' O que você já usou ficou na lista.' : ''}`,
-        'success'
-      );
-    } else if (kept.length > 0) {
-      this.showToast('Os títulos de exemplo que estão na lista já têm progresso ou anotações, então ficaram.', 'info');
-    } else {
-      this.showToast('Não há títulos de exemplo na sua lista.', 'info');
-    }
-    this.refreshAll();
-    // a faixa some junto com o botão: o foco vai para o título da tela, em vez de cair no <body>
-    if (hadFocus) {
-      const heading = document.querySelector('#view-watchlist h2');
-      if (heading) {
-        heading.setAttribute('tabindex', '-1');
-        heading.focus();
-      }
-    }
-  }
-
   removeFromList(showId) {
     window.appState.removeShow(showId); // grava também a marca de exclusão, para a remoção chegar aos outros aparelhos
     this.showToast('Removido da sua lista.');

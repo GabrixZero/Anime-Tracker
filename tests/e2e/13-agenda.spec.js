@@ -5,7 +5,7 @@
 
 const { test, expect } = require('./support/fixtures');
 const { EXPECTED } = require('./fake-sources/data');
-const { openApp, gotoTab, toast, queueCard, newUser, signInWithApi, loadExample, horizontalOverflow, tap } = require('./support/helpers');
+const { openApp, gotoTab, toast, queueCard, newUser, signInWithApi, seedLibrary, horizontalOverflow, tap } = require('./support/helpers');
 
 const { calendar } = EXPECTED;
 
@@ -90,9 +90,9 @@ test.describe('Agenda', () => {
     await expect(page.locator('#calendar-empty')).toContainText('Sua lista está vazia');
     await expect(page.locator('#calendar-counter-pill')).toHaveText('0 episódios');
 
-    // obras do exemplo não têm episódios futuros: o período fica vazio, mas com dica
+    // obras semeadas não têm episódios futuros: o período fica vazio, mas com dica
     await gotoTab(page, 'next-up');
-    await loadExample(page);
+    await seedLibrary(page);
     await gotoTab(page, 'calendar');
     await expect(page.locator('#calendar-empty')).toContainText('Nenhum episódio nesse período');
     await expect(page.locator('#calendar-empty')).toContainText('Tente outro período');

@@ -35,7 +35,7 @@ class AppState {
       console.warn('Erro ao ler estado local:', e);
     }
 
-    // Primeira visita: lista vazia (D-22). Nada de obras, datas ou anotações de enfeite; o usuário explora ou usa "Carregar exemplo".
+    // Primeira visita: lista vazia (D-22). Nada de obras, datas ou anotações de enfeite; o usuário explora o catálogo.
     // `seeded` = estado inicial ainda não editado (nem gravado): ao entrar numa conta, o servidor vence sem mesclar (decideLogin).
     this.seeded = true;
     return window.LibraryMerge.normalizeData(window.LibraryMerge.emptyData());
@@ -504,54 +504,9 @@ class AppState {
   getNote(showId, seasonNum, epNum) {
     return this.data.episodeNotes[this.noteKey(showId, seasonNum, epNum)] || null;
   }
-
-  // ----- exemplo opcional (D-22) -----
-  // "Carregar exemplo": põe algumas obras do catálogo na lista como "Quero ver", SEM episódios assistidos, datas
-  // ou anotações de enfeite. São obras comuns: o usuário remove quando quiser. Só entram as que o catálogo já trouxe.
-  loadExample() {
-    const added = [];
-    let missing = 0;
-    for (const id of AppState.EXAMPLE_SHOW_IDS) {
-      if (this.getTracked(id)) continue;
-      if (!this.getMedia(id)) {
-        missing++;
-        continue;
-      }
-      if (this.addShow(id)) added.push(id);
-    }
-    return { added, missing };
-  }
-
-  // ----- remover o exemplo (S13) -----
-  // Obra do exemplo "intocada" = continua como "Quero ver", sem nenhum episódio marcado (nem filme assistido) e sem anotações.
-  // A chave de episódio/anotação começa com "<id>_" ("12_s1_e3", "12_movie"): o "_" evita confundir o id 12 com o 125.
-  isExampleUntouched(showId) {
-    const id = Number(showId);
-    const tracked = this.getTracked(id);
-    if (!tracked || tracked.status !== 'plan_to_watch') return false;
-    const prefix = `${id}_`;
-    const used = obj => Object.keys(obj || {}).some(key => key.startsWith(prefix));
-    return !used(this.data.watchedEpisodes) && !used(this.data.episodeNotes);
-  }
-
-  // Quais obras do exemplo estão na lista e quais delas dá para tirar sem perder nada do usuário.
-  exampleStatus() {
-    const inList = AppState.EXAMPLE_SHOW_IDS.filter(id => this.getTracked(id));
-    return { inList, removable: inList.filter(id => this.isExampleUntouched(id)) };
-  }
-
-  // "Remover exemplo": tira da lista SÓ as obras do exemplo ainda intocadas (as que o usuário já usou ficam). Grava uma vez só e
-  // deixa a marca de exclusão de cada uma (a remoção chega aos outros aparelhos). Devolve { removed, kept }.
-  removeExample() {
-    const { inList, removable } = this.exampleStatus();
-    removable.forEach(id => this.removeShow(id, { save: false }));
-    if (removable.length > 0) this.save();
-    return { removed: removable, kept: inList.filter(id => !removable.includes(id)) };
-  }
 }
 
 AppState.NOTE_VERSION_GAP_MS = 10 * 60 * 1000; // anotação parada por 10 min = nova sessão de edição
 AppState.MAX_NOTE_VERSIONS = 5; // igual ao limite do servidor e do backup (MAX_SNAPSHOTS)
-AppState.EXAMPLE_SHOW_IDS = [157336, 872585, 1396, 1429]; // Interestelar, Oppenheimer, Breaking Bad, Attack on Titan (seed)
 
 window.appState = new AppState();

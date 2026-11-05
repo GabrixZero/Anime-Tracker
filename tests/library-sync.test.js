@@ -748,14 +748,7 @@ test('importar backup propaga a substituição aos outros aparelhos', async () =
   assert.equal(B.state.getTracked(300).status, 'completed');
 });
 
-// ---------------------------------------------------------------- S08: estado inicial vazio, "Carregar exemplo" e histórico de versões da nota
-
-const EXAMPLE_ITEMS = [
-  { id: 157336, type: 'movie', name: 'Filme de exemplo 1', genres: [], runtime: 120 },
-  { id: 872585, type: 'movie', name: 'Filme de exemplo 2', genres: [] },
-  { id: 1396, type: 'tv', name: 'Série de exemplo', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] },
-  { id: 1429, type: 'anime', name: 'Anime de exemplo', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] }
-];
+// ---------------------------------------------------------------- S08: estado inicial vazio e histórico de versões da nota
 
 test('primeira visita: lista vazia, sem obras/datas/anotações de enfeite e nada gravado até o usuário agir', () => {
   const dev = makeDevice(tmpModel(), { firstVisit: true });
@@ -792,32 +785,6 @@ test('visitante vazio que entra numa conta recebe a nuvem (sem herdar nada) e qu
   guest.state.addShow(300); // visitante que usou o app antes de entrar
   await guest.login('usr_s08a');
   assert.deepEqual(guest.ids(), [100, 300], 'une o que fez como visitante com a conta');
-});
-
-test('"Carregar exemplo": só obras do catálogo, como Quero ver, sem episódios, datas ou anotações; repetir não duplica', () => {
-  const dev = makeDevice(tmpModel(), { firstVisit: true });
-  const state = dev.state;
-
-  const none = state.loadExample(); // catálogo ainda não chegou: nada entra (não cria obra sem dados)
-  assert.deepEqual(plain(none.added), []);
-  assert.equal(none.missing, 4);
-  assert.deepEqual(dev.ids(), []);
-
-  state.cacheMediaList(EXAMPLE_ITEMS);
-  const out = state.loadExample();
-  assert.deepEqual(plain(out.added), [157336, 872585, 1396, 1429]);
-  assert.deepEqual(plain(state.data.trackedShows.map(t => t.status)), ['plan_to_watch', 'plan_to_watch', 'plan_to_watch', 'plan_to_watch']);
-  assert.deepEqual(plain(state.data.watchedEpisodes), {});
-  assert.deepEqual(plain(state.data.episodeNotes), {});
-  assert.equal(state.seeded, false);
-
-  const again = state.loadExample();
-  assert.deepEqual(plain(again.added), []);
-  assert.equal(state.data.trackedShows.length, 4);
-
-  // exemplo é lista comum: remover vale e o resto do exemplo fica
-  state.removeShow(1396);
-  assert.deepEqual(dev.ids(), [1429, 157336, 872585]);
 });
 
 test('histórico de versões: nova sessão de edição guarda a versão anterior; digitar seguido não enche o histórico', () => {

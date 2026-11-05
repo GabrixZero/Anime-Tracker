@@ -1,5 +1,5 @@
 // Testes S08: tabela única de emoções, textos sem dados inventados e rótulos honestos (HTML/JS estáticos).
-// Os testes de estado (primeira visita vazia, "Carregar exemplo", histórico de versões) rodam o frontend real em
+// Os testes de estado (primeira visita vazia, histórico de versões) rodam o frontend real em
 // tests/library-sync.test.js (usam o mesmo "aparelho" simulado).
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -163,12 +163,12 @@ test('rótulos não vazam implementação nem prometem o que não existe', () =>
   assert.ok(!/id="user-cloud-badge">Sincronizado/.test(html), 'selo de sync não pode ser fixo no HTML');
 });
 
-test('estado vazio tem chamada para explorar e "Carregar exemplo" (lista e A Seguir)', () => {
-  assert.match(html, /id="btn-watchlist-example"[^>]*data-action="load-example"/);
+test('estado vazio tem chamada para explorar (lista e A Seguir), sem botão de exemplo', () => {
   assert.match(html, /id="watchlist-empty-title"/);
+  assert.ok(!/load-example|Carregar exemplo|btn-watchlist-example/.test(html), 'index.html ainda tem o exemplo');
   const nextUp = read('js', 'views', 'nextUpView.js');
-  assert.match(nextUp, /Carregar exemplo/);
-  assert.match(nextUp, /data-action="load-example"/);
+  assert.match(nextUp, /data-goto="explore"/);
+  assert.ok(!/load-example|Carregar exemplo/.test(nextUp), 'nextUpView ainda tem o exemplo');
 });
 
 test('o editor tem botão de histórico e painel de versões; o diário renderiza Markdown', () => {
