@@ -3,8 +3,8 @@ const mediaService = require('../services/mediaService');
 const RateLimiter = require('../utils/rateLimiter');
 const { LandingFeatured } = require('../services/landingFeatured');
 
-// Endpoint público: limite por IP (cada visita à landing pode, no máximo, disparar 3 consultas ao TMDB por semana, via cache).
-const featuredLimiter = new RateLimiter({ windowMs: 10 * 60 * 1000, max: 60 });
+// Endpoint público: limite por IP (a resposta vem do cache; o TMDB só é consultado a cada 7 dias).
+const featuredLimiter = new RateLimiter({ windowMs: 10 * 60 * 1000, max: 300 });
 const featured = new LandingFeatured({ tmdb: mediaService.tmdb, dataDir: config.DATA_DIR });
 
 const FALLBACK = () => featured.items.map(i => ({ type: i.type, title: i.title }));

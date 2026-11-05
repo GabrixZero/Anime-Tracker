@@ -158,7 +158,7 @@ test('GET /api/landing/featured: público, sem parâmetros, resposta pequena e s
     assert.match(ok.data[0].posterUrl, /^https:\/\/image\.tmdb\.org\/t\/p\/w342\//);
 
     // limite de taxa: passou do máximo, continua 200, sem erro
-    for (let i = 0; i < 70; i++) await fetch(url);
+    for (let i = 0; i < 310; i++) await fetch(url);
     const limited = await fetch(url);
     assert.equal(limited.status, 200);
     assert.equal(limited.headers.get('cache-control'), 'no-store');
