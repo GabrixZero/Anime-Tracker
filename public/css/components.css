@@ -565,6 +565,30 @@
   border-left-color: var(--accent-rose);
 }
 
+/* Botão de ação dentro do aviso (ex.: "Desfazer", Ajustes 2) */
+.toast-action {
+  margin-left: auto;
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.8rem;
+  min-height: 32px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toast-action:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.toast-action:focus-visible {
+  outline: 2px solid var(--tvtime-yellow);
+  outline-offset: 2px;
+}
+
 /* ---------- Nota pessoal (S17) ---------- */
 .rating-control {
   display: flex;
