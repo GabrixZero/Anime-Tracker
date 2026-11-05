@@ -76,12 +76,42 @@ function extraCatalog() {
   });
 }
 
+// Duas obras fictícias para o cartão do "A Seguir" (fix descrição): uma com sinopse LONGA (o resumo traz a versão curta) e outra sem sinopse
+// nenhuma na fonte (continua "Sem descrição cadastrada."). Episódios sem sinopse, como nos animes.
+const LONG_SYNOPSIS_ID = 990201;
+const NO_SYNOPSIS_ID = 990202;
+const LONG_SYNOPSIS = Array.from({ length: 60 }, (_, i) => `palavra${i + 1}`).join(' ') + ' FIMDATEXTO.';
+
+function descriptionCatalog() {
+  const make = (id, name, overview) => ({
+    id,
+    type: 'anime',
+    name,
+    overview,
+    poster_path: null,
+    backdrop_path: null,
+    vote_average: null,
+    first_air_date: '2020-01-01',
+    genres: [],
+    status: '',
+    runtime: null,
+    seasons: [
+      {
+        season_number: 1,
+        name: 'Temporada 1',
+        episodes: [{ episode_number: 1, name: 'Episódio 1', runtime: 24, air_date: '2020-01-01', overview: '', still_path: null }]
+      }
+    ]
+  });
+  return [make(LONG_SYNOPSIS_ID, 'Saga Longa E2E', LONG_SYNOPSIS), make(NO_SYNOPSIS_ID, 'Saga Muda E2E', '')];
+}
+
 // Pasta nova em os.tmpdir() (showvault-e2e-XXXXXX) com o catálogo de runtime = seed + obras fictícias.
 function prepareDataDir({ withExtraCatalog = true } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), TMP_PREFIX));
   if (withExtraCatalog) {
     const seed = JSON.parse(fs.readFileSync(SEED, 'utf-8'));
-    fs.writeFileSync(path.join(dir, 'mediaCatalog.runtime.json'), JSON.stringify([...seed, ...extraCatalog()]));
+    fs.writeFileSync(path.join(dir, 'mediaCatalog.runtime.json'), JSON.stringify([...seed, ...extraCatalog(), ...descriptionCatalog()]));
   }
   return dir;
 }

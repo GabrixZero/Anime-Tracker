@@ -114,14 +114,15 @@ test.describe('Agenda', () => {
     await expect(page.locator('#calendar-container .calendar-item')).toHaveCount(0);
   });
 
-  test('se a atualização das fontes falhar, mostra um aviso discreto e continua com os dados salvos', async ({ page, guard }, testInfo) => {
+  test('se a atualização das fontes falhar, não mostra aviso nenhum e continua com os dados salvos', async ({ page, guard }, testInfo) => {
     guard.allow(/Failed to load resource/, /\[API Error\]/);
     await addCalendarShow(page, testInfo);
     await page.route('**/api/media/*/refresh', route =>
       route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Fonte fora do ar (teste).' }) })
     );
     await gotoTab(page, 'calendar');
-    await expect(page.locator('#calendar-notice')).toContainText('Algumas obras não foram atualizadas agora; mostrando os dados salvos.');
+    await expect(page.locator('#calendar-notice')).toBeHidden(); // sem texto de erro para a pessoa
+    await expect(page.locator('#calendar-container')).not.toContainText('não foram atualizadas');
     await tap(page.locator('[data-range="next7"]'));
     await expect(item(page, calendar.today)).toBeVisible(); // a agenda continua com o que já estava salvo
     await expect(page.locator('#calendar-container [role="alert"]')).toHaveCount(0);
