@@ -262,12 +262,19 @@
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0.2rem;
+  padding: 0.35rem;
   display: flex;
   align-items: center;
 }
 
-.btn-icon-tiny:hover {
+.btn-icon-tiny svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.btn-icon-tiny:hover,
+.btn-icon-tiny:focus-visible {
   color: var(--accent-rose);
 }
 
