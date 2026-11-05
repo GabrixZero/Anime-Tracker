@@ -55,13 +55,26 @@ test.describe('progresso', () => {
     await expect(page.locator('#show-episodes-container .episode-row')).toHaveCount(3);
     await expect(page.locator('#detail-status-select')).toHaveValue('plan_to_watch');
 
-    // marcar o episódio 2 pelo modal: a linha, a aba, o resumo e o status mudam na hora
+    // marcar o episódio 2 pelo modal marca também o 1 (Ajustes 2): a linha, a aba, o resumo e o status mudam na hora
     await tap(episodeCheck(page, 2));
+    await expect(toast(page, '2 episódios marcados.')).toBeVisible();
+    await expect(toast(page, '2 episódios marcados.').getByRole('button', { name: 'Desfazer' })).toBeVisible();
     await expect(episodeCheck(page, 2)).toHaveAttribute('aria-checked', 'true');
+    await expect(episodeCheck(page, 1)).toHaveAttribute('aria-checked', 'true');
+    await expect(episodeCheck(page, 3)).toHaveAttribute('aria-checked', 'false');
     await expect(page.locator('#show-episodes-container .episode-row[data-ep="2"]')).toHaveClass(/watched/);
+    await expect(page.locator('#show-episodes-container .episode-row[data-ep="1"]')).toHaveClass(/watched/);
+    await expect(page.locator('#show-seasons-tabs .season-tab-btn')).toHaveText('Temporada 1 (2/3)');
+    await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 2/3 assistidos');
+    await expect(page.locator('#detail-status-select')).toHaveValue('watching');
+
+    // desmarcar o episódio 2 mexe só nele: o 1 continua assistido
+    await tap(episodeCheck(page, 2));
+    await expect(toast(page, 'Desmarcado.')).toBeVisible();
+    await expect(episodeCheck(page, 2)).toHaveAttribute('aria-checked', 'false');
+    await expect(episodeCheck(page, 1)).toHaveAttribute('aria-checked', 'true');
     await expect(page.locator('#show-seasons-tabs .season-tab-btn')).toHaveText('Temporada 1 (1/3)');
     await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 1/3 assistidos');
-    await expect(page.locator('#detail-status-select')).toHaveValue('watching');
 
     await tap(page.locator('#btn-batch-check-season'));
     await expect(toast(page, 'Temporada inteira marcada como assistida!')).toBeVisible();

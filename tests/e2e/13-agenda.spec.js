@@ -320,7 +320,12 @@ test.describe('Agenda · janela de 90 dias', () => {
       .last();
     await expect(pastEp.locator('.calendar-item-code')).toHaveText('T1:E8');
     await tap(pastEp.getByRole('button', { name: /^Marcar como assistido/ }));
-    await expect(toast(page, 'Marcado como assistido!')).toBeVisible();
+    // marcar o E8 marca também os 7 anteriores já lançados (Ajustes 2): um aviso só, com "Desfazer"
+    await expect(toast(page, `${weeklySeries.pastEpisodes} episódios marcados.`)).toBeVisible();
+    await expect(toast(page, `${weeklySeries.pastEpisodes} episódios marcados.`).getByRole('button', { name: 'Desfazer' })).toBeVisible();
+    await expect(page.locator('#calendar-container .calendar-item--watched').filter({ hasText: weeklySeries.name })).toHaveCount(
+      weeklySeries.pastEpisodes
+    );
     await expect(pastEp).toHaveClass(/calendar-item--watched/);
     await expect(pastEp).toHaveClass(/calendar-item--past/);
     await expect(pastEp.locator('.calendar-item-released')).toHaveText('Lançado');
@@ -336,6 +341,10 @@ test.describe('Agenda · janela de 90 dias', () => {
     await tap(pastEp.getByRole('button', { name: /^Desmarcar como assistido/ }));
     await expect(toast(page, 'Desmarcado.')).toBeVisible();
     await expect(pastEp).not.toHaveClass(/calendar-item--watched/);
+    // desmarcar mexe só no E8: os 7 anteriores continuam assistidos
+    await expect(page.locator('#calendar-container .calendar-item--watched').filter({ hasText: weeklySeries.name })).toHaveCount(
+      weeklySeries.pastEpisodes - 1
+    );
 
     // item futuro (estreia do filme)
     const future = byShow(page, upcomingMovie.name);

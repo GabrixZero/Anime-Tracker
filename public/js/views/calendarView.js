@@ -13,7 +13,7 @@ class CalendarView {
     this.range = 'week';
     this.scrollToToday = false; // 'Todos' abre posicionado em Hoje (só ao abrir a aba ou trocar o filtro)
     this.refreshing = false;
-    this.lastRefreshAt = 0; // início da última rodada de atualização das fontes (uma a cada 30 min por sessão)
+    this.lastRefreshById = new Map(); // id da obra -> quando foi tentada a última atualização (no máximo 1 a cada 30 min por obra)
     this.refreshFailures = 0; // obras que não atualizaram na última rodada
     this.bindEvents();
   }
@@ -53,20 +53,25 @@ class CalendarView {
   }
 
   // ---------- atualização das fontes ao abrir a aba ----------
-  // Chamado pelo AppController.switchTab('calendar'). Só com login, no máximo 1 rodada a cada 30 min, até 8 obras, uma por vez.
+  // Chamado pelo AppController.switchTab("calendar"). Só com login, até 8 obras por abertura (as mais desatualizadas primeiro), uma por vez, cada obra no máximo a cada 30 min.
   async onOpen() {
     this.scrollToToday = true;
     const sync = window.syncService;
     if (this.refreshing || !sync || !sync.isLoggedIn()) return;
-    if (this.lastRefreshAt && Date.now() - this.lastRefreshAt < CalendarView.REFRESH_EVERY_MS) return;
     const state = window.appState;
+    const now = Date.now();
+    // Rodízio: cada obra tem o seu relógio de 30 min; as mais desatualizadas (mapeamento antigo ou `refreshedAt` mais velho) vão primeiro,
+    // então com mais de 8 obras as que ficaram de fora numa abertura entram na seguinte (antes eram sempre as mesmas 8).
+    const age = m => Date.parse(m.refreshedAt || m.ingestedAt || '') || 0;
     const ids = (state.data.trackedShows || [])
       .filter(t => this.includeTracked(t))
       .map(t => ({ id: t.showId, media: state.getMedia(t.showId) }))
       .filter(x => x.media && this.needsRefresh(x.media))
+      .filter(x => now - (this.lastRefreshById.get(Number(x.id)) || 0) >= CalendarView.REFRESH_EVERY_MS)
+      .sort((a, b) => (a.media.scheduleVersion || 0) - (b.media.scheduleVersion || 0) || age(a.media) - age(b.media))
       .slice(0, CalendarView.REFRESH_LIMIT)
       .map(x => x.id);
-    this.lastRefreshAt = Date.now();
+    ids.forEach(id => this.lastRefreshById.set(Number(id), now));
     if (ids.length === 0) return;
 
     this.refreshing = true;

@@ -736,17 +736,20 @@ test('modal: marcar um episódio atualiza só a linha, o rótulo da temporada e 
   app.els.set('season-stats-summary', summary);
 
   const before = app.state.getProgress(m.id).watched;
-  w.appController.quickCheck(m.id, 1, 700); // 700 ainda não assistido (a obra grande tem 300)
+  w.appController.quickCheck(m.id, 1, 700); // 700 ainda não assistido (a obra grande tem 300); marcar o 700 marca também os anteriores
+  const afterMark = app.state.getProgress(m.id).watched;
+  assert.equal(afterMark, 700, 'episódios 1 a 700 assistidos (Ajustes 2)');
   assert.equal(classes.contains('watched'), true);
   assert.equal(rowAttrs.get('aria-checked'), 'true');
   assert.equal(mark.textContent, '✓');
-  assert.equal(tab.textContent, `Temporada 1 (${before + 1}/${totalEps(m)})`);
-  assert.match(summary.innerHTML, new RegExp(`${before + 1}/${totalEps(m)} assistidos`));
+  assert.equal(tab.textContent, `Temporada 1 (${afterMark}/${totalEps(m)})`);
+  assert.match(summary.innerHTML, new RegExp(`${afterMark}/${totalEps(m)} assistidos`));
   w.appController.quickCheck(m.id, 1, 700); // desmarca
   assert.equal(classes.contains('watched'), false);
   assert.equal(rowAttrs.get('aria-checked'), 'false');
   assert.equal(mark.textContent, '');
-  assert.equal(tab.textContent, `Temporada 1 (${before}/${totalEps(m)})`);
+  assert.equal(tab.textContent, `Temporada 1 (${afterMark - 1}/${totalEps(m)})`); // desmarcar mexe só no 700
+  assert.equal(before, 300);
 });
 
 test('modal: obra da lista leve mostra "Carregando", busca o detalhe e redesenha; se falhar, avisa', async () => {

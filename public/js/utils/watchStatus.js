@@ -46,6 +46,30 @@
     return { total, watched, complete: total > 0 && watched === total };
   }
 
+  // Marcar o episódio N também marca os anteriores (Ajustes 2, D-AV2-3): as temporadas anteriores inteiras e os episódios anteriores da
+  // mesma temporada (a temporada 0, de especiais, só entra se for a do próprio episódio). NÃO entram episódios com data futura (ainda não
+  // lançados) nem os já assistidos; episódio sem data conta como lançado. Devolve [{ season, episode }] SEM o episódio clicado.
+  // `isWatched(season, episode)`; `todayKey` = 'AAAA-MM-DD' de hoje (fuso do navegador).
+  function episodesToCascade(media, seasonNum, epNum, isWatched, todayKey) {
+    if (!media || (media.type !== 'tv' && media.type !== 'anime')) return [];
+    const s0 = Number(seasonNum);
+    const e0 = Number(epNum);
+    const out = [];
+    for (const season of media.seasons || []) {
+      const sn = Number(season.season_number);
+      const before = sn === s0 ? true : sn > 0 && sn < s0;
+      if (!before) continue;
+      for (const ep of season.episodes || []) {
+        const en = Number(ep.episode_number);
+        if (sn === s0 && !(en < e0)) continue;
+        const day = String(ep.air_date || '').slice(0, 10);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(day) && todayKey && day > todayKey) continue; // ainda não lançado
+        if (isWatched(sn, en)) continue;
+        out.push({ season: sn, episode: en });
+      }
+    }
+    return out;
+  }
   // Status que a tela deve mostrar/contar. Correção só para itens antigos (sem updatedAt = nunca tocados pelas regras da S03):
   // série/filme com tudo assistido e status "Assistindo/Quero ver" aparece como "Finalizado". Itens novos valem como estão
   // (assim o usuário ainda pode escolher "Assistindo" para rever uma série).
@@ -103,6 +127,7 @@
     normalizeStatus,
     statusLabel,
     computeProgress,
+    episodesToCascade,
     effectiveStatus,
     initialStatus,
     statusAfterProgress,
