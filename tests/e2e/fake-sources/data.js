@@ -13,11 +13,12 @@ const ep = (season, number, name, airdate) => ({
   image: null
 });
 
-// Dia civil (AAAA-MM-DD) de hoje + n dias no fuso local, gerado na hora para os episódios da Agenda (S15) nunca envelhecerem.
+// Dia civil (AAAA-MM-DD) de hoje + n dias no MESMO fuso do navegador dos testes (playwright.config.js: America/Sao_Paulo),
+// gerado na hora para os episódios da Agenda (S15) nunca envelhecerem nem divergirem do "hoje" da página perto da meia-noite UTC.
 const dayFromToday = n => {
-  const d = new Date();
-  d.setDate(d.getDate() + n);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const [y, m, d] = fmt.format(new Date()).split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------
