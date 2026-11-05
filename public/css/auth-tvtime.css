@@ -372,6 +372,60 @@ input[aria-invalid='true'] {
   gap: 1rem;
 }
 
+.account-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.account-photo-btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.account-photo-btn:focus-visible {
+  outline: 3px solid var(--tvtime-yellow);
+  outline-offset: 3px;
+}
+
+.account-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--tvtime-yellow);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.account-photo-badge {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--tvtime-yellow);
+  color: #111111;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.btn-account-photo-remove {
+  min-height: 36px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
 .account-data {
   display: grid;
   grid-template-columns: auto 1fr;

@@ -758,18 +758,32 @@
             <section class="account-section" aria-labelledby="account-profile-title">
               <h3 class="account-section-title" id="account-profile-title">Perfil</h3>
               <div class="account-profile">
-                <img class="user-avatar" id="account-avatar" src="" alt="" />
+                <div class="account-photo">
+                  <button
+                    type="button"
+                    class="account-photo-btn"
+                    id="btn-account-photo"
+                    aria-label="Alterar foto de perfil"
+                    title="Alterar foto de perfil"
+                  >
+                    <img class="account-avatar" id="account-avatar" src="" alt="" />
+                    <span class="account-photo-badge" aria-hidden="true">&#9998;</span>
+                  </button>
+                  <input type="file" id="account-photo-input" class="hidden" accept="image/png,image/jpeg,image/webp" tabindex="-1" />
+                  <button type="button" class="btn-account-secondary btn-account-photo-remove hidden" id="btn-account-photo-remove">
+                    Remover foto
+                  </button>
+                </div>
                 <dl class="account-data">
                   <dt>Nome</dt>
                   <dd id="account-name"></dd>
                   <dt>E-mail</dt>
                   <dd id="account-email"></dd>
-                  <dt>Entrada</dt>
-                  <dd id="account-provider"></dd>
                   <dt>Conta criada em</dt>
                   <dd id="account-created"></dd>
                 </dl>
               </div>
+              <p id="account-photo-msg" class="hidden auth-form-error" role="alert"></p>
             </section>
 
             <section class="account-section" id="account-password-section" aria-labelledby="account-password-title">

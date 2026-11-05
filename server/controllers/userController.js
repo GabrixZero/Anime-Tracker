@@ -1,4 +1,6 @@
 const LibraryModel = require('../models/LibraryModel');
+const UserModel = require('../models/UserModel');
+const avatarService = require('../services/avatarService');
 const { sendError } = require('../utils/httpErrors');
 
 class UserController {
@@ -35,6 +37,51 @@ class UserController {
       return res.json({ resetAt: library.resetAt, updatedAt: library.updatedAt });
     } catch (err) {
       return sendError(res, err, 'Erro interno ao apagar a biblioteca.', 'user/library:delete');
+    }
+  }
+
+  // --- foto de perfil (só o dono, autenticado) ---
+
+  getAvatar(req, res) {
+    try {
+      const user = UserModel.findById(req.userId);
+      const photo = user && user.photoExt ? avatarService.read(user.id, user.photoExt) : null;
+      if (!photo) return res.status(404).json({ error: 'Você ainda não tem foto de perfil.' });
+      res.set({ 'Content-Type': photo.mime, 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' });
+      return res.send(photo.buffer);
+    } catch (err) {
+      return sendError(res, err, 'Erro ao ler a foto de perfil.', 'user/avatar:get');
+    }
+  }
+
+  putAvatar(req, res) {
+    const body = req.body;
+    if (!Buffer.isBuffer(body) || body.length === 0) {
+      return res.status(415).json({ error: 'Envie a foto como PNG, JPEG ou WEBP.', code: 'AVATAR_TYPE' });
+    }
+    if (body.length > avatarService.MAX_BYTES) {
+      return res.status(413).json({ error: 'A foto é grande demais (máximo de 200 KB).', code: 'AVATAR_TOO_LARGE' });
+    }
+    try {
+      const ext = avatarService.save(req.userId, body);
+      if (!ext) return res.status(415).json({ error: 'O arquivo não é uma imagem PNG, JPEG ou WEBP válida.', code: 'AVATAR_TYPE' });
+      if (!UserModel.setPhoto(req.userId, ext)) {
+        avatarService.remove(req.userId);
+        return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
+      }
+      return res.json({ user: UserModel.toPublic(UserModel.findById(req.userId)) });
+    } catch (err) {
+      return sendError(res, err, 'Erro ao gravar a foto de perfil.', 'user/avatar:put');
+    }
+  }
+
+  deleteAvatar(req, res) {
+    try {
+      avatarService.remove(req.userId);
+      UserModel.setPhoto(req.userId, null);
+      return res.json({ user: UserModel.toPublic(UserModel.findById(req.userId)) });
+    } catch (err) {
+      return sendError(res, err, 'Erro ao remover a foto de perfil.', 'user/avatar:delete');
     }
   }
 }

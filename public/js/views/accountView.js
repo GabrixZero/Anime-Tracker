@@ -8,6 +8,9 @@ class AccountView {
     this.modal = document.getElementById('modal-account');
     this.busy = false;
     this.user = null;
+    this.photoUrl = null; // blob: da foto de perfil atual (revogado ao trocar, remover ou sair)
+    this.photoKey = ''; // "<id>:<avatarUpdatedAt>" da foto que photoUrl mostra
+    this.photoSeq = 0; // descarta respostas de downloads antigos
     this.bindEvents();
   }
 
@@ -24,6 +27,15 @@ class AccountView {
       e.preventDefault();
       this.handleDelete();
     });
+    document.getElementById('btn-account-photo').addEventListener('click', () => {
+      if (!this.busy) document.getElementById('account-photo-input').click();
+    });
+    document.getElementById('account-photo-input').addEventListener('change', e => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = ''; // permite escolher o mesmo arquivo de novo
+      if (file) this.handlePhotoFile(file);
+    });
+    document.getElementById('btn-account-photo-remove').addEventListener('click', () => this.handlePhotoRemove());
     // Mostra o que falta na nova senha enquanto digita (mesma regra do servidor: passwordRules.js)
     document.getElementById('account-new-password').addEventListener('input', e => {
       const value = e.target.value;
@@ -55,7 +67,7 @@ class AccountView {
 
   async open() {
     this.modal.classList.remove('hidden');
-    ['account-password-msg', 'account-sessions-msg', 'account-delete-msg'].forEach(id => this.showMessage(id, ''));
+    ['account-password-msg', 'account-sessions-msg', 'account-delete-msg', 'account-photo-msg'].forEach(id => this.showMessage(id, ''));
     ['account-current-password', 'account-new-password', 'account-confirm-password', 'account-delete-password'].forEach(id => {
       document.getElementById(id).value = '';
     });
@@ -85,19 +97,153 @@ class AccountView {
         if (i > 0) emailEl.appendChild(document.createElement('wbr'));
         emailEl.appendChild(document.createTextNode(part));
       });
-    document.getElementById('account-provider').textContent = isGoogle ? 'Google' : 'E-mail e senha';
     const created = user.createdAt ? new Date(user.createdAt) : null;
     document.getElementById('account-created').textContent =
       created && !Number.isNaN(created.getTime()) ? created.toLocaleDateString('pt-BR') : '—';
-    const avatar = document.getElementById('account-avatar');
-    avatar.src = window.safeUrl ? window.safeUrl(user.avatar) : '';
-    avatar.alt = `Avatar de ${user.name || 'usuário'}`;
+    this.syncPhoto(user);
+    document.getElementById('btn-account-photo-remove').classList.toggle('hidden', !user.hasPhoto);
 
     // Conta Google não tem senha própria: sem troca de senha; a exclusão pede confirmação do Google.
     document.getElementById('account-password-section').classList.toggle('hidden', isGoogle);
     document.getElementById('account-delete-password-field').classList.toggle('hidden', isGoogle);
     document.getElementById('account-delete-google-note').classList.toggle('hidden', !isGoogle);
     document.getElementById('btn-account-delete').disabled = isGoogle;
+  }
+
+  // --- foto de perfil ---
+
+  // Mostra no cabeçalho e em Minha conta a foto enviada (se houver) ou o avatar padrão (user.avatar).
+  async syncPhoto(user) {
+    const seq = ++this.photoSeq;
+    const fallback = window.safeUrl ? window.safeUrl(user.avatar) : '';
+    const imgs = [document.getElementById('user-avatar-img'), document.getElementById('account-avatar')];
+    const show = src => {
+      imgs.forEach(img => {
+        img.src = src;
+      });
+    };
+    document.getElementById('account-avatar').alt = '';
+    if (!user.hasPhoto) {
+      this.clearPhoto();
+      show(fallback);
+      return;
+    }
+    const key = `${user.id}:${user.avatarUpdatedAt || ''}`;
+    if (this.photoUrl && this.photoKey === key) {
+      show(this.photoUrl);
+      return;
+    }
+    show(fallback); // enquanto baixa (ou se falhar), o avatar padrão
+    try {
+      const blob = await window.apiClient.fetchAvatar();
+      if (seq !== this.photoSeq || !blob) return;
+      const url = URL.createObjectURL(blob);
+      if (this.photoUrl) URL.revokeObjectURL(this.photoUrl);
+      this.photoUrl = url;
+      this.photoKey = key;
+      show(url);
+    } catch {
+      /* mantém o avatar padrão */
+    }
+  }
+
+  // Revoga o blob (sair da conta, foto removida).
+  clearPhoto() {
+    this.photoSeq += 1;
+    if (this.photoUrl) URL.revokeObjectURL(this.photoUrl);
+    this.photoUrl = null;
+    this.photoKey = '';
+  }
+
+  // Só PNG, JPEG e WEBP (nunca SVG). Lê no navegador, recorta o quadrado central e reduz para 256x256 antes de enviar.
+  async handlePhotoFile(file) {
+    if (this.busy) return;
+    const ok = ['image/png', 'image/jpeg', 'image/webp'];
+    if (!ok.includes(file.type) || /.svg$/i.test(file.name)) {
+      this.showMessage('account-photo-msg', 'Tipo de arquivo não aceito. Use uma foto PNG, JPEG ou WEBP.');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      this.showMessage('account-photo-msg', 'A foto é grande demais. Escolha uma imagem de até 15 MB.');
+      return;
+    }
+    this.showMessage('account-photo-msg', '');
+    this.setBusy(['btn-account-photo', 'btn-account-photo-remove'], true);
+    try {
+      let blob;
+      try {
+        blob = await this.squarePhoto(file);
+      } catch {
+        this.showMessage('account-photo-msg', 'Não foi possível ler esse arquivo como imagem. Escolha outra foto.');
+        return;
+      }
+      if (!blob || blob.size > 200 * 1024) {
+        this.showMessage('account-photo-msg', 'A foto ficou grande demais. Escolha outra imagem.');
+        return;
+      }
+      const res = await window.apiClient.uploadAvatar(blob);
+      this.afterPhotoChange(res.user);
+      window.appController.showToast('Foto de perfil atualizada.', 'success');
+    } catch (err) {
+      const msg =
+        err && err.status === 413
+          ? 'A foto é grande demais. Escolha uma imagem menor.'
+          : err && err.status === 415
+            ? 'Tipo de arquivo não aceito. Use uma foto PNG, JPEG ou WEBP.'
+            : this.friendlyError(err);
+      this.showMessage('account-photo-msg', msg);
+    } finally {
+      this.setBusy(['btn-account-photo', 'btn-account-photo-remove'], false);
+    }
+  }
+
+  async squarePhoto(file) {
+    const size = 256;
+    const bitmap = await createImageBitmap(file);
+    try {
+      const side = Math.min(bitmap.width, bitmap.height);
+      if (!side) throw new Error('imagem vazia');
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const draw = background => {
+        ctx.clearRect(0, 0, size, size);
+        if (background) {
+          ctx.fillStyle = background;
+          ctx.fillRect(0, 0, size, size);
+        }
+        ctx.drawImage(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, side, 0, 0, size, size);
+      };
+      const toBlob = (type, quality) => new Promise(resolve => canvas.toBlob(resolve, type, quality));
+      draw(null);
+      const webp = await toBlob('image/webp', 0.85);
+      if (webp && webp.type === 'image/webp') return webp;
+      draw('#ffffff'); // JPEG não tem transparência
+      return toBlob('image/jpeg', 0.85);
+    } finally {
+      bitmap.close();
+    }
+  }
+
+  async handlePhotoRemove() {
+    if (this.busy) return;
+    this.showMessage('account-photo-msg', '');
+    this.setBusy(['btn-account-photo', 'btn-account-photo-remove'], true);
+    try {
+      const res = await window.apiClient.deleteAvatar();
+      this.afterPhotoChange(res.user);
+      window.appController.showToast('Foto removida. Voltamos ao avatar padrão.', 'info');
+    } catch (err) {
+      this.showMessage('account-photo-msg', this.friendlyError(err));
+    } finally {
+      this.setBusy(['btn-account-photo', 'btn-account-photo-remove'], false);
+    }
+  }
+
+  afterPhotoChange(user) {
+    if (!user) return;
+    this.render(user); // render() também atualiza a foto do cabeçalho (syncPhoto)
   }
 
   setBusy(buttonIds, busy) {

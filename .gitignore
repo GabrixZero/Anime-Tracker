@@ -18,6 +18,7 @@ Thumbs.db
 !.env.example
 server/data/users.json
 server/data/libraries/
+server/data/avatars/
 server/data/jwt.secret
 # Convites já usados (S14; só hashes)
 server/data/invites.json

@@ -334,8 +334,10 @@ class AuthView {
       const avatar = document.getElementById('user-avatar-img');
       avatar.src = window.safeUrl ? window.safeUrl(user.avatar) : user.avatar;
       avatar.alt = `Avatar de ${user.name}`;
+      if (window.accountView) window.accountView.syncPhoto(user); // troca pelo upload do usuário, se houver
       window.syncService.setBaseLabel(user.provider === 'google' ? 'Google Nuvem' : 'Nuvem Ativa');
     } else {
+      if (window.accountView) window.accountView.clearPhoto();
       btnOpen.classList.remove('hidden');
       profile.classList.add('hidden');
       window.syncService.setBaseLabel('Só neste aparelho');

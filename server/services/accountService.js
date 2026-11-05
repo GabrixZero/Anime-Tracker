@@ -3,6 +3,7 @@
 const storage = require('../storage');
 const UserModel = require('../models/UserModel');
 const LibraryModel = require('../models/LibraryModel');
+const avatarService = require('./avatarService');
 
 // Apaga o documento da biblioteca e as cópias dele (arquivos: .bak/.corrupt-*/.tmp; SQLite: a linha inteira, com a versão anterior).
 function deleteLibraryFiles(libraryModel, userId) {
@@ -19,6 +20,11 @@ function deleteAccount(userId, { userModel = UserModel, libraryModel = LibraryMo
     libraryFilesRemoved = deleteLibraryFiles(libraryModel, userId);
   } catch (err) {
     console.error(`[accountService] Conta ${userId} removida, mas a biblioteca não pôde ser apagada: ${err.message}`);
+  }
+  try {
+    avatarService.remove(userId); // a foto de perfil sai junto com a conta
+  } catch (err) {
+    console.error(`[accountService] Conta ${userId} removida, mas a foto não pôde ser apagada: ${err.message}`);
   }
   return { existed, libraryFilesRemoved };
 }
