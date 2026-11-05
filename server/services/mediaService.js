@@ -34,6 +34,7 @@ const UPCOMING_STATUS = 'Em breve';
 const SCHEDULE_VERSION = 2;
 const FORCE_REFRESH_MIN_MS = 10 * 60 * 1000; // atualização forçada da mesma obra: no máximo 1 vez a cada 10 min
 const REFRESH_RETRY_AFTER_FAILURE_MS = 30 * 60 * 1000; // a conferência automática não insiste numa obra que acabou de falhar
+const TMDB_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000; // termos do TMDB: dados em cache por no máximo 6 meses; aqui, 90 dias
 
 // Catálogo de obras: seed versionado (somente leitura) + catálogo de runtime (ignorado pelo git) na pasta de dados.
 // Obras novas entram por ingestão sob demanda (AniList para animes, com a Jikan/MyAnimeList de reserva — D-26; TVMaze e TMDB para séries,
@@ -49,6 +50,7 @@ class MediaService {
     this.inflight = new Map(); // ingestões em andamento: id -> Promise
     this.sleep = opts.sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
     this.writeBlockedBy = null; // preenchido se o catálogo de runtime estiver ilegível: leitura segue, gravação não
+    this.seedRealBackedUp = false; // o backup "seed-real" (antes da 1ª troca de amostra por obra real) sai no máximo 1 vez por execução
 
     // Fontes externas. Anime: AniList (principal) e Jikan (reserva), ambas sempre ligadas; o TMDB (séries/filmes) só com TMDB_API_KEY (D-17).
     const fetchJson = (url, o) => this.fetchJson(url, o);
@@ -96,7 +98,20 @@ class MediaService {
     if (!result || !Array.isArray(result.data)) {
       throw new Error(`Seed do catálogo ausente ou inválido (${this.seedPath}).`);
     }
-    return result.data.filter(MediaService.isValidItem);
+    return result.data.filter(MediaService.isValidItem).map(MediaService.seedEntry);
+  }
+
+  // Entrada do seed vira obra do catálogo: sem dados da fonte, nota/imagens ficam null e as temporadas vazias (o Explorar não quebra).
+  // O que o seed já traz (fixtures de teste, cópias antigas) é mantido.
+  static seedEntry(m) {
+    return {
+      ...m,
+      poster_path: m.poster_path ?? null,
+      backdrop_path: m.backdrop_path ?? null,
+      vote_average: m.vote_average ?? null,
+      genres: m.genres ?? [],
+      seasons: m.seasons ?? []
+    };
   }
 
   static isValidItem(item) {
@@ -189,14 +204,15 @@ class MediaService {
     }
   }
 
-  // Obras do seed já copiadas para o runtime antes da S06 não têm `mal_id`/`alt_titles` (usados na deduplicação da busca):
-  // completa só esses dois campos, em memória, sem mexer no resto da obra.
+  // Obras do seed já copiadas para o runtime antes da S06 não têm `mal_id`/`alt_titles` (usados na deduplicação da busca) nem
+  // `source`/`tmdb_id` (usados para trocar a amostra pela obra real do TMDB): completa só esses campos, em memória, sem mexer no resto.
   withSeedHints(item) {
     const seed = this.seedById && this.seedById.get(item.id);
     if (!seed) return item;
     const patch = {};
-    if (item.mal_id === undefined && seed.mal_id !== undefined) patch.mal_id = seed.mal_id;
-    if (item.alt_titles === undefined && seed.alt_titles !== undefined) patch.alt_titles = seed.alt_titles;
+    for (const key of ['mal_id', 'alt_titles', 'source', 'tmdb_id']) {
+      if (item[key] === undefined && seed[key] !== undefined) patch[key] = seed[key];
+    }
     return Object.keys(patch).length ? { ...item, ...patch } : item;
   }
 
@@ -267,8 +283,22 @@ class MediaService {
     return this.catalog.find(m => m.id === id) || null;
   }
 
+  // Entrada do seed que ainda é só título (nunca baixada e sem nenhum dado): o Explorar a mostra sem nota/imagem/gênero e sem temporadas.
+  // Só vale para entradas com `source` (as do seed novo); a cópia antiga de runtime, com temporadas/sinopse, segue exibível.
+  static isTitleOnly(item) {
+    return (
+      Boolean(item.source) &&
+      !item.ingestedAt &&
+      describeId(item.id).source === 'seed' &&
+      !(Array.isArray(item.seasons) && item.seasons.length > 0) &&
+      !item.overview &&
+      !item.poster_path
+    );
+  }
+
   // Uma obra "completa" não precisa ser ingerida de novo.
   static isComplete(item) {
+    if (MediaService.isTitleOnly(item)) return false;
     return (
       item.type === 'movie' ||
       Boolean(item.ingestedAt) ||
@@ -283,7 +313,7 @@ class MediaService {
     const local = this.findLocal(id);
     if (local && MediaService.isComplete(local)) return local;
     const alias = this.findAlias(id);
-    return alias && !MediaService.isSeedSample(alias) ? alias : null;
+    return alias && !this.isSeedSample(alias) ? alias : null;
   }
 
   // O id pode virar uma obra nova no catálogo (precisa de login)?
@@ -294,6 +324,15 @@ class MediaService {
   // Obra do catálogo, com id DIFERENTE, que já cobre a entrada da MAL (faixa da Jikan) ou da AniList (faixa própria) deste id.
   findAlias(id, source = describeId(id)) {
     let covers;
+    if (source.source === 'tmdb_tv' || source.source === 'tmdb_movie') {
+      // id do TMDB (série 2000xxxx / filme 3000xxxx) que é a obra do seed com o mesmo tmdb_id E o mesmo tipo (filme X nunca é série X)
+      for (const entry of this.seedById.values()) {
+        if (entry.source === source.source && (entry.tmdb_id ?? entry.id) === source.externalId && entry.id !== id) {
+          return this.findLocal(entry.id);
+        }
+      }
+      return null;
+    }
     if (source.source === 'jikan') covers = m => malIdsOf(m).has(source.externalId);
     else if (source.source === 'anilist') covers = m => anilistIdsOf(m).has(source.externalId);
     else return null;
@@ -310,13 +349,15 @@ class MediaService {
         if (m.id === work.id) return false;
         for (const id of malIdsOf(m)) if (mal.has(id)) return true;
         for (const id of anilistIdsOf(m)) if (ani.has(id)) return true;
-        return MediaService.isSeedSample(m) && sameWork(m, work);
+        return this.isSeedSample(m) && sameWork(m, work);
       }) || null
     );
   }
 
   canIngest(id) {
-    return describeId(id).ingestable;
+    if (describeId(id).ingestable) return true;
+    const local = this.findLocal(id);
+    return Boolean(local && this.seedById.has(id) && MediaService.isTitleOnly(local)); // amostra do seed ainda só com título
   }
 
   // Várias obras COMPLETAS do catálogo de uma vez (S09: o app carrega o detalhe das obras da lista em lote ao abrir).
@@ -485,25 +526,36 @@ class MediaService {
       .map(x => x.c);
     const kept = [];
     for (const cand of ordered) {
+      // Série/filme do TMDB que é a obra do seed (mesmo tmdb_id e tipo): o catálogo já tem a obra, com o id do seed.
+      const own = cand.source === 'tmdb' && cand.item.id !== undefined ? this.findAlias(cand.item.id) : null;
+      if (own) {
+        const at = kept.findIndex(k => k.item.id === own.id);
+        const merged = { ...cand, item: { ...cand.item, catalog_id: own.id } };
+        if (at < 0) kept.push(merged);
+        else if (this.isSeedSample(own)) kept[at] = { ...merged, score: Math.max(cand.score, kept[at].score) };
+        continue;
+      }
       const dup = kept.findIndex(k => sameWork(k.item, cand.item));
       if (dup < 0) {
         kept.push(cand);
         continue;
       }
-      if (
-        (cand.source === 'anilist' || cand.source === 'jikan') &&
-        kept[dup].source === 'local' &&
-        MediaService.isSeedSample(kept[dup].item)
-      ) {
+      if ((cand.source === 'anilist' || cand.source === 'jikan') && kept[dup].source === 'local' && this.isSeedSample(kept[dup].item)) {
         kept[dup] = { ...cand, item: { ...cand.item, catalog_id: kept[dup].item.id }, score: Math.max(cand.score, kept[dup].score) };
       }
     }
     return MediaService.sortCandidates(kept);
   }
 
-  // Anime do seed (ids 1..999.999) nunca ingerido da Jikan: tem só 1-2 episódios de exemplo.
-  static isSeedSample(item) {
-    return item.type === 'anime' && !item.ingestedAt && describeId(item.id).source === 'seed' && Number.isSafeInteger(item.mal_id);
+  // Amostra do seed (ids 1..999.999, de qualquer tipo): obra do seed nunca ingerida (só título, ou a cópia antiga com poucos dados de exemplo).
+  // `seedById` (opcional) confere se o id está mesmo no seed; sem ele vale o rastro deixado pelo seed (`source` ou `mal_id`).
+  static isSeedSample(item, seedById = null) {
+    if (!item || item.ingestedAt || describeId(item.id).source !== 'seed') return false;
+    return seedById ? seedById.has(item.id) : Boolean(item.source) || Number.isSafeInteger(item.mal_id);
+  }
+
+  isSeedSample(item) {
+    return MediaService.isSeedSample(item, this.seedById);
   }
 
   // --- Anime: busca (AniList principal, Jikan reserva) -----------------------------------------------
@@ -629,9 +681,15 @@ class MediaService {
     }
 
     const existing = this.findLocal(numId);
-    if (existing && MediaService.isComplete(existing)) return Promise.resolve(existing);
+    const seedEntry = this.seedById.get(numId) || null;
+    // Amostra do seed (série/filme do TMDB): pedir a ingestão troca a amostra pela obra real, mesmo se a cópia antiga já tem temporadas;
+    // sem chave do TMDB a cópia antiga (completa) segue sendo devolvida e a entrada só com título dá o erro "não configurado".
+    const tmdbSample = Boolean(seedEntry && /^tmdb_/.test(seedEntry.source || '') && existing && this.isSeedSample(existing));
+    if (existing && MediaService.isComplete(existing) && !(tmdbSample && this.tmdb.enabled)) return Promise.resolve(existing);
 
-    const source = describeId(numId);
+    // Entrada do seed ainda não baixada: a fonte vem da própria entrada (tmdb_tv, tmdb_movie ou anime com mal_id).
+    const seedKind = seedEntry && existing && this.isSeedSample(existing) ? seedEntry.source : null;
+    const source = seedKind ? { source: seedKind, externalId: seedEntry.tmdb_id ?? numId, ingestable: true } : describeId(numId);
     if (!source.ingestable) return Promise.reject(source.source ? mediaErrors.unsupportedSource() : mediaErrors.notFound());
     if ((source.source === 'tmdb_tv' || source.source === 'tmdb_movie') && !this.tmdb.enabled) {
       return Promise.reject(
@@ -643,26 +701,32 @@ class MediaService {
     }
     if (this.writeBlockedBy) return Promise.reject(mediaErrors.catalogUnavailable());
 
-    const alias = this.findAlias(numId, source);
-    if (alias && !MediaService.isSeedSample(alias)) return Promise.resolve(alias);
+    const alias = seedKind ? null : this.findAlias(numId, source);
+    if (alias && !this.isSeedSample(alias)) return Promise.resolve(alias);
 
-    if (this.inflight.has(numId)) return this.inflight.get(numId);
     const targetId = alias ? alias.id : numId;
+    if (this.inflight.has(targetId)) return this.inflight.get(targetId);
     const run = {
       tvmaze: () => this.ingestTvmaze(numId, source.externalId),
       jikan: () => this.ingestAnime(targetId, { malId: source.externalId }),
       anilist: () => this.ingestAnime(targetId, { anilistId: source.externalId }),
-      tmdb_tv: () => this.ingestTmdb(numId, () => this.tmdb.getTv(source.externalId)),
-      tmdb_movie: () => this.ingestTmdb(numId, () => this.tmdb.getMovie(source.externalId))
+      anime: () => this.ingestAnime(targetId, { malId: seedEntry.mal_id }),
+      tmdb_tv: () => this.ingestTmdb(targetId, () => this.tmdb.getTv(source.externalId)),
+      tmdb_movie: () => this.ingestTmdb(targetId, () => this.tmdb.getMovie(source.externalId))
     }[source.source];
-    const promise = run().finally(() => this.inflight.delete(numId));
-    this.inflight.set(numId, promise);
+    const promise = run().finally(() => this.inflight.delete(targetId));
+    this.inflight.set(targetId, promise);
     return promise;
   }
 
   // Grava primeiro; só depois a memória muda (se a gravação falhar, nada fica pela metade).
   commitIngested(numId, fullMedia) {
     const index = this.catalog.findIndex(m => m.id === numId);
+    // Antes da primeira troca de uma amostra do seed pela obra real: UM backup do catálogo como estava (no máximo um por execução).
+    if (index >= 0 && !this.seedRealBackedUp && this.isSeedSample(this.catalog[index])) {
+      if (!this.backupBeforeMigration(this.catalog, [this.catalog[index]], 'seed-real')) throw mediaErrors.catalogUnavailable();
+      this.seedRealBackedUp = true;
+    }
     const next = index >= 0 ? this.catalog.map(m => (m.id === numId ? fullMedia : m)) : [...this.catalog, fullMedia];
     this.saveCatalog(next);
     this.catalog = next;
@@ -790,7 +854,17 @@ class MediaService {
 
   async ingestTmdb(numId, load, { previous = null } = {}) {
     const media = await load();
-    return this.commitIngested(numId, { ...media, id: numId, ...MediaService.stamps(previous) });
+    // Obra do seed: ocupa o lugar da amostra (mesmo id) e guarda o que o seed sabia (títulos alternativos, fonte, id do TMDB).
+    const seed = this.seedById.get(numId);
+    const keep = {};
+    if (seed) {
+      const before = previous || this.findLocal(numId) || {};
+      for (const key of ['alt_titles', 'source', 'tmdb_id']) {
+        const value = before[key] !== undefined ? before[key] : seed[key];
+        if (value !== undefined) keep[key] = value;
+      }
+    }
+    return this.commitIngested(numId, { ...media, ...keep, id: numId, ...MediaService.stamps(previous) });
   }
 
   // --- Atualização de obras em exibição (S13) -----------------------------------------------------------
@@ -802,6 +876,19 @@ class MediaService {
   // Filme AINDA NÃO LANÇADO (sem data, data de hoje em diante ou status diferente de 'Lançado') vence como obra 'Em breve' (a data de estreia
   // pode mudar); filme lançado não vence. Sem chave do TMDB não há como atualizar filme: nunca vence (sem erro à toa).
   refreshTtlMs(item, now = Date.now()) {
+    const ttl = this.baseRefreshTtlMs(item, now);
+    // Termos do TMDB: dados em cache por no máximo 6 meses => obra do TMDB (seed, 20M ou 30M) vence em até 90 dias. Sem chave não há como atualizar.
+    if (!item || !item.ingestedAt || !MediaService.isTmdbWork(item) || !this.tmdb.enabled) return ttl;
+    return ttl === null ? TMDB_MAX_AGE_MS : Math.min(ttl, TMDB_MAX_AGE_MS);
+  }
+
+  // Obra cujos dados vêm do TMDB: faixas 20M/30M ou obra do seed (série/filme) com fonte tmdb_*.
+  static isTmdbWork(item) {
+    const source = describeId(item.id).source;
+    return source === 'tmdb_tv' || source === 'tmdb_movie' || (source === 'seed' && /^tmdb_/.test(item.source || ''));
+  }
+
+  baseRefreshTtlMs(item, now) {
     if (!item || !item.ingestedAt) return null;
     if (item.type === 'movie') {
       if (!this.tmdb.enabled) return null;
@@ -826,11 +913,12 @@ class MediaService {
     return now - last >= ttl;
   }
 
-  // Obra do seed (id do TMDB) que já foi trocada pela versão real da AniList/Jikan: tem `ingestedAt` e id da MAL ou da AniList.
+  // Obra do seed que já foi trocada pela versão real: tem `ingestedAt` e, se for anime, id da MAL ou da AniList (AniList/Jikan);
+  // série/filme vem do TMDB (fonte tmdb_*).
   static isUpgradedSeed(item) {
-    return (
-      item.type === 'anime' && Boolean(item.ingestedAt) && describeId(item.id).source === 'seed' && Boolean(item.mal_id || item.anilist_id)
-    );
+    if (!item.ingestedAt || describeId(item.id).source !== 'seed') return false;
+    if (item.type === 'anime') return Boolean(item.mal_id || item.anilist_id);
+    return /^tmdb_/.test(item.source || '');
   }
 
   static countEpisodes(item) {
@@ -880,6 +968,11 @@ class MediaService {
     if (item.type === 'anime' && (item.mal_id || item.anilist_id) && ['jikan', 'anilist', 'seed'].includes(source.source)) {
       const req = item.mal_id ? { malId: item.mal_id } : { anilistId: item.anilist_id };
       return this.ingestAnime(item.id, req, { fresh: true, previous: item });
+    }
+    if (source.source === 'seed' && /^tmdb_/.test(item.source || '')) {
+      const tmdbId = item.tmdb_id ?? item.id;
+      const load = () => (item.source === 'tmdb_movie' ? this.tmdb.getMovie(tmdbId) : this.tmdb.getTv(tmdbId));
+      return this.ingestTmdb(item.id, load, { previous: item });
     }
     if (source.source === 'tvmaze') return this.ingestTvmaze(item.id, source.externalId, { previous: item });
     if (source.source === 'tmdb_tv') return this.ingestTmdb(item.id, () => this.tmdb.getTv(source.externalId), { previous: item });

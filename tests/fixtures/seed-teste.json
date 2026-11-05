@@ -41,7 +41,9 @@
           }
         ]
       }
-    ]
+    ],
+    "source": "tmdb_tv",
+    "tmdb_id": 1396
   },
   {
     "id": 136283,
@@ -77,7 +79,9 @@
           }
         ]
       }
-    ]
+    ],
+    "source": "tmdb_tv",
+    "tmdb_id": 136283
   },
   {
     "id": 95396,
@@ -105,7 +109,9 @@
           }
         ]
       }
-    ]
+    ],
+    "source": "tmdb_tv",
+    "tmdb_id": 95396
   },
   {
     "id": 66732,
@@ -133,7 +139,9 @@
           }
         ]
       }
-    ]
+    ],
+    "source": "tmdb_tv",
+    "tmdb_id": 66732
   },
   {
     "id": 94605,
@@ -161,7 +169,9 @@
           }
         ]
       }
-    ]
+    ],
+    "source": "tmdb_tv",
+    "tmdb_id": 94605
   },
   {
     "id": 100088,
@@ -189,7 +199,9 @@
           }
         ]
       }
-    ]
+    ],
+    "source": "tmdb_tv",
+    "tmdb_id": 100088
   },
   {
     "id": 1429,
@@ -227,7 +239,8 @@
       }
     ],
     "mal_id": 16498,
-    "alt_titles": ["Shingeki no Kyojin", "Attack on Titan", "進撃の巨人", "AoT"]
+    "alt_titles": ["Shingeki no Kyojin", "Attack on Titan", "進撃の巨人", "AoT"],
+    "source": "anime"
   },
   {
     "id": 85937,
@@ -256,7 +269,8 @@
       }
     ],
     "mal_id": 38000,
-    "alt_titles": ["Kimetsu no Yaiba", "Demon Slayer: Kimetsu no Yaiba", "鬼滅の刃"]
+    "alt_titles": ["Kimetsu no Yaiba", "Demon Slayer: Kimetsu no Yaiba", "鬼滅の刃"],
+    "source": "anime"
   },
   {
     "id": 95479,
@@ -285,7 +299,8 @@
       }
     ],
     "mal_id": 40748,
-    "alt_titles": ["Jujutsu Kaisen", "呪術廻戦"]
+    "alt_titles": ["Jujutsu Kaisen", "呪術廻戦"],
+    "source": "anime"
   },
   {
     "id": 209867,
@@ -315,7 +330,8 @@
       }
     ],
     "mal_id": 52991,
-    "alt_titles": ["Sousou no Frieren", "Frieren: Beyond Journey's End", "葬送のフリーレン"]
+    "alt_titles": ["Sousou no Frieren", "Frieren: Beyond Journey's End", "葬送のフリーレン"],
+    "source": "anime"
   },
   {
     "id": 13916,
@@ -344,7 +360,8 @@
       }
     ],
     "mal_id": 1535,
-    "alt_titles": ["Death Note", "デスノート"]
+    "alt_titles": ["Death Note", "デスノート"],
+    "source": "anime"
   },
   {
     "id": 157336,
@@ -358,7 +375,9 @@
     "first_air_date": "2014-11-05",
     "genres": ["Filme", "Ficção Científica", "Drama"],
     "status": "Lançado",
-    "seasons": []
+    "seasons": [],
+    "source": "tmdb_movie",
+    "tmdb_id": 157336
   },
   {
     "id": 872585,
@@ -372,7 +391,9 @@
     "first_air_date": "2023-07-19",
     "genres": ["Filme", "Drama", "História"],
     "status": "Lançado",
-    "seasons": []
+    "seasons": [],
+    "source": "tmdb_movie",
+    "tmdb_id": 872585
   },
   {
     "id": 693134,
@@ -386,7 +407,9 @@
     "first_air_date": "2024-02-27",
     "genres": ["Filme", "Ficção Científica", "Aventura"],
     "status": "Lançado",
-    "seasons": []
+    "seasons": [],
+    "source": "tmdb_movie",
+    "tmdb_id": 693134
   },
   {
     "id": 324857,
@@ -400,7 +423,9 @@
     "first_air_date": "2018-12-01",
     "genres": ["Filme", "Animação", "Ação"],
     "status": "Lançado",
-    "seasons": []
+    "seasons": [],
+    "source": "tmdb_movie",
+    "tmdb_id": 324857
   },
   {
     "id": 155,
@@ -414,6 +439,8 @@
     "first_air_date": "2008-07-16",
     "genres": ["Filme", "Ação", "Crime", "Drama"],
     "status": "Lançado",
-    "seasons": []
+    "seasons": [],
+    "source": "tmdb_movie",
+    "tmdb_id": 155
   }
 ]

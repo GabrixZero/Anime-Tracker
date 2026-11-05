@@ -198,7 +198,8 @@ test('validade: filme não lançado vence como "Em breve" (24h); filme já lanç
     day,
     'status ainda não é Lançado'
   );
-  assert.equal(svc.refreshTtlMs({ ...base, first_air_date: '2026-05-01', status: 'Lançado' }, now), null, 'lançado');
+  // Termos do TMDB (cache de no máximo 6 meses): filme lançado vence em 90 dias, não mais "nunca"
+  assert.equal(svc.refreshTtlMs({ ...base, first_air_date: '2026-05-01', status: 'Lançado' }, now), 90 * day, 'lançado');
 
   const old = { ...base, first_air_date: '', status: '', refreshedAt: '2026-06-10T00:00:00.000Z' };
   assert.equal(svc.isRefreshDue(old, now), true, 'passou de 24h desde a última atualização');
