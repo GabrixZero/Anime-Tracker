@@ -115,8 +115,14 @@ class DetailModalView {
     const token = ++this.detailToken;
     await window.appController.ensureDetails([showId]);
     if (token !== this.detailToken || !this.isOpenFor(showId)) return; // abriu outra obra / fechou enquanto carregava
-    if (window.appState.hasDetail(showId)) this.open(showId);
-    else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
+    if (window.appState.hasDetail(showId)) {
+      const keepSeason = this.currentSeasonNum; // veio do resumo: reabre na mesma temporada
+      this.open(showId);
+      const media = window.appState.getMedia(showId);
+      if (keepSeason !== this.currentSeasonNum && media.seasons.some(s => s.season_number === keepSeason)) this.switchSeason(keepSeason);
+    } else if (window.appState.hasEpisodes(showId)) {
+      // o detalhe completo falhou, mas o resumo já mostra os episódios: segue com ele
+    } else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
   }
 
   // Sem episódios para mostrar (carregando, erro ou obra que ainda não foi adicionada): limpa abas e lista antigas.
@@ -335,7 +341,45 @@ class DetailModalView {
     summary.innerHTML = `Progresso da Temporada: <strong>${watched}/${season.episodes.length} assistidos</strong>`;
 
 
-    container.innerHTML = season.episodes.map(ep => {
+    // S18: com centenas de episódios só as primeiras linhas existem; o resto é desenhado aos poucos (rolagem ou botão).
+    this.renderedEpisodes = 0;
+    this.renderToken = (this.renderToken || 0) + 1;
+    container.innerHTML = '';
+    this.renderMoreEpisodes(media, season, DetailModalView.EP_CHUNK);
+  }
+
+  // Desenha mais `count` linhas depois das já existentes; se ainda sobrar, põe o botão "Mostrar mais" (acessível por teclado)
+  // e um observador que o aciona sozinho quando ele entra na tela.
+  renderMoreEpisodes(media, season, count) {
+    const container = document.getElementById('show-episodes-container');
+    const old = container.querySelector('.episodes-more');
+    if (old) old.remove();
+    if (this.moreObserver) { this.moreObserver.disconnect(); this.moreObserver = null; }
+    const from = this.renderedEpisodes;
+    const slice = season.episodes.slice(from, from + count);
+    container.insertAdjacentHTML('beforeend', this.episodeRowsHtml(media, season, slice));
+    this.renderedEpisodes = from + slice.length;
+    const left = season.episodes.length - this.renderedEpisodes;
+    if (left <= 0) return;
+    container.insertAdjacentHTML('beforeend', `<div class="episodes-more"><button type="button" class="btn btn-outline" data-focus-key="ep:more" data-action="more-episodes">Mostrar mais episódios (faltam ${left})</button></div>`);
+    const btn = container.querySelector('.episodes-more button');
+    if (btn && typeof IntersectionObserver !== 'undefined') {
+      const token = this.renderToken;
+      this.moreObserver = new IntersectionObserver((entries) => {
+        if (token === this.renderToken && entries.some(e => e.isIntersecting)) this.showMoreEpisodes();
+      }, { root: null, rootMargin: '400px' });
+      this.moreObserver.observe(btn);
+    }
+  }
+
+  showMoreEpisodes() {
+    const media = window.appState.getMedia(this.currentShowId);
+    const season = media && media.seasons && media.seasons.find(s => s.season_number === this.currentSeasonNum);
+    if (season) this.renderMoreEpisodes(media, season, DetailModalView.EP_CHUNK);
+  }
+
+  episodeRowsHtml(media, season, episodes) {
+    return episodes.map(ep => {
       const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
       const note = window.appState.getNote(media.id, season.season_number, ep.episode_number);
       const hasNote = note && note.text && note.text.trim();
@@ -519,5 +563,7 @@ class DetailModalView {
   // ===== fim S08 =====
 
 }
+
+DetailModalView.EP_CHUNK = 60; // linhas de episódio desenhadas por vez (S18)
 
 window.detailModalView = new DetailModalView();

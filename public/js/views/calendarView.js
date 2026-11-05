@@ -99,7 +99,7 @@ class CalendarView {
     this.renderNotice();
 
     // Obras da lista ainda sem episódios (o detalhe chega em lote): carregamento ou erro, nunca uma agenda errada.
-    if (state && trackedCount > 0 && state.detailsStatus !== 'idle' && state.data.trackedShows.some(t => !state.hasDetail(t.showId))) {
+    if (state && trackedCount > 0 && state.detailsStatus !== 'idle' && state.data.trackedShows.some(t => !state.hasEpisodes(t.showId))) {
       const failed = state.detailsStatus === 'error';
       if (this.counterPill) this.counterPill.textContent = failed ? 'Não carregou' : 'Carregando agenda...';
       if (this.container) {

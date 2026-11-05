@@ -13,6 +13,7 @@ const TmdbClient = require('./tmdbClient');
 const anilistMapper = require('./anilistMapper');
 const jikanMapper = require('./jikanMapper');
 const { migrateLegacyCatalog } = require('./catalogMigration');
+const { migrateCatalogImages } = require('./imageMigration');
 
 const TVMAZE_BASE = 'https://api.tvmaze.com';
 const SEED_PATH = path.join(__dirname, '..', 'data', 'mediaCatalog.seed.json');
@@ -113,6 +114,15 @@ class MediaService {
       }
     }
 
+    // S18: pôsteres gravados no tamanho grande passam para o médio (idempotente; só `poster_path`; com backup antes).
+    if (runtime) {
+      const imgs = migrateCatalogImages(items);
+      if (imgs.changed > 0 && this.backupBeforeMigration(runtime, new Array(imgs.changed), 's18')) {
+        items = imgs.items;
+        migrated = true;
+      }
+    }
+
     const known = new Set(items.map(m => m.id));
     const missing = seed.filter(m => !known.has(m.id));
     this.catalog = [...items, ...missing];
@@ -128,15 +138,15 @@ class MediaService {
 
   // Cópia do catálogo de runtime COMO ESTAVA, antes da migração mexer em qualquer obra (mediaCatalog.backup-pre-s13-<data>.json, ao lado
   // do original, ignorada pelo git). Sem a cópia a migração não acontece: tenta de novo na próxima partida.
-  backupBeforeMigration(original, changed) {
+  backupBeforeMigration(original, changed, tag = 's13') {
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const file = path.join(path.dirname(this.catalogPath), `mediaCatalog.backup-pre-s13-${stamp}.json`);
+    const file = path.join(path.dirname(this.catalogPath), `mediaCatalog.backup-pre-${tag}-${stamp}.json`);
     try {
       writeJsonAtomic(file, original);
-      console.log(`[MediaService] Migração S13: ${changed.length} obra(s) do catálogo antigo marcadas para atualização (backup: ${path.basename(file)}).`);
+      console.log(`[MediaService] Migração ${tag.toUpperCase()}: ${changed.length} obra(s) do catálogo ajustadas (backup: ${path.basename(file)}).`);
       return true;
     } catch (err) {
-      console.error('[MediaService] Migração S13 adiada: não foi possível gravar o backup do catálogo:', err.message);
+      console.error(`[MediaService] Migração ${tag.toUpperCase()} adiada: não foi possível gravar o backup do catálogo:`, err.message);
       return false;
     }
   }

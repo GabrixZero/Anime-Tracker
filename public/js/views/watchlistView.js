@@ -146,7 +146,7 @@ class WatchlistView {
     if (!media) return '';
 
     const isMovie = media.type === 'movie';
-    const detailed = state.hasDetail(media.id);
+    const detailed = state.hasEpisodes(media.id);
     let percent = 0;
     let progressText;
 

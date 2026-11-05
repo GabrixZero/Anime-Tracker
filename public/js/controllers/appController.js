@@ -38,9 +38,9 @@ class AppController {
   // Carrega o detalhe das obras da lista que ainda não o têm. Devolve true se buscou algo (a tela deve ser redesenhada).
   async ensureTrackedDetails() {
     const state = window.appState;
-    const need = this.trackedIds().filter(id => !state.hasDetail(id));
+    const need = this.trackedIds().filter(id => !state.hasEpisodes(id));
     if (need.length === 0) return false;
-    await this.ensureDetails(need);
+    await this.ensureDetails(need, { summary: true }); // S18: só o resumo; o detalhe completo vem ao abrir a obra
     return true;
   }
 
@@ -50,22 +50,22 @@ class AppController {
 
   // Carrega em lote (até 50 por requisição) o detalhe completo dessas obras. Nunca lança: em falha deixa
   // `appState.detailsStatus = 'error'` e as telas mostram o aviso. Chamadas simultâneas entram numa fila (um lote por vez).
-  ensureDetails(ids) {
-    const run = this.detailChain.then(() => this.loadDetails(ids));
+  ensureDetails(ids, opts = {}) {
+    const run = this.detailChain.then(() => this.loadDetails(ids, opts));
     this.detailChain = run.catch(() => {});
     return run;
   }
 
-  async loadDetails(ids) {
+  async loadDetails(ids, { summary = false } = {}) {
     const state = window.appState;
-    const need = [...new Set(ids.map(Number))].filter(id => Number.isSafeInteger(id) && id > 0 && !state.hasDetail(id));
+    const need = [...new Set(ids.map(Number))].filter(id => Number.isSafeInteger(id) && id > 0 && !(summary ? state.hasEpisodes(id) : state.hasDetail(id)));
     if (need.length === 0) return;
     state.detailsStatus = 'loading';
     let failed = false;
     for (let i = 0; i < need.length; i += AppController.DETAIL_BATCH) {
       try {
-        const res = await window.apiClient.getBatch(need.slice(i, i + AppController.DETAIL_BATCH));
-        ((res && res.data) || []).forEach(item => state.cacheMediaDetail(item));
+        const res = await window.apiClient.getBatch(need.slice(i, i + AppController.DETAIL_BATCH), { summary });
+        ((res && res.data) || []).forEach(item => (summary ? state.cacheMediaSummary(item) : state.cacheMediaDetail(item)));
       } catch (err) {
         failed = true;
         console.warn('Não foi possível carregar o detalhe das obras:', err.message);
@@ -156,7 +156,7 @@ class AppController {
     // Obra já completa no cache (filme ou com temporadas): não precisa buscar de novo. Senão pede o detalhe ao servidor:
     // obra que já está no catálogo é pública; obra nova é ingerida e isso exige login (S02).
     // (resultado de busca externa — isExternal — e item leve da lista — light — nunca contam como completos: sem episódios no cache)
-    const complete = known && !known.isExternal && !known.light && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
+    const complete = known && !known.isExternal && !known.light && !known.summary && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
     if (!complete) {
       try {
         this.showToast('Buscando os episódios da obra...', 'info');

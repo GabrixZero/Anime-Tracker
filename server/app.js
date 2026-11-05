@@ -73,7 +73,8 @@ app.use(express.static(path.join(__dirname, '..', 'public'), {
   lastModified: true,
   maxAge: config.STATIC_MAX_AGE_SEC * 1000,
   setHeaders(res, filePath) {
-    if (/\.html?$/i.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
+    // HTML, service worker e manifesto sempre conferidos (o navegador precisa ver a versão nova do sw.js na hora; S18)
+    if (/\.html?$/i.test(filePath) || /[\\/]sw\.js$/.test(filePath) || /\.webmanifest$/.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
   }
 }));
 

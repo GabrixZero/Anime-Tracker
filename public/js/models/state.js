@@ -166,7 +166,7 @@ class AppState {
     items.forEach((item) => {
       if (!item || !Number.isSafeInteger(item.id)) return;
       const current = this.mediaMap.get(item.id);
-      if (current && this.isDetailed(current) && (item.light || item.isExternal)) return;
+      if (current && !current.light && !current.isExternal && (item.light || item.isExternal)) return; // lista leve nunca apaga resumo/detalhe
       this.mediaMap.set(item.id, item);
       this._progress.delete(item.id);
     });
@@ -181,9 +181,27 @@ class AppState {
     this.rev++;
   }
 
+  // Resumo por obra (S18): temporadas com episódios enxutos (sem sinopses). Serve às listas e contas; o modal pede o detalhe completo.
+  cacheMediaSummary(item) {
+    if (!item || !Number.isSafeInteger(item.id)) return;
+    const current = this.mediaMap.get(item.id);
+    if (current && this.isDetailed(current)) return; // nunca troca o detalhe completo por um resumo
+    this.mediaMap.set(item.id, item);
+    this._progress.delete(item.id);
+    this.prevRev = this.rev;
+    this.rev++;
+  }
+
   // Item com os dados completos? (os de teste e os do servidor antigo, sem a marca `light`, contam como completos)
   isDetailed(item) {
-    return !!item && !item.light && !item.isExternal;
+    return !!item && !item.light && !item.summary && !item.isExternal;
+  }
+
+  // Tem os episódios (resumo ou detalhe) para calcular progresso e "A Seguir"? Filme não tem episódios: basta não ser item leve.
+  hasEpisodes(id) {
+    const item = this.mediaMap.get(Number(id));
+    if (!item || item.light || item.isExternal) return false;
+    return item.type === 'movie' || Array.isArray(item.seasons);
   }
 
   hasDetail(id) {

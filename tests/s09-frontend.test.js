@@ -51,7 +51,8 @@ function makeEl(id) {
   return {
     id, textContent: '', innerHTML: '', value: '', checked: false, dataset: {}, style: {}, classList: FakeCards.classList(),
     addEventListener() {}, setAttribute: (k, v) => attrs.set(k, String(v)), getAttribute: (k) => (attrs.has(k) ? attrs.get(k) : null), removeAttribute: (k) => attrs.delete(k),
-    querySelector: () => null, querySelectorAll: () => [], focus() {}, click() {}, append() {}, remove() {}, contains: () => false
+    querySelector: () => null, querySelectorAll: () => [], focus() {}, click() {}, append() {}, remove() {}, contains: () => false,
+    insertAdjacentHTML(where, html) { this.innerHTML += html; } // S18: o modal desenha os episódios aos poucos
   };
 }
 
