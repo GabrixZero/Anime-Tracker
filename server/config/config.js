@@ -104,6 +104,7 @@ module.exports = {
     loginPerIp: { windowMs: intFromEnv('AUTH_LOGIN_WINDOW_MS', 15 * 60 * 1000), max: intFromEnv('AUTH_LOGIN_IP_MAX', 50) },
     register: { windowMs: intFromEnv('AUTH_REGISTER_WINDOW_MS', 60 * 60 * 1000), max: intFromEnv('AUTH_REGISTER_MAX', 20) },
     google: { windowMs: intFromEnv('AUTH_GOOGLE_WINDOW_MS', 15 * 60 * 1000), max: intFromEnv('AUTH_GOOGLE_MAX', 30) },
+    avatar: { windowMs: intFromEnv('AUTH_AVATAR_WINDOW_MS', 15 * 60 * 1000), max: intFromEnv('AUTH_AVATAR_MAX', 30) },
     sensitive: { windowMs: intFromEnv('AUTH_SENSITIVE_WINDOW_MS', 15 * 60 * 1000), max: intFromEnv('AUTH_SENSITIVE_MAX', 10) }
   }
 };

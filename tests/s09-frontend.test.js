@@ -229,6 +229,7 @@ function makeApp({ catalog = catalogFor(), library = null, withController = true
     'utils/viewKit.js',
     'utils/libraryMerge.js',
     'utils/rating.js',
+    'utils/genreStats.js',
     'utils/watchStatus.js',
     'utils/backupValidator.js',
     'utils/migrations.js'
@@ -523,32 +524,6 @@ test('falha ao carregar o detalhe: A Seguir mostra aviso com "Tentar de novo", e
   await w.appController.retryDetails();
   assert.equal(app.state.detailsStatus, 'idle');
   assert.ok(app.cards['next-up-container'].cards.length > 5, 'a fila apareceu');
-});
-
-test('"Carregar exemplo" busca o detalhe das obras de exemplo antes de adicionar', async () => {
-  const catalog = catalogFor();
-  const ids = [157336, 872585, 1396, 1429];
-  const examples = ids.map(id => ({
-    id,
-    type: id === 1396 ? 'tv' : id === 1429 ? 'anime' : 'movie',
-    name: `Exemplo ${id}`,
-    genres: [],
-    seasons: id === 1396 || id === 1429 ? [{ season_number: 1, episodes: [{ episode_number: 1, name: 'E1' }] }] : undefined
-  }));
-  const app = makeApp({ catalog: [...catalog, ...examples] });
-  await app.window.appController.loadExample();
-  assert.deepEqual(
-    app.apiCalls
-      .filter(c => c[0] === 'batch')
-      .flatMap(c => c[1])
-      .sort((a, b) => a - b),
-    ids.slice().sort((a, b) => a - b)
-  );
-  assert.deepEqual(
-    app.state.data.trackedShows.map(t => t.showId).sort((a, b) => a - b),
-    ids.slice().sort((a, b) => a - b)
-  );
-  assert.ok(app.toasts.some(([, m]) => /Exemplo carregado/.test(m)));
 });
 
 test('adicionar uma obra do catálogo vinda da lista leve busca o detalhe (público, sem ingestão) e só então entra na lista', async () => {

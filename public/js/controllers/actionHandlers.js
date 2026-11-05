@@ -17,8 +17,6 @@
 
   // Navegação e listas
   A.on('goto-tab', el => window.appController.switchTab(el.getAttribute('data-goto')));
-  A.on('load-example', () => window.appController.loadExample());
-  A.on('remove-example', () => window.appController.removeExample());
   A.on('add-to-list', el => window.appController.addToList(show(el)));
   A.on('remove-from-list', el => window.appController.removeFromList(show(el)));
   A.on('quick-check', el => window.appController.quickCheck(show(el), season(el), episode(el)));
@@ -45,7 +43,6 @@
   });
 
   // Login
-  A.on('auth-mode', el => window.authView.switchMode(el.getAttribute('data-mode')));
   // "Perdi a senha": por enquanto só um aviso (a recuperação por e-mail ainda não existe)
   A.on('forgot-password', () => document.getElementById('tvtime-forgot-note').classList.remove('hidden'));
 

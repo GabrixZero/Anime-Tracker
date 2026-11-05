@@ -1,10 +1,10 @@
 // S12 · Anotações: Markdown simples com spoiler (S08, D-19), salvamento automático, diário, histórico de versões e exportação.
-// Visitante com o exemplo carregado. Roda em desktop e mobile.
+// Visitante com a biblioteca semeada. Roda em desktop e mobile.
 'use strict';
 
 const fs = require('fs');
 const { test, expect } = require('./support/fixtures');
-const { openApp, waitForBoot, gotoTab, toast, loadExample, queueCard, tap } = require('./support/helpers');
+const { openApp, waitForBoot, gotoTab, toast, seedLibrary, queueCard, tap } = require('./support/helpers');
 
 const noteModal = page => page.locator('#modal-episode-note');
 const textarea = page => page.locator('#note-textarea');
@@ -31,7 +31,7 @@ const MARKDOWN = [
 test.describe('anotações', () => {
   test.beforeEach(async ({ page }) => {
     await openApp(page);
-    await loadExample(page);
+    await seedLibrary(page);
   });
 
   test('escreve com Markdown e spoiler, salva sozinha e aparece no Diário e nas Estatísticas', async ({ page }) => {

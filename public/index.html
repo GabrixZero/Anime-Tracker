@@ -293,6 +293,15 @@
               <h2>Minha Lista</h2>
               <p>Seu cofre pessoal de séries, filmes e animes com progresso detalhado.</p>
             </div>
+          </div>
+
+          <div class="watchlist-filters-row">
+            <div class="type-filter-row" role="group" aria-label="Filtrar a lista por tipo">
+              <button type="button" class="type-pill-btn active" data-cat="all" aria-pressed="true">Todos</button>
+              <button type="button" class="type-pill-btn" data-cat="tv" aria-pressed="false">Séries</button>
+              <button type="button" class="type-pill-btn" data-cat="anime" aria-pressed="false">Animes</button>
+              <button type="button" class="type-pill-btn" data-cat="movie" aria-pressed="false">Filmes</button>
+            </div>
 
             <div class="filter-pills" id="watchlist-filters" role="group" aria-label="Filtrar a lista por status">
               <button type="button" class="pill-btn active" data-filter="all" aria-pressed="true">
@@ -308,26 +317,6 @@
                 Quero Ver (<span id="count-plan">0</span>)
               </button>
             </div>
-          </div>
-
-          <div class="type-filter-row" role="group" aria-label="Filtrar a lista por tipo">
-            <button type="button" class="type-pill-btn active" data-cat="all" aria-pressed="true">Todos</button>
-            <button type="button" class="type-pill-btn" data-cat="tv" aria-pressed="false">Séries</button>
-            <button type="button" class="type-pill-btn" data-cat="anime" aria-pressed="false">Animes</button>
-            <button type="button" class="type-pill-btn" data-cat="movie" aria-pressed="false">Filmes</button>
-          </div>
-
-          <div class="example-bar hidden" id="watchlist-example-bar">
-            <p class="example-bar-text" id="watchlist-example-text"></p>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline"
-              id="btn-remove-example"
-              data-action="remove-example"
-              aria-describedby="watchlist-example-text"
-            >
-              Remover exemplo
-            </button>
           </div>
 
           <div class="shows-grid" id="watchlist-container"></div>
@@ -350,20 +339,10 @@
             </div>
             <h3 class="empty-title" id="watchlist-empty-title">Sua lista está vazia</h3>
             <p class="empty-text" id="watchlist-empty-text">
-              Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns
-              títulos de exemplo.
+              Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar.
             </p>
             <div class="empty-actions">
               <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
-              <button
-                type="button"
-                class="btn btn-outline"
-                id="btn-watchlist-example"
-                data-focus-key="empty:example"
-                data-action="load-example"
-              >
-                Carregar exemplo
-              </button>
             </div>
           </div>
         </section>
@@ -373,7 +352,10 @@
           <div class="section-hero">
             <div class="hero-text">
               <h2>Agenda de Lançamentos</h2>
-              <p>Os episódios das obras da sua lista por dia de exibição. Marque como assistido direto daqui.</p>
+              <p>
+                Os episódios das obras da sua lista (menos as que você desistiu) por dia de exibição. Obras sem data prevista aparecem no
+                fim. Marque como assistido direto daqui.
+              </p>
             </div>
             <div class="hero-actions">
               <span class="hero-pill" id="calendar-counter-pill">Carregando agenda...</span>
@@ -699,7 +681,16 @@
 
               <div class="tvtime-field">
                 <label for="input-tvtime-email">E-mail</label>
-                <input type="email" id="input-tvtime-email" placeholder="seu@email.com" maxlength="254" autocomplete="email" required />
+                <input
+                  type="email"
+                  id="input-tvtime-email"
+                  placeholder="seu@email.com"
+                  maxlength="254"
+                  autocomplete="email"
+                  aria-describedby="tvtime-email-error"
+                  required
+                />
+                <small id="tvtime-email-error" class="hidden auth-field-error" role="alert"></small>
               </div>
 
               <div class="tvtime-field">
@@ -710,9 +701,13 @@
                   placeholder="••••••••"
                   maxlength="128"
                   autocomplete="current-password"
+                  aria-describedby="tvtime-password-hint tvtime-password-error"
                   required
                 />
-                <small id="tvtime-password-hint" class="hidden auth-field-hint">Use de 8 a 128 caracteres.</small>
+                <small id="tvtime-password-hint" class="hidden auth-field-hint"
+                  >Use de 8 a 128 caracteres, com pelo menos uma letra e um número.</small
+                >
+                <small id="tvtime-password-error" class="hidden auth-field-error" aria-live="polite"></small>
                 <button
                   type="button"
                   class="auth-switch-link auth-forgot-link"
@@ -746,15 +741,6 @@
 
               <button type="submit" class="btn-tvtime-submit" id="btn-tvtime-auth-submit">Entrar na Conta</button>
             </form>
-
-            <div class="tvtime-auth-footer">
-              <span id="tvtime-switch-link"
-                >Não tem conta?
-                <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">
-                  Cadastre-se grátis
-                </button></span
-              >
-            </div>
           </div>
         </div>
       </div>
@@ -775,18 +761,32 @@
             <section class="account-section" aria-labelledby="account-profile-title">
               <h3 class="account-section-title" id="account-profile-title">Perfil</h3>
               <div class="account-profile">
-                <img class="user-avatar" id="account-avatar" src="" alt="" />
+                <div class="account-photo">
+                  <button
+                    type="button"
+                    class="account-photo-btn"
+                    id="btn-account-photo"
+                    aria-label="Alterar foto de perfil"
+                    title="Alterar foto de perfil"
+                  >
+                    <img class="account-avatar" id="account-avatar" src="" alt="" />
+                    <span class="account-photo-badge" aria-hidden="true">&#9998;</span>
+                  </button>
+                  <input type="file" id="account-photo-input" class="hidden" accept="image/png,image/jpeg,image/webp" tabindex="-1" />
+                  <button type="button" class="btn-account-secondary btn-account-photo-remove hidden" id="btn-account-photo-remove">
+                    Remover foto
+                  </button>
+                </div>
                 <dl class="account-data">
                   <dt>Nome</dt>
                   <dd id="account-name"></dd>
                   <dt>E-mail</dt>
                   <dd id="account-email"></dd>
-                  <dt>Entrada</dt>
-                  <dd id="account-provider"></dd>
                   <dt>Conta criada em</dt>
                   <dd id="account-created"></dd>
                 </dl>
               </div>
+              <p id="account-photo-msg" class="hidden auth-form-error" role="alert"></p>
             </section>
 
             <section class="account-section" id="account-password-section" aria-labelledby="account-password-title">
@@ -803,10 +803,13 @@
                     id="account-new-password"
                     maxlength="128"
                     autocomplete="new-password"
-                    aria-describedby="account-new-password-hint"
+                    aria-describedby="account-new-password-hint account-new-password-error"
                     required
                   />
-                  <small id="account-new-password-hint" class="auth-field-hint">Use de 8 a 128 caracteres.</small>
+                  <small id="account-new-password-hint" class="auth-field-hint"
+                    >Use de 8 a 128 caracteres, com pelo menos uma letra e um número.</small
+                  >
+                  <small id="account-new-password-error" class="hidden auth-field-error" aria-live="polite"></small>
                 </div>
                 <div class="tvtime-field">
                   <label for="account-confirm-password">Repita a nova senha</label>
@@ -1105,9 +1108,11 @@
     <script src="js/utils/a11y.js"></script>
     <script src="js/utils/libraryMerge.js"></script>
     <script src="js/utils/rating.js"></script>
+    <script src="js/utils/genreStats.js"></script>
     <script src="js/utils/watchStatus.js"></script>
     <script src="js/utils/calendar.js"></script>
     <script src="js/utils/backupValidator.js"></script>
+    <script src="js/utils/passwordRules.js"></script>
     <script src="js/utils/migrations.js"></script>
     <script src="js/api/apiClient.js"></script>
     <script src="js/models/state.js"></script>

@@ -6,6 +6,7 @@
 //  - Imagens de capa/episódio vindas das fontes do catálogo (TMDB, TVMaze, MyAnimeList...) e avatares: qualquer https
 //    (e http, que em produção o `upgrade-insecure-requests` troca por https). Imagem não executa nada; o frontend ainda
 //    filtra as URLs (`safeUrl`);
+//  - Foto de perfil: a imagem só é entregue a quem tem o token, então o front a baixa com fetch e a mostra por blob: (mesma origem);
 //  - Login com Google (opcional): script, iframe do botão, requisições e estilo vêm de accounts.google.com/gsi/.
 function buildCspDirectives({ isProduction, googleEnabled = false }) {
   return {
@@ -21,7 +22,7 @@ function buildCspDirectives({ isProduction, googleEnabled = false }) {
       ...(googleEnabled ? ["'unsafe-inline'"] : [])
     ],
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-    imgSrc: ["'self'", 'data:', 'https:', 'http:'],
+    imgSrc: ["'self'", 'data:', 'blob:', 'https:', 'http:'], // blob: = foto de perfil (buscada com token e exibida via URL.createObjectURL)
     connectSrc: ["'self'", 'https://accounts.google.com/gsi/'],
     frameSrc: ["'self'", 'https://accounts.google.com/gsi/'],
     workerSrc: ["'self'"], // service worker do modo offline (S18)

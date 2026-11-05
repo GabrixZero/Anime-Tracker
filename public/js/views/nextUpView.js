@@ -141,11 +141,10 @@ class NextUpView {
         iconSvg:
           '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>',
         title: 'Sua lista está vazia',
-        text: 'Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar, ou carregue alguns títulos de exemplo para ver o app funcionando (você remove quando quiser).',
+        text: 'Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar.',
         narrow: true,
         actionsHtml: `<div class="empty-actions">
           <button type="button" class="btn btn-primary" data-focus-key="empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>
-          <button type="button" class="btn btn-outline" data-focus-key="empty:example" data-action="load-example">Carregar exemplo</button>
         </div>`
       });
       return;

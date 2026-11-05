@@ -474,3 +474,18 @@ test('o segredo local foi criado no diretório temporário e é longo', () => {
   assert.ok(fs.readFileSync(file, 'utf8').trim().length >= 64);
   assert.equal(config.JWT_SECRET_SOURCE, 'file');
 });
+
+test('senha nova: cadastro 400 com a mensagem exata; login com corpo vazio 400 por campo; senha fraca antiga ainda entra', async () => {
+  const semNumero = await register({ email: 'regra@exemplo.test', password: 'somenteletras' });
+  assert.equal(semNumero.status, 400);
+  assert.equal(semNumero.body.fields.password, 'Falta pelo menos um número.');
+  const semLetra = await register({ email: 'regra@exemplo.test', password: '123456789' });
+  assert.equal(semLetra.body.fields.password, 'Falta pelo menos uma letra.');
+  const curta = await register({ email: 'regra@exemplo.test', password: 'abc123' });
+  assert.equal(curta.body.fields.password, 'A senha precisa ter pelo menos 8 caracteres.');
+
+  const vazio = await login('', '');
+  assert.equal(vazio.status, 400);
+  assert.ok(vazio.body.fields.email);
+  assert.ok(vazio.body.fields.password);
+});

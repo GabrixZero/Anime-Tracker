@@ -33,7 +33,6 @@ test.describe('minha conta', () => {
 
     await expect(page.locator('#account-name')).toHaveText(user.name);
     await expect(page.locator('#account-email')).toHaveText(user.email);
-    await expect(page.locator('#account-provider')).toHaveText('E-mail e senha');
 
     const message = page.locator('#account-password-msg');
     await page.locator('#account-current-password').fill(user.password);

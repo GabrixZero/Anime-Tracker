@@ -32,9 +32,18 @@ class CalendarView {
     return window.Calendar.dayKey(new Date());
   }
 
-  // Só obras cujo status entra na fila (Assistindo / Quero ver), como no "A Seguir".
+  // Todas as obras da lista, menos as que o usuário desistiu (status "Desisti").
   includeTracked(tracked) {
-    return window.WatchStatus.isQueueStatus(window.appState.getStatus(tracked));
+    return window.appState.getStatus(tracked) !== 'dropped';
+  }
+
+  // Obras sem nenhuma data futura conhecida (seção "Sem data prevista"), independente do período.
+  buildUndated() {
+    const state = window.appState;
+    if (!state || !state.data || !state.data.trackedShows) return [];
+    return window.Calendar.buildUndated(state.data.trackedShows, id => state.getMedia(id), this.today(), {
+      includeTracked: t => this.includeTracked(t)
+    });
   }
 
   buildItems() {
@@ -113,13 +122,24 @@ class CalendarView {
     }
 
     const items = this.buildItems();
-    if (this.counterPill) this.counterPill.textContent = `${items.length} episódio${items.length === 1 ? '' : 's'}`;
+    const undated = this.buildUndated();
+    if (this.counterPill) {
+      const eps = `${items.length} episódio${items.length === 1 ? '' : 's'}`;
+      this.counterPill.textContent = undated.length > 0 ? `${eps} · ${undated.length} sem data` : eps;
+    }
 
-    if (items.length > 0) {
+    if (items.length > 0 || undated.length > 0) {
       this.emptyState.classList.add('hidden');
-      this.container.innerHTML = window.Calendar.groupByDay(items)
-        .map(g => this.renderDay(g))
-        .join('');
+      const noEpisodes =
+        items.length === 0
+          ? '<div class="grid-message grid-message--info" role="status">Nenhum episódio com data nesse período. Tente outro período.</div>'
+          : '';
+      this.container.innerHTML =
+        noEpisodes +
+        window.Calendar.groupByDay(items)
+          .map(g => this.renderDay(g))
+          .join('') +
+        this.renderUndated(undated);
       return;
     }
 
@@ -143,7 +163,7 @@ class CalendarView {
     this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
       iconSvg: calendarIcon,
       title: 'Nenhum episódio nesse período',
-      text: 'Tente outro período. A agenda só mostra episódios com data de exibição conhecida, de obras em Assistindo ou Quero ver.',
+      text: 'Tente outro período. A agenda só mostra episódios com data de exibição conhecida, de todas as obras exceto as que você desistiu.',
       narrow: true
     });
   }
@@ -162,6 +182,33 @@ class CalendarView {
         <h3 class="calendar-day-title${group.daysFromToday === 0 ? ' calendar-day-title--today' : ''}">${escapeHtml(this.dayHeading(group))}</h3>
         <ul class="calendar-list">
           ${group.items.map(item => this.renderItem(item)).join('')}
+        </ul>
+      </div>
+    `;
+  }
+
+  // Seção no fim: obras sem data prevista (sem botão de marcar episódio, só abre o detalhe).
+  renderUndated(list) {
+    if (list.length === 0) return '';
+    return `
+      <div class="calendar-day calendar-undated">
+        <h3 class="calendar-day-title">Sem data prevista</h3>
+        <ul class="calendar-list">
+          ${list
+            .map(o => {
+              const id = toInt(o.showId);
+              return `
+          <li class="calendar-item" data-show-id="${id}">
+            <div class="calendar-item-info">
+              <div class="calendar-item-top">
+                <span class="calendar-item-show">${escapeHtml(o.showName)}</span>
+                ${window.ViewKit.typeBadge(o.type)}
+              </div>
+              <p class="calendar-item-title"><button type="button" class="link-btn" data-focus-key="cal:undated-${id}:open" aria-label="Ver detalhes: ${escapeHtml(o.showName)}" data-action="open-detail" data-show="${id}">Ver detalhes</button></p>
+            </div>
+          </li>`;
+            })
+            .join('')}
         </ul>
       </div>
     `;

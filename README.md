@@ -2,7 +2,7 @@
 
 > Acompanhe séries, filmes e animes: progresso episódio por episódio, diário de anotações e estatísticas de tempo assistido.
 
-Os dados ficam no seu navegador (e, se você criar uma conta, também numa cópia no servidor para usar em vários aparelhos). O primeiro acesso começa com a lista **vazia**: explore o catálogo, ou use "Carregar exemplo" para ver o app com alguns títulos (sem progresso nem anotações de mentira).
+Os dados ficam no seu navegador (e, se você criar uma conta, também numa cópia no servidor para usar em vários aparelhos). O primeiro acesso começa com a lista **vazia**: explore o catálogo para adicionar títulos à sua lista.
 
 Stack: Node.js + Express (API REST) e HTML/CSS/JavaScript puro no navegador (sem framework e sem etapa de build). Interface em português do Brasil.
 
@@ -160,7 +160,7 @@ Detalhes de cada arquivo: `Documentacao/01-visao-geral-e-arquitetura.md`.
 
 ### Testes ponta a ponta (E2E): o app de verdade num navegador (S12)
 
-Um robô (Playwright + Chromium) abre o ShowVault como uma pessoa abriria e clica, digita e navega pelo teclado, em **desktop (1280×800)** e **celular (375×812)**: primeira visita e "Carregar exemplo"/"Remover exemplo", cadastro e login, marcar episódios, status por obra, anotações com Markdown/spoiler e histórico, Explorar (busca, adicionar, "Mostrar mais"), backup, sair isolando contas e **sincronização entre dois aparelhos**. Além dos fluxos, todo teste falha se o navegador mostrar erro de console, violação da CSP ou tentar usar a internet, e há conferências de largura em 375 px, de teclado, de acessibilidade (axe-core) e do botão do Google.
+Um robô (Playwright + Chromium) abre o ShowVault como uma pessoa abriria e clica, digita e navega pelo teclado, em **desktop (1280×800)** e **celular (375×812)**: primeira visita, cadastro e login, marcar episódios, status por obra, anotações com Markdown/spoiler e histórico, Explorar (busca, adicionar, "Mostrar mais"), backup, sair isolando contas e **sincronização entre dois aparelhos**. Além dos fluxos, todo teste falha se o navegador mostrar erro de console, violação da CSP ou tentar usar a internet, e há conferências de largura em 375 px, de teclado, de acessibilidade (axe-core) e do botão do Google.
 
 ```bash
 npm run test:e2e:install   # UMA vez por instalação: baixa o Chromium (~440 MB) para dentro de node_modules
@@ -238,5 +238,4 @@ Observação: contas Google nunca são fundidas automaticamente com uma conta de
 6. **Catálogo e busca:**
    - Catálogo inicial com 16 séries, animes e filmes (os de série/anime trazem poucos episódios de amostra), busca no TVMaze, na AniList (animes; a Jikan/MyAnimeList é a reserva) e, com `TMDB_API_KEY`, no TMDB; adicionar uma obra nova à lista exige estar conectado.
    - Animes aparecem agrupados por franquia (uma obra, várias temporadas). A AniList não tem o título de cada episódio: aparece "Episódio N" (a Jikan completa os títulos quando está no ar).
-   - Na Minha Lista, **Remover exemplo** tira de uma vez os títulos do "Carregar exemplo" que você ainda não usou.
    - O que a fonte não informa aparece como **"Sem nota"**, **"Sem gênero"** ou uma imagem neutra, nunca como um valor de enfeite.

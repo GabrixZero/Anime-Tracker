@@ -37,4 +37,7 @@ const sensitive = build(config.RATE_LIMITS.sensitive, {
   keyGenerator: req => `${req.userId || ipKeyGenerator(req.ip)}`
 });
 
-module.exports = { loginPerEmail, loginPerIp, register, google, sensitive };
+// Troca/remoção da foto de perfil: por usuário, todas as tentativas contam (o envio grava no disco).
+const avatar = build(config.RATE_LIMITS.avatar, { keyGenerator: req => `${req.userId || ipKeyGenerator(req.ip)}` });
+
+module.exports = { loginPerEmail, loginPerIp, register, google, sensitive, avatar };
