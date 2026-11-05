@@ -32,11 +32,12 @@ const focusInside = (page, dialogSelector) =>
 test.describe('teclado', () => {
   test('atalho para o conteúdo, abas com setas, marcar episódio e abrir a obra', async ({ page }) => {
     await openApp(page);
+    await openApp(page); // 2ª abertura: o visitante já está registrado, o app abre direto e o foco começa do zero
 
     // 1º Tab = "Pular para o conteúdo"; Enter leva o foco para a área principal
     await page.keyboard.press('Tab');
-    await expect(page.locator('.skip-link')).toBeFocused();
-    await expect(page.locator('.skip-link')).toBeVisible();
+    await expect(page.locator('.skip-link[href="#main-content"]')).toBeFocused();
+    await expect(page.locator('.skip-link[href="#main-content"]')).toBeVisible();
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-content')).toBeFocused();
 

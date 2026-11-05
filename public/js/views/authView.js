@@ -74,6 +74,7 @@ class AuthView {
       if (err && err.status === 401) {
         // O servidor recusou o token (expirado, conta excluída, senha trocada): aí sim a sessão acabou.
         localStorage.removeItem('showvault_auth_token');
+        if (window.Landing) window.Landing.markVisitor();
         this.updateHeader(null);
         return;
       }
@@ -257,6 +258,7 @@ class AuthView {
 
   finishLogin(res, message) {
     localStorage.setItem('showvault_auth_token', res.token);
+    if (window.Landing) window.Landing.showApp(); // login feito pela landing: mostra o app
     this.updateHeader(res.user);
     this.showError('');
     this.close();
@@ -318,6 +320,7 @@ class AuthView {
   // Parte local de sair (os dados já foram limpos pelo syncService/AppState): tira o token, volta o cabeçalho a "visitante" e redesenha.
   finishLocalLogout() {
     localStorage.removeItem('showvault_auth_token');
+    if (window.Landing) window.Landing.markVisitor(); // depois de sair, continua no app como visitante (D-LP-1)
     this.updateHeader(null);
     document.getElementById('modal-show-detail').classList.add('hidden');
     window.appController.refreshAll();

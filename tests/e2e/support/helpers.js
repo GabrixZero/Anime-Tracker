@@ -18,8 +18,13 @@ async function waitForBoot(page) {
   await expect(page.locator('#next-up-counter-pill')).toHaveText(/^\d+ títulos? na fila$|^Não carregou$/);
 }
 
+// Abre o app. Sem conta e sem escolha anterior, o endereço principal mostra a landing: aqui entramos como visitante ("Usar sem conta"),
+// que é o caminho de uma pessoa de verdade. Com sessão (token) ou visitante já registrado, vai direto ao app.
 async function openApp(page, path = '/') {
   await page.goto(path);
+  if ((await page.locator('html').getAttribute('data-view')) === 'landing') {
+    await page.getByRole('button', { name: 'Usar sem conta' }).click();
+  }
   await waitForBoot(page);
 }
 
