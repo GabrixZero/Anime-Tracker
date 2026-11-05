@@ -154,6 +154,7 @@ class DetailModalView {
         <h2 class="modal-title" id="detail-modal-title">${escapeHtml(media.name)}</h2>
         <div class="modal-meta">${metaParts}</div>
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
+        <p class="rating-catalog-line">${window.Rating.catalogRatingHtml(MD.ratingBadge(media.vote_average))}</p>
         
         <div class="modal-actions">
           ${tracked ? `
@@ -162,6 +163,7 @@ class DetailModalView {
               <span class="status-picker-label">Status</span>
               <select class="status-select" id="detail-status-select" aria-label="Status da obra" data-change-action="set-status" data-show="${toInt(media.id)}">${window.WatchStatus.statusOptionsHtml(window.appState.getStatus(tracked))}</select>
             </label>
+            ${window.Rating.ratingControlHtml({ showId: media.id, name: media.name, rating: tracked.rating, idPrefix: 'detail-rating' })}
           ` : `
             <button type="button" class="btn btn-sm btn-primary" data-focus-key="detail:primary" data-action="add-to-list" data-show="${toInt(media.id)}">+ Adicionar à Lista</button>
           `}
@@ -214,6 +216,16 @@ class DetailModalView {
 
     this.detailModal.classList.remove('hidden');
     if (!window.appState.hasDetail(media.id) && !media.isExternal) this.loadDetail(media.id);
+  }
+
+  // Mantém o campo de nota do modal igual ao estado (valor normalizado, "Remover nota" só com nota), sem redesenhar (o foco fica).
+  refreshRating() {
+    const input = document.getElementById(`detail-rating-${this.currentShowId}`);
+    if (!input || this.currentShowId === null) return;
+    const rating = window.appState.getRating(this.currentShowId);
+    input.value = window.Rating.formatUserRating(rating);
+    const clear = input.parentNode ? input.parentNode.querySelector('[data-action="clear-rating"]') : null;
+    if (clear) clear.disabled = rating === null;
   }
 
   // Mantém o seletor de status do modal igual ao estado (ex.: virou "Finalizado" ao marcar o último episódio).

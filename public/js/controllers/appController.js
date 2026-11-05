@@ -244,6 +244,18 @@ class AppController {
     this.refreshShow(showId);
   }
 
+  // Nota pessoal (S17): valor do campo (texto) ou vazio para remover. Inválido não grava e o campo volta ao valor salvo.
+  setRating(showId, raw) {
+    const ok = window.appState.setRating(showId, raw);
+    if (!ok) {
+      this.showToast('Nota inválida: use um número de 0 a 10 com no máximo uma casa decimal (ex.: 7.5).', 'error');
+    } else {
+      this.showToast(window.appState.getRating(showId) === null ? 'Nota removida.' : `Nota salva: ${window.Rating.formatUserRating(window.appState.getRating(showId))}.`, 'success');
+    }
+    this.refreshShow(showId);
+    window.detailModalView.refreshRating();
+  }
+
   // Tudo pode ter mudado (login, sync, importar/resetar, adicionar/remover obra): marca as 4 telas como desatualizadas e
   // redesenha só a que está visível; as outras redesenham quando forem abertas (S09). Os números das abas ficam em dia.
   refreshAll() {

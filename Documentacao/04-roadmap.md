@@ -52,6 +52,6 @@ Status pelo quadro (`npm run status`). Ordem (uma por vez, D-30): **S13 → S11 
 | 14 | Contas completas e convites | [S14](secoes/S14-contas-completas.md) | (S12 recomendado) |
 | 15 | Calendário de lançamentos | [S15](secoes/S15-calendario.md) | S13 |
 | 16 | Importar e exportar histórico | [S16](secoes/S16-importar-exportar.md) | S13 |
-| 17 | Nota do usuário (1 a 5) | [S17](secoes/S17-nota-1-a-5.md) | (S12 recomendado) |
+| 17 | Nota do usuário (0 a 10) | [S17](secoes/S17-nota-1-a-5.md) | (S12 recomendado) |
 | 18 | Performance 2 e modo offline | [S18](secoes/S18-performance-e-offline.md) | S13 |
 | 19 | Acessibilidade real e polimento | [S19](secoes/S19-polimento-final.md) | S11–S18 |

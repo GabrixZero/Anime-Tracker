@@ -287,6 +287,30 @@ class AppState {
     return true;
   }
 
+  // ----- nota pessoal (S17) -----
+  // Nota de 0 a 10 com uma casa decimal, guardada no item da lista (`rating`; ausente = sem nota). Vazio/null remove (apaga o campo).
+  // Alterar ou remover renova o `updatedAt` do item: o merge (mais novo vence) leva a mudança aos outros aparelhos.
+  // Devolve false se a obra não está na lista ou o valor é inválido (nada é gravado).
+  setRating(showId, value) {
+    const tracked = this.getTracked(showId);
+    if (!tracked) return false;
+    const empty = window.Rating.isEmptyRating(value);
+    const rating = empty ? null : window.Rating.normalizeRating(value);
+    if (!empty && rating === null) return false;
+    if (rating === null && tracked.rating === undefined) return true;
+    if (rating !== null && tracked.rating === rating) return true;
+    if (rating === null) delete tracked.rating;
+    else tracked.rating = rating;
+    tracked.updatedAt = this.stamp(tracked.updatedAt, tracked.addedAt);
+    this.save();
+    return true;
+  }
+
+  getRating(showId) {
+    const tracked = this.getTracked(showId);
+    return tracked && window.Rating.normalizeRating(tracked.rating) !== null ? tracked.rating : null;
+  }
+
   // Depois de marcar/desmarcar episódios: mantém o status coerente com o progresso. Não grava (quem chama grava).
   applyProgressRules(showId, marked) {
     const tracked = this.getTracked(showId);

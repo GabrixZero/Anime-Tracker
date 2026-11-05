@@ -555,3 +555,65 @@
 .toast.toast-error {
   border-left-color: var(--accent-rose);
 }
+
+/* ---------- Nota pessoal (S17) ---------- */
+.rating-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rating-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.rating-input {
+  width: 5rem;
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.rating-input:hover,
+.rating-input:focus-visible {
+  border-color: var(--bg-card-border-hover);
+}
+
+.rating-card-row { margin: 0.5rem 0; }
+
+.rating-user-badge {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--tvtime-yellow);
+}
+
+.rating-catalog,
+.rating-catalog-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.rating-top-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.rating-top-value { font-weight: 800; color: var(--tvtime-yellow); }
+
+.stat-subtitle {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
