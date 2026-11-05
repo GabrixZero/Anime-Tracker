@@ -49,7 +49,7 @@ test('o anel de foco (amarelo) tem contraste >= 3:1 com o fundo (WCAG 1.4.11)', 
 test('existe :focus-visible global e nenhum "outline: none" sem substituto', () => {
   const a11y = read('css', 'a11y.css');
   assert.ok(/:focus-visible\s*\{[^}]*outline:\s*3px solid/.test(a11y), 'falta :focus-visible global com anel');
-  const allowed = new Set(['.show-open-btn:focus-visible', '.next-up-card .link-btn:focus-visible', '.app-main:focus']); // anel desenhado em ::after / alvo não interativo
+  const allowed = new Set(['.show-open-btn:focus-visible', '.next-up-card .link-btn:focus-visible', '.app-main:focus', '#lp-main:focus']); // anel desenhado em ::after / alvo não interativo
   for (const f of cssFiles) {
     const css = read('css', f);
     for (const m of css.matchAll(/([^{}]+)\{[^{}]*outline:\s*none/g)) {

@@ -221,7 +221,7 @@ test.describe('login com Google', () => {
       expect(config.googleClientId).toBe(FAKE_CLIENT_ID);
 
       await page.goto(server.url);
-      await page.locator('#btn-open-auth').click();
+      await page.locator('.lp-header').getByRole('button', { name: 'Entrar' }).click(); // a landing abre o mesmo modal de entrada
       await expect(page.locator('#tvtime-auth-modal')).toBeVisible();
       await expect(page.locator('#google-signin-section')).toBeVisible();
       await expect(page.locator('#google-signin-button #google-botao-simulado')).toBeVisible();
