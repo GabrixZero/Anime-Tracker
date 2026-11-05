@@ -864,7 +864,19 @@
               <div id="movie-detail-body" class="hidden"></div>
 
               <div id="series-detail-body">
-                <div id="show-episodes-container" class="season-list"></div>
+                <div id="show-seasons-tabs" class="season-tabs" role="tablist" aria-label="Temporadas"></div>
+
+                <div id="season-summary-bar" class="season-summary-bar">
+                  <div id="season-stats-summary" class="season-summary">Progresso: <strong>0/0</strong></div>
+                  <div class="season-batch-actions">
+                    <button type="button" class="btn btn-sm btn-outline" id="btn-batch-check-season">
+                      <span aria-hidden="true">✓</span> Marcar Temporada Inteira
+                    </button>
+                    <button type="button" class="btn btn-sm btn-ghost" id="btn-batch-uncheck-season">Desmarcar Temporada</button>
+                  </div>
+                </div>
+
+                <div id="show-episodes-container" role="tabpanel"></div>
               </div>
             </div>
           </div>

@@ -163,9 +163,10 @@
 }
 
 /* Chips de filtro e abas de temporada (S10): UMA base compartilhada por .type-pill-btn (chip arredondado), .pill-btn (segmento dentro
-   de .filter-pills) (chip e segmento). Cada um só declara o que o diferencia (forma, tamanho, cor do ativo). */
+   de .filter-pills) e .season-tab-btn (aba retangular). Cada um só declara o que o diferencia (forma, tamanho, cor do ativo). */
 .type-pill-btn,
-.pill-btn {
+.pill-btn,
+.season-tab-btn {
   background: var(--bg-surface);
   border: 1px solid var(--bg-card-border);
   font-family: var(--font-body);

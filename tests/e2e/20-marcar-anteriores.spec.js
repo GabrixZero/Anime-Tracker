@@ -10,12 +10,8 @@ const SHOW_ID = 987001;
 const SHOW_NAME = 'Maratona dos Anteriores';
 
 const modal = page => page.locator('#modal-show-detail');
-// O quadro da obra é só leitura (Ajustes 3): marcar/ler o estado pelo caminho que continua existindo (a lógica do app).
-const markEp = (page, n) => page.evaluate(([id, ep]) => window.appController.quickCheck(id, 1, ep), [SHOW_ID, n]);
-const isWatched = (page, n) => page.evaluate(([id, ep]) => window.appState.isWatched(id, 1, ep), [SHOW_ID, n]);
-const expectWatched = async (page, list, value) => {
-  for (const n of list) expect(await isWatched(page, n), `episódio ${n}`).toBe(value);
-};
+const episodeCheck = (page, n) => page.locator(`#show-episodes-container .episode-row[data-ep="${n}"] .episode-check`);
+const seasonTab = page => page.locator('#season-tab-1');
 const watchedKeys = async page => {
   const lib = await localLibrary(page);
   return Object.keys(lib.watchedEpisodes).filter(k => lib.watchedEpisodes[k].watched);
@@ -87,7 +83,7 @@ async function undoWithKeyboard(page) {
 }
 
 test.describe('marcar anteriores', () => {
-  test('com o quadro aberto: marcar o ep 30 marca 1 a 30, Desfazer (teclado) volta, desmarcar o 10 mexe só nele e futuros não entram', async ({
+  test('no modal: marcar o ep 30 marca 1 a 30, Desfazer (teclado) volta, desmarcar o 10 mexe só nele e futuros não entram', async ({
     page
   }) => {
     await openApp(page);
@@ -95,41 +91,46 @@ test.describe('marcar anteriores', () => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: SHOW_NAME, exact: true }));
     await expect(modal(page)).toBeVisible();
-    // lista só de leitura: uma temporada por <details>; a primeira (Especiais) vem aberta, a Temporada 1 abre ao clicar
-    await expect(page.locator('#show-episodes-container summary')).toHaveText(['Especiais · 2 episódios', 'Temporada 1 · 40 episódios']);
-    await tap(page.locator('#show-episodes-container summary').nth(1));
-    await expect(page.locator('#show-episodes-container details').nth(1).locator('.episode-line')).toHaveCount(40);
-    await expect(page.locator('#show-episodes-container button')).toHaveCount(0);
+    await tap(seasonTab(page));
+    await expect(seasonTab(page)).toHaveText('Temporada 1 (0/40)');
+    await expect(page.locator('#show-episodes-container .episode-row')).toHaveCount(40);
 
     // marcar o 30: 1 a 30 ficam assistidos, aviso único com botão Desfazer
-    await markEp(page, 30);
+    await tap(episodeCheck(page, 30));
     await expect(toast(page, '30 episódios marcados.')).toHaveCount(1);
     await expect(toast(page, '30 episódios marcados.')).toBeVisible();
     await expect(toast(page, '30 episódios marcados.').getByRole('button', { name: 'Desfazer' })).toBeVisible();
-    await expectWatched(page, [1, 2, 15, 29, 30], true);
-    await expectWatched(page, [31, 35, 36, 40], false);
+    await expect(seasonTab(page)).toHaveText('Temporada 1 (30/40)');
+    await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 30/40 assistidos');
+    for (const n of [1, 2, 15, 29, 30]) await expect(episodeCheck(page, n)).toHaveAttribute('aria-checked', 'true');
+    for (const n of [31, 35, 36, 40]) await expect(episodeCheck(page, n)).toHaveAttribute('aria-checked', 'false');
     expect(await watchedKeys(page)).toHaveLength(30); // os especiais (temporada 0) não entraram
     await expect(page.locator('#detail-status-select')).toHaveValue('watching');
 
     // Desfazer pelo teclado (Tab + Enter): volta ao estado anterior
     await undoWithKeyboard(page);
     await expect(toast(page, 'Desfeito.')).toBeVisible();
-    await expectWatched(page, [1, 30], false);
+    await expect(seasonTab(page)).toHaveText('Temporada 1 (0/40)');
+    await expect(episodeCheck(page, 1)).toHaveAttribute('aria-checked', 'false');
+    await expect(episodeCheck(page, 30)).toHaveAttribute('aria-checked', 'false');
     expect(await watchedKeys(page)).toHaveLength(0);
 
     // marca de novo e desmarca só o 10
-    await markEp(page, 30);
+    await tap(episodeCheck(page, 30));
     await expect(toast(page, '30 episódios marcados.')).toBeVisible();
-    await markEp(page, 10);
+    await tap(episodeCheck(page, 10));
     await expect(toast(page, 'Desmarcado.')).toBeVisible();
-    await expectWatched(page, [10], false);
-    await expectWatched(page, [1, 9, 11, 30], true);
+    await expect(seasonTab(page)).toHaveText('Temporada 1 (29/40)');
+    await expect(episodeCheck(page, 10)).toHaveAttribute('aria-checked', 'false');
+    for (const n of [1, 9, 11, 30]) await expect(episodeCheck(page, n)).toHaveAttribute('aria-checked', 'true');
 
     // clicar num episódio futuro (38) marca ele e os lançados que faltam (10 e 31 a 35), nunca os outros futuros
-    await markEp(page, 38);
+    await tap(episodeCheck(page, 38));
     await expect(toast(page, '7 episódios marcados.')).toBeVisible();
-    await expectWatched(page, [38, 10], true);
-    await expectWatched(page, [36, 37, 39, 40], false);
+    await expect(episodeCheck(page, 38)).toHaveAttribute('aria-checked', 'true');
+    await expect(episodeCheck(page, 10)).toHaveAttribute('aria-checked', 'true');
+    for (const n of [36, 37, 39, 40]) await expect(episodeCheck(page, n)).toHaveAttribute('aria-checked', 'false');
+    await expect(seasonTab(page)).toHaveText('Temporada 1 (36/40)');
     expect(await watchedKeys(page)).toHaveLength(36);
   });
 
@@ -138,7 +139,8 @@ test.describe('marcar anteriores', () => {
     await addFakeShow(page);
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: SHOW_NAME, exact: true }));
-    await markEp(page, 3);
+    await tap(seasonTab(page));
+    await tap(episodeCheck(page, 3));
     await expect(toast(page, '3 episódios marcados.')).toBeVisible();
     const button = page.locator('.toast-action');
     await tabToUndo(page); // foco pelo teclado: aparece o contorno de foco (:focus-visible)
