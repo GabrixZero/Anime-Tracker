@@ -24,6 +24,9 @@
   A.on('quick-check', el => window.appController.quickCheck(show(el), season(el), episode(el)));
   A.on('retry-details', () => window.appController.retryDetails());
   A.onChange('set-status', el => window.appController.setStatus(show(el), el.value));
+  // Nota pessoal (S17): confirma ao mudar o valor (Enter ou sair do campo); "Remover nota" apaga
+  A.onChange('set-rating', el => window.appController.setRating(show(el), el.value));
+  A.on('clear-rating', el => window.appController.setRating(show(el), ''));
 
   // Detalhes e anotações
   A.on('open-detail', el => window.detailModalView.open(show(el)));

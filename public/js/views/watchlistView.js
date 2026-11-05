@@ -190,6 +190,11 @@ class WatchlistView {
 
               <select class="status-select status-select--card" data-focus-key="wl:${toInt(media.id)}:status" aria-label="Status de ${escapeHtml(media.name)}" data-change-action="set-status" data-show="${toInt(media.id)}">${window.WatchStatus.statusOptionsHtml(state.getStatus(t))}</select>
 
+              <div class="rating-card-row">
+                ${window.Rating.userRatingBadgeHtml(t.rating)}
+                ${window.Rating.ratingControlHtml({ showId: media.id, name: media.name, rating: t.rating, idPrefix: 'wl-rating' })}
+              </div>
+
               <div class="show-progress-wrap">
                 <div class="show-progress-info">
                   <span>Progresso</span>

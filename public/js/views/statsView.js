@@ -91,6 +91,9 @@ class StatsView {
       `;
     }).join('');
 
+    // Suas notas (S17): média, distribuição por faixa e as 5 obras mais bem avaliadas
+    this.renderRatings(state);
+
     // Top Gêneros
     const sortedGenres = Object.entries(genresCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
     if (sortedGenres.length === 0) {
@@ -112,5 +115,41 @@ class StatsView {
     }
   }
 }
+
+StatsView.prototype.renderRatings = function (state) {
+  const R = window.Rating;
+  const items = state.data.trackedShows.map(t => {
+    const media = state.getMedia(t.showId);
+    return { showId: t.showId, title: media ? media.name : `Obra ${t.showId}`, rating: t.rating };
+  });
+  const stats = R.computeRatingStats(items);
+  const summary = document.getElementById('stats-rating-summary');
+  const chart = document.getElementById('stats-rating-chart');
+  const top = document.getElementById('stats-rating-top');
+  if (!summary || !chart || !top) return;
+
+  if (stats.count === 0) {
+    summary.textContent = 'Média das notas que você deu (0 a 10)';
+    chart.innerHTML = '<p class="muted">Você ainda não deu nenhuma nota. Abra uma obra da lista e use "Minha nota".</p>';
+    top.innerHTML = '';
+    return;
+  }
+  summary.textContent = `Média: ${stats.average.toFixed(1)} (${stats.count} ${stats.count === 1 ? 'obra avaliada' : 'obras avaliadas'})`;
+  const maxCount = Math.max(...stats.distribution.map(b => b.count), 1);
+  chart.innerHTML = stats.distribution.map(band => {
+    const pct = Math.round((band.count / maxCount) * 100);
+    return `
+      <div class="stat-bar-row">
+        <span class="stat-bar-label">${escapeHtml(band.label)}</span>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill stat-bar-fill--cyan ${window.ViewKit.pctClass(pct)}"></div>
+        </div>
+        <span class="stat-bar-count">${band.count}</span>
+      </div>`;
+  }).join('');
+  top.innerHTML = `<ol class="rating-top-list">${stats.top.map(item =>
+    `<li><span class="rating-top-title">${escapeHtml(item.title)}</span> <span class="rating-top-value">★ ${escapeHtml(item.rating.toFixed(1))}</span></li>`
+  ).join('')}</ol>`;
+};
 
 window.statsView = new StatsView();

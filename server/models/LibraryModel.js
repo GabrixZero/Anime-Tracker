@@ -4,6 +4,7 @@ const storage = require('../storage');
 const { readJson, writeJsonAtomic } = storage;
 const { STATE_VERSION, migrateLibrary } = require('../../public/js/utils/migrations');
 const LibraryMerge = require('../../public/js/utils/libraryMerge');
+const Rating = require('../../public/js/utils/rating');
 
 const USER_ID_RE = /^usr_[A-Za-z0-9_]+$/;
 const EPISODE_KEY_RE = /^\d+_(movie|s\d+_e\d+)$/;
@@ -55,6 +56,12 @@ class LibraryModel {
       const show = { showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) };
       const updatedAt = LibraryMerge.cleanStamp(t.updatedAt);
       if (updatedAt) show.updatedAt = updatedAt;
+      // Nota pessoal (S17): 0 a 10 com uma casa decimal; ausente/null = sem nota; qualquer outro valor é rejeitado
+      if (!Rating.isEmptyRating(t.rating)) {
+        const rating = Rating.normalizeRating(t.rating);
+        if (rating === null) throw new Error('Nota inválida em trackedShows: use 0 a 10 com no máximo uma casa decimal.');
+        show.rating = rating;
+      }
       cleanShows.push(show);
     }
 

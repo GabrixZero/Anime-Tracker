@@ -1,10 +1,10 @@
 {
   "secao": "S17",
-  "titulo": "Nota do usuário (1 a 5)",
+  "titulo": "Nota do usuário (0 a 10)",
   "arquivo": "Documentacao/secoes/S17-nota-1-a-5.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s17-nota-0-a-10",
+  "concluidaEm": "2026-11-04",
   "commit": "",
-  "notas": ""
+  "notas": "Nota pessoal 0-10 com 1 casa decimal em trackedShows[].rating; estatisticas; testes unitarios e e2e."
 }

@@ -40,7 +40,7 @@ test('toda ação usada nos templates está registrada em actionHandlers.js (e v
   const registeredChange = new Set([...handlers.matchAll(/A\.onChange\('([a-z-]+)'/g)].map(m => m[1]));
   const usedClick = new Set();
   const usedChange = new Set();
-  for (const src of [html, ...viewFiles.map(f => read('js', 'views', f))]) {
+  for (const src of [html, read('js', 'utils', 'rating.js'), ...viewFiles.map(f => read('js', 'views', f))]) {
     for (const m of src.matchAll(/\sdata-action="([a-z-]+)"/g)) usedClick.add(m[1]);
     for (const m of src.matchAll(/\sdata-change-action="([a-z-]+)"/g)) usedChange.add(m[1]);
   }

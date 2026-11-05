@@ -141,6 +141,7 @@
 
 /* O que precisa continuar clicável por cima do botão esticado */
 .show-card .status-select,
+.show-card .rating-control,
 .show-card-actions {
   position: relative;
   z-index: 2;

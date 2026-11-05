@@ -16,6 +16,9 @@
   // libraryMerge.js (carregado antes de qualquer uso): navegador = window.LibraryMerge; Node = require.
   const merge = () => (typeof module !== 'undefined' && module.exports ? require('./libraryMerge') : root.LibraryMerge);
 
+  // rating.js (carregado antes de qualquer uso): mesma regra da nota do servidor.
+  const rating = () => (typeof module !== 'undefined' && module.exports ? require('./rating') : root.Rating);
+
   // Retorna uma cópia saneada {trackedShows, watchedEpisodes, episodeNotes, tombstones, resetAt} ou lança Error com mensagem em português.
   function validateBackup(payload) {
     if (!isPlainObject(payload)) throw new Error('Backup inválido.');
@@ -40,6 +43,12 @@
       const show = { showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) };
       const updatedAt = merge().cleanStamp(t.updatedAt);
       if (updatedAt) show.updatedAt = updatedAt;
+      // Nota pessoal (S17): mesma regra do servidor (0 a 10, uma casa decimal; ausente/null = sem nota; inválida = rejeita)
+      if (!rating().isEmptyRating(t.rating)) {
+        const value = rating().normalizeRating(t.rating);
+        if (value === null) throw new Error('Backup inválido: nota incorreta em trackedShows (use 0 a 10 com no máximo uma casa decimal).');
+        show.rating = value;
+      }
       cleanShows.push(show);
     }
 

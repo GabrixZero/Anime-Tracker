@@ -88,7 +88,7 @@ function makeApp({ catalog = [] } = {}) {
   store.set('showvault_state_mvc_v1', JSON.stringify({ trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: { shows: {}, watched: {}, notes: {} }, resetAt: '' }));
   store.set('showvault_state_version', '2');
   const run = (...f) => vm.runInContext(fs.readFileSync(path.join(ROOT, 'js', ...f), 'utf-8'), ctx, { filename: f.join('/') });
-  ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/viewKit.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js', 'models/state.js']
+  ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/viewKit.js', 'utils/libraryMerge.js', 'utils/rating.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js', 'models/state.js']
     .forEach(f => run(...f.split('/')));
   ['nextUpView', 'watchlistView', 'diaryView', 'statsView', 'exploreView', 'detailModalView'].forEach(v => run('views', `${v}.js`));
   run('controllers', 'appController.js');
