@@ -65,6 +65,11 @@ class ApiClient {
     });
   }
 
+  // Atualiza uma obra em exibição (S13/S15): o servidor respeita a validade e o limite (sem force). Devolve { refreshed, data }.
+  async refreshMedia(id) {
+    return this.request(`/media/${encodeURIComponent(Number(id))}/refresh`, { method: 'POST', body: '{}' });
+  }
+
   // --- AUTENTICAÇÃO ---
   async register(name, email, password, inviteCode) {
     return this.request('/auth/register', {

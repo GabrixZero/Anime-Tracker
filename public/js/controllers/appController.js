@@ -95,11 +95,14 @@ class AppController {
 
     if (tabId === 'explore') window.exploreView.loadMedia();
     else this.renderTab(tabId);
+
+    // S15: ao abrir a Agenda, atualiza em segundo plano as obras em exibição (a tela já foi desenhada com os dados salvos)
+    if (tabId === 'calendar' && window.calendarView) window.calendarView.onOpen();
   }
 
-  // As views das 4 abas que dependem da lista do usuário (a aba Explorar tem o próprio ciclo de carga).
+  // As views das 5 abas que dependem da lista do usuário (a aba Explorar tem o próprio ciclo de carga).
   viewFor(tabId) {
-    return { 'next-up': window.nextUpView, watchlist: window.watchlistView, diary: window.diaryView, stats: window.statsView }[tabId] || null;
+    return { 'next-up': window.nextUpView, watchlist: window.watchlistView, diary: window.diaryView, stats: window.statsView, calendar: window.calendarView }[tabId] || null;
   }
 
   // Redesenha a aba se ela ficou para trás (estado mudou ou foi marcada); senão não faz nada.
@@ -256,10 +259,10 @@ class AppController {
     window.detailModalView.refreshRating();
   }
 
-  // Tudo pode ter mudado (login, sync, importar/resetar, adicionar/remover obra): marca as 4 telas como desatualizadas e
+  // Tudo pode ter mudado (login, sync, importar/resetar, adicionar/remover obra): marca as 5 telas como desatualizadas e
   // redesenha só a que está visível; as outras redesenham quando forem abertas (S09). Os números das abas ficam em dia.
   refreshAll() {
-    ['next-up', 'watchlist', 'diary', 'stats'].forEach(tab => this.dirty.add(tab));
+    ['next-up', 'watchlist', 'diary', 'stats', 'calendar'].forEach(tab => this.dirty.add(tab));
     this.renderTab(this.activeTab);
     this.updateBadges(this.activeTab);
     window.detailModalView.refreshStatusPicker();
