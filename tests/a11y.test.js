@@ -147,10 +147,9 @@ test('o botão do título do A Seguir cobre o cartão (substitui os cliques só-
   assert.ok(!/next-up-thumb-wrap[^>]*data-action/.test(view) && !/next-up-show-name[^>]*data-action/.test(view));
 });
 
-test('o quadro de detalhe é só leitura: sem botão/checkbox de assistido e sem abas de temporada', () => {
+test('o círculo de marcar episódio é um checkbox acessível (button role=checkbox + aria-checked)', () => {
   const src = read('js', 'views', 'detailModalView.js');
-  assert.ok(!/episode-check|role="checkbox"|role="tab"/.test(src));
-  assert.ok(/<details class="season-block"/.test(src) && /<summary>/.test(src));
+  assert.ok(/<button[^>]*class="episode-check"[^>]*role="checkbox"[^>]*aria-checked=/.test(src));
 });
 
 test('o seletor de arquivo do backup não usa display:none (teclado alcança)', () => {

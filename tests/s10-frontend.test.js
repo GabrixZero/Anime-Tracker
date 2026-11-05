@@ -53,7 +53,7 @@ test('toda ação usada nos templates está registrada em actionHandlers.js (e v
 test('atributos S09 dos templates continuam (data-show-id, data-ep, data-focus-key)', () => {
   assert.ok(/data-show-id="\$\{toInt\(item\.showId\)\}"/.test(read('js', 'views', 'nextUpView.js')));
   assert.ok(/data-show-id="\$\{toInt\(media\.id\)\}"/.test(read('js', 'views', 'watchlistView.js')));
-  assert.ok(/<details class="season-block" data-season="/.test(read('js', 'views', 'detailModalView.js')));
+  assert.ok(/class="episode-row [^"]*" data-ep="/.test(read('js', 'views', 'detailModalView.js')));
   assert.ok(
     /data-action="retry-details"/.test(read('js', 'views', 'nextUpView.js')) &&
       /data-focus-key="nuload:retry"/.test(read('js', 'views', 'nextUpView.js'))

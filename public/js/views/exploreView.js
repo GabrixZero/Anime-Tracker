@@ -226,7 +226,7 @@ class ExploreView {
               <span class="show-year">${escapeHtml(when)}</span>
             </div>
 
-            <h3 class="show-title" title="${escapeHtml(fullTitle)}"><button type="button" class="show-open-btn" data-focus-key="ex:${toInt(item.id)}:open" data-action="open-detail" data-show="${toInt(item.id)}">${escapeHtml(item.name)}</button></h3>
+            <h3 class="show-title" title="${escapeHtml(fullTitle)}"><button type="button" class="show-open-btn" data-focus-key="ex:${toInt(item.id)}:open" data-action="open-detail" data-show="${toInt(item.id)}" data-detail-mode="explore">${escapeHtml(item.name)}</button></h3>
             <div class="show-meta-line">
               <span>${escapeHtml(this.metaText(item))}</span>
               <span>${escapeHtml(MD.genresText(item.genres, 2))}</span>
@@ -236,7 +236,7 @@ class ExploreView {
               ${
                 isTracked
                   ? `
-                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" data-action="open-detail" data-show="${toInt(ownId)}">
+                <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" data-action="open-detail" data-show="${toInt(ownId)}" data-detail-mode="explore">
                   Ver no Cofre
                 </button>
               `
