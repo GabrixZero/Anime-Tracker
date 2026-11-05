@@ -51,6 +51,9 @@ module.exports = {
   HOST: parseHost(process.env.HOST, { isProduction: IS_PRODUCTION }),
   IS_PRODUCTION,
   DATA_DIR,
+  // SHOWVAULT_SEED_PATH: arquivo de seed do catálogo diferente do versionado (os testes apontam para tests/fixtures/seed-teste.json).
+  // Vazio = server/data/mediaCatalog.seed.json. O MediaService usa como padrão de seedPath.
+  SEED_PATH: process.env.SHOWVAULT_SEED_PATH || '',
   STORAGE: parseStorage(process.env.STORAGE),
   TMDB_API_KEY: process.env.TMDB_API_KEY || '',
   // AniList (anime, fonte principal desde a S13; GraphQL, sem chave). Vazio = https://graphql.anilist.co. Só para testes/desenvolvimento.

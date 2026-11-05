@@ -14,7 +14,6 @@ class CalendarView {
     this.scrollToToday = false; // 'Todos' abre posicionado em Hoje (só ao abrir a aba ou trocar o filtro)
     this.refreshing = false;
     this.lastRefreshById = new Map(); // id da obra -> quando foi tentada a última atualização (no máximo 1 a cada 30 min por obra)
-    this.refreshFailures = 0; // obras que não atualizaram na última rodada
     this.bindEvents();
   }
 
@@ -75,14 +74,13 @@ class CalendarView {
     if (ids.length === 0) return;
 
     this.refreshing = true;
-    this.refreshFailures = 0;
     this.renderNotice();
     for (const id of ids) {
       try {
         const res = await window.apiClient.refreshMedia(id);
         if (res && res.data && Number(res.data.id) === Number(id)) state.cacheMediaDetail(res.data);
       } catch (err) {
-        this.refreshFailures++;
+        // sem texto na tela: a agenda segue com os dados salvos; o motivo vai só para o console
         console.warn('Não foi possível atualizar a obra para a agenda:', err.message);
       }
     }
@@ -105,7 +103,6 @@ class CalendarView {
     if (!this.notice) return;
     let text = '';
     if (this.refreshing) text = 'Atualizando as obras em exibição...';
-    else if (this.refreshFailures > 0) text = 'Algumas obras não foram atualizadas agora; mostrando os dados salvos.';
     this.notice.textContent = text;
     this.notice.classList.toggle('hidden', !text);
   }
@@ -214,7 +211,9 @@ class CalendarView {
   renderItem(item) {
     const id = toInt(item.showId);
     const isMovie = item.type === 'movie';
-    const code = isMovie ? 'FILME' : `T${toInt(item.seasonNumber)}:E${toInt(item.episodeNumber)}`;
+    // Extra de anime (filme/OVA dentro da obra): rótulo no lugar de "T:E", mas a marcação grava id_sN_eM como qualquer episódio.
+    const extraLabel = item.extra ? (item.extraKind === 'movie' ? 'FILME' : 'OVA/ESPECIAL') : '';
+    const code = isMovie ? 'FILME' : extraLabel || `T${toInt(item.seasonNumber)}:E${toInt(item.episodeNumber)}`;
     const epAttrs = isMovie ? '' : ` data-season="${toInt(item.seasonNumber)}" data-episode="${toInt(item.episodeNumber)}"`;
     const key = isMovie ? `${id}-m` : `${id}-${toInt(item.seasonNumber)}-${toInt(item.episodeNumber)}`;
     const title = item.title || (isMovie ? 'Filme' : `Episódio ${toInt(item.episodeNumber)}`);

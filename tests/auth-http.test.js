@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes HTTP das rotas de contas (S04): cadastro, login, /me, troca de senha, exclusão, Google, cabeçalhos e CORS.
 // Tudo roda num diretório temporário (SHOWVAULT_DATA_DIR): nunca toca em server/data real.
 const test = require('node:test');

@@ -176,7 +176,7 @@ class ExploreView {
   metaText(item) {
     if (item.type === 'movie') return window.MediaDisplay.runtimeText(item.runtime) || 'Filme';
     // obra do catálogo: a lista leve traz `season_count`; o detalhe completo traz as temporadas
-    const seasonCount = Array.isArray(item.seasons) ? item.seasons.length : Number(item.season_count) || 0;
+    const seasonCount = Array.isArray(item.seasons) ? window.WatchStatus.mainSeasons(item).length : Number(item.season_count) || 0;
     if (seasonCount > 0) {
       return `${seasonCount} ${seasonCount === 1 ? 'temporada' : 'temporadas'}`;
     }
@@ -185,6 +185,21 @@ class ExploreView {
     if (item.related_count > 0) parts.push(`+${item.related_count} ${item.related_count === 1 ? 'parte' : 'partes'} da franquia`);
     else if (item.episode_count) parts.push(`${item.episode_count} eps`);
     return parts.join(' · ');
+  }
+
+  // Amostra só com título (o servidor ainda não baixou a obra real): sem imagem, nota, gênero, data nem temporadas.
+  isDataPending(item) {
+    return Boolean(
+      item.pending ||
+      (!item.isExternal &&
+        item.light &&
+        !item.poster_path &&
+        item.vote_average == null &&
+        !(Array.isArray(item.genres) && item.genres.length) &&
+        !item.first_air_date &&
+        !item.season_count &&
+        !item.episode_count)
+    );
   }
 
   render(items, notice = '') {
@@ -231,6 +246,7 @@ class ExploreView {
               <span>${escapeHtml(this.metaText(item))}</span>
               <span>${escapeHtml(MD.genresText(item.genres, 2))}</span>
             </div>
+            ${this.isDataPending(item) ? '<p class="muted pending-note" role="status">Dados ainda não carregados da fonte.</p>' : ''}
 
             <div class="show-card-actions">
               ${

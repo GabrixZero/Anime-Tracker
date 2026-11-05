@@ -131,6 +131,28 @@
       if (media.type !== 'tv' && media.type !== 'anime') continue;
 
       for (const season of media.seasons || []) {
+        // Temporada extra (filme/OVA de anime) com data própria: um item só no dia, como filme/OVA; a chave id_sN_eM não muda.
+        const category = season.category || 'season';
+        if (category !== 'season') {
+          const ep = (season.episodes || [])[0] || null;
+          const day = parseDay(String((ep && ep.air_date) || '').slice(0, 10)); // a data do extra é a do seu episódio 1
+          if (!day) continue;
+          const airDate = keyOf(day.y, day.m, day.d);
+          if (!inRange(airDate)) continue;
+          const epNum = ep ? ep.episode_number : 1;
+          items.push({
+            ...base,
+            seasonNumber: season.season_number,
+            episodeNumber: epNum,
+            title: (ep && ep.name) || season.name || media.name || '',
+            airDate,
+            extra: true,
+            extraKind: category === 'movie' ? 'movie' : 'special',
+            watched: !!isWatched(media.id, season.season_number, epNum),
+            daysFromToday: diffDays(todayKey, airDate)
+          });
+          continue;
+        }
         for (const ep of season.episodes || []) {
           const day = parseDay(String(ep.air_date || '').slice(0, 10));
           if (!day) continue;

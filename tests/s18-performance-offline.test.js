@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S18 · resumo por obra (/batch?summary=1), migração de imagens, service worker e manifesto. Sem rede externa.
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -23,6 +24,7 @@ fs.writeFileSync(path.join(DATA_DIR, 'mediaCatalog.runtime.json'), JSON.stringif
 const app = require('../server/app');
 const { shrinkPosterUrl, migrateCatalogImages } = require('../server/services/imageMigration');
 const { buildCspDirectives } = require('../server/config/csp');
+const { SUMMARY_OVERVIEW_MAX } = require('../server/utils/mediaLight');
 
 let server;
 let origin;
@@ -61,7 +63,7 @@ test('/batch?summary=1: episódios enxutos (sem sinopses) e bem menor que o deta
   const item = data[0];
   assert.equal(item.summary, true);
   assert.equal(item.light, undefined);
-  assert.equal(item.overview, undefined);
+  assert.ok(item.overview.length <= SUMMARY_OVERVIEW_MAX + 1, 'o resumo traz só a sinopse curta da obra');
   const source = SYNTHETIC.find(s => s.id === item.id);
   assert.equal(item.seasons.length, source.seasons.length);
   const ep = item.seasons[0].episodes[0];
@@ -127,4 +129,18 @@ test('service worker: nunca intercepta/guarda /api/auth nem /api/user', () => {
   for (const ok of ['/api/media/trending', '/api/media/batch', '/api/media/search', '/api/media/123']) assert.ok(re.test(ok), ok);
   for (const no of ['/api/user/library', '/api/auth/me', '/api/media/123/refresh', '/api/user/media/1']) assert.ok(!re.test(no), no);
   assert.ok(!/cache\.put[^;]*api\/(user|auth)/.test(src));
+});
+
+test('/batch?summary=1: sinopse curta da obra (≤ 240, termina em …); sem sinopse na fonte, sem o campo; episódios sem sinopse', async () => {
+  const ids = SYNTHETIC.slice(0, 10)
+    .map(i => i.id)
+    .join(',');
+  const data = JSON.parse((await get(`/api/media/batch?ids=${ids}&summary=1`)).text).data;
+  for (const item of data) {
+    const source = SYNTHETIC.find(s => s.id === item.id);
+    assert.ok(source.overview.length > 0);
+    assert.ok(item.overview.length <= SUMMARY_OVERVIEW_MAX + 1, `sinopse curta passou do limite: ${item.overview.length}`);
+    assert.ok(source.overview.startsWith(item.overview.replace(/…$/, '')), 'a curta é o começo da completa');
+    for (const season of item.seasons) for (const ep of season.episodes) assert.equal(ep.overview, undefined);
+  }
 });

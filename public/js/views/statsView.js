@@ -13,9 +13,20 @@ class StatsView {
       const item = state.data.watchedEpisodes[key];
       if (!item || !item.watched) return;
 
-      totalWatchedEpisodes++;
-
       const parsed = window.ViewKit.parseKey(key); // { showId, seasonNum, epNum, isMovie } ou null
+
+      // Extras de anime (filme/OVA/especial) não entram na contagem de episódios; só o tempo (duração própria, ou 90 min filme / 45 min OVA).
+      if (parsed && !parsed.isMovie) {
+        const season = (state.getMedia(parsed.showId)?.seasons || []).find(s => s.season_number === parsed.seasonNum);
+        if (season && window.WatchStatus.isExtraSeason(season)) {
+          const ep = state.getEpisode(parsed.showId, parsed.seasonNum, parsed.epNum);
+          const fallback = window.WatchStatus.seasonCategory(season) === 'movie' ? 90 : 45;
+          totalMinutes += (ep && ep.runtime ? ep.runtime : fallback) * (item.rewatchCount || 1);
+          return;
+        }
+      }
+
+      totalWatchedEpisodes++;
       if (!parsed) return;
 
       if (parsed.isMovie) {

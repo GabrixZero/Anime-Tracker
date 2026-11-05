@@ -337,3 +337,77 @@ test('Explorar: aviso cuja fonte reserva respondeu (fallback) não aparece; avis
     /~30 s/
   );
 });
+
+// ---------------------------------------------------------------- amostras só com título: aviso e créditos
+
+const PENDING_TEXT = 'Dados ainda não carregados da fonte.';
+const LIGHT_SAMPLE = { id: 95396, type: 'tv', name: 'Amostra Pendente', genres: [], poster_path: null, vote_average: null, light: true };
+
+test('Explorar: amostra só com título mostra o aviso e "Sem nota"/"Sem imagem"; obra completa não mostra o aviso', () => {
+  const view = makeApp().window.exploreView;
+  view.container = makeEl('explore-container');
+  view.hasMore = false;
+  view.render([LIGHT_SAMPLE]);
+  assert.ok(view.container.innerHTML.includes(PENDING_TEXT));
+  assert.match(view.container.innerHTML, /Sem nota/);
+  view.render([
+    { ...LIGHT_SAMPLE, poster_path: '/x.jpg', vote_average: 8.1, genres: [{ id: 1, name: 'Drama' }], first_air_date: '2020-01-01' }
+  ]);
+  assert.ok(!view.container.innerHTML.includes(PENDING_TEXT));
+});
+
+test('detalhe: amostra pendente, anônimo = aviso escrito e sem nova busca; logado = tenta a obra real e a mostra', async () => {
+  const app = makeApp();
+  const modal = app.window.detailModalView;
+  app.state.cacheMediaList([LIGHT_SAMPLE]);
+  app.window.syncService = { isLoggedIn: () => false };
+  modal.open(LIGHT_SAMPLE.id, 'explore');
+  await new Promise(resolve => setImmediate(resolve));
+  const text = () => app.els.get('show-modal-header').innerHTML + app.els.get('show-episodes-container').innerHTML;
+  assert.ok(text().includes(PENDING_TEXT), 'aviso no detalhe');
+  assert.ok(!app.apiCalls.some(c => c[0] === 'byId'), 'anônimo não pede a obra');
+
+  // logado, o servidor devolve ainda pendente: segue o aviso
+  const modal2 = makeApp();
+  modal2.state.cacheMediaList([LIGHT_SAMPLE]);
+  modal2.window.syncService = { isLoggedIn: () => true };
+  modal2.resolveId = () => ({ ...LIGHT_SAMPLE, pending: true });
+  modal2.window.detailModalView.open(LIGHT_SAMPLE.id, 'explore');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.ok(modal2.apiCalls.some(c => c[0] === 'byId'));
+  assert.ok(modal2.els.get('show-modal-header').innerHTML.includes(PENDING_TEXT));
+
+  // logado, o servidor devolve a obra real: o aviso some
+  const real = makeApp();
+  real.state.cacheMediaList([LIGHT_SAMPLE]);
+  real.window.syncService = { isLoggedIn: () => true };
+  real.resolveId = () => ({
+    id: 95396,
+    type: 'tv',
+    name: 'Obra Real',
+    genres: [],
+    overview: 'Sinopse falsa',
+    seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'E1' }] }]
+  });
+  real.window.detailModalView.open(LIGHT_SAMPLE.id, 'explore');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.ok(real.state.hasDetail(95396));
+  assert.ok(!real.els.get('show-modal-header').innerHTML.includes(PENDING_TEXT));
+  assert.ok(real.els.get('show-modal-header').innerHTML.includes('Obra Real'));
+});
+
+test('rodapé "Créditos dos dados": textos de TMDB, TVMaze e AniList, links seguros, sem imagem e sem style/onclick', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf-8');
+  const footer = /<footer class="app-credits"[\s\S]*?<\/footer>/.exec(html);
+  assert.ok(footer, 'rodapé existe');
+  const f = footer[0];
+  assert.match(f, /Créditos dos dados/);
+  assert.match(f, /Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB\./);
+  assert.match(f, /Dados de séries também do TVMaze \(CC BY-SA 4\.0\)/);
+  assert.match(f, /Dados de animes da AniList; ShowVault é não oficial/);
+  for (const host of ['themoviedb.org', 'tvmaze.com', 'anilist.co']) {
+    const link = new RegExp('<a href="https://[^"]*' + host.replace('.', '[.]') + '/"[^>]*rel="noopener noreferrer"');
+    assert.match(f, link, host);
+  }
+  assert.ok(!/<img|style=|onclick=/i.test(f));
+});

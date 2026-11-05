@@ -8,18 +8,13 @@ const path = require('node:path');
 
 const root = path.join(__dirname, '..');
 
-test('seed: Demon Slayer, Jujutsu Kaisen e Death Note só têm episódio com título e data conferidos (nada de sinopse/imagem inventada)', () => {
+test('seed: Demon Slayer, Jujutsu Kaisen e Death Note não trazem episódios nem textos (só id/título; os dados reais vêm da ingestão)', () => {
   const seed = JSON.parse(fs.readFileSync(path.join(root, 'server', 'data', 'mediaCatalog.seed.json'), 'utf8'));
   for (const id of [85937, 95479, 13916]) {
     const work = seed.find(m => m.id === id);
     assert.ok(work, `obra ${id} no seed`);
-    for (const season of work.seasons) {
-      for (const ep of season.episodes) {
-        assert.ok(ep.name && ep.air_date, `${work.name}: episódio ${ep.episode_number} precisa de título e data`);
-        for (const campo of ['overview', 'still_path', 'runtime'])
-          assert.equal(ep[campo], undefined, `${work.name}: ${campo} não verificado`);
-      }
-    }
+    assert.equal(work.seasons, undefined, `${work.name}: o seed versionado não leva temporadas`);
+    assert.equal(work.overview, undefined);
   }
 });
 

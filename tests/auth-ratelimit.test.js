@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Limite de tentativas em login e cadastro (S04). Arquivo separado porque os contadores ficam em memória no processo:
 // aqui os limites são baixos, no auth-http.test.js ficam folgados.
 const test = require('node:test');

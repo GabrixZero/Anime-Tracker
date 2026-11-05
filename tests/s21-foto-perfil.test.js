@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Foto de perfil: envio, leitura só pelo dono, validação pelos bytes reais (magic bytes), remoção e exclusão da conta.
 // Todas as imagens são geradas em memória; nenhuma foto real entra no repositório.
 const test = require('node:test');

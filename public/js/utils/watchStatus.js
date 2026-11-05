@@ -27,8 +27,24 @@
     return STATUS_LABELS[normalizeStatus(status)];
   }
 
+  // Anime: cada temporada pode ser 'season' (TV normal), 'movie' ou 'special' (OVA/especial). Sem `category` = temporada normal.
+  function seasonCategory(season) {
+    return (season && season.category) || 'season';
+  }
+
+  function isExtraSeason(season) {
+    return seasonCategory(season) !== 'season';
+  }
+
+  // Temporadas que contam no progresso e no "Finalizado": as normais. Se a obra só tem extras (anime só de filme/OVA), eles contam.
+  function mainSeasons(media) {
+    const seasons = (media && media.seasons) || [];
+    const normal = seasons.filter(s => !isExtraSeason(s));
+    return normal.length > 0 ? normal : seasons;
+  }
+
   // Progresso da obra. `isWatched(seasonNum, epNum)`; para filme é chamado sem argumentos.
-  // Sem episódios conhecidos (catálogo incompleto) => total 0 e complete=false.
+  // Sem episódios conhecidos (catálogo incompleto) => total 0 e complete=false. Extras (filmes/OVAs) ficam de fora (ver mainSeasons).
   function computeProgress(media, isWatched) {
     if (!media) return { total: 0, watched: 0, complete: false };
     if (media.type === 'movie') {
@@ -37,7 +53,7 @@
     }
     let total = 0;
     let watched = 0;
-    for (const season of media.seasons || []) {
+    for (const season of mainSeasons(media)) {
       for (const ep of season.episodes || []) {
         total++;
         if (isWatched(season.season_number, ep.episode_number)) watched++;
@@ -55,10 +71,13 @@
     const s0 = Number(seasonNum);
     const e0 = Number(epNum);
     const out = [];
+    const clicked = (media.seasons || []).find(s => Number(s.season_number) === s0);
+    if (clicked && isExtraSeason(clicked)) return []; // filme/OVA não puxa nada para trás
     for (const season of media.seasons || []) {
       const sn = Number(season.season_number);
       const before = sn === s0 ? true : sn > 0 && sn < s0;
       if (!before) continue;
+      if (sn !== s0 && isExtraSeason(season)) continue; // extras de outras temporadas não entram na cascata
       for (const ep of season.episodes || []) {
         const en = Number(ep.episode_number);
         if (sn === s0 && !(en < e0)) continue;
@@ -124,6 +143,9 @@
     STATUS_LIST,
     STATUS_VALUES,
     STATUS_LABELS,
+    seasonCategory,
+    isExtraSeason,
+    mainSeasons,
     normalizeStatus,
     statusLabel,
     computeProgress,

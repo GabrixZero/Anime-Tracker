@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S12 (D-S12-3): TVMAZE_BASE_URL e TMDB_BASE_URL apontam as fontes de séries/filmes para um servidor falso (como JIKAN_BASE_URL e
 // ANILIST_BASE_URL já faziam). Sem as variáveis, o app continua usando os endereços oficiais.
 // A config lê o ambiente ao ser carregada, então cada caso roda num processo filho com pasta de dados temporária (nada em server/data).

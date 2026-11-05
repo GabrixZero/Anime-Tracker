@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes HTTP da S14: cadastro por convite, "sair de todos os aparelhos", excluir conta (apaga a biblioteca) e trocar senha.
 // Roda numa pasta temporária (SHOWVAULT_DATA_DIR). Os códigos de convite são inventados a cada execução: nenhum código real aparece aqui.
 const test = require('node:test');

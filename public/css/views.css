@@ -967,6 +967,59 @@
   color: var(--text-muted);
 }
 
+/* Anime: seções "Filmes" e "OVAs e especiais" abaixo das temporadas */
+.extras-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+  margin-top: 0.75rem;
+  padding: 0.8rem 1.1rem 0.4rem;
+}
+
+.extras-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.extras-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.extra-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--bg-card-border);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.extra-item:last-child {
+  border-bottom: 0;
+}
+
+.extra-item .extra-title {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.extra-date {
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
+
+.extra-item.watched .episode-check {
+  border-color: var(--tvtime-yellow);
+  background: var(--tvtime-yellow);
+}
+
 /* ---------- Modal de anotação ---------- */
 .note-header {
   padding: 1.75rem 4rem 1.25rem 2rem;
