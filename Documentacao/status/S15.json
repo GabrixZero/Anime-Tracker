@@ -2,8 +2,8 @@
   "secao": "S15",
   "titulo": "Calendário de lançamentos",
   "arquivo": "Documentacao/secoes/S15-calendario.md",
-  "status": "pendente",
-  "branch": "",
+  "status": "em-andamento",
+  "branch": "feature/s15-calendario",
   "concluidaEm": "",
   "commit": "",
   "notas": ""
