@@ -15,6 +15,9 @@ const jikanMapper = require('./jikanMapper');
 const { migrateLegacyCatalog } = require('./catalogMigration');
 const { migrateCatalogImages } = require('./imageMigration');
 const { migrateAnimeSeasons } = require('./animeMigration');
+const { categoryOf } = require('./animeSeasons');
+const AnimeIdMap = require('./animeIdMap');
+const { alignEntry } = require('./animeTmdbEpisodes');
 
 const TVMAZE_BASE = 'https://api.tvmaze.com';
 const SEED_PATH = path.join(__dirname, '..', 'data', 'mediaCatalog.seed.json');
@@ -35,6 +38,11 @@ const SCHEDULE_VERSION = 2;
 const FORCE_REFRESH_MIN_MS = 10 * 60 * 1000; // atualização forçada da mesma obra: no máximo 1 vez a cada 10 min
 const REFRESH_RETRY_AFTER_FAILURE_MS = 30 * 60 * 1000; // a conferência automática não insiste numa obra que acabou de falhar
 const TMDB_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000; // termos do TMDB: dados em cache por no máximo 6 meses; aqui, 90 dias
+// Versão dos títulos/miniaturas de episódio de anime vindos do TMDB (D-TE-5). Obra de anime guardada com versão menor (ou sem) é
+// reprocessada UMA vez em segundo plano; depois só ao completar 90 dias (limite de cache do TMDB).
+const TITLES_VERSION = 1;
+const ANIME_RECENT_TMDB_SEASONS = 2; // obra em exibição: a atualização rotineira só baixa as 2 últimas temporadas do TMDB
+class BudgetExceeded extends Error {}
 
 // Catálogo de obras: seed versionado (somente leitura) + catálogo de runtime (ignorado pelo git) na pasta de dados.
 // Obras novas entram por ingestão sob demanda (AniList para animes, com a Jikan/MyAnimeList de reserva — D-26; TVMaze e TMDB para séries,
@@ -68,6 +76,9 @@ class MediaService {
       baseUrl: opts.jikanBase || process.env.JIKAN_BASE_URL,
       ...(opts.jikan || {})
     });
+    // Mapa de ids AniList/MAL -> TMDB (baixado em tempo de execução, nunca versionado; D-TE-2). Os testes passam `idMapDownload` falso.
+    this.idMap =
+      opts.idMap || new AnimeIdMap({ dataDir, download: opts.idMapDownload, enabled: opts.idMapEnabled !== false, now: opts.idMapNow });
     this.tmdb = new TmdbClient({
       apiKey: opts.tmdbKey !== undefined ? opts.tmdbKey : config.TMDB_API_KEY,
       baseUrl: opts.tmdbBase || config.TMDB_BASE_URL || undefined,
@@ -78,6 +89,8 @@ class MediaService {
     this.airingTtlMs = opts.airingTtlMs ?? config.AIRING_TTL_MS;
     this.upcomingTtlMs = opts.upcomingTtlMs ?? 24 * 60 * 60 * 1000;
     this.enrichBudgetMs = opts.enrichBudgetMs ?? 15000; // quanto tempo, no total, a ingestão espera pelos títulos da Jikan
+    this.tmdbBudgetMs = opts.tmdbBudgetMs ?? 15000; // ingestão com o usuário esperando: no máximo isto nas chamadas do TMDB (segundo plano: 10x)
+    this.titlesBackedUp = false; // o backup "titulos-episodios" sai no máximo 1 vez por execução
     this.enrichTimeoutMs = opts.enrichTimeoutMs ?? 3000; // e quanto espera por CADA resposta dela (Jikan fora do ar custa só isto, uma vez)
     this.refreshAttempts = new Map(); // id -> quando falhou a última atualização automática
     this.refreshTimers = [];
@@ -780,12 +793,12 @@ class MediaService {
   // Anime: a obra reúne a franquia inteira (cadeia SEQUEL/PREQUEL) como temporadas (D-18). A AniList é a fonte principal (D-26); se ela
   // falhar ou não conhecer a obra e houver id da MAL, a Jikan faz o mesmo trabalho. `req` = {malId} ou {anilistId}.
   // `previous` (atualização): obra já gravada, de onde saem as marcas de tempo e os títulos de episódio que a Jikan já tinha dado.
-  async ingestAnime(targetId, req, { fresh = false, previous = null } = {}) {
+  async ingestAnime(targetId, req, { fresh = false, previous = null, background = false } = {}) {
     const errors = [];
     let work = null;
     if (this.anilistEnabled) {
       try {
-        work = await this.buildAnimeFromAniList(targetId, req, { fresh });
+        work = await this.buildAnimeFromAniList(targetId, req, { fresh, previous, background });
       } catch (err) {
         if (!(err instanceof MediaError) || !req.malId) throw err; // sem id da MAL a Jikan não consegue ajudar
         errors.push(err);
@@ -812,11 +825,98 @@ class MediaService {
     return this.commitIngested(work.id, { ...work, ...MediaService.stamps(previous) });
   }
 
-  async buildAnimeFromAniList(id, req, { fresh = false } = {}) {
+  async buildAnimeFromAniList(id, req, { fresh = false, previous = null, background = false } = {}) {
     const root = req.malId ? { idMal: req.malId } : { id: req.anilistId };
     const franchise = await this.anilist.getFranchise(root, { fresh });
-    const titlesFor = await this.jikanTitles(franchise);
-    return anilistMapper.buildAnimeWork(id, req, franchise, { titlesFor });
+    const tmdb = await this.tmdbTitles(franchise, { previous, background });
+    const titlesFor = await this.jikanTitles(franchise, tmdb.map);
+    const work = anilistMapper.buildAnimeWork(id, req, franchise, { titlesFor, tmdbFor: tmdb.map });
+    // Marca de que o TMDB foi consultado por inteiro (sem falha nem estouro de orçamento): a migração não repete (D-TE-5).
+    if (tmdb.complete) {
+      work.titlesVersion = TITLES_VERSION;
+      work.tmdbEpisodesAt = tmdb.partial && previous && previous.tmdbEpisodesAt ? previous.tmdbEpisodesAt : new Date().toISOString();
+    } else if (previous && previous.titlesVersion) {
+      work.titlesVersion = previous.titlesVersion;
+      if (previous.tmdbEpisodesAt) work.tmdbEpisodesAt = previous.tmdbEpisodesAt;
+    }
+    return work;
+  }
+
+  // Todas as pontas prontas para buscar títulos de anime no TMDB: chave, mapa de ids e AniList (a fonte da obra) no ar.
+  titlesReady() {
+    return Boolean(this.tmdb.enabled && this.idMap.ready && this.anilistEnabled && !this.anilist.breaker.isOpen);
+  }
+
+  // Obra de anime guardada que a AniList/Jikan descrevem e cujos títulos podem vir do TMDB.
+  static isTitleAnime(item) {
+    return Boolean(
+      item &&
+        item.type === 'anime' &&
+        item.ingestedAt &&
+        (item.mal_id || item.anilist_id) &&
+        ['jikan', 'anilist', 'seed'].includes(describeId(item.id).source)
+    );
+  }
+
+  // Precisa (re)buscar títulos no TMDB: ainda não foi processada nesta versão, ou os dados do TMDB passaram de 90 dias.
+  titlesDue(item, now = Date.now()) {
+    if (!MediaService.isTitleAnime(item) || !this.titlesReady()) return false;
+    if ((item.titlesVersion || 0) < TITLES_VERSION) return true;
+    return Boolean(item.tmdbEpisodesAt) && now - (Date.parse(item.tmdbEpisodesAt) || 0) >= TMDB_MAX_AGE_MS;
+  }
+
+  // Alinha cada entrada de TV da franquia com a série do TMDB e devolve Map(anilistId -> [{episode_number, name, still_path}]) já CONFERIDO
+  // pela trava de datas (D-TE-3). Melhor esforço: nada aqui atrapalha a ingestão. { map, complete, partial }:
+  //  complete = o TMDB foi consultado por inteiro (sem falha de rede nem estouro do orçamento; "sem par no mapa/no TMDB" conta como completo).
+  async tmdbTitles(franchise, { previous = null, background = false } = {}) {
+    const out = { map: new Map(), complete: false, partial: false };
+    if (!this.tmdb.enabled || !this.idMap.ready) return out;
+    const budgetMs = background ? this.tmdbBudgetMs * 10 : this.tmdbBudgetMs;
+    const started = Date.now();
+    const groups = new Map(); // id da série no TMDB -> entradas da AniList (ordem de estreia)
+    for (const e of anilistMapper.orderedEntries(franchise)) {
+      if (categoryOf(e.node.format, e.episodes.length) !== 'season') continue;
+      const info = this.idMap.lookup({ anilistId: e.node.id, malId: e.node.idMal });
+      if (!info) continue;
+      if (!groups.has(info.tmdbId)) groups.set(info.tmdbId, []);
+      groups.get(info.tmdbId).push({ ...e, info });
+    }
+    // Obra em exibição já processada e ainda "fresca": a atualização rotineira só baixa as últimas temporadas do TMDB.
+    const processed = Boolean(previous && previous.titlesVersion >= TITLES_VERSION && previous.tmdbEpisodesAt);
+    const recentOnly = processed && Date.now() - Date.parse(previous.tmdbEpisodesAt) < TMDB_MAX_AGE_MS - 7 * 24 * 60 * 60 * 1000;
+    let complete = true;
+    try {
+      for (const [tmdbId, group] of groups) {
+        let tv;
+        try {
+          tv = await this.tmdb.tvInfo(tmdbId);
+        } catch (err) {
+          if (err instanceof MediaError && err.code === 'NOT_FOUND') continue; // o mapa aponta para série que não existe mais
+          throw err;
+        }
+        const seasonCache = new Map();
+        const loadSeason = async n => {
+          if (Date.now() - started > budgetMs) throw new BudgetExceeded();
+          if (!seasonCache.has(n)) seasonCache.set(n, (await this.tmdb.seasonEpisodes(tmdbId, n)).episodes);
+          return seasonCache.get(n);
+        };
+        let start = 0;
+        for (const g of group) {
+          const recentSeasons = recentOnly && g.node.status === 'RELEASING' ? ANIME_RECENT_TMDB_SEASONS : 0;
+          const aligned = await alignEntry({ entry: { episodes: g.episodes }, info: g.info, tv, start, loadSeason, recentSeasons });
+          if (aligned && aligned.list.length) out.map.set(g.node.id, aligned.list);
+          if (recentSeasons > 0) out.partial = true;
+          start += g.episodes.length;
+        }
+      }
+    } catch (err) {
+      complete = false;
+      if (!(err instanceof BudgetExceeded)) {
+        console.warn(`[MediaService] Títulos de episódio do TMDB indisponíveis (${(err && err.code) || 'erro'}); seguindo sem eles.`);
+      }
+    }
+    out.complete = complete;
+    return out;
   }
 
   async buildAnimeFromJikan(id, malId, { fresh = false } = {}) {
@@ -826,12 +926,22 @@ class MediaService {
 
   // Títulos de episódio (a AniList não os tem): pergunta à Jikan, entrada por entrada (as que têm idMal). Melhor esforço: Jikan fora do
   // ar (disjuntor aberto), lenta (orçamento de tempo) ou com erro NUNCA atrapalha a ingestão; os episódios ficam "Episódio N".
-  async jikanTitles(franchise) {
+  async jikanTitles(franchise, tmdbMap = new Map()) {
     const titles = new Map();
     if (!this.jikanEnabled || this.jikan.breaker.isOpen) return titles;
+    // entradas em que o TMDB já deu título a TODOS os episódios: poupa a Jikan
+    const skip = new Set(
+      anilistMapper
+        .orderedEntries(franchise)
+        .filter(e => {
+          const list = tmdbMap.get(e.node.id);
+          return list && e.episodes.every(ep => list.some(x => x.episode_number === ep.episode_number && x.name));
+        })
+        .map(e => e.node.id)
+    );
     const started = Date.now();
     for (const a of franchise.nodes) {
-      if (!a.idMal || !JIKAN_EPISODE_FORMATS.has(a.format) || a.status === 'NOT_YET_RELEASED') continue;
+      if (!a.idMal || !JIKAN_EPISODE_FORMATS.has(a.format) || a.status === 'NOT_YET_RELEASED' || skip.has(a.id)) continue;
       if (Date.now() - started > this.enrichBudgetMs) break;
       try {
         titles.set(a.id, await this.jikan.getEpisodes(a.idMal, { timeoutMs: this.enrichTimeoutMs }));
@@ -907,8 +1017,9 @@ class MediaService {
 
   isRefreshDue(item, now = Date.now()) {
     const ttl = this.refreshTtlMs(item, now);
-    if (ttl === null) return false;
     if (!describeId(item.id).ingestable && !MediaService.isUpgradedSeed(item)) return false;
+    if (this.titlesDue(item, now)) return true; // títulos de episódio do TMDB pendentes ou com mais de 90 dias (D-TE-5)
+    if (ttl === null) return false;
     const last = Date.parse(item.refreshedAt || item.ingestedAt) || 0;
     return now - last >= ttl;
   }
@@ -967,7 +1078,7 @@ class MediaService {
     const source = describeId(item.id);
     if (item.type === 'anime' && (item.mal_id || item.anilist_id) && ['jikan', 'anilist', 'seed'].includes(source.source)) {
       const req = item.mal_id ? { malId: item.mal_id } : { anilistId: item.anilist_id };
-      return this.ingestAnime(item.id, req, { fresh: true, previous: item });
+      return this.ingestAnime(item.id, req, { fresh: true, previous: item, background: true });
     }
     if (source.source === 'seed' && /^tmdb_/.test(item.source || '')) {
       const tmdbId = item.tmdb_id ?? item.id;
@@ -980,16 +1091,26 @@ class MediaService {
     return Promise.reject(mediaErrors.unsupportedSource());
   }
 
+  backupTitlesOnce() {
+    if (this.titlesBackedUp) return true;
+    this.titlesBackedUp = this.backupBeforeMigration(this.catalog, [], 'titulos-episodios');
+    return this.titlesBackedUp;
+  }
+
   // Atualiza as obras vencidas, uma de cada vez e as mais antigas primeiro (no máximo `limit` por rodada). Quem falhou só é tentado
   // de novo depois de 30 min. Devolve {checked, refreshed:[{id, name, newEpisodes}], failed:[{id, code}]}.
   async refreshDueWorks({ limit = 5, now = Date.now() } = {}) {
     const out = { checked: 0, refreshed: [], failed: [] };
     if (this.writeBlockedBy) return out;
+    if (this.tmdb.enabled) await this.idMap.ensure(); // baixa/atualiza o mapa de ids (no máx. 1x por semana; nunca lança)
     const lastOf = m => Date.parse(m.refreshedAt || m.ingestedAt) || 0;
-    const due = this.catalog
+    let due = this.catalog
       .filter(m => this.isRefreshDue(m, now) && now - (this.refreshAttempts.get(m.id) || 0) >= REFRESH_RETRY_AFTER_FAILURE_MS)
       .sort((a, b) => lastOf(a) - lastOf(b))
       .slice(0, limit);
+    // Migração dos títulos: UM backup do catálogo antes da 1ª obra mexida em cada execução; sem backup, essas obras esperam (D-TE-5).
+    const migrating = m => this.titlesDue(m, now) && (m.titlesVersion || 0) < TITLES_VERSION;
+    if (due.some(migrating) && !this.backupTitlesOnce()) due = due.filter(m => !migrating(m));
     for (const item of due) {
       out.checked++;
       try {

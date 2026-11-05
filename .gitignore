@@ -44,3 +44,6 @@ blob-report/
 
 # Worktrees temporarias dos agentes do Claude
 .claude/worktrees/
+
+# Mapa de ids de anime (Fribb/anime-lists) baixado em tempo de execução: nunca versionar (D-TE-2)
+server/data/animeIdMap.runtime.json
