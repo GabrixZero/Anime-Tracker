@@ -56,6 +56,112 @@
 
 .input-field:focus { border-color: var(--tvtime-yellow); }
 
+/* ---------- Agenda (S15) ---------- */
+.calendar-notice {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+}
+
+.calendar-notice.hidden { display: none; }
+
+.calendar-day { margin-bottom: 1.5rem; }
+
+.calendar-day-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--bg-card-border);
+}
+
+.calendar-day-title--today { color: var(--tvtime-yellow); }
+
+.calendar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.calendar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-md);
+}
+
+.calendar-item--watched { opacity: 0.8; }
+
+.calendar-item-info { min-width: 0; flex: 1; }
+
+.calendar-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.calendar-item-show {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tvtime-yellow);
+}
+
+.calendar-item-code {
+  font-size: var(--fs-meta);
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.calendar-item-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.calendar-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0b0c10;
+  background: linear-gradient(135deg, var(--tvtime-yellow), #f59e0b);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.calendar-check:hover { filter: brightness(1.1); }
+
+.calendar-check--done {
+  color: var(--accent-emerald);
+  background: transparent;
+  border: 1px solid var(--accent-emerald);
+}
+
 /* ---------- Minha Lista: filtros de status ---------- */
 .filter-pills {
   display: flex;

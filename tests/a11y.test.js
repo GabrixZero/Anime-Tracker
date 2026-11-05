@@ -93,7 +93,7 @@ test('todo botão só de ícone/símbolo tem aria-label e todo <img> estático t
 test('navegação principal usa o padrão de abas (tablist/tab/tabpanel) e cada aba aponta para um painel', () => {
   assert.ok(/<nav[^>]*role="tablist"/.test(html));
   const tabs = [...html.matchAll(/<button[^>]*data-tab="([a-z-]+)"[^>]*>/g)];
-  assert.equal(tabs.length, 5);
+  assert.equal(tabs.length, 6);
   for (const [tag, name] of tabs) {
     assert.ok(/role="tab"/.test(tag) && /aria-selected="(true|false)"/.test(tag), `aba ${name} sem role/aria-selected`);
     assert.ok(new RegExp(`id="view-${name}"[^>]*role="tabpanel"`).test(html), `painel view-${name} sem role="tabpanel"`);

@@ -35,10 +35,11 @@ test('CSS define os breakpoints reais (<=480, <=768, <=1024) e a barra de abas i
   assert.ok(/<meta name="viewport"[^>]*viewport-fit=cover/.test(html), 'viewport sem viewport-fit=cover (área segura do notch)');
 });
 
-test('as 5 abas existem na navegação e têm rótulo curto para a barra inferior', () => {
+test('as 6 abas existem na navegação e têm rótulo curto para a barra inferior', () => {
   const tabs = html.match(/class="nav-tab[^"]*"\s+data-tab="[a-z-]+"/g) || [];
-  assert.equal(tabs.length, 5);
-  assert.equal((html.match(/class="nav-short"/g) || []).length, 4);
+  assert.equal(tabs.length, 6);
+  assert.equal((html.match(/class="nav-short"/g) || []).length, 5);
+  assert.ok(/\.main-nav\s*\{[^}]*grid-template-columns:\s*repeat\(6,\s*1fr\)/.test(read('css', 'layout.css')), 'a barra inferior precisa de 6 colunas');
 });
 
 test('prefers-reduced-motion desliga animações e a entrada das abas é curta', () => {

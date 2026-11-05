@@ -352,7 +352,7 @@
 
 @media (max-width: 1320px) {
   .header-left { gap: 1.25rem; }
-  .nav-tab { padding: 0.5rem 0.65rem; gap: 0.4rem; }
+  .nav-tab { padding: 0.5rem 0.55rem; gap: 0.35rem; }
 }
 
 /* Notebook estreito: so os rotulos nas abas */
@@ -402,7 +402,7 @@
     bottom: 0;
     z-index: 150;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr); /* 6 abas (S15): rótulos curtos, cada coluna tem ~60px em 375px */
     gap: 0;
     padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom, 0px));
     min-height: var(--bottom-nav-h);
@@ -419,10 +419,11 @@
     justify-content: center;
     gap: 0.15rem;
     min-width: 0;
-    padding: 0.35rem 0.1rem;
+    padding: 0.35rem 0;
     border: 1px solid transparent;
     font-size: var(--fs-meta);
     font-weight: 600;
+    letter-spacing: -0.01em; /* 6 abas: cabe "Explorar" em 375px sem cortar */
   }
 
   .nav-tab svg { width: 22px; height: 22px; }
@@ -623,6 +624,10 @@
   /* Cartões de A Seguir: botões continuam lado a lado, textos quebram */
   .next-up-info { padding: 1rem; }
   .next-up-ep-title { font-size: 1.05rem; }
+
+  /* Agenda: o botão "Assistido" desce para baixo do texto */
+  .calendar-item { flex-direction: column; align-items: stretch; }
+  .calendar-check { justify-content: center; }
 
   .modal-poster { width: 96px; }
   .modal-meta { font-size: 0.85rem; }

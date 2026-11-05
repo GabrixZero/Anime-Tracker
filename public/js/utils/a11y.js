@@ -136,6 +136,7 @@
     wrapRender(window.nextUpView, 'render', '#next-up-container', '#view-next-up');
     wrapRender(window.watchlistView, 'render', '#watchlist-container', '#view-watchlist');
     wrapRender(window.diaryView, 'render', '#diary-container', '#view-diary');
+    wrapRender(window.calendarView, 'render', '#calendar-container', '#view-calendar');
     // S09: troca de um só cartão/linha ao marcar episódio (o foco volta ao mesmo botão do cartão novo)
     wrapRender(window.nextUpView, 'updateShow', '#next-up-container', '#view-next-up');
     wrapRender(window.watchlistView, 'updateShow', '#watchlist-container', '#view-watchlist');
