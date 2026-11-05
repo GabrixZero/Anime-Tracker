@@ -56,7 +56,7 @@ test('a landing respeita a CSP: sem style=, onclick= nem recursos externos além
   assert.ok(!/<img\b/i.test(landing), 'sem imagens: só CSS/SVG próprio');
   assert.equal((landing.match(/<h1\b/g) || []).length, 1);
   for (const [, href] of landing.matchAll(/href="(https?:[^"]+)"/g)) {
-    assert.ok(/themoviedb\.org|tvmaze\.com|anilist\.co/.test(href), href);
+    assert.ok(/themoviedb\.org|tvmaze\.com|anilist\.co|github\.com\/(Fribb|manami-project|Anime-Lists)\//.test(href), href);
   }
 });
 

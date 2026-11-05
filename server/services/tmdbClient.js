@@ -4,6 +4,7 @@ const TtlCache = require('../utils/ttlCache');
 const { stripHtml, safeHttpUrl } = require('../utils/sanitize');
 const { toInternalId } = require('../utils/ids');
 const { mediaErrors } = require('../utils/errors');
+const { realTitle } = require('./animeTmdbEpisodes');
 
 const IMG = 'https://image.tmdb.org/t/p';
 const MAX_SEASONS = 40;
@@ -145,6 +146,59 @@ class TmdbClient {
     return out;
   }
 
+  // Detalhes leves da série (sem episódios): usado pelo alinhamento dos animes (D-TE-3). { seasons: [{season_number, episode_count}] }
+  async tvInfo(tmdbId) {
+    const tv = await this.get(`/tv/${tmdbId}`, {}, { ttlMs: 60 * 60 * 1000 });
+    if (!tv || tv.id !== tmdbId) throw mediaErrors.notFound();
+    const seasons = (Array.isArray(tv.seasons) ? tv.seasons : [])
+      .filter(
+        s => s && Number.isInteger(s.season_number) && s.season_number > 0 && Number.isInteger(s.episode_count) && s.episode_count > 0
+      )
+      .slice(0, MAX_SEASONS * 2)
+      .map(s => ({ season_number: s.season_number, episode_count: s.episode_count }));
+    return { seasons };
+  }
+
+  // Episódios de UMA temporada, ordenados por número, com título em pt-BR e queda para en-US (1 chamada extra, só quando algum episódio JÁ
+  // exibido vem sem título real: vazio ou "Episode N"). `title` vem '' quando nenhuma língua tem título de verdade. Miniatura = `still_path` do TMDB.
+  async seasonEpisodes(tmdbId, seasonNumber, { today = new Date().toISOString().slice(0, 10) } = {}) {
+    const ttl = { ttlMs: 60 * 60 * 1000 };
+    const s = await this.get(`/tv/${tmdbId}/season/${seasonNumber}`, {}, ttl);
+    const episodes = (Array.isArray(s && s.episodes) ? s.episodes : [])
+      .filter(e => e && Number.isInteger(e.episode_number) && e.episode_number > 0)
+      .map(e => ({ ...e, title: realTitle(e.name) }))
+      .sort((a, b) => a.episode_number - b.episode_number);
+    const hasGap = episodes.some(e => !e.title && dateOnly(e.air_date) && dateOnly(e.air_date) <= today);
+    if (hasGap && this.language !== 'en-US') {
+      try {
+        const en = await this.get(`/tv/${tmdbId}/season/${seasonNumber}`, { language: 'en-US' }, ttl);
+        const byNumber = new Map((Array.isArray(en && en.episodes) ? en.episodes : []).filter(Boolean).map(e => [e.episode_number, e]));
+        for (const e of episodes) {
+          const alt = byNumber.get(e.episode_number);
+          if (!alt) continue;
+          if (!e.title) e.title = realTitle(alt.name);
+          if (!e.still_path && alt.still_path) e.still_path = alt.still_path;
+        }
+      } catch {
+        /* sem o inglês: segue só com o que o pt-BR trouxe */
+      }
+    }
+    // Formato normalizado: `name` = título de verdade já resolvido (pt-BR, senão en-US; '' se nenhum), `raw_name` = o que o TMDB mandou,
+    // `still_path` = endereço completo da miniatura (w300) no image.tmdb.org.
+    return {
+      name: s && s.name,
+      episodes: episodes.map(e => ({
+        episode_number: e.episode_number,
+        name: e.title,
+        raw_name: e.name,
+        air_date: dateOnly(e.air_date),
+        runtime: e.runtime,
+        overview: e.overview,
+        still_path: img(e.still_path, 'w300')
+      }))
+    };
+  }
+
   // Série + uma requisição por temporada (o TMDB só entrega os episódios por temporada). Temporada 0 (extras) fica de fora.
   async getTv(tmdbId) {
     const tv = await this.get(`/tv/${tmdbId}`, {}, { ttlMs: 60 * 60 * 1000 });
@@ -155,17 +209,15 @@ class TmdbClient {
       .slice(0, MAX_SEASONS);
     const seasons = [];
     for (const n of numbers) {
-      const s = await this.get(`/tv/${tmdbId}/season/${n}`, {}, { ttlMs: 60 * 60 * 1000 });
-      const episodes = (Array.isArray(s && s.episodes) ? s.episodes : [])
-        .filter(e => e && Number.isInteger(e.episode_number) && e.episode_number > 0)
-        .map(e => ({
-          episode_number: e.episode_number,
-          name: stripHtml(e.name, 300) || `Episódio ${e.episode_number}`,
-          runtime: Number(e.runtime) > 0 ? Number(e.runtime) : Number(tv.episode_run_time && tv.episode_run_time[0]) || null,
-          air_date: dateOnly(e.air_date),
-          overview: stripHtml(e.overview),
-          still_path: safeHttpUrl(img(e.still_path, 'w300'), null)
-        }));
+      const s = await this.seasonEpisodes(tmdbId, n);
+      const episodes = s.episodes.map(e => ({
+        episode_number: e.episode_number,
+        name: e.name || stripHtml(e.raw_name, 300) || `Episódio ${e.episode_number}`,
+        runtime: Number(e.runtime) > 0 ? Number(e.runtime) : Number(tv.episode_run_time && tv.episode_run_time[0]) || null,
+        air_date: e.air_date,
+        overview: stripHtml(e.overview),
+        still_path: safeHttpUrl(e.still_path, null)
+      }));
       if (episodes.length) seasons.push({ season_number: n, name: stripHtml(s.name, 80) || `Temporada ${n}`, episodes });
     }
     return { ...TmdbClient.mapTv(tv), seasons };

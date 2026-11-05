@@ -67,7 +67,24 @@
     return n ? `${n} min` : '';
   }
 
+  // Episódio sem título (D-TE-1): o armazenamento guarda o rótulo "Episódio N" (nunca vazio, nada quebra); as telas o mostram atenuado,
+  // para não parecer um título de verdade. Devolve a classe CSS extra (com espaço na frente) ou ''.
+  function isPlaceholderEpisodeName(name) {
+    const t = String(name == null ? '' : name).trim();
+    return t === '' || /^Epis[óo]dio\s+\d+$/i.test(t);
+  }
+  function episodeNameClass(name) {
+    return isPlaceholderEpisodeName(name) ? ' is-placeholder' : '';
+  }
+
+  // Miniatura de episódio que falhou: espaço escuro liso, sem ícone (D-TE-6). Data URI: funciona offline e a CSP (img-src) permite.
+  const EP_THUMB_BLANK =
+    'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22%3E%3Crect width=%2216%22 height=%229%22 fill=%22%2312141c%22/%3E%3C/svg%3E';
+
   const api = {
+    isPlaceholderEpisodeName,
+    episodeNameClass,
+    EP_THUMB_BLANK,
     POSTER_PLACEHOLDER,
     STILL_PLACEHOLDER,
     STATUS_PT,
