@@ -786,8 +786,17 @@ class MediaService {
   // Obras marcadas pela migração do catálogo antigo (`needsRefresh`) vencem na hora.
 
   // Validade da obra em ms (0 = vence agora, null = nunca vence).
-  refreshTtlMs(item) {
-    if (!item || !item.ingestedAt || item.type === 'movie') return null;
+  // Filme AINDA NÃO LANÇADO (sem data, data de hoje em diante ou status diferente de 'Lançado') vence como obra 'Em breve' (a data de estreia
+  // pode mudar); filme lançado não vence. Sem chave do TMDB não há como atualizar filme: nunca vence (sem erro à toa).
+  refreshTtlMs(item, now = Date.now()) {
+    if (!item || !item.ingestedAt) return null;
+    if (item.type === 'movie') {
+      if (!this.tmdb.enabled) return null;
+      const today = new Date(now).toISOString().slice(0, 10);
+      const date = /^\d{4}-\d{2}-\d{2}/.test(String(item.first_air_date || '')) ? item.first_air_date.slice(0, 10) : '';
+      const released = Boolean(date) && date < today && item.status === 'Lançado';
+      return released ? null : this.upcomingTtlMs;
+    }
     if (item.needsRefresh) return 0;
     if (item.status === AIRING_STATUS) return this.airingTtlMs;
     if (item.status === UPCOMING_STATUS) return this.upcomingTtlMs;
@@ -795,7 +804,7 @@ class MediaService {
   }
 
   isRefreshDue(item, now = Date.now()) {
-    const ttl = this.refreshTtlMs(item);
+    const ttl = this.refreshTtlMs(item, now);
     if (ttl === null) return false;
     if (!describeId(item.id).ingestable && !MediaService.isUpgradedSeed(item)) return false;
     const last = Date.parse(item.refreshedAt || item.ingestedAt) || 0;

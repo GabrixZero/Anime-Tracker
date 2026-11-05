@@ -307,8 +307,8 @@ test('refreshCheck: "fresh" dentro da validade, "recent" para força repetida em
 
 test('refresh de anime em exibição pela AniList: episódios novos entram, o cache é ignorado, a obra continua com o mesmo id e as marcas certas', async () => {
   const svc = makeService(MediaService, T.newDir(), { extra: { seedPath: undefined } });
-  const first = await svc.ingest(10000021); // One Piece: 1180 episódios (o próximo é o 1181)
-  assert.equal(first.seasons[0].episodes.length, 1180);
+  const first = await svc.ingest(10000021); // One Piece: 1181 episódios (o próximo, 1181, tem data confirmada)
+  assert.equal(first.seasons[0].episodes.length, 1181);
   assert.equal(first.status, 'Em Exibição');
 
   const before = svc.callsTo('anilist').length;
@@ -326,14 +326,14 @@ test('refresh de anime em exibição pela AniList: episódios novos entram, o ca
   assert.equal(res.refreshed, true);
   assert.equal(res.newEpisodes, 2, 'agora o próximo é o 1183: já foram 1182');
   assert.equal(res.item.id, 10000021);
-  assert.equal(res.item.seasons[0].episodes.length, 1182);
+  assert.equal(res.item.seasons[0].episodes.length, 1183);
   assert.equal(res.item.ingestedAt, first.ingestedAt);
   assert.ok(Date.parse(res.item.refreshedAt) > Date.now() - 5000);
   assert.ok(svc.callsTo('anilist').length > before, 'ignorou o cache da AniList (fresh)');
   assert.equal(svc.catalog.filter(m => m.id === 10000021).length, 1);
   assert.equal(
     readRuntime(path.dirname(svc.catalogPath)).find(m => m.id === 10000021).seasons[0].episodes.length,
-    1182,
+    1183,
     'gravado em disco'
   );
   assert.equal((await svc.refresh(10000021)).reason, 'fresh');
