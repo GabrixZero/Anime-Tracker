@@ -70,7 +70,7 @@ Dados em disco (`server/data/`):
 
 | Arquivo | Versionado? | Papel |
 |---|---|---|
-| `mediaCatalog.seed.json` | sim (somente leitura) | 16 obras iniciais (ids do TMDB, incluindo o filme Batman 155) |
+| `mediaCatalog.seed.json` | sim (somente leitura) | lista de 16 obras iniciais (só id/tipo/título/fonte; SEM dados copiados, D-AM-1); os dados reais são baixados para o runtime (D-AM-5) |
 | `mediaCatalog.runtime.json` (+ `.bak`) | **não** (ignorado) | catálogo vivo: criado a partir do seed na primeira execução; obras novas do seed são acrescentadas depois (nunca sobrescrevem); recebe as ingestões. Se estiver ilegível (sem `.bak` válido) o servidor serve só o seed e **bloqueia gravações** (ingestão responde 503) até alguém corrigir |
 | `users.example.json` | sim | só contém a conta de demonstração; é copiado para `users.json` **apenas** com `SEED_DEMO_USER=1` (fora de produção); sem isso `users.json` nasce vazio |
 | `jwt.secret` | **não** (ignorado) | segredo JWT local gerado na primeira execução sem `JWT_SECRET` (apagar = todos precisam entrar de novo) |
@@ -102,7 +102,7 @@ Ids continuam **numéricos**; cada fonte tem uma **faixa própria** (código em 
 
 | Fonte | Faixa do id interno | Conta | Estado |
 |---|---|---|---|
-| Seed (TMDB, curado) | 1 – 999.999 | id nativo do TMDB, sem deslocamento (ex.: Breaking Bad 1396, Batman 155) | ativo (não ingerível: só existe se estiver no seed) |
+| Seed (TMDB, curado) | 1 – 999.999 | id nativo do TMDB, sem deslocamento (ex.: Breaking Bad 1396, Batman 155) | ativo (só existe se estiver na lista do seed; a ingestão troca a amostra pela obra real com o mesmo id, D-AM-3) |
 | TVMaze | 1.000.000 – 1.999.999 | 1.000.000 + id do TVMaze (ex.: Naruto 495 → 1.000.495) | ativo (ingestão sob demanda) |
 | MyAnimeList (anime) — via **AniList** (principal) ou Jikan (reserva) | 10.000.000 – 19.999.999 | 10.000.000 + `mal_id` (= `idMal` da AniList) | **ativo (S06; AniList na S13)**: ingestão sob demanda; a obra reúne a franquia; AniList e Jikan descrevem a mesma obra com o mesmo id |
 | TMDB externo — séries | 20.000.000 – 29.999.999 | 20.000.000 + id de série do TMDB | ativo só com `TMDB_API_KEY` (S06) |
