@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-    <title>ShowVault · Rastreador de Séries, Filmes e Animes</title>
+    <title>ShowVault · Séries, animes e filmes em um lugar só</title>
     <meta
       name="description"
-      content="Acompanhe séries, filmes e animes: progresso episódio por episódio, diário de anotações com histórico de versões e estatísticas de tempo assistido."
+      content="ShowVault: acompanhe séries, animes e filmes em um lugar só, com lista de status, agenda de lançamentos, notas, diário, estatísticas, importação da MyAnimeList e do TV Time, modo offline e cadastro por convite."
     />
 
     <!-- Fontes Google: Outfit e Plus Jakarta Sans -->
@@ -29,10 +29,397 @@
     <link rel="stylesheet" href="css/auth-tvtime.css" />
     <link rel="stylesheet" href="css/status.css" />
     <link rel="stylesheet" href="css/a11y.css" />
+    <link rel="stylesheet" href="css/landing.css" />
+    <!-- Landing x app: decide ANTES do primeiro desenho (sem piscar a tela errada). Script externo e síncrono de propósito (CSP estrita). -->
+    <script src="js/utils/landing.js"></script>
   </head>
   <body>
     <!-- Acessibilidade (S07): atalho para quem navega por teclado -->
     <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+
+    <!-- ================= LANDING PAGE (aparece só para quem não está logado nem escolheu usar sem conta; ver js/utils/landing.js) ================= -->
+
+    <div class="lp" id="landing">
+      <a class="skip-link lp-skip" href="#lp-main">Pular para o conteúdo</a>
+
+      <header class="lp-header">
+        <div class="lp-wrap lp-header-in">
+          <div class="lp-brand">
+            <span class="brand-badge">
+              <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+              </svg>
+            </span>
+
+            <span class="lp-brand-name">SHOW<strong>VAULT</strong></span>
+          </div>
+
+          <nav class="lp-header-actions" aria-label="Conta">
+            <button type="button" class="btn btn-outline lp-btn-sm" data-landing="login" aria-haspopup="dialog">Entrar</button>
+
+            <button type="button" class="btn btn-primary lp-btn-sm" data-landing="register" aria-haspopup="dialog">Criar conta</button>
+          </nav>
+        </div>
+      </header>
+
+      <main id="lp-main" tabindex="-1">
+        <section class="lp-hero" aria-labelledby="lp-title">
+          <div class="lp-wrap lp-hero-in">
+            <div class="lp-hero-text">
+              <p class="lp-eyebrow">Séries, animes e filmes</p>
+
+              <h1 id="lp-title">ShowVault: acompanhe tudo em um lugar só</h1>
+
+              <p class="lp-lead">
+                Marque o que você já viu, descubra o próximo episódio, veja o que estreia e guarde suas anotações. Sem planilha, sem bloco
+                de notas espalhado.
+              </p>
+
+              <div class="lp-cta">
+                <button type="button" class="btn btn-primary lp-btn-lg" data-landing="register" aria-haspopup="dialog">Criar conta</button>
+
+                <button type="button" class="btn btn-secondary lp-btn-lg" data-landing="login" aria-haspopup="dialog">
+                  Já tenho conta
+                </button>
+              </div>
+
+              <p class="lp-note">
+                O cadastro pode pedir um código de convite. Prefere só olhar?
+
+                <button type="button" class="link-btn lp-link" data-landing="visitor">Usar sem conta</button>
+
+                — sua lista fica só neste aparelho.
+              </p>
+            </div>
+
+            <!-- Ilustração própria (mockup simples em CSS, sem obras nem dados reais) -->
+
+            <div class="lp-mock" role="img" aria-label="Ilustração: uma lista com três títulos de exemplo, barras de progresso e uma nota">
+              <div class="lp-mock-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+
+              <div class="lp-mock-row" aria-hidden="true">
+                <span class="lp-mock-poster lp-tone-a"></span>
+
+                <span class="lp-mock-info">
+                  <span class="lp-mock-title">Série de exemplo</span>
+
+                  <span class="lp-mock-track"><span class="lp-fill lp-w-70"></span></span>
+
+                  <span class="lp-mock-meta">Temporada 2 · episódio 5</span>
+                </span>
+
+                <span class="lp-mock-score">9</span>
+              </div>
+
+              <div class="lp-mock-row" aria-hidden="true">
+                <span class="lp-mock-poster lp-tone-b"></span>
+
+                <span class="lp-mock-info">
+                  <span class="lp-mock-title">Anime de exemplo</span>
+
+                  <span class="lp-mock-track"><span class="lp-fill lp-w-35"></span></span>
+
+                  <span class="lp-mock-meta">Em andamento</span>
+                </span>
+
+                <span class="lp-mock-score">8</span>
+              </div>
+
+              <div class="lp-mock-row" aria-hidden="true">
+                <span class="lp-mock-poster lp-tone-c"></span>
+
+                <span class="lp-mock-info">
+                  <span class="lp-mock-title">Filme de exemplo</span>
+
+                  <span class="lp-mock-track"><span class="lp-fill lp-w-100"></span></span>
+
+                  <span class="lp-mock-meta">Finalizado</span>
+                </span>
+
+                <span class="lp-mock-score">10</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="lp-section" aria-labelledby="lp-features-title">
+          <div class="lp-wrap">
+            <h2 id="lp-features-title">O que você encontra aqui</h2>
+
+            <ul class="lp-grid">
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M9 11l3 3L22 4" />
+
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+
+                <h3>Lista com status</h3>
+
+                <p>Em andamento, finalizado ou quero ver. Marque episódio por episódio e o app mostra o que vem a seguir.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+
+                  <line x1="16" y1="2" x2="16" y2="6" />
+
+                  <line x1="8" y1="2" x2="8" y2="6" />
+
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+
+                <h3>Agenda de lançamentos</h3>
+
+                <p>Veja quando saem os próximos episódios e filmes das obras que você acompanha.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+
+                <h3>Notas de 0 a 10</h3>
+
+                <p>Dê sua nota a cada obra e acompanhe a média dos seus favoritos.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+
+                  <polyline points="14 2 14 8 20 8" />
+
+                  <line x1="16" y1="13" x2="8" y2="13" />
+
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+
+                <h3>Diário de anotações</h3>
+
+                <p>Escreva o que achou de cada episódio. O texto guarda o histórico de versões.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <line x1="18" y1="20" x2="18" y2="10" />
+
+                  <line x1="12" y1="20" x2="12" y2="4" />
+
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+
+                <h3>Estatísticas</h3>
+
+                <p>Quanto tempo você já assistiu e quais gêneros mais aparecem na sua lista.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+
+                  <polyline points="17 8 12 3 7 8" />
+
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+
+                <h3>Importar e exportar</h3>
+
+                <p>Traga seu histórico da MyAnimeList e do TV Time e leve uma cópia dos seus dados quando quiser.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M1 1l22 22" />
+
+                  <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+
+                  <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+
+                  <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+
+                  <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+
+                  <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+
+                  <line x1="12" y1="20" x2="12.01" y2="20" />
+                </svg>
+
+                <h3>Funciona offline</h3>
+
+                <p>Sem internet você ainda consulta e atualiza a lista. Tudo sincroniza quando a conexão volta.</p>
+              </li>
+
+              <li class="lp-card">
+                <svg
+                  class="lp-ico"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+
+                  <line x1="12" y1="18" x2="12.01" y2="18" />
+                </svg>
+
+                <h3>Instalável</h3>
+
+                <p>Adicione o ShowVault à tela inicial do celular ou do computador e abra como um aplicativo.</p>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="lp-section lp-section-alt" aria-labelledby="lp-steps-title">
+          <div class="lp-wrap">
+            <h2 id="lp-steps-title">Como funciona</h2>
+
+            <ol class="lp-steps">
+              <li class="lp-step">
+                <span class="lp-step-n" aria-hidden="true">1</span>
+
+                <h3>Entre ou use sem conta</h3>
+
+                <p>
+                  Você cria sua conta (se o cadastro pedir, com o código de convite) e a lista fica salva entre aparelhos. Sem conta, ela
+                  fica só neste aparelho.
+                </p>
+              </li>
+
+              <li class="lp-step">
+                <span class="lp-step-n" aria-hidden="true">2</span>
+
+                <h3>Adicione suas obras</h3>
+
+                <p>Busque no Explorar ou importe seu histórico e escolha o status de cada uma.</p>
+              </li>
+
+              <li class="lp-step">
+                <span class="lp-step-n" aria-hidden="true">3</span>
+
+                <h3>Acompanhe e anote</h3>
+
+                <p>Marque os episódios vistos, dê sua nota e escreva no diário. A aba A Seguir mostra o que assistir agora.</p>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="lp-section lp-final" aria-labelledby="lp-final-title">
+          <div class="lp-wrap lp-final-in">
+            <h2 id="lp-final-title">Pronto para começar?</h2>
+
+            <p>Crie sua conta (com o código de convite, se for pedido) ou entre se você já tem uma.</p>
+
+            <div class="lp-cta lp-cta-center">
+              <button type="button" class="btn btn-primary lp-btn-lg" data-landing="register" aria-haspopup="dialog">Criar conta</button>
+
+              <button type="button" class="btn btn-secondary lp-btn-lg" data-landing="login" aria-haspopup="dialog">Entrar</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="lp-footer">
+        <div class="lp-wrap">
+          <h2 class="lp-footer-title">Créditos dos dados</h2>
+
+          <p>
+            Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB.
+
+            <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">themoviedb.org</a>
+          </p>
+
+          <p>
+            Dados de séries também do TVMaze (CC BY-SA 4.0).
+
+            <a href="https://www.tvmaze.com/" target="_blank" rel="noopener noreferrer">tvmaze.com</a>
+          </p>
+
+          <p>
+            Dados de animes da AniList; ShowVault é não oficial.
+
+            <a href="https://anilist.co/" target="_blank" rel="noopener noreferrer">anilist.co</a>
+          </p>
+        </div>
+      </footer>
+    </div>
 
     <div id="app" class="app-container">
       <!-- BARRA SUPERIOR / HEADER -->
