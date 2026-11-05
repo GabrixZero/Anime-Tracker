@@ -20,7 +20,7 @@
   A.on('add-to-list', el => window.appController.addToList(show(el)));
   A.on('remove-from-list', el => window.appController.removeFromList(show(el)));
   A.on('quick-check', el => window.appController.quickCheck(show(el), season(el), episode(el)));
-  A.on('more-episodes', () => window.detailModalView.showMoreEpisodes());
+  A.on('more-episodes', el => window.detailModalView.showMoreEpisodes(season(el)));
   A.on('retry-details', () => window.appController.retryDetails());
   A.onChange('set-status', el => window.appController.setStatus(show(el), el.value));
   // Nota pessoal (S17): confirma ao mudar o valor (Enter ou sair do campo); "Remover nota" apaga
@@ -30,7 +30,6 @@
   // Detalhes e anotações
   A.on('open-detail', el => window.detailModalView.open(show(el)));
   A.on('open-note', el => window.detailModalView.openNote(show(el), season(el), episode(el)));
-  A.on('switch-season', el => window.detailModalView.switchSeason(season(el)));
 
   // Explorar
   A.on('retry-explore', () => window.exploreView.loadMedia());

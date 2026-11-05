@@ -162,22 +162,20 @@ class AppController {
     this.onEpisodeToggled(showId, seasonNum, epNum);
   }
 
-  // Depois de marcar/desfazer VÁRIOS episódios de uma vez: as listas atualizam a obra uma vez; o modal repinta as linhas da temporada aberta.
+  // Depois de marcar/desfazer VÁRIOS episódios de uma vez: as listas atualizam a obra uma vez.
+  // (O quadro de detalhe da série é só leitura, não tem linhas de assistido para repintar.)
   refreshBatch(showId) {
     this.refreshShow(showId);
-    const modal = window.detailModalView;
-    if (modal.isOpenFor(showId)) modal.syncEpisodeRows();
   }
 
   // Depois de marcar/desmarcar um episódio ou filme (S09): atualiza só o que mudou, não a tela inteira.
   onEpisodeToggled(showId, seasonNum = null, epNum = null) {
     this.refreshShow(showId);
-    // Se o modal de detalhes estiver aberto nesta obra, atualiza a linha do episódio (filme: o modal pequeno é redesenhado)
+    // Se o modal de detalhes estiver aberto num filme, ele é redesenhado (série: a lista de episódios é só leitura)
     const modal = window.detailModalView;
     if (modal.isOpenFor(showId)) {
       const media = window.appState.getMedia(showId);
       if (media && media.type === 'movie') modal.open(showId);
-      else modal.updateEpisode(seasonNum, epNum);
     }
   }
 

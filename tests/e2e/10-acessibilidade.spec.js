@@ -66,7 +66,7 @@ test.describe('acessibilidade (axe-core)', () => {
     await tap(page.getByRole('button', { name: 'Breaking Bad', exact: true }));
     await expect(page.locator('#modal-show-detail')).toBeVisible();
     await check('Janela da obra (série)', '#modal-show-detail');
-    await tap(page.locator('#show-episodes-container .episode-row[data-ep="1"]').getByRole('button', { name: /^Anotar/ }));
+    await page.evaluate(() => window.detailModalView.openNote(1396, 1, 1)); // o quadro da obra não tem mais "Anotar": abre o diário pela lógica
     await expect(page.locator('#modal-episode-note')).toBeVisible();
     await page.locator('#note-textarea').fill('Texto com **negrito** e >!spoiler!<');
     await check('Janela da anotação', '#modal-episode-note');
