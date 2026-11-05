@@ -18,10 +18,18 @@ function runAuth(header) {
   const req = { headers: header === undefined ? {} : { authorization: header } };
   const out = { nextCalled: false, status: null };
   const res = {
-    status(code) { out.status = code; return this; },
-    json(body) { out.body = body; return this; }
+    status(code) {
+      out.status = code;
+      return this;
+    },
+    json(body) {
+      out.body = body;
+      return this;
+    }
   };
-  requireAuth(req, res, () => { out.nextCalled = true; });
+  requireAuth(req, res, () => {
+    out.nextCalled = true;
+  });
   return { req, out };
 }
 
@@ -57,7 +65,7 @@ test('UserModel: hash scrypt, senha legada e comprimentos inválidos', async () 
   assert.equal(await UserModel.verifyPassword('x', 'abcd:0011'), false);
 });
 
-test('LibraryModel', async (t) => {
+test('LibraryModel', async t => {
   const originalDir = LibraryModel.dir;
   LibraryModel.dir = fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-lib-'));
   t.after(() => {

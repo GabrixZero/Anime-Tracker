@@ -18,12 +18,12 @@ class SyncService {
     this.pushAgain = false;
     this.pulling = false;
     this.inflight = null;
-    this.epoch = 0;          // muda a cada troca de sessão: respostas de uma sessão antiga são ignoradas
-    this.userId = '';        // conta da sessão atual
-    this.ready = false;      // primeiro pull concluído (só então é seguro enviar)
-    this.dirty = false;      // há alterações locais ainda não confirmadas pelo servidor
+    this.epoch = 0; // muda a cada troca de sessão: respostas de uma sessão antiga são ignoradas
+    this.userId = ''; // conta da sessão atual
+    this.ready = false; // primeiro pull concluído (só então é seguro enviar)
+    this.dirty = false; // há alterações locais ainda não confirmadas pelo servidor
     this.dirtyVersion = 0;
-    this.status = 'idle';    // 'idle' | 'syncing' | 'offline' | 'error' | 'auth'
+    this.status = 'idle'; // 'idle' | 'syncing' | 'offline' | 'error' | 'auth'
     this.baseLabel = 'Só neste aparelho'; // visitante: os dados ficam apenas no navegador
     this.bindStatusClick();
   }
@@ -64,7 +64,13 @@ class SyncService {
       error: 'Erro ao sincronizar · tentar de novo',
       auth: 'Sessão expirada'
     };
-    const badges = { idle: 'Sincronizado', syncing: 'Sincronizando...', offline: 'Offline', error: 'Erro ao sincronizar', auth: 'Sessão expirada' };
+    const badges = {
+      idle: 'Sincronizado',
+      syncing: 'Sincronizando...',
+      offline: 'Offline',
+      error: 'Erro ao sincronizar',
+      auth: 'Sessão expirada'
+    };
 
     const box = document.getElementById('sync-status');
     if (box) {
@@ -193,10 +199,14 @@ class SyncService {
   // Compara bibliotecas ignorando a ordem de chaves/obras.
   fingerprint(data) {
     const d = window.LibraryMerge.normalizeData(data);
-    const sorted = (value) => {
+    const sorted = value => {
       if (Array.isArray(value)) return value.map(sorted);
       if (value && typeof value === 'object') {
-        return Object.fromEntries(Object.keys(value).sort().map(k => [k, sorted(value[k])]));
+        return Object.fromEntries(
+          Object.keys(value)
+            .sort()
+            .map(k => [k, sorted(value[k])])
+        );
       }
       return value;
     };
@@ -206,7 +216,8 @@ class SyncService {
   handleError(err) {
     this.lastError = err;
     if (err && err.status === 401) this.setStatus('auth');
-    else if (err && !err.status && err instanceof TypeError) this.setStatus('offline'); // fetch sem rede
+    else if (err && !err.status && err instanceof TypeError)
+      this.setStatus('offline'); // fetch sem rede
     else this.setStatus('error');
   }
 
@@ -229,7 +240,11 @@ class SyncService {
 
       const remote = window.LibraryMerge.normalizeData(res.data);
       const decision = window.LibraryMerge.decideLogin({
-        ownerId: state.getOwner(), userId, seeded: !!state.seeded, local: state.data, remote
+        ownerId: state.getOwner(),
+        userId,
+        seeded: !!state.seeded,
+        local: state.data,
+        remote
       });
       if (decision.archiveLocal) state.archiveFor(state.getOwner());
 
@@ -267,7 +282,9 @@ class SyncService {
     clearTimeout(this.timer);
     this.timer = null;
     let timer;
-    const timeout = new Promise(resolve => { timer = setTimeout(() => resolve(false), this.FLUSH_TIMEOUT_MS); });
+    const timeout = new Promise(resolve => {
+      timer = setTimeout(() => resolve(false), this.FLUSH_TIMEOUT_MS);
+    });
     try {
       for (let i = 0; i < 2 && this.dirty && this.canSync(); i++) {
         await Promise.race([this.pushing && this.inflight ? this.inflight : this.push(), timeout]);

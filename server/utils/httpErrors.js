@@ -9,7 +9,9 @@ function sendError(res, err, fallbackMessage, logLabel) {
   }
   if (err instanceof DataCorruptionError || (err && err.code === 'DATA_CORRUPT')) {
     console.error(`[${logLabel || 'dados'}] ${err.message}`);
-    return res.status(503).json({ error: 'Os dados do servidor estão temporariamente indisponíveis. Avise o administrador.', code: 'DATA_CORRUPT' });
+    return res
+      .status(503)
+      .json({ error: 'Os dados do servidor estão temporariamente indisponíveis. Avise o administrador.', code: 'DATA_CORRUPT' });
   }
   console.error(`[${logLabel || 'erro'}]`, err);
   return res.status(500).json({ error: fallbackMessage });

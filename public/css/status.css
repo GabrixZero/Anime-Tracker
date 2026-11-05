@@ -44,26 +44,26 @@
   cursor: pointer;
 }
 
-#sync-status[data-sync-state="offline"],
-#sync-status[data-sync-state="error"],
-#sync-status[data-sync-state="auth"] {
+#sync-status[data-sync-state='offline'],
+#sync-status[data-sync-state='error'],
+#sync-status[data-sync-state='auth'] {
   background: rgba(244, 63, 94, 0.1);
   border-color: rgba(244, 63, 94, 0.3);
 }
 
-#sync-status[data-sync-state="offline"] .status-dot,
-#sync-status[data-sync-state="error"] .status-dot,
-#sync-status[data-sync-state="auth"] .status-dot {
+#sync-status[data-sync-state='offline'] .status-dot,
+#sync-status[data-sync-state='error'] .status-dot,
+#sync-status[data-sync-state='auth'] .status-dot {
   background: var(--accent-rose);
   animation: none;
 }
 
-#user-cloud-badge[data-sync-state="offline"],
-#user-cloud-badge[data-sync-state="error"],
-#user-cloud-badge[data-sync-state="auth"] {
+#user-cloud-badge[data-sync-state='offline'],
+#user-cloud-badge[data-sync-state='error'],
+#user-cloud-badge[data-sync-state='auth'] {
   color: var(--accent-rose);
 }
 
-#user-cloud-badge[data-sync-state="syncing"] {
+#user-cloud-badge[data-sync-state='syncing'] {
   color: var(--text-secondary);
 }

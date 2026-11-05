@@ -15,12 +15,17 @@ const newDir = () => {
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 };
-const quiet = (fn) => {
+const quiet = fn => {
   const log = console.log;
   const warn = console.warn;
   console.log = () => {};
   console.warn = () => {};
-  try { return fn(); } finally { console.log = log; console.warn = warn; }
+  try {
+    return fn();
+  } finally {
+    console.log = log;
+    console.warn = warn;
+  }
 };
 
 test('sem JWT_SECRET fora de produção: gera um segredo único, grava em jwt.secret e reaproveita (idempotente)', () => {
@@ -73,8 +78,14 @@ test('produção: sem JWT_SECRET falha; segredo curto ou o do exemplo/antigo pad
   assert.throws(() => resolveJwtSecret({ env: {}, dataDir: dir, isProduction: true }), /JWT_SECRET é obrigatório/);
   assert.throws(() => resolveJwtSecret({ env: { JWT_SECRET: '   ' }, dataDir: dir, isProduction: true }), /obrigatório/);
   assert.throws(() => resolveJwtSecret({ env: { JWT_SECRET: 'curto' }, dataDir: dir, isProduction: true }), /inseguro/);
-  assert.throws(() => resolveJwtSecret({ env: { JWT_SECRET: 'showvault_dev_only_secret_change_me' }, dataDir: dir, isProduction: true }), /inseguro/);
-  assert.throws(() => resolveJwtSecret({ env: { JWT_SECRET: 'troque-por-um-segredo-longo-e-aleatorio' }, dataDir: dir, isProduction: true }), /inseguro/);
+  assert.throws(
+    () => resolveJwtSecret({ env: { JWT_SECRET: 'showvault_dev_only_secret_change_me' }, dataDir: dir, isProduction: true }),
+    /inseguro/
+  );
+  assert.throws(
+    () => resolveJwtSecret({ env: { JWT_SECRET: 'troque-por-um-segredo-longo-e-aleatorio' }, dataDir: dir, isProduction: true }),
+    /inseguro/
+  );
   assert.equal(resolveJwtSecret({ env: { JWT_SECRET: 'a'.repeat(48) }, dataDir: dir, isProduction: true }).source, 'env');
   assert.equal(fs.existsSync(path.join(dir, SECRET_FILE_NAME)), false, 'produção nunca gera arquivo de segredo');
 });
@@ -82,7 +93,7 @@ test('produção: sem JWT_SECRET falha; segredo curto ou o do exemplo/antigo pad
 // --- Processo real (config.js de verdade) ---------------------------------------------------------------------------------
 
 const REPO = path.join(__dirname, '..');
-const childEnv = (extra) => {
+const childEnv = extra => {
   const env = { ...process.env, ...extra };
   for (const key of Object.keys(extra)) if (extra[key] === undefined) delete env[key];
   return env;
@@ -101,12 +112,16 @@ test('processo real: NODE_ENV=production sem JWT_SECRET não sobe', () => {
 
 test('processo real: dois "reinícios" seguidos usam o mesmo segredo local', () => {
   const dir = newDir();
-  const run = () => execFileSync(process.execPath, ['-e', "process.stdout.write(require('./server/config/config').JWT_SECRET)"], {
-    cwd: REPO,
-    env: childEnv({ NODE_ENV: 'development', JWT_SECRET: undefined, SHOWVAULT_DATA_DIR: dir }),
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore']
-  }).trim().split('\n').pop();
+  const run = () =>
+    execFileSync(process.execPath, ['-e', "process.stdout.write(require('./server/config/config').JWT_SECRET)"], {
+      cwd: REPO,
+      env: childEnv({ NODE_ENV: 'development', JWT_SECRET: undefined, SHOWVAULT_DATA_DIR: dir }),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    })
+      .trim()
+      .split('\n')
+      .pop();
   const first = run();
   const second = run();
   assert.ok(first.length >= MIN_SECRET_LENGTH);

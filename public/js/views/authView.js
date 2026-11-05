@@ -18,7 +18,7 @@ class AuthView {
     // Abertura / Fechamento
     document.getElementById('btn-open-auth').addEventListener('click', () => this.open());
     document.getElementById('btn-close-tvtime-auth').addEventListener('click', () => this.close());
-    this.modal.addEventListener('click', (e) => {
+    this.modal.addEventListener('click', e => {
       if (e.target === this.modal) this.close();
     });
 
@@ -27,13 +27,13 @@ class AuthView {
     document.getElementById('tvtime-tab-register').addEventListener('click', () => this.switchMode('register'));
 
     // Submit de Formulário E-mail / Senha
-    document.getElementById('tvtime-auth-form').addEventListener('submit', (e) => {
+    document.getElementById('tvtime-auth-form').addEventListener('submit', e => {
       e.preventDefault();
       this.handleSubmit();
     });
 
     // Some a mensagem de erro assim que a pessoa volta a digitar
-    ['input-tvtime-name', 'input-tvtime-email', 'input-tvtime-password', 'input-tvtime-invite'].forEach((id) => {
+    ['input-tvtime-name', 'input-tvtime-email', 'input-tvtime-password', 'input-tvtime-invite'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => this.showError(''));
     });
 
@@ -174,7 +174,9 @@ class AuthView {
     script.async = true;
     script.defer = true;
     script.onload = () => this.renderGoogleButton(clientId);
-    script.onerror = () => { /* bloqueado/sem internet: o botão simplesmente não aparece */ };
+    script.onerror = () => {
+      /* bloqueado/sem internet: o botão simplesmente não aparece */
+    };
     document.head.appendChild(script);
   }
 
@@ -183,7 +185,7 @@ class AuthView {
     if (!gsi) return;
     gsi.initialize({
       client_id: clientId,
-      callback: (response) => this.handleGoogleCredential(response && response.credential)
+      callback: response => this.handleGoogleCredential(response && response.credential)
     });
     gsi.renderButton(document.getElementById('google-signin-button'), {
       type: 'standard',
@@ -260,9 +262,10 @@ class AuthView {
     this.showError('');
     this.setBusy(true);
     try {
-      const res = this.mode === 'register'
-        ? await window.apiClient.register(name, email, password, this.inviteRequired ? inviteCode : '')
-        : await window.apiClient.login(email, password);
+      const res =
+        this.mode === 'register'
+          ? await window.apiClient.register(name, email, password, this.inviteRequired ? inviteCode : '')
+          : await window.apiClient.login(email, password);
       this.finishLogin(res, res.message);
     } catch (err) {
       this.showError(this.friendlyError(err));
@@ -274,7 +277,12 @@ class AuthView {
   // Sair = enviar o que falta, tirar os dados desta conta do navegador (a próxima pessoa não os vê) e encerrar a sessão.
   // Se o envio falhar (sem rede), uma cópia fica guardada e volta quando a mesma conta entrar de novo.
   async handleLogout() {
-    if (!confirm('Deseja sair da sua conta? Seus dados ficam guardados na sua conta e voltam quando você entrar de novo; este navegador será limpo.')) return;
+    if (
+      !confirm(
+        'Deseja sair da sua conta? Seus dados ficam guardados na sua conta e voltam quando você entrar de novo; este navegador será limpo.'
+      )
+    )
+      return;
 
     const { synced } = await window.syncService.logout();
     this.finishLocalLogout();

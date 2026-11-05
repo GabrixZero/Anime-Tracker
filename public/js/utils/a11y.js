@@ -38,7 +38,7 @@
   if (typeof window === 'undefined' || !window.document) return;
 
   const doc = window.document;
-  const keySel = (k) => '[data-focus-key="' + String(k).replace(/"/g, '') + '"]';
+  const keySel = k => '[data-focus-key="' + String(k).replace(/"/g, '') + '"]';
 
   // ---------- 2. classe `active` -> atributos ARIA ----------
   function updateFromClass(el, mode) {
@@ -54,7 +54,7 @@
   function mirrorActive(selector, mode) {
     const apply = () => doc.querySelectorAll(selector).forEach(el => updateFromClass(el, mode));
     apply();
-    new MutationObserver((records) => {
+    new MutationObserver(records => {
       for (const r of records) {
         if (r.target.matches && r.target.matches(selector)) updateFromClass(r.target, mode);
       }
@@ -66,7 +66,7 @@
   // auto = ativa a aba ao mover (barato: temporadas, login); senão só move o foco e Enter/Espaço ativam (abas principais).
   function enableTablist(container, { auto = false } = {}) {
     if (!container) return;
-    container.addEventListener('keydown', (e) => {
+    container.addEventListener('keydown', e => {
       const tab = e.target.closest && e.target.closest('[role="tab"]');
       if (!tab || e.altKey || e.ctrlKey || e.metaKey) return;
       const tabs = Array.from(container.querySelectorAll('[role="tab"]')).filter(t => t.getClientRects().length > 0);
@@ -85,21 +85,37 @@
     const key = a && container.contains(a) ? a.getAttribute('data-focus-key') : null;
     if (!key) return null;
     const action = actionOf(key);
-    const same = Array.from(container.querySelectorAll('[data-focus-key]')).filter(el => actionOf(el.getAttribute('data-focus-key')) === action);
+    const same = Array.from(container.querySelectorAll('[data-focus-key]')).filter(
+      el => actionOf(el.getAttribute('data-focus-key')) === action
+    );
     return { key, action, index: same.indexOf(a) };
   }
 
   function restoreFocus(container, saved, section) {
     const exact = container.querySelector(keySel(saved.key));
-    if (exact) { exact.focus(); return; }
+    if (exact) {
+      exact.focus();
+      return;
+    }
     const sibling = container.querySelector('[data-focus-key^="' + groupOf(saved.key).replace(/"/g, '') + '"]');
-    if (sibling) { sibling.focus(); return; }
+    if (sibling) {
+      sibling.focus();
+      return;
+    }
     // O item saiu da lista: vai para o próximo da mesma ação (ou o último), como um leitor esperaria.
-    const same = Array.from(container.querySelectorAll('[data-focus-key]')).filter(el => actionOf(el.getAttribute('data-focus-key')) === saved.action);
-    if (same.length) { same[Math.min(Math.max(saved.index, 0), same.length - 1)].focus(); return; }
+    const same = Array.from(container.querySelectorAll('[data-focus-key]')).filter(
+      el => actionOf(el.getAttribute('data-focus-key')) === saved.action
+    );
+    if (same.length) {
+      same[Math.min(Math.max(saved.index, 0), same.length - 1)].focus();
+      return;
+    }
     // O item sumiu (ex.: episódio concluído saiu da fila): foco no título da tela, para não cair no <body>.
     const heading = section ? section.querySelector('h2') : null;
-    if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus(); }
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus();
+    }
   }
 
   function wrapRender(obj, method, containerSelector, sectionSelector) {

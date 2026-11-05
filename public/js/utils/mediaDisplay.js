@@ -12,17 +12,17 @@
 
   // Status que vêm em inglês das fontes externas (TVMaze/Jikan) -> português. O resto passa como veio.
   const STATUS_PT = {
-    'running': 'Em exibição',
-    'ended': 'Finalizada',
+    running: 'Em exibição',
+    ended: 'Finalizada',
     'to be determined': 'A definir',
     'in development': 'Em desenvolvimento',
-    'canceled': 'Cancelada',
-    'cancelled': 'Cancelada',
+    canceled: 'Cancelada',
+    cancelled: 'Cancelada',
     'currently airing': 'Em exibição',
     'finished airing': 'Finalizada',
     'not yet aired': 'Ainda não lançada',
-    'released': 'Lançado',
-    'upcoming': 'Em breve'
+    released: 'Lançado',
+    upcoming: 'Em breve'
   };
 
   // Só vale nota numérica maior que zero (null, vazio e 0,0 = ninguém avaliou)
@@ -68,8 +68,16 @@
   }
 
   const api = {
-    POSTER_PLACEHOLDER, STILL_PLACEHOLDER, STATUS_PT,
-    hasRating, ratingBadge, genresText, statusText, yearText, knownRuntime, runtimeText
+    POSTER_PLACEHOLDER,
+    STILL_PLACEHOLDER,
+    STATUS_PT,
+    hasRating,
+    ratingBadge,
+    genresText,
+    statusText,
+    yearText,
+    knownRuntime,
+    runtimeText
   };
   root.MediaDisplay = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

@@ -21,10 +21,16 @@ const PROFILES = {
 // Gerador pseudo-aleatório determinístico (as duas medições usam exatamente os mesmos dados).
 function rng(seed) {
   let s = seed >>> 0;
-  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
 }
 
-const WORDS = 'o a de que e do da em um para com não uma os no se na por mais as dos como mas foi ao ele das tem à seu sua ou ser quando muito há nos já está eu também só pelo pela até isso ela entre era depois sem mesmo aos ter seus quem nas me esse eles estão você tinha foram essa num nem suas meu às minha têm numa pelos elas havia seja qual será nós tenho lhe deles essas esses pelas este fosse dele'.split(' ');
+const WORDS =
+  'o a de que e do da em um para com não uma os no se na por mais as dos como mas foi ao ele das tem à seu sua ou ser quando muito há nos já está eu também só pelo pela até isso ela entre era depois sem mesmo aos ter seus quem nas me esse eles estão você tinha foram essa num nem suas meu às minha têm numa pelos elas havia seja qual será nós tenho lhe deles essas esses pelas este fosse dele'.split(
+    ' '
+  );
 function sentence(rand, n) {
   return Array.from({ length: n }, () => WORDS[Math.floor(rand() * WORDS.length)]).join(' ');
 }
@@ -34,10 +40,10 @@ function buildCatalog(profile) {
   const rand = rng(20261027);
   const items = [];
   for (let i = 0; i < cfg.works; i++) {
-    const id = 1000000 + 1000 + i;                       // faixa do TVMaze (ingerida)
+    const id = 1000000 + 1000 + i; // faixa do TVMaze (ingerida)
     const type = i % 5 === 4 ? 'anime' : 'tv';
     const isBig = cfg.big && i === 0;
-    const total = isBig ? cfg.big : (cfg.perWork ? cfg.perWork[i] : 20 + Math.floor(rand() * 20));
+    const total = isBig ? cfg.big : cfg.perWork ? cfg.perWork[i] : 20 + Math.floor(rand() * 20);
     const seasons = [];
     if (isBig) {
       seasons.push({ season_number: 1, name: 'Temporada 1', episodes: makeEpisodes(rand, id, 1, total) });
@@ -48,7 +54,8 @@ function buildCatalog(profile) {
       }
     }
     items.push({
-      id, type,
+      id,
+      type,
       name: isBig ? 'Maratona Sem Fim' : `Obra Sintética ${i + 1}`,
       overview: sentence(rand, 60),
       poster_path: `https://static.tvmaze.com/uploads/images/medium_portrait/${id}.jpg`,
@@ -87,7 +94,12 @@ function buildLibrary(catalog) {
       for (const e of s.episodes) {
         n++;
         if (limit ? n <= limit : n <= Math.floor(totalEpisodes(m) / 2)) {
-          data.watchedEpisodes[`${m.id}_s${s.season_number}_e${e.episode_number}`] = { watched: true, watchedAt: now, updatedAt: now, rewatchCount: 1 };
+          data.watchedEpisodes[`${m.id}_s${s.season_number}_e${e.episode_number}`] = {
+            watched: true,
+            watchedAt: now,
+            updatedAt: now,
+            rewatchCount: 1
+          };
         }
       }
     }
@@ -101,11 +113,13 @@ const kb = n => `${(n / 1024).toFixed(1)} KB`;
 
 function get(url, headers = {}) {
   return new Promise((resolve, reject) => {
-    http.get(url, { headers }, (res) => {
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
-    }).on('error', reject);
+    http
+      .get(url, { headers }, res => {
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
+      })
+      .on('error', reject);
   });
 }
 
@@ -119,7 +133,14 @@ async function main() {
     fs.writeFileSync(path.join(dir, 'mediaCatalog.runtime.json'), JSON.stringify(catalog));
     const library = buildLibrary(catalog);
     fs.writeFileSync(path.join(dir, 'bench-library.json'), JSON.stringify(library));
-    console.log(JSON.stringify({ works: catalog.length, episodes: catalog.reduce((n, m) => n + totalEpisodes(m), 0), watched: Object.keys(library.watchedEpisodes).length, dir }));
+    console.log(
+      JSON.stringify({
+        works: catalog.length,
+        episodes: catalog.reduce((n, m) => n + totalEpisodes(m), 0),
+        watched: Object.keys(library.watchedEpisodes).length,
+        dir
+      })
+    );
     return;
   }
   if (cmd === 'payload') {
@@ -132,7 +153,9 @@ async function main() {
     const app = require('../server/app');
     const mediaService = require('../server/services/mediaService');
     const all = mediaService.catalog;
-    const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+    const server = await new Promise(resolve => {
+      const s = app.listen(0, '127.0.0.1', () => resolve(s));
+    });
     const base = `http://127.0.0.1:${server.address().port}`;
 
     // formato antigo = catálogo inteiro com todos os episódios, sem paginação
@@ -149,9 +172,15 @@ async function main() {
     const eps = all.reduce((n, m) => n + totalEpisodes(m), 0);
     console.log(`Perfil "${profile}": ${all.length} obras, ${eps} episódios`);
     console.log(`  ANTES  /trending (catálogo inteiro): ${oldBody.length} bytes (${kb(oldBody.length)}) · gzip ${kb(gz(oldBody))}`);
-    console.log(`  DEPOIS /trending (lista leve):       ${lite.body.length} bytes (${kb(lite.body.length)}) · gzip (servidor) ${kb(liteGz.body.length)} [Content-Encoding: ${liteGz.headers['content-encoding']}]`);
-    console.log(`  Redução da lista: ${(oldBody.length / lite.body.length).toFixed(1)}x sem gzip · ${(gz(oldBody) / liteGz.body.length).toFixed(1)}x com gzip`);
-    console.log(`  Detalhe em lote (/batch, até 50 obras, só obras da lista do usuário): ${kb(batch.body.length)} · gzip ${kb(batchGz.body.length)}`);
+    console.log(
+      `  DEPOIS /trending (lista leve):       ${lite.body.length} bytes (${kb(lite.body.length)}) · gzip (servidor) ${kb(liteGz.body.length)} [Content-Encoding: ${liteGz.headers['content-encoding']}]`
+    );
+    console.log(
+      `  Redução da lista: ${(oldBody.length / lite.body.length).toFixed(1)}x sem gzip · ${(gz(oldBody) / liteGz.body.length).toFixed(1)}x com gzip`
+    );
+    console.log(
+      `  Detalhe em lote (/batch, até 50 obras, só obras da lista do usuário): ${kb(batch.body.length)} · gzip ${kb(batchGz.body.length)}`
+    );
     console.log(`  Revalidação com ETag: HTTP ${cond.status} (${cond.body.length} bytes)`);
     return;
   }
@@ -161,5 +190,8 @@ async function main() {
 module.exports = { buildCatalog, buildLibrary, PROFILES }; // reaproveitado por tests/s09-performance.test.js
 
 if (require.main === module) {
-  main().catch((err) => { console.error(err); process.exit(1); });
+  main().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
 }

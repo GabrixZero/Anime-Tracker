@@ -39,14 +39,20 @@ test('as 6 abas existem na navegação e têm rótulo curto para a barra inferio
   const tabs = html.match(/class="nav-tab[^"]*"\s+data-tab="[a-z-]+"/g) || [];
   assert.equal(tabs.length, 6);
   assert.equal((html.match(/class="nav-short"/g) || []).length, 5);
-  assert.ok(/\.main-nav\s*\{[^}]*grid-template-columns:\s*repeat\(6,\s*1fr\)/.test(read('css', 'layout.css')), 'a barra inferior precisa de 6 colunas');
+  assert.ok(
+    /\.main-nav\s*\{[^}]*grid-template-columns:\s*repeat\(6,\s*1fr\)/.test(read('css', 'layout.css')),
+    'a barra inferior precisa de 6 colunas'
+  );
 });
 
 test('prefers-reduced-motion desliga animações e a entrada das abas é curta', () => {
   assert.ok(/@media \(prefers-reduced-motion: reduce\)/.test(allCss));
   const m = read('css', 'layout.css').match(/\.tab-content\.active\s*\{[^}]*animation:\s*fadeIn\s+([0-9.]+)s/);
   assert.ok(m && parseFloat(m[1]) <= 0.2, 'animação de entrada das abas deve ser <= 0,2 s');
-  assert.ok(/@keyframes fadeIn\s*\{\s*from\s*\{\s*opacity:\s*0\.[4-9]/.test(read('css', 'layout.css')), 'a entrada não pode partir de opacity 0 (tela escura)');
+  assert.ok(
+    /@keyframes fadeIn\s*\{\s*from\s*\{\s*opacity:\s*0\.[4-9]/.test(read('css', 'layout.css')),
+    'a entrada não pode partir de opacity 0 (tela escura)'
+  );
 });
 
 test('nenhum texto do CSS fica abaixo de 0,8rem (metadados legíveis)', () => {

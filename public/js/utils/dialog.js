@@ -35,9 +35,9 @@
   }
 
   function createDialogManager(doc, win) {
-    const stack = [];            // diálogos ativos (o último é o do topo)
-    const registry = new Map();  // overlay -> opções
-    const marked = new Map();    // elemento deixado inerte por nós -> aria-hidden anterior
+    const stack = []; // diálogos ativos (o último é o do topo)
+    const registry = new Map(); // overlay -> opções
+    const marked = new Map(); // elemento deixado inerte por nós -> aria-hidden anterior
     let listening = false;
     let lastClickTarget = null;
 
@@ -55,16 +55,22 @@
       return !!el && (el.isConnected !== undefined ? el.isConnected : doc.contains(el));
     }
 
-    function top() { return stack[stack.length - 1]; }
-    function isActive(overlay) { return stack.some(e => e.overlay === overlay); }
-    function isHiddenOverlay(overlay) { return overlay.classList.contains('hidden'); }
+    function top() {
+      return stack[stack.length - 1];
+    }
+    function isActive(overlay) {
+      return stack.some(e => e.overlay === overlay);
+    }
+    function isHiddenOverlay(overlay) {
+      return overlay.classList.contains('hidden');
+    }
 
     // Tudo que é irmão do diálogo do topo fica inerte (menos regiões aria-live, como os avisos/toasts).
     function applyInert() {
       const t = top();
       const desired = new Set();
       if (t && t.overlay.parentElement) {
-        Array.from(t.overlay.parentElement.children).forEach((el) => {
+        Array.from(t.overlay.parentElement.children).forEach(el => {
           if (el === t.overlay) return;
           if (el.hasAttribute('aria-live') || /^(SCRIPT|STYLE|LINK)$/.test(el.tagName)) return;
           desired.add(el);
@@ -73,10 +79,11 @@
       marked.forEach((prev, el) => {
         if (desired.has(el)) return;
         el.removeAttribute('inert');
-        if (prev === null) el.removeAttribute('aria-hidden'); else el.setAttribute('aria-hidden', prev);
+        if (prev === null) el.removeAttribute('aria-hidden');
+        else el.setAttribute('aria-hidden', prev);
         marked.delete(el);
       });
-      desired.forEach((el) => {
+      desired.forEach(el => {
         if (marked.has(el)) return;
         marked.set(el, el.hasAttribute('aria-hidden') ? el.getAttribute('aria-hidden') : null);
         el.setAttribute('inert', '');
@@ -92,7 +99,10 @@
 
     function focusInitial(entry) {
       const { dialog, opts } = entry;
-      if (opts.initialFocus === 'dialog') { dialog.focus(); return; } // leitor de tela anuncia o nome do diálogo
+      if (opts.initialFocus === 'dialog') {
+        dialog.focus();
+        return;
+      } // leitor de tela anuncia o nome do diálogo
       let target = resolve(dialog, opts.initialFocus);
       const coarse = typeof win_.matchMedia === 'function' && win_.matchMedia('(pointer: coarse)').matches;
       // Em tela de toque, abrir direto num campo de texto levanta o teclado: foca o diálogo e deixa a pessoa escolher.
@@ -115,7 +125,10 @@
       }
       // Gatilho dentro de outro diálogo aberto continua válido (nota aberta a partir dos detalhes).
       const entry = {
-        overlay, dialog, opts, opener,
+        overlay,
+        dialog,
+        opts,
+        opener,
         openerKey: opener && opener.getAttribute ? opener.getAttribute('data-focus-key') : null
       };
       stack.push(entry);
@@ -150,7 +163,8 @@
     }
 
     function sync(overlay) {
-      if (isHiddenOverlay(overlay)) deactivate(overlay); else activate(overlay);
+      if (isHiddenOverlay(overlay)) deactivate(overlay);
+      else activate(overlay);
     }
 
     function onKeydown(e) {
@@ -166,8 +180,13 @@
       const active = doc.activeElement;
       const inside = !!active && t.dialog.contains(active);
       const next = nextFocusIndex(list.length, list.indexOf(active), e.shiftKey, inside);
-      if (next === -2) { e.preventDefault(); t.dialog.focus(); }
-      else if (next >= 0) { e.preventDefault(); list[next].focus(); }
+      if (next === -2) {
+        e.preventDefault();
+        t.dialog.focus();
+      } else if (next >= 0) {
+        e.preventDefault();
+        list[next].focus();
+      }
     }
 
     // Rede de segurança para navegadores sem `inert`: o foco não escapa do diálogo.

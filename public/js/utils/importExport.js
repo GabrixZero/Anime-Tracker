@@ -12,19 +12,32 @@
   const rating = () => (isNode ? require('./rating') : root.Rating);
 
   const MAX_FILE_CHARS = 20 * 1024 * 1024; // 20 MB de texto
-  const MAX_ITEMS = 5000;                  // obras por arquivo
-  const MAX_ROWS = 200000;                 // linhas do CSV
+  const MAX_ITEMS = 5000; // obras por arquivo
+  const MAX_ROWS = 200000; // linhas do CSV
   const MAX_EPISODES_PER_ITEM = 5000;
   const MAX_TITLE = 300;
 
   const MAL_STATUS = {
-    watching: 'watching', completed: 'completed', 'on-hold': 'paused', onhold: 'paused',
-    dropped: 'dropped', 'plan to watch': 'plan_to_watch', plantowatch: 'plan_to_watch',
+    watching: 'watching',
+    completed: 'completed',
+    'on-hold': 'paused',
+    onhold: 'paused',
+    dropped: 'dropped',
+    'plan to watch': 'plan_to_watch',
+    plantowatch: 'plan_to_watch',
     // a MAL também exporta o código numérico
-    1: 'watching', 2: 'completed', 3: 'paused', 4: 'dropped', 6: 'plan_to_watch'
+    1: 'watching',
+    2: 'completed',
+    3: 'paused',
+    4: 'dropped',
+    6: 'plan_to_watch'
   };
   const STATUS_TO_MAL = {
-    watching: 'Watching', completed: 'Completed', paused: 'On-Hold', dropped: 'Dropped', plan_to_watch: 'Plan to Watch'
+    watching: 'Watching',
+    completed: 'Completed',
+    paused: 'On-Hold',
+    dropped: 'Dropped',
+    plan_to_watch: 'Plan to Watch'
   };
 
   // ---------------------------------------------------------------- utilidades
@@ -32,7 +45,8 @@
     if (typeof v !== 'string') return '';
     // remove caracteres de controle e corta; tags não são interpretadas em lugar nenhum (a tela escapa)
     // eslint-disable-next-line no-control-regex
-    return v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim().slice(0, max);
+    const controlChars = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+    return v.replace(controlChars, '').trim().slice(0, max);
   };
 
   const toPositiveInt = v => {
@@ -57,8 +71,12 @@
   // "Sousou no Frieren (2023)" / "Café: A Série!" -> "sousou no frieren 2023" (sem acento, pontuação e caixa)
   function normalizeTitle(s) {
     return String(s === undefined || s === null ? '' : s)
-      .normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
   }
 
   // ---------------------------------------------------------------- XML (MyAnimeList)
@@ -68,7 +86,9 @@
     return s.replace(/&(#x[0-9a-fA-F]{1,6}|#\d{1,7}|[a-zA-Z]+);/g, (m, name) => {
       if (name[0] === '#') {
         const code = name[1] === 'x' || name[1] === 'X' ? parseInt(name.slice(2), 16) : parseInt(name.slice(1), 10);
-        return Number.isInteger(code) && code > 31 && code < 0x110000 && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : '';
+        return Number.isInteger(code) && code > 31 && code < 0x110000 && !(code >= 0xd800 && code <= 0xdfff)
+          ? String.fromCodePoint(code)
+          : '';
       }
       return Object.prototype.hasOwnProperty.call(XML_ENTITIES, name) ? XML_ENTITIES[name] : ''; // entidade desconhecida: descartada, nunca expandida
     });
@@ -77,7 +97,8 @@
   // Lê só o necessário: <anime> ... </anime> com campos simples (texto ou CDATA). Recusa DOCTYPE/ENTITY.
   function parseMalXml(text) {
     checkSize(text);
-    if (/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(text)) throw new Error('Arquivo XML recusado: contém declarações não permitidas (DOCTYPE/ENTITY).');
+    if (/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(text))
+      throw new Error('Arquivo XML recusado: contém declarações não permitidas (DOCTYPE/ENTITY).');
     if (!/<myanimelist[\s>]/i.test(text)) throw new Error('Isto não parece uma exportação da MyAnimeList (falta <myanimelist>).');
 
     const items = [];
@@ -95,7 +116,10 @@
       };
       const malId = toPositiveInt(field('series_animedb_id'));
       const title = cleanText(field('series_title'));
-      if (!malId || malId > 9999999) { skipped.push({ title: title || '(sem título)', reason: 'sem id válido da MyAnimeList' }); continue; }
+      if (!malId || malId > 9999999) {
+        skipped.push({ title: title || '(sem título)', reason: 'sem id válido da MyAnimeList' });
+        continue;
+      }
       const statusRaw = cleanText(field('my_status'), 30).toLowerCase();
       const score = Number(field('my_score'));
       items.push({
@@ -131,19 +155,28 @@
       const ch = src[i];
       if (inQuotes) {
         if (ch === '"') {
-          if (src[i + 1] === '"') { cell += '"'; i++; } else inQuotes = false;
+          if (src[i + 1] === '"') {
+            cell += '"';
+            i++;
+          } else inQuotes = false;
         } else cell += ch;
       } else if (ch === '"' && cell === '') inQuotes = true;
-      else if (ch === delim) { row.push(cell); cell = ''; }
-      else if (ch === '\n' || ch === '\r') {
+      else if (ch === delim) {
+        row.push(cell);
+        cell = '';
+      } else if (ch === '\n' || ch === '\r') {
         if (ch === '\r' && src[i + 1] === '\n') i++;
-        row.push(cell); cell = '';
+        row.push(cell);
+        cell = '';
         if (row.length > 1 || row[0] !== '') rows.push(row);
         row = [];
         if (rows.length > MAX_ROWS) throw new Error('CSV com linhas demais.');
       } else cell += ch;
     }
-    if (cell !== '' || row.length) { row.push(cell); if (row.length > 1 || row[0] !== '') rows.push(row); }
+    if (cell !== '' || row.length) {
+      row.push(cell);
+      if (row.length > 1 || row[0] !== '') rows.push(row);
+    }
     return rows;
   }
 
@@ -160,7 +193,11 @@
   };
 
   function headerIndex(headers) {
-    const norm = headers.map(h => cleanText(h, 80).toLowerCase().replace(/[\s-]+/g, '_'));
+    const norm = headers.map(h =>
+      cleanText(h, 80)
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_')
+    );
     const idx = {};
     for (const [key, names] of Object.entries(HEADER_ALIASES)) {
       const i = norm.findIndex(h => names.includes(h));
@@ -177,11 +214,12 @@
     const idx = headerIndex(rows[0]);
     const hasSeries = idx.series !== undefined || (idx.title !== undefined && idx.episode !== undefined);
     const hasMovie = idx.movie !== undefined || (idx.title !== undefined && idx.kind !== undefined);
-    if (!hasSeries && !hasMovie) throw new Error('Não reconheci as colunas do TV Time (esperava algo como series_name, season_number, episode_number).');
+    if (!hasSeries && !hasMovie)
+      throw new Error('Não reconheci as colunas do TV Time (esperava algo como series_name, season_number, episode_number).');
 
     const groups = new Map();
     const skipped = [];
-    const cell = (r, key) => (idx[key] === undefined ? '' : (r[idx[key]] === undefined ? '' : r[idx[key]]));
+    const cell = (r, key) => (idx[key] === undefined ? '' : r[idx[key]] === undefined ? '' : r[idx[key]]);
     for (let i = 1; i < rows.length; i++) {
       const r = rows[i];
       const kindRaw = cleanText(cell(r, 'kind'), 30).toLowerCase();
@@ -189,7 +227,7 @@
       const seriesName = cleanText(cell(r, 'series'));
       const title = cleanText(cell(r, 'title'));
       const isMovie = !!movieName || kindRaw === 'movie' || kindRaw === 'filme';
-      const name = isMovie ? (movieName || title) : (seriesName || title);
+      const name = isMovie ? movieName || title : seriesName || title;
       if (!name) continue;
       const year = toPositiveInt(cell(r, 'year')) || toPositiveInt((/\b(19|20)\d{2}\b/.exec(cleanText(cell(r, 'year'))) || [])[0]);
       const at = cleanDate(cleanText(cell(r, 'date'), 40));
@@ -200,7 +238,10 @@
         g = { name, year: year || null, movie: isMovie, episodes: [], watchedAt: '' };
         groups.set(key, g);
       }
-      if (isMovie) { if (at && (!g.watchedAt || at < g.watchedAt)) g.watchedAt = at; continue; }
+      if (isMovie) {
+        if (at && (!g.watchedAt || at < g.watchedAt)) g.watchedAt = at;
+        continue;
+      }
       const season = Number(cell(r, 'season'));
       const episode = toPositiveInt(cell(r, 'episode'));
       if (!Number.isInteger(season) || season < 0 || season > 1000 || !episode) {
@@ -217,7 +258,8 @@
   function matchLevel(wanted, candidate) {
     const a = normalizeTitle(wanted.name);
     const names = [candidate.name, candidate.original_name, ...(Array.isArray(candidate.alt_titles) ? candidate.alt_titles : [])]
-      .filter(x => typeof x === 'string' && x).map(normalizeTitle);
+      .filter(x => typeof x === 'string' && x)
+      .map(normalizeTitle);
     const cYear = Number(String(candidate.first_air_date || candidate.release_date || candidate.year || '').slice(0, 4)) || null;
     const yearOk = !wanted.year || !cYear || Math.abs(wanted.year - cYear) <= 1;
     if (names.includes(a)) return yearOk ? 'sure' : 'maybe';
@@ -265,14 +307,20 @@
         if (tracked.status !== e.status) diffs.push(`situação (${tracked.status} × ${e.status})`);
         const value = R.isEmptyRating(e.rating) ? null : R.normalizeRating(e.rating);
         if (value !== null) {
-          if (tracked.rating === undefined) { tracked.rating = value; tracked.updatedAt = now; } else if (tracked.rating !== value) diffs.push(`nota (${tracked.rating} × ${value})`);
+          if (tracked.rating === undefined) {
+            tracked.rating = value;
+            tracked.updatedAt = now;
+          } else if (tracked.rating !== value) diffs.push(`nota (${tracked.rating} × ${value})`);
         }
         if (diffs.length) report.conflicts.push({ showId: e.showId, what: diffs.join(', '), kept: 'a sua' });
       }
       const list = e.isMovie ? [{ season: null, episode: null, at: e.movieAt || '' }] : e.episodes;
       for (const ep of list) {
-        const key = e.isMovie ? `${e.showId}_movie` : `${e.showId}_s${ep.season}_e${ep.episode}`;
-        if (out.watchedEpisodes[key] && out.watchedEpisodes[key].watched) { report.episodesExisting++; continue; }
+        const key = (isNode ? require('./viewKit') : root.ViewKit).makeKey(e.showId, ep.season, ep.episode, e.isMovie);
+        if (out.watchedEpisodes[key] && out.watchedEpisodes[key].watched) {
+          report.episodesExisting++;
+          continue;
+        }
         const watchedAt = ep.at || now;
         out.watchedEpisodes[key] = { watched: true, watchedAt, updatedAt: now, rewatchCount: 1 };
         delete out.tombstones.watched[key];
@@ -289,10 +337,15 @@
     return /[",;\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
 
-  const xmlText = v => String(v === undefined || v === null ? '' : v)
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  const xmlText = v =>
+    String(v === undefined || v === null ? '' : v)
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
 
   /**
    * rows: [{ showId, title, type ('anime'|'tv'|'movie'), status, rating, watched, total, addedAt }]
@@ -302,8 +355,11 @@
     const head = ['id', 'tipo', 'titulo', 'situacao', 'nota_0_a_10', 'episodios_assistidos', 'episodios_total', 'adicionado_em'];
     const lines = [head.join(',')];
     for (const r of rows) {
-      lines.push([r.showId, r.type, r.title, r.status, r.rating === undefined || r.rating === null ? '' : r.rating, r.watched, r.total, r.addedAt]
-        .map(csvCell).join(','));
+      lines.push(
+        [r.showId, r.type, r.title, r.status, r.rating === undefined || r.rating === null ? '' : r.rating, r.watched, r.total, r.addedAt]
+          .map(csvCell)
+          .join(',')
+      );
     }
     return '﻿' + lines.join('\r\n') + '\r\n';
   }
@@ -313,9 +369,16 @@
    * XML no formato da exportação da MyAnimeList (só animes).
    */
   function exportMalXml(entries) {
-    const out = ['<?xml version="1.0" encoding="UTF-8" ?>', '<myanimelist>', '\t<myinfo>', '\t\t<user_export_type>1</user_export_type>', '\t</myinfo>'];
+    const out = [
+      '<?xml version="1.0" encoding="UTF-8" ?>',
+      '<myanimelist>',
+      '\t<myinfo>',
+      '\t\t<user_export_type>1</user_export_type>',
+      '\t</myinfo>'
+    ];
     for (const e of entries) {
-      out.push('\t<anime>',
+      out.push(
+        '\t<anime>',
         `\t\t<series_animedb_id>${toPositiveInt(e.malId)}</series_animedb_id>`,
         `\t\t<series_title>${xmlText(e.title)}</series_title>`,
         `\t\t<series_type>${xmlText(e.type || 'TV')}</series_type>`,
@@ -327,16 +390,27 @@
         `\t\t<my_score>${Math.min(10, Math.max(0, Math.round(Number(e.score) || 0)))}</my_score>`,
         `\t\t<my_status>${xmlText(STATUS_TO_MAL[e.status] || 'Plan to Watch')}</my_status>`,
         '\t\t<update_on_import>1</update_on_import>',
-        '\t</anime>');
+        '\t</anime>'
+      );
     }
     out.push('</myanimelist>');
     return out.join('\n') + '\n';
   }
 
   const api = {
-    MAX_FILE_CHARS, MAX_ITEMS, STATUS_TO_MAL,
-    cleanDate, normalizeTitle, parseMalXml, parseCsv, parseTvTimeCsv, matchLevel,
-    combineStatuses, applyEntries, exportCsv, exportMalXml
+    MAX_FILE_CHARS,
+    MAX_ITEMS,
+    STATUS_TO_MAL,
+    cleanDate,
+    normalizeTitle,
+    parseMalXml,
+    parseCsv,
+    parseTvTimeCsv,
+    matchLevel,
+    combineStatuses,
+    applyEntries,
+    exportCsv,
+    exportMalXml
   };
   root.ImportExport = api;
   if (isNode) module.exports = api;

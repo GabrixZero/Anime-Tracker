@@ -5,7 +5,8 @@
 
 const { AxeBuilder } = require('@axe-core/playwright');
 const { test, expect } = require('./support/fixtures');
-const { openApp, gotoTab, loadExample, queueCard, tap } = require('./support/helpers');
+const fs = require('fs');
+const { openApp, gotoTab, loadExample, queueCard, tap, newUser, signInWithApi } = require('./support/helpers');
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
@@ -111,6 +112,59 @@ test.describe('acessibilidade (axe-core)', () => {
     });
     // E2E_AXE_VERBOSE=1 npm run test:e2e -- tests/e2e/10-acessibilidade.spec.js  ->  mostra no terminal TUDO que o axe achou (inclusive o leve)
     if (process.env.E2E_AXE_VERBOSE) console.log(JSON.stringify({ projeto: testInfo.project.name, grave, leves }, null, 2));
+    expect(grave, 'violações graves do axe (critical/serious)').toEqual([]);
+  });
+
+  // S19: telas que só existem com conta ou que chegaram depois da S12 (Agenda, Minha conta, importar/exportar, nota pessoal).
+  test('nenhuma violação grave em Agenda, Minha conta, importar/exportar e nota', async ({ page }, testInfo) => {
+    const report = {};
+    const check = async (label, include) => {
+      report[label] = await scan(page, include);
+    };
+    await openApp(page);
+    await signInWithApi(page, newUser(testInfo, 'axe'));
+    await loadExample(page);
+
+    await gotoTab(page, 'calendar');
+    await expect(page.locator('#view-calendar')).toBeVisible();
+    await check('Agenda');
+
+    await gotoTab(page, 'watchlist');
+    await tap(page.getByRole('button', { name: 'Breaking Bad', exact: true }));
+    await expect(page.locator('#modal-show-detail')).toBeVisible();
+    await page.locator('#modal-show-detail .rating-control input').first().fill('7.5');
+    await check('Janela da obra com nota pessoal', '#modal-show-detail');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#modal-show-detail')).toBeHidden();
+
+    await gotoTab(page, 'stats');
+    await check('Estatísticas (com conta)');
+
+    await page.locator('#btn-open-account').click();
+    await expect(page.locator('#modal-account')).toBeVisible();
+    await check('Minha conta', '#modal-account');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#modal-account')).toBeHidden();
+
+    await tap(page.locator('#btn-open-backup'));
+    await expect(page.locator('#modal-backup')).toBeVisible();
+    await check('Backup, importar e exportar', '#modal-backup');
+    const file = testInfo.outputPath('mal.xml');
+    fs.writeFileSync(
+      file,
+      '<?xml version="1.0"?><myanimelist><anime><series_animedb_id>90001</series_animedb_id><series_title>Hoshi no Kioku</series_title><series_type>TV</series_type><series_episodes>3</series_episodes><my_watched_episodes>3</my_watched_episodes><my_score>9</my_score><my_status>Completed</my_status></anime></myanimelist>'
+    );
+    await page.locator('#input-import-mal').setInputFiles(file);
+    await expect(page.locator('#modal-import')).toBeVisible();
+    await expect(page.locator('#import-summary')).toContainText('Prévia', { timeout: 30000 });
+    await check('Prévia da importação', '#modal-import');
+
+    const grave = [];
+    for (const [tela, violations] of Object.entries(report)) {
+      for (const v of violations) if (['critical', 'serious'].includes(v.impact)) grave.push({ tela, ...v });
+    }
+    await testInfo.attach('axe-conta.json', { body: JSON.stringify({ grave, report }, null, 2), contentType: 'application/json' });
+    if (process.env.E2E_AXE_VERBOSE) console.log(JSON.stringify({ projeto: testInfo.project.name, report }, null, 2));
     expect(grave, 'violações graves do axe (critical/serious)').toEqual([]);
   });
 });

@@ -20,9 +20,13 @@ if (migration.migrated || migration.failed) {
 // Não conseguiu abrir a porta (S11): mensagem em português e saída com código 1 (o Agendador do Windows e o Docker tentam de novo).
 function failToListen(err) {
   if (err.code === 'EADDRINUSE') {
-    console.error(`[servidor] A porta ${config.PORT} já está em uso (talvez outro ShowVault aberto). Feche o outro ou troque PORT no .env.`);
+    console.error(
+      `[servidor] A porta ${config.PORT} já está em uso (talvez outro ShowVault aberto). Feche o outro ou troque PORT no .env.`
+    );
   } else if (err.code === 'EADDRNOTAVAIL') {
-    console.error(`[servidor] O endereço HOST=${config.HOST} não existe neste computador. Use 127.0.0.1 (só este PC) ou 0.0.0.0 (todas as interfaces).`);
+    console.error(
+      `[servidor] O endereço HOST=${config.HOST} não existe neste computador. Use 127.0.0.1 (só este PC) ou 0.0.0.0 (todas as interfaces).`
+    );
   } else {
     console.error('[servidor] Não foi possível abrir a porta:', err.message);
   }
@@ -48,7 +52,9 @@ const server = app.listen(...listenArgs, err => {
   console.log(`  Saúde: http://${where}:${config.PORT}/health`);
   console.log(`========================================================`);
   if (config.TRUST_PROXY === true) {
-    console.warn('[segurança] TRUST_PROXY=true confia em qualquer X-Forwarded-For: qualquer visitante forja o IP e burla o limite de tentativas. Use um número (1).');
+    console.warn(
+      '[segurança] TRUST_PROXY=true confia em qualquer X-Forwarded-For: qualquer visitante forja o IP e burla o limite de tentativas. Use um número (1).'
+    );
   }
 
   // S13: de tempos em tempos busca episódios novos das obras em exibição (e atualiza as marcadas pela migração do catálogo antigo).

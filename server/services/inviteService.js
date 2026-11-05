@@ -44,7 +44,10 @@ function reserve(code) {
 // Devolve o código quando o cadastro não aconteceu (ex.: e-mail já usado), para a pessoa poder tentar de novo.
 function release(id) {
   if (!id) return;
-  storage.writeJsonAtomic(usedFile(), readUsed().filter(x => x !== id));
+  storage.writeJsonAtomic(
+    usedFile(),
+    readUsed().filter(x => x !== id)
+  );
 }
 
 module.exports = { isEnabled, reserve, release, CODE_MAX };

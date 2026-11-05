@@ -29,7 +29,7 @@
     return keyOf(date.getFullYear(), date.getMonth() + 1, date.getDate());
   }
 
-  const utcMs = (key) => {
+  const utcMs = key => {
     const day = parseDay(key);
     return day ? Date.UTC(day.y, day.m - 1, day.d) : null;
   };
@@ -86,7 +86,7 @@
   function buildAgenda(trackedList, getMedia, isWatched, todayKey, { range = 'next7', includeTracked } = {}) {
     const bounds = rangeBounds(todayKey, range);
     if (!bounds || !Array.isArray(trackedList)) return [];
-    const inRange = (key) => key >= bounds.from && key <= bounds.to; // chaves YYYY-MM-DD comparam bem como texto
+    const inRange = key => key >= bounds.from && key <= bounds.to; // chaves YYYY-MM-DD comparam bem como texto
     const items = [];
     const seen = new Set();
 
@@ -102,7 +102,15 @@
         const day = parseDay(String(media.first_air_date || '').slice(0, 10));
         const airDate = day ? keyOf(day.y, day.m, day.d) : null;
         if (airDate && airDate >= todayKey && inRange(airDate)) {
-          items.push({ ...base, seasonNumber: null, episodeNumber: null, title: 'Filme', airDate, watched: !!isWatched(media.id), daysFromToday: diffDays(todayKey, airDate) });
+          items.push({
+            ...base,
+            seasonNumber: null,
+            episodeNumber: null,
+            title: 'Filme',
+            airDate,
+            watched: !!isWatched(media.id),
+            daysFromToday: diffDays(todayKey, airDate)
+          });
         }
         continue;
       }
@@ -127,11 +135,12 @@
       }
     }
 
-    items.sort((a, b) =>
-      a.airDate.localeCompare(b.airDate) ||
-      String(a.showName).localeCompare(String(b.showName), 'pt-BR') ||
-      (a.seasonNumber || 0) - (b.seasonNumber || 0) ||
-      (a.episodeNumber || 0) - (b.episodeNumber || 0)
+    items.sort(
+      (a, b) =>
+        a.airDate.localeCompare(b.airDate) ||
+        String(a.showName).localeCompare(String(b.showName), 'pt-BR') ||
+        (a.seasonNumber || 0) - (b.seasonNumber || 0) ||
+        (a.episodeNumber || 0) - (b.episodeNumber || 0)
     );
     return items;
   }
@@ -143,7 +152,15 @@
       let group = groups[groups.length - 1];
       if (!group || group.key !== item.airDate) {
         const day = parseDay(item.airDate);
-        group = { key: item.airDate, y: day.y, m: day.m, d: day.d, weekday: weekday(item.airDate), daysFromToday: item.daysFromToday, items: [] };
+        group = {
+          key: item.airDate,
+          y: day.y,
+          m: day.m,
+          d: day.d,
+          weekday: weekday(item.airDate),
+          daysFromToday: item.daysFromToday,
+          items: []
+        };
         groups.push(group);
       }
       group.items.push(item);

@@ -17,7 +17,10 @@ class WatchlistView {
   addStatusFilters() {
     const base = document.querySelector('#watchlist-filters [data-filter="plan_to_watch"]');
     if (!base) return;
-    [['paused', 'Pausados', 'count-paused'], ['dropped', 'Desisti', 'count-dropped']].forEach(([filter, label, countId]) => {
+    [
+      ['paused', 'Pausados', 'count-paused'],
+      ['dropped', 'Desisti', 'count-dropped']
+    ].forEach(([filter, label, countId]) => {
       if (document.getElementById(countId)) return;
       const btn = base.cloneNode(false);
       btn.classList.remove('active');
@@ -57,9 +60,18 @@ class WatchlistView {
     const trackedList = state.data.trackedShows || [];
     if (this.badge) this.badge.textContent = trackedList.length;
     const counts = { all: trackedList.length, watching: 0, completed: 0, plan_to_watch: 0, paused: 0, dropped: 0 };
-    trackedList.forEach(t => { counts[state.getStatus(t)]++; });
+    trackedList.forEach(t => {
+      counts[state.getStatus(t)]++;
+    });
 
-    const countIds = { all: 'count-all', watching: 'count-watching', completed: 'count-completed', plan_to_watch: 'count-plan', paused: 'count-paused', dropped: 'count-dropped' };
+    const countIds = {
+      all: 'count-all',
+      watching: 'count-watching',
+      completed: 'count-completed',
+      plan_to_watch: 'count-plan',
+      paused: 'count-paused',
+      dropped: 'count-dropped'
+    };
     Object.entries(countIds).forEach(([key, id]) => {
       const el = document.getElementById(id);
       if (el) el.textContent = counts[key];
@@ -113,9 +125,10 @@ class WatchlistView {
       const text = document.getElementById('watchlist-empty-text');
       const exampleBtn = document.getElementById('btn-watchlist-example');
       if (title) title.textContent = noItems ? 'Sua lista está vazia' : 'Nenhuma obra neste filtro';
-      if (text) text.textContent = noItems
-        ? 'Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.'
-        : 'Troque o filtro de status ou de categoria para ver as outras obras da sua lista.';
+      if (text)
+        text.textContent = noItems
+          ? 'Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.'
+          : 'Troque o filtro de status ou de categoria para ver as outras obras da sua lista.';
       if (exampleBtn) exampleBtn.classList.toggle('hidden', !noItems);
       return;
     }
@@ -164,7 +177,7 @@ class WatchlistView {
 
     const typeBadge = window.ViewKit.typeBadge(media.type);
 
-    const seasonCount = Array.isArray(media.seasons) ? media.seasons.length : (Number(media.season_count) || 1);
+    const seasonCount = Array.isArray(media.seasons) ? media.seasons.length : Number(media.season_count) || 1;
 
     return `
           <div class="show-card" data-show-id="${toInt(media.id)}">

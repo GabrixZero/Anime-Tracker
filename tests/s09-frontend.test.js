@@ -11,36 +11,86 @@ const { buildCatalog, buildLibrary } = require('../scripts/bench-s09');
 const { toListItem } = require('../server/utils/mediaLight');
 
 const ROOT = path.join(__dirname, '..', 'public', 'js');
-const clone = (v) => JSON.parse(JSON.stringify(v));
-const plain = (v) => JSON.parse(JSON.stringify(v));
+const clone = v => JSON.parse(JSON.stringify(v));
+const plain = v => JSON.parse(JSON.stringify(v));
 const flush = () => new Promise(resolve => setImmediate(resolve));
 
-const MOVIE = { id: 777, type: 'movie', name: 'Filme Sintético', overview: 'Sinopse do filme', runtime: 100, genres: ['Ação'], poster_path: null, vote_average: null, first_air_date: '2020-01-01', status: '' };
+const MOVIE = {
+  id: 777,
+  type: 'movie',
+  name: 'Filme Sintético',
+  overview: 'Sinopse do filme',
+  runtime: 100,
+  genres: ['Ação'],
+  poster_path: null,
+  vote_average: null,
+  first_air_date: '2020-01-01',
+  status: ''
+};
 const catalogFor = () => [...clone(buildCatalog('atual')), clone(MOVIE)];
 
 // ---- DOM mínimo --------------------------------------------------------------------------------
 
 // Contêiner de cartões: guarda o HTML como lista de cartões e responde às consultas por data-show-id que as views fazem.
 class FakeCards {
-  constructor() { this.cards = []; this.renders = 0; this.textContent = ''; this.classList = FakeCards.classList(); this.style = {}; this.dataset = {}; }
-  static classList() { const s = new Set(); return { add: (c) => s.add(c), remove: (c) => s.delete(c), toggle: (c, on) => (on === undefined ? (s.has(c) ? s.delete(c) : s.add(c)) : (on ? s.add(c) : s.delete(c))), contains: (c) => s.has(c) }; }
+  constructor() {
+    this.cards = [];
+    this.renders = 0;
+    this.textContent = '';
+    this.classList = FakeCards.classList();
+    this.style = {};
+    this.dataset = {};
+  }
+  static classList() {
+    const s = new Set();
+    return {
+      add: c => s.add(c),
+      remove: c => s.delete(c),
+      toggle: (c, on) => (on === undefined ? (s.has(c) ? s.delete(c) : s.add(c)) : on ? s.add(c) : s.delete(c)),
+      contains: c => s.has(c)
+    };
+  }
   set innerHTML(html) {
     this.renders++;
     this._html = html;
-    this.cards = html.split(/(?=<div class="(?:next-up-card|show-card)")/).filter(part => /data-show-id="\d+"/.test(part)).map((part) => this.makeCard(part));
+    this.cards = html
+      .split(/(?=<div class="(?:next-up-card|show-card)")/)
+      .filter(part => /data-show-id="\d+"/.test(part))
+      .map(part => this.makeCard(part));
   }
-  get innerHTML() { return this._html || ''; }
+  get innerHTML() {
+    return this._html || '';
+  }
   makeCard(html) {
     const card = { html, id: Number(/data-show-id="(\d+)"/.exec(html)[1]), removed: false };
     const self = this;
-    Object.defineProperty(card, 'outerHTML', { set(v) { card.html = v; card.id = Number(/data-show-id="(\d+)"/.exec(v)[1]); self.replaced.push(card.id); } });
-    card.remove = () => { card.removed = true; self.cards = self.cards.filter(c => c !== card); self.removedIds.push(card.id); };
+    Object.defineProperty(card, 'outerHTML', {
+      set(v) {
+        card.html = v;
+        card.id = Number(/data-show-id="(\d+)"/.exec(v)[1]);
+        self.replaced.push(card.id);
+      }
+    });
+    card.remove = () => {
+      card.removed = true;
+      self.cards = self.cards.filter(c => c !== card);
+      self.removedIds.push(card.id);
+    };
     return card;
   }
-  get replaced() { return this._replaced || (this._replaced = []); }
-  get removedIds() { return this._removed || (this._removed = []); }
-  querySelector(sel) { const m = /\[data-show-id="(\d+)"\]/.exec(sel); return m ? (this.cards.find(c => c.id === Number(m[1])) || null) : null; }
-  querySelectorAll(sel) { return sel === '[data-show-id]' ? this.cards : []; }
+  get replaced() {
+    return this._replaced || (this._replaced = []);
+  }
+  get removedIds() {
+    return this._removed || (this._removed = []);
+  }
+  querySelector(sel) {
+    const m = /\[data-show-id="(\d+)"\]/.exec(sel);
+    return m ? this.cards.find(c => c.id === Number(m[1])) || null : null;
+  }
+  querySelectorAll(sel) {
+    return sel === '[data-show-id]' ? this.cards : [];
+  }
   addEventListener() {}
   setAttribute() {}
   removeAttribute() {}
@@ -49,10 +99,28 @@ class FakeCards {
 function makeEl(id) {
   const attrs = new Map();
   return {
-    id, textContent: '', innerHTML: '', value: '', checked: false, dataset: {}, style: {}, classList: FakeCards.classList(),
-    addEventListener() {}, setAttribute: (k, v) => attrs.set(k, String(v)), getAttribute: (k) => (attrs.has(k) ? attrs.get(k) : null), removeAttribute: (k) => attrs.delete(k),
-    querySelector: () => null, querySelectorAll: () => [], focus() {}, click() {}, append() {}, remove() {}, contains: () => false,
-    insertAdjacentHTML(where, html) { this.innerHTML += html; } // S18: o modal desenha os episódios aos poucos
+    id,
+    textContent: '',
+    innerHTML: '',
+    value: '',
+    checked: false,
+    dataset: {},
+    style: {},
+    classList: FakeCards.classList(),
+    addEventListener() {},
+    setAttribute: (k, v) => attrs.set(k, String(v)),
+    getAttribute: k => (attrs.has(k) ? attrs.get(k) : null),
+    removeAttribute: k => attrs.delete(k),
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    focus() {},
+    click() {},
+    append() {},
+    remove() {},
+    contains: () => false,
+    insertAdjacentHTML(where, html) {
+      this.innerHTML += html;
+    } // S18: o modal desenha os episódios aos poucos
   };
 }
 
@@ -61,7 +129,7 @@ function makeApp({ catalog = catalogFor(), library = null, withController = true
   const store = new Map();
   const els = new Map();
   const cards = { 'next-up-container': new FakeCards(), 'watchlist-container': new FakeCards() };
-  const el = (id) => {
+  const el = id => {
     if (cards[id]) return cards[id];
     if (!els.has(id)) els.set(id, makeEl(id));
     return els.get(id);
@@ -69,12 +137,57 @@ function makeApp({ catalog = catalogFor(), library = null, withController = true
   const app = { els, cards, store, apiCalls: [], fail: apiFails, toasts: [], catalog };
   const byId = new Map(catalog.map(m => [m.id, m]));
   const ctx = {
-    console, JSON, Promise, Math, Object, Array, Number, String, Map, Set, WeakMap, Error, TypeError, SyntaxError, Date, Intl, isNaN, parseInt, Symbol, Boolean,
-    setTimeout: (fn) => { app.timers = (app.timers || 0) + 1; return 0; }, clearTimeout: () => {},
-    localStorage: { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => { store.set(k, String(v)); }, removeItem: (k) => { store.delete(k); } },
-    CustomEvent: class { constructor(type) { this.type = type; } },
-    document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, createElement: () => makeEl('x'), body: makeEl('body') },
-    addEventListener() {}, dispatchEvent() {}, confirm: () => true, prompt: () => 'APAGAR'
+    console,
+    JSON,
+    Promise,
+    Math,
+    Object,
+    Array,
+    Number,
+    String,
+    Map,
+    Set,
+    WeakMap,
+    Error,
+    TypeError,
+    SyntaxError,
+    Date,
+    Intl,
+    isNaN,
+    parseInt,
+    Symbol,
+    Boolean,
+    setTimeout: fn => {
+      app.timers = (app.timers || 0) + 1;
+      return 0;
+    },
+    clearTimeout: () => {},
+    localStorage: {
+      getItem: k => (store.has(k) ? store.get(k) : null),
+      setItem: (k, v) => {
+        store.set(k, String(v));
+      },
+      removeItem: k => {
+        store.delete(k);
+      }
+    },
+    CustomEvent: class {
+      constructor(type) {
+        this.type = type;
+      }
+    },
+    document: {
+      getElementById: el,
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      addEventListener() {},
+      createElement: () => makeEl('x'),
+      body: makeEl('body')
+    },
+    addEventListener() {},
+    dispatchEvent() {},
+    confirm: () => true,
+    prompt: () => 'APAGAR'
   };
   ctx.window = ctx;
   vm.createContext(ctx);
@@ -91,7 +204,10 @@ function makeApp({ catalog = catalogFor(), library = null, withController = true
       if (app.fail) throw new TypeError('fetch failed');
       return { data: clone(byId.get(id)) };
     },
-    async ingest(id) { app.apiCalls.push(['ingest', id]); return { data: clone(byId.get(id)) }; },
+    async ingest(id) {
+      app.apiCalls.push(['ingest', id]);
+      return { data: clone(byId.get(id)) };
+    },
     async getTrending(type, opts = {}) {
       app.apiCalls.push(['trending', type, opts]);
       const all = catalog.filter(m => type === 'all' || m.type === type);
@@ -100,39 +216,75 @@ function makeApp({ catalog = catalogFor(), library = null, withController = true
       const data = all.slice(offset, offset + limit).map(toListItem);
       return { count: data.length, total: all.length, offset, limit, hasMore: offset + data.length < all.length, data };
     },
-    async search() { return { count: 0, data: [], warnings: [] }; }
+    async search() {
+      return { count: 0, data: [], warnings: [] };
+    }
   };
 
-  const files = ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/viewKit.js', 'utils/libraryMerge.js', 'utils/rating.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
+  const files = [
+    'utils/dom.js',
+    'utils/emotions.js',
+    'utils/markdown.js',
+    'utils/mediaDisplay.js',
+    'utils/viewKit.js',
+    'utils/libraryMerge.js',
+    'utils/rating.js',
+    'utils/watchStatus.js',
+    'utils/backupValidator.js',
+    'utils/migrations.js'
+  ];
   if (library) store.set('showvault_state_mvc_v1', JSON.stringify(library));
-  else store.set('showvault_state_mvc_v1', JSON.stringify({ trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: { shows: {}, watched: {}, notes: {} }, resetAt: '' }));
+  else
+    store.set(
+      'showvault_state_mvc_v1',
+      JSON.stringify({
+        trackedShows: [],
+        watchedEpisodes: {},
+        episodeNotes: {},
+        tombstones: { shows: {}, watched: {}, notes: {} },
+        resetAt: ''
+      })
+    );
   store.set('showvault_state_version', '2');
-  const run = (f) => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf-8'), ctx, { filename: f });
+  const run = f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf-8'), ctx, { filename: f });
   files.forEach(run);
   run('models/state.js');
-  ['views/nextUpView.js', 'views/watchlistView.js', 'views/diaryView.js', 'views/statsView.js', 'views/exploreView.js', 'views/detailModalView.js'].forEach(run);
+  [
+    'views/nextUpView.js',
+    'views/watchlistView.js',
+    'views/diaryView.js',
+    'views/statsView.js',
+    'views/exploreView.js',
+    'views/detailModalView.js'
+  ].forEach(run);
   if (withController) {
     run('controllers/appController.js');
-    vm.runInContext('window.appController = Object.create(AppController.prototype); window.appController.activeTab = "next-up"; window.appController.dirty = new Set(); window.appController.renderedRev = {}; window.appController.detailChain = Promise.resolve();', ctx);
+    vm.runInContext(
+      'window.appController = Object.create(AppController.prototype); window.appController.activeTab = "next-up"; window.appController.dirty = new Set(); window.appController.renderedRev = {}; window.appController.detailChain = Promise.resolve();',
+      ctx
+    );
     ctx.appController.showToast = (msg, type) => app.toasts.push([type, msg]);
   }
   app.window = ctx;
   app.state = ctx.appState;
-  app.text = (id) => String(els.get(id) ? els.get(id).textContent : '');
+  app.text = id => String(els.get(id) ? els.get(id).textContent : '');
   return app;
 }
 
 // Biblioteca com as obras do catálogo: metade dos episódios assistidos (a obra grande: 300).
-const libraryFor = (catalog) => buildLibrary(catalog.filter(m => m.type !== 'movie'));
+const libraryFor = catalog => buildLibrary(catalog.filter(m => m.type !== 'movie'));
 
 // Algoritmo ANTIGO do "A Seguir" (antes da S09), usado como referência de correção.
 function referenceQueue(state, W) {
   const queue = [];
-  state.data.trackedShows.forEach((tracked) => {
+  state.data.trackedShows.forEach(tracked => {
     if (!W.isQueueStatus(state.getStatus(tracked))) return;
     const media = state.getMedia(tracked.showId);
     if (!media) return;
-    if (media.type === 'movie') { if (!state.isWatched(media.id)) queue.push({ showId: media.id, isMovie: true }); return; }
+    if (media.type === 'movie') {
+      if (!state.isWatched(media.id)) queue.push({ showId: media.id, isMovie: true });
+      return;
+    }
     if (!media.seasons) return;
     for (const season of media.seasons) {
       let found = false;
@@ -184,12 +336,18 @@ test('progresso em cache: igual ao cálculo direto, e invalida ao marcar, desmar
   s.cacheMediaDetail(clone(media));
   s.addShow(media.id);
   const direct = () => W.computeProgress(s.getMedia(media.id), (se, ep) => s.isWatched(media.id, se, ep));
-  const cached = () => { const { next, ...rest } = s.getProgress(media.id); return plain(rest); };
+  const cached = () => {
+    const { next, ...rest } = s.getProgress(media.id);
+    return plain(rest);
+  };
   assert.deepEqual(cached(), plain(direct()));
   assert.deepEqual(plain(s.getNextEpisode(media.id)), { seasonNumber: 1, episodeNumber: 1 });
 
   let seed = 12345;
-  const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const rand = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  };
   const eps = media.seasons.flatMap(se => se.episodes.map(e => [se.season_number, e.episode_number]));
   for (let i = 0; i < 60; i++) {
     const [se, ep] = eps[Math.floor(rand() * eps.length)];
@@ -206,7 +364,14 @@ test('progresso em cache: igual ao cálculo direto, e invalida ao marcar, desmar
   // trocar os dados (login, importar backup, resetar) limpa o cache
   const ok = clone(s.data);
   ok.watchedEpisodes = {};
-  eps.slice(0, 7).forEach(([se, ep]) => { ok.watchedEpisodes[`${media.id}_s${se}_e${ep}`] = { watched: true, watchedAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z', rewatchCount: 1 }; });
+  eps.slice(0, 7).forEach(([se, ep]) => {
+    ok.watchedEpisodes[`${media.id}_s${se}_e${ep}`] = {
+      watched: true,
+      watchedAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      rewatchCount: 1
+    };
+  });
   s.replaceData(ok);
   assert.equal(s.getProgress(media.id).watched, 7);
   s.resetLocal();
@@ -230,14 +395,18 @@ test('getStatus: item antigo (sem updatedAt) com tudo assistido continua "Finali
   const m = catalog.find(x => x.seasons && totalEps(x) < 40);
   s.cacheMediaDetail(clone(m));
   s.data.trackedShows.push({ showId: m.id, status: 'watching', addedAt: '2026-10-01T00:00:00.000Z' });
-  for (const se of m.seasons) for (const ep of se.episodes) s.data.watchedEpisodes[`${m.id}_s${se.season_number}_e${ep.episode_number}`] = { watched: true, watchedAt: 'x', rewatchCount: 1 };
+  for (const se of m.seasons)
+    for (const ep of se.episodes)
+      s.data.watchedEpisodes[`${m.id}_s${se.season_number}_e${ep.episode_number}`] = { watched: true, watchedAt: 'x', rewatchCount: 1 };
   s.invalidateProgress();
   assert.equal(s.getStatus(s.getTracked(m.id)), 'completed');
   s.setShowStatus(m.id, 'watching');
   assert.equal(s.getStatus(s.getTracked(m.id)), 'watching', 'depois de escolher, o status vale como escolhido');
 });
 
-function totalEps(m) { return m.seasons.reduce((n, se) => n + se.episodes.length, 0); }
+function totalEps(m) {
+  return m.seasons.reduce((n, se) => n + se.episodes.length, 0);
+}
 
 test('getEpisode: índice por obra (o primeiro quando há repetido) e null fora do catálogo', () => {
   const app = makeApp();
@@ -266,7 +435,10 @@ test('ao abrir: as obras da lista carregam o detalhe em lotes de 50, uma única 
   const batches = app.apiCalls.filter(c => c[0] === 'batch');
   assert.equal(batches.length, Math.ceil(ids.length / 50));
   assert.ok(batches.every(c => c[1].length <= 50));
-  assert.deepEqual(batches.flatMap(c => c[1]).sort((a, b) => a - b), ids.slice().sort((a, b) => a - b));
+  assert.deepEqual(
+    batches.flatMap(c => c[1]).sort((a, b) => a - b),
+    ids.slice().sort((a, b) => a - b)
+  );
   assert.equal(app.apiCalls.filter(c => c[0] === 'trending').length, 0, 'a lista do catálogo não é buscada ao abrir');
   assert.equal(app.state.detailsStatus, 'idle');
   assert.ok(ids.every(id => app.state.hasDetail(id)));
@@ -279,7 +451,10 @@ test('ao abrir: as obras da lista carregam o detalhe em lotes de 50, uma única 
   const W = w.WatchStatus;
   const expected = referenceQueue(app.state, W);
   const got = plain(w.nextUpView.calculateQueue());
-  assert.deepEqual(got.map(q => [q.showId, q.seasonNumber, q.episodeNumber, q.title]), expected.map(q => [q.showId, q.seasonNumber, q.episodeNumber, q.title]));
+  assert.deepEqual(
+    got.map(q => [q.showId, q.seasonNumber, q.episodeNumber, q.title]),
+    expected.map(q => [q.showId, q.seasonNumber, q.episodeNumber, q.title])
+  );
   assert.ok(got.length > 5);
   assert.equal(app.cards['next-up-container'].cards.length, got.length);
   assert.equal(app.text('badge-next-up'), String(got.length));
@@ -295,7 +470,7 @@ test('ao abrir: as obras da lista carregam o detalhe em lotes de 50, uma única 
     const season = media.seasons.find(s => s.season_number === Number(se.slice(1)));
     if (season) {
       const e = season.episodes.find(x => x.episode_number === Number(ep.slice(1)));
-      minutes += ((e && e.runtime) ? e.runtime : 45) * (item.rewatchCount || 1);
+      minutes += (e && e.runtime ? e.runtime : 45) * (item.rewatchCount || 1);
     }
   }
   w.statsView.render();
@@ -315,7 +490,13 @@ test('diário: o episódio da anotação vem do detalhe (título e imagem), e se
   const catalog = catalogFor();
   const m = catalog[1];
   const library = libraryFor(catalog);
-  library.episodeNotes[`${m.id}_s1_e2`] = { text: 'Gostei', emotion: 'love', character: '', updatedAt: '2026-10-02T00:00:00.000Z', snapshots: [] };
+  library.episodeNotes[`${m.id}_s1_e2`] = {
+    text: 'Gostei',
+    emotion: 'love',
+    character: '',
+    updatedAt: '2026-10-02T00:00:00.000Z',
+    snapshots: []
+  };
   const app = makeApp({ catalog, library });
   app.state.cacheMediaList([toListItem(m)]); // só a versão leve
   const entriesLight = app.window.diaryView.buildEntries();
@@ -347,11 +528,26 @@ test('falha ao carregar o detalhe: A Seguir mostra aviso com "Tentar de novo", e
 test('"Carregar exemplo" busca o detalhe das obras de exemplo antes de adicionar', async () => {
   const catalog = catalogFor();
   const ids = [157336, 872585, 1396, 1429];
-  const examples = ids.map(id => ({ id, type: id === 1396 ? 'tv' : (id === 1429 ? 'anime' : 'movie'), name: `Exemplo ${id}`, genres: [], seasons: id === 1396 || id === 1429 ? [{ season_number: 1, episodes: [{ episode_number: 1, name: 'E1' }] }] : undefined }));
+  const examples = ids.map(id => ({
+    id,
+    type: id === 1396 ? 'tv' : id === 1429 ? 'anime' : 'movie',
+    name: `Exemplo ${id}`,
+    genres: [],
+    seasons: id === 1396 || id === 1429 ? [{ season_number: 1, episodes: [{ episode_number: 1, name: 'E1' }] }] : undefined
+  }));
   const app = makeApp({ catalog: [...catalog, ...examples] });
   await app.window.appController.loadExample();
-  assert.deepEqual(app.apiCalls.filter(c => c[0] === 'batch').flatMap(c => c[1]).sort((a, b) => a - b), ids.slice().sort((a, b) => a - b));
-  assert.deepEqual(app.state.data.trackedShows.map(t => t.showId).sort((a, b) => a - b), ids.slice().sort((a, b) => a - b));
+  assert.deepEqual(
+    app.apiCalls
+      .filter(c => c[0] === 'batch')
+      .flatMap(c => c[1])
+      .sort((a, b) => a - b),
+    ids.slice().sort((a, b) => a - b)
+  );
+  assert.deepEqual(
+    app.state.data.trackedShows.map(t => t.showId).sort((a, b) => a - b),
+    ids.slice().sort((a, b) => a - b)
+  );
   assert.ok(app.toasts.some(([, m]) => /Exemplo carregado/.test(m)));
 });
 
@@ -361,7 +557,10 @@ test('adicionar uma obra do catálogo vinda da lista leve busca o detalhe (públ
   const m = catalog[2];
   app.state.cacheMediaList([toListItem(m)]);
   await app.window.appController.addToList(m.id);
-  assert.deepEqual(app.apiCalls.filter(c => c[0] === 'byId'), [['byId', m.id]]);
+  assert.deepEqual(
+    app.apiCalls.filter(c => c[0] === 'byId'),
+    [['byId', m.id]]
+  );
   assert.equal(app.apiCalls.filter(c => c[0] === 'ingest').length, 0);
   assert.equal(app.state.hasDetail(m.id), true);
   assert.equal(app.state.getTracked(m.id).status, 'plan_to_watch');
@@ -390,7 +589,10 @@ test('marcar um episódio troca só o cartão da obra; abas ocultas não são de
   w.appController.quickCheck(target.id, next.seasonNumber, next.episodeNumber);
   assert.equal(nu.renders, rendersBefore, 'a lista de cartões não foi reconstruída');
   assert.deepEqual(nu.replaced, [target.id], 'só o cartão da obra foi trocado');
-  assert.deepEqual(nu.cards.filter(c => c !== target).map(c => c.html), others);
+  assert.deepEqual(
+    nu.cards.filter(c => c !== target).map(c => c.html),
+    others
+  );
   const after = app.state.getNextEpisode(target.id);
   assert.match(target.html, new RegExp(`T${after.seasonNumber}:E${after.episodeNumber}`), 'o cartão mostra o episódio seguinte');
   assert.equal(wl.renders, 0, 'aba oculta continua sem desenhar');
@@ -414,7 +616,10 @@ test('marcar um episódio troca só o cartão da obra; abas ocultas não são de
   const nuRenders = nu.renders;
   w.appController.switchTab('next-up');
   assert.equal(nu.renders, nuRenders + 1, 'A Seguir estava desatualizada e redesenhou ao abrir');
-  assert.deepEqual(nu.cards.map(c => c.id), plain(w.nextUpView.calculateQueue().map(q => q.showId)));
+  assert.deepEqual(
+    nu.cards.map(c => c.id),
+    plain(w.nextUpView.calculateQueue().map(q => q.showId))
+  );
 });
 
 test('terminar a obra tira o cartão da fila sem reconstruir a lista; o último cartão cai no estado "em dia"', async () => {
@@ -422,7 +627,14 @@ test('terminar a obra tira o cartão da fila sem reconstruir a lista; o último 
   const library = libraryFor(catalog);
   // deixa cada obra com UM episódio faltando
   for (const m of catalog) {
-    for (const se of m.seasons) for (const ep of se.episodes) library.watchedEpisodes[`${m.id}_s${se.season_number}_e${ep.episode_number}`] = { watched: true, watchedAt: '2026-10-01T00:00:00.000Z', updatedAt: '2026-10-01T00:00:00.000Z', rewatchCount: 1 };
+    for (const se of m.seasons)
+      for (const ep of se.episodes)
+        library.watchedEpisodes[`${m.id}_s${se.season_number}_e${ep.episode_number}`] = {
+          watched: true,
+          watchedAt: '2026-10-01T00:00:00.000Z',
+          updatedAt: '2026-10-01T00:00:00.000Z',
+          rewatchCount: 1
+        };
     const last = m.seasons[m.seasons.length - 1];
     delete library.watchedEpisodes[`${m.id}_s${last.season_number}_e${last.episodes[last.episodes.length - 1].episode_number}`];
   }
@@ -431,7 +643,7 @@ test('terminar a obra tira o cartão da fila sem reconstruir a lista; o último 
   await loadAll(app);
   const nu = app.cards['next-up-container'];
   assert.equal(nu.cards.length, 3);
-  const finish = (m) => {
+  const finish = m => {
     const last = m.seasons[m.seasons.length - 1];
     w.appController.quickCheck(m.id, last.season_number, last.episodes[last.episodes.length - 1].episode_number);
   };
@@ -505,7 +717,10 @@ test('regressão de custo: marcar 1 episódio com 2.800+ rastreados varre só os
   assert.ok(trackedEpisodes > 1000, `rastreados: ${trackedEpisodes}`);
   let calls = 0;
   const original = app.state.isWatched.bind(app.state);
-  app.state.isWatched = (...args) => { calls++; return original(...args); };
+  app.state.isWatched = (...args) => {
+    calls++;
+    return original(...args);
+  };
   const small = catalog[7];
   const next = app.state.getNextEpisode(small.id);
   w.appController.quickCheck(small.id, next.seasonNumber, next.episodeNumber);
@@ -535,10 +750,10 @@ test('modal: marcar um episódio atualiza só a linha, o rótulo da temporada e 
   const mark = { textContent: '' };
   const classes = FakeCards.classList();
   const check = { setAttribute: (k, v) => rowAttrs.set(k, v), querySelector: () => mark };
-  const row = { classList: classes, querySelector: (sel) => (sel === '.episode-check' ? check : null), getAttribute: () => '700' };
+  const row = { classList: classes, querySelector: sel => (sel === '.episode-check' ? check : null), getAttribute: () => '700' };
   const container = makeEl('show-episodes-container');
-  container.querySelector = (sel) => (sel === '[data-ep="700"]' ? row : null);
-  container.querySelectorAll = (sel) => (sel === '[data-ep]' ? [row] : []);
+  container.querySelector = sel => (sel === '[data-ep="700"]' ? row : null);
+  container.querySelectorAll = sel => (sel === '[data-ep]' ? [row] : []);
   app.els.set('show-episodes-container', container);
   const tab = makeEl('season-tab-1');
   app.els.set('season-tab-1', tab);
@@ -568,11 +783,16 @@ test('modal: obra da lista leve mostra "Carregando", busca o detalhe e redesenha
   const dv = w.detailModalView;
   let opens = 0;
   const realOpen = dv.open.bind(dv);
-  dv.open = (id) => { opens++; return realOpen(id); };
+  dv.open = id => {
+    opens++;
+    return realOpen(id);
+  };
   dv.open(m.id);
   assert.equal(opens, 1);
   assert.match(app.els.get('show-episodes-container').innerHTML, /Carregando episódios/);
-  await flush(); await flush(); await flush();
+  await flush();
+  await flush();
+  await flush();
   assert.equal(app.state.hasDetail(m.id), true);
   assert.equal(opens, 2, 'redesenhou uma vez com o detalhe');
   assert.match(app.els.get('show-episodes-container').innerHTML || '', /episode-row|^$/);
@@ -581,7 +801,9 @@ test('modal: obra da lista leve mostra "Carregando", busca o detalhe e redesenha
   const app2 = makeApp({ catalog, apiFails: true });
   app2.state.cacheMediaList([toListItem(m)]);
   app2.window.detailModalView.open(m.id);
-  await flush(); await flush(); await flush();
+  await flush();
+  await flush();
+  await flush();
   assert.match(app2.els.get('show-episodes-container').innerHTML, /Não foi possível carregar os episódios/);
   assert.equal(app2.state.detailsStatus, 'error');
 });
@@ -602,7 +824,8 @@ test('Explorar: a lista leve mostra o nº de temporadas e o "Mostrar mais" acres
   const app = makeApp({ catalog: many });
   const w = app.window;
   const ev = w.exploreView;
-  ev.container = app.els.get('explore-container') || (app.els.set('explore-container', makeEl('explore-container')), app.els.get('explore-container'));
+  ev.container =
+    app.els.get('explore-container') || (app.els.set('explore-container', makeEl('explore-container')), app.els.get('explore-container'));
   ev.titleEl = makeEl('title');
   await ev.loadMedia();
   assert.equal(ev.titleEl.textContent, 'Catálogo (130)');
@@ -628,7 +851,8 @@ test('Explorar redesenha os cartões já carregados depois de adicionar/remover 
   const app = makeApp({ catalog: clone(catalogFor()) });
   const w = app.window;
   const ev = w.exploreView;
-  ev.container = app.els.get('explore-container') || (app.els.set('explore-container', makeEl('explore-container')), app.els.get('explore-container'));
+  ev.container =
+    app.els.get('explore-container') || (app.els.set('explore-container', makeEl('explore-container')), app.els.get('explore-container'));
   ev.titleEl = makeEl('title');
   await ev.loadMedia();
   const id = ev.items[0].id;

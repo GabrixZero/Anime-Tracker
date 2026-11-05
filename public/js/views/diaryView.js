@@ -24,7 +24,7 @@ class DiaryView {
 
     const searchInput = document.getElementById('diary-search-input');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
+      searchInput.addEventListener('input', e => {
         this.searchQuery = e.target.value.trim().toLowerCase();
         this.render();
       });
@@ -63,7 +63,7 @@ class DiaryView {
             isMovie: true,
             showId,
             name: media.name,
-            epTitle: "Filme",
+            epTitle: 'Filme',
             stillPath: media.backdrop_path || media.poster_path,
             text: note.text,
             emotion: note.emotion,
@@ -85,7 +85,7 @@ class DiaryView {
             epNum,
             name: media.name,
             epTitle: ep ? ep.name : `Episódio ${epNum}`,
-            stillPath: (ep && ep.still_path) ? ep.still_path : media.backdrop_path,
+            stillPath: ep && ep.still_path ? ep.still_path : media.backdrop_path,
             text: note.text,
             emotion: note.emotion,
             character: note.character,
@@ -105,9 +105,11 @@ class DiaryView {
     const filtered = entries.filter(e => {
       if (this.emotionFilter !== 'all' && e.emotion !== this.emotionFilter) return false;
       if (this.searchQuery) {
-        return e.text.toLowerCase().includes(this.searchQuery) ||
-               e.name.toLowerCase().includes(this.searchQuery) ||
-               (e.character || '').toLowerCase().includes(this.searchQuery);
+        return (
+          e.text.toLowerCase().includes(this.searchQuery) ||
+          e.name.toLowerCase().includes(this.searchQuery) ||
+          (e.character || '').toLowerCase().includes(this.searchQuery)
+        );
       }
       return true;
     });
@@ -121,14 +123,19 @@ class DiaryView {
     this.emptyState.classList.add('hidden');
     // S08: rótulo e ícone vêm da tabela única de emoções (utils/emotions.js)
 
-    this.container.innerHTML = filtered.map(e => {
-      const formattedDate = new Date(e.updatedAt).toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
+    this.container.innerHTML = filtered
+      .map(e => {
+        const formattedDate = new Date(e.updatedAt).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
 
-      const headerText = escapeHtml(e.isMovie ? `${e.name} · Filme` : `${e.name} · T${e.seasonNum}:E${e.epNum}`);
+        const headerText = escapeHtml(e.isMovie ? `${e.name} · Filme` : `${e.name} · T${e.seasonNum}:E${e.epNum}`);
 
-      return `
+        return `
         <div class="diary-entry-card">
           <img ${window.ViewKit.imgAttrs(e.stillPath, 'still')} alt="" class="diary-thumb" loading="lazy" decoding="async">
           
@@ -138,7 +145,7 @@ class DiaryView {
               ${e.emotion ? `<span class="diary-emotion">${escapeHtml(window.Emotions.withIcon(e.emotion))}</span>` : ''}
             </div>
 
-            <h4 class="diary-title">${escapeHtml(e.epTitle)}</h4>
+            <h3 class="diary-title">${escapeHtml(e.epTitle)}</h3>
 
             ${e.character ? `<div class="diary-highlight">Destaque: ${escapeHtml(e.character)}</div>` : ''}
 
@@ -151,9 +158,9 @@ class DiaryView {
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join('');
   }
-
 
   exportMarkdown() {
     let md = `# Meu Diário de Obras · ShowVault\n*Exportado em: ${new Date().toLocaleString('pt-BR')}*\n\n---\n\n`;

@@ -72,7 +72,7 @@ test('scripts novos estão no HTML na ordem certa', () => {
 });
 
 test('as 101 classes de largura das barras de progresso existem (.pct-0 a .pct-100)', () => {
-  const css = read('css', 'views.css');
+  const css = read('css', 'views.css').replace(/\s+/g, ' ');
   for (let i = 0; i <= 100; i++) assert.ok(css.includes(`.pct-${i} { width: ${i}%; }`), `.pct-${i}`);
 });
 

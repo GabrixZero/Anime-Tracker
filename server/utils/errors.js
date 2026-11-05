@@ -15,15 +15,26 @@ const mediaErrors = {
   invalidId: () => new MediaError('INVALID_ID', 'ID inválido: use um número inteiro positivo.', 400),
   invalidQuery: msg => new MediaError('INVALID_QUERY', msg, 400),
   notFound: () => new MediaError('NOT_FOUND', 'Título não encontrado.', 404),
-  unsupportedSource: () => new MediaError('UNSUPPORTED_SOURCE', 'Esta obra não pode ser adicionada ao catálogo (fonte não suportada).', 404),
-  rateLimited: retryAfterMs => new MediaError('RATE_LIMITED', 'A fonte externa pediu para aguardar. Tente novamente em instantes.', 429, { retryAfterMs }),
+  unsupportedSource: () =>
+    new MediaError('UNSUPPORTED_SOURCE', 'Esta obra não pode ser adicionada ao catálogo (fonte não suportada).', 404),
+  rateLimited: retryAfterMs =>
+    new MediaError('RATE_LIMITED', 'A fonte externa pediu para aguardar. Tente novamente em instantes.', 429, { retryAfterMs }),
   // extra.unreachable = true: a fonte nem respondeu (timeout/conexão recusada/DNS). O disjuntor (sourceBreaker) abre na hora e as
   // retentativas param, porque a próxima tentativa esperaria outro timeout inteiro (S13).
   upstream: (msg, extra = {}) => new MediaError('UPSTREAM', msg || 'A fonte externa está indisponível no momento.', 502, extra),
-  catalogUnavailable: () => new MediaError('CATALOG_UNAVAILABLE', 'O catálogo está temporariamente somente leitura (arquivo de dados ilegível). Avise o administrador.', 503),
-  tooManyRequests: retryAfterSec => new MediaError('TOO_MANY_REQUESTS', 'Muitas obras adicionadas em pouco tempo. Aguarde um pouco e tente de novo.', 429, { retryAfterSec }),
+  catalogUnavailable: () =>
+    new MediaError(
+      'CATALOG_UNAVAILABLE',
+      'O catálogo está temporariamente somente leitura (arquivo de dados ilegível). Avise o administrador.',
+      503
+    ),
+  tooManyRequests: retryAfterSec =>
+    new MediaError('TOO_MANY_REQUESTS', 'Muitas obras adicionadas em pouco tempo. Aguarde um pouco e tente de novo.', 429, {
+      retryAfterSec
+    }),
   notConfigured: msg => new MediaError('SOURCE_NOT_CONFIGURED', msg || 'Esta fonte de dados não está configurada neste servidor.', 503),
-  tooManySearches: retryAfterSec => new MediaError('TOO_MANY_REQUESTS', 'Muitas buscas em pouco tempo. Aguarde alguns segundos e tente de novo.', 429, { retryAfterSec }),
+  tooManySearches: retryAfterSec =>
+    new MediaError('TOO_MANY_REQUESTS', 'Muitas buscas em pouco tempo. Aguarde alguns segundos e tente de novo.', 429, { retryAfterSec }),
   loginRequired: () => new MediaError('LOGIN_REQUIRED', 'Entre na sua conta para adicionar novas obras ao catálogo.', 401)
 };
 

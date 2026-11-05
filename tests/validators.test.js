@@ -13,7 +13,25 @@ const v = require('../server/utils/validators');
 
 test('e-mail: normaliza e rejeita formatos inválidos sem lançar', () => {
   assert.equal(v.checkEmail('  Ana@Exemplo.COM ').value, 'ana@exemplo.com');
-  for (const bad of [undefined, null, 5, {}, [], '', ' ', 'ana', 'ana@', '@x.com', 'ana@x', 'a..b@x.com', '.a@x.com', 'a@-x.com', 'a b@x.com', 'a@x.com\nb@y.com', `${'a'.repeat(65)}@x.com`]) {
+  for (const bad of [
+    undefined,
+    null,
+    5,
+    {},
+    [],
+    '',
+    ' ',
+    'ana',
+    'ana@',
+    '@x.com',
+    'ana@x',
+    'a..b@x.com',
+    '.a@x.com',
+    'a@-x.com',
+    'a b@x.com',
+    'a@x.com\nb@y.com',
+    `${'a'.repeat(65)}@x.com`
+  ]) {
     assert.ok(v.checkEmail(bad).error, `deveria rejeitar ${JSON.stringify(bad)}`);
   }
 });
@@ -38,7 +56,13 @@ test('cadastro: limites de senha (8 a 128) e nome (até 60)', () => {
 
 test('qualquer corpo que não seja objeto é inválido (sem exceção)', () => {
   for (const body of [undefined, null, 'texto', 5, [], true]) {
-    for (const fn of [v.validateRegister, v.validateLogin, v.validateChangePassword, v.validatePasswordConfirmation, v.validateGoogleCredential]) {
+    for (const fn of [
+      v.validateRegister,
+      v.validateLogin,
+      v.validateChangePassword,
+      v.validatePasswordConfirmation,
+      v.validateGoogleCredential
+    ]) {
       const r = fn(body);
       assert.equal(r.ok, false);
       assert.equal(typeof r.error, 'string');

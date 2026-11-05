@@ -12,8 +12,8 @@ class CalendarView {
     this.notice = document.getElementById('calendar-notice');
     this.range = 'week';
     this.refreshing = false;
-    this.lastRefreshAt = 0;      // início da última rodada de atualização das fontes (uma a cada 30 min por sessão)
-    this.refreshFailures = 0;    // obras que não atualizaram na última rodada
+    this.lastRefreshAt = 0; // início da última rodada de atualização das fontes (uma a cada 30 min por sessão)
+    this.refreshFailures = 0; // obras que não atualizaram na última rodada
     this.bindEvents();
   }
 
@@ -95,7 +95,7 @@ class CalendarView {
   // ---------- desenho ----------
   render() {
     const state = window.appState;
-    const trackedCount = (state && state.data && state.data.trackedShows) ? state.data.trackedShows.length : 0;
+    const trackedCount = state && state.data && state.data.trackedShows ? state.data.trackedShows.length : 0;
     this.renderNotice();
 
     // Obras da lista ainda sem episódios (o detalhe chega em lote): carregamento ou erro, nunca uma agenda errada.
@@ -117,13 +117,16 @@ class CalendarView {
 
     if (items.length > 0) {
       this.emptyState.classList.add('hidden');
-      this.container.innerHTML = window.Calendar.groupByDay(items).map(g => this.renderDay(g)).join('');
+      this.container.innerHTML = window.Calendar.groupByDay(items)
+        .map(g => this.renderDay(g))
+        .join('');
       return;
     }
 
     this.container.innerHTML = '';
     this.emptyState.classList.remove('hidden');
-    const calendarIcon = '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+    const calendarIcon =
+      '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
 
     if (trackedCount === 0) {
       this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
@@ -131,7 +134,8 @@ class CalendarView {
         title: 'Sua lista está vazia',
         text: 'Adicione séries e animes em exibição para ver aqui os dias em que saem os próximos episódios.',
         narrow: true,
-        actionsHtml: '<button type="button" class="btn btn-primary" data-focus-key="cal:empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>'
+        actionsHtml:
+          '<button type="button" class="btn btn-primary" data-focus-key="cal:empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>'
       });
       return;
     }
@@ -147,7 +151,7 @@ class CalendarView {
   // "Hoje", "Amanhã", "Ontem" ou o dia da semana; depois a data dd/mm.
   dayHeading(group) {
     const names = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-    const rel = { '-1': 'Ontem', '0': 'Hoje', '1': 'Amanhã' }[String(group.daysFromToday)];
+    const rel = { '-1': 'Ontem', 0: 'Hoje', 1: 'Amanhã' }[String(group.daysFromToday)];
     const date = `${String(group.d).padStart(2, '0')}/${String(group.m).padStart(2, '0')}`;
     return `${rel || names[group.weekday]} · ${date}`;
   }

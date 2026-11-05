@@ -122,10 +122,10 @@ test.describe('progresso', () => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Interestelar (Interstellar)', exact: true }));
     await expect(modal(page)).toBeVisible();
-    await expect(page.locator('#movie-detail-body h4')).toHaveText('Filme Pendente para Assistir');
+    await expect(page.locator('#movie-detail-body h3')).toHaveText('Filme Pendente para Assistir');
 
     await tap(page.getByRole('button', { name: '✓ Marcar como Assistido' }));
-    await expect(page.locator('#movie-detail-body h4')).toHaveText('✓ Filme Assistido no Seu Diário');
+    await expect(page.locator('#movie-detail-body h3')).toHaveText('✓ Filme Assistido no Seu Diário');
     await expect(page.getByRole('button', { name: 'Desmarcar Filme' })).toBeVisible();
     await expect(page.locator('#detail-status-select')).toHaveValue('completed');
     await page.keyboard.press('Escape');

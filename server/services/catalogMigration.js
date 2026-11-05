@@ -32,7 +32,9 @@ function cleanItem(item, kind) {
   if (Array.isArray(next.seasons)) {
     next.seasons = next.seasons.map(season => ({
       ...season,
-      episodes: Array.isArray(season.episodes) ? season.episodes.map(ep => (isUnsplash(ep && ep.still_path) ? { ...ep, still_path: null } : ep)) : season.episodes
+      episodes: Array.isArray(season.episodes)
+        ? season.episodes.map(ep => (isUnsplash(ep && ep.still_path) ? { ...ep, still_path: null } : ep))
+        : season.episodes
     }));
   }
   return next;
@@ -41,7 +43,7 @@ function cleanItem(item, kind) {
 // items -> { items (novos; os intactos são os MESMOS objetos), changed: [{id, name, kind}] }
 function migrateLegacyCatalog(items) {
   const changed = [];
-  const out = items.map((item) => {
+  const out = items.map(item => {
     const kind = legacyKind(item);
     if (!kind) return item;
     changed.push({ id: item.id, name: item.name, kind });

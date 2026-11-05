@@ -20,7 +20,11 @@ const { normalizeTitle, franchiseKey, relevance, sameWork } = require('../server
 const { toInternalId, describeId } = require('../server/utils/ids');
 
 let counter = 0;
-const newDir = () => { const d = path.join(ROOT, `c${++counter}`); fs.mkdirSync(d, { recursive: true }); return d; };
+const newDir = () => {
+  const d = path.join(ROOT, `c${++counter}`);
+  fs.mkdirSync(d, { recursive: true });
+  return d;
+};
 
 // ---------- Fábrica de respostas simuladas da Jikan ----------------------------------------------------------------------
 
@@ -51,40 +55,163 @@ function anime(id, o = {}) {
 const rel = (relation, ...ids) => ({ relation, entry: ids.map(i => ({ mal_id: i, type: 'anime', name: `Anime ${i}` })) });
 
 const FRIEREN = anime(52991, {
-  title: 'Sousou no Frieren', title_english: "Frieren: Beyond Journey's End", title_japanese: '葬送のフリーレン',
-  episodes: 28, aired: { from: '2023-09-29T00:00:00+00:00' }, season: 'fall', year: 2023, score: 9.3,
+  title: 'Sousou no Frieren',
+  title_english: "Frieren: Beyond Journey's End",
+  title_japanese: '葬送のフリーレン',
+  episodes: 28,
+  aired: { from: '2023-09-29T00:00:00+00:00' },
+  season: 'fall',
+  year: 2023,
+  score: 9.3,
   relations: [rel('Sequel', 59978), rel('Adaptation', 118586)]
 });
 const FRIEREN_2 = anime(59978, {
-  title: 'Sousou no Frieren 2nd Season', title_english: "Frieren: Beyond Journey's End Season 2", episodes: 10, status: 'Currently Airing',
-  aired: { from: '2026-01-16T00:00:00+00:00' }, season: 'winter', year: 2026, score: null, relations: [rel('Prequel', 52991)]
+  title: 'Sousou no Frieren 2nd Season',
+  title_english: "Frieren: Beyond Journey's End Season 2",
+  episodes: 10,
+  status: 'Currently Airing',
+  aired: { from: '2026-01-16T00:00:00+00:00' },
+  season: 'winter',
+  year: 2026,
+  score: null,
+  relations: [rel('Prequel', 52991)]
 });
 
 const AOT = [
-  anime(16498, { title: 'Shingeki no Kyojin', title_english: 'Attack on Titan', title_japanese: '進撃の巨人', episodes: 25, aired: { from: '2013-04-07T00:00:00+00:00' }, season: 'spring', year: 2013, score: 8.55, relations: [rel('Sequel', 25777), rel('Summary', 99001), rel('Side story', 99002)] }),
-  anime(25777, { title: 'Shingeki no Kyojin Season 2', title_english: 'Attack on Titan Season 2', title_japanese: '進撃の巨人 Season2', episodes: 12, aired: { from: '2017-04-01T00:00:00+00:00' }, season: 'spring', year: 2017, relations: [rel('Prequel', 16498), rel('Sequel', 35760)] }),
-  anime(35760, { title: 'Shingeki no Kyojin Season 3', title_english: 'Attack on Titan Season 3', episodes: 12, aired: { from: '2018-07-23T00:00:00+00:00' }, season: 'summer', year: 2018, relations: [rel('Prequel', 25777), rel('Sequel', 38524)] }),
-  anime(38524, { title: 'Shingeki no Kyojin Season 3 Part 2', title_english: 'Attack on Titan Season 3 Part 2', episodes: 10, aired: { from: '2019-04-29T00:00:00+00:00' }, season: 'spring', year: 2019, relations: [rel('Prequel', 35760), rel('Sequel', 40028)] }),
-  anime(40028, { title: 'Shingeki no Kyojin: The Final Season', title_english: 'Attack on Titan: Final Season', episodes: 16, aired: { from: '2020-12-07T00:00:00+00:00' }, season: 'fall', year: 2020, relations: [rel('Prequel', 38524), rel('Sequel', 99003)] }),
+  anime(16498, {
+    title: 'Shingeki no Kyojin',
+    title_english: 'Attack on Titan',
+    title_japanese: '進撃の巨人',
+    episodes: 25,
+    aired: { from: '2013-04-07T00:00:00+00:00' },
+    season: 'spring',
+    year: 2013,
+    score: 8.55,
+    relations: [rel('Sequel', 25777), rel('Summary', 99001), rel('Side story', 99002)]
+  }),
+  anime(25777, {
+    title: 'Shingeki no Kyojin Season 2',
+    title_english: 'Attack on Titan Season 2',
+    title_japanese: '進撃の巨人 Season2',
+    episodes: 12,
+    aired: { from: '2017-04-01T00:00:00+00:00' },
+    season: 'spring',
+    year: 2017,
+    relations: [rel('Prequel', 16498), rel('Sequel', 35760)]
+  }),
+  anime(35760, {
+    title: 'Shingeki no Kyojin Season 3',
+    title_english: 'Attack on Titan Season 3',
+    episodes: 12,
+    aired: { from: '2018-07-23T00:00:00+00:00' },
+    season: 'summer',
+    year: 2018,
+    relations: [rel('Prequel', 25777), rel('Sequel', 38524)]
+  }),
+  anime(38524, {
+    title: 'Shingeki no Kyojin Season 3 Part 2',
+    title_english: 'Attack on Titan Season 3 Part 2',
+    episodes: 10,
+    aired: { from: '2019-04-29T00:00:00+00:00' },
+    season: 'spring',
+    year: 2019,
+    relations: [rel('Prequel', 35760), rel('Sequel', 40028)]
+  }),
+  anime(40028, {
+    title: 'Shingeki no Kyojin: The Final Season',
+    title_english: 'Attack on Titan: Final Season',
+    episodes: 16,
+    aired: { from: '2020-12-07T00:00:00+00:00' },
+    season: 'fall',
+    year: 2020,
+    relations: [rel('Prequel', 38524), rel('Sequel', 99003)]
+  }),
   // filme ligado por Sequel, e um anúncio que ainda não estreou
-  anime(99003, { title: 'Shingeki no Kyojin: Movie', title_english: 'Attack on Titan: The Last Attack', type: 'Movie', episodes: 1, duration: '1 hr 25 min', aired: { from: '2024-11-08T00:00:00+00:00' }, season: null, year: 2024, relations: [rel('Prequel', 40028), rel('Sequel', 99004)] }),
-  anime(99004, { title: 'Shingeki no Kyojin: Futuro', type: 'TV', episodes: null, status: 'Not yet aired', aired: { from: null }, season: null, year: null, relations: [rel('Prequel', 99003)] })
+  anime(99003, {
+    title: 'Shingeki no Kyojin: Movie',
+    title_english: 'Attack on Titan: The Last Attack',
+    type: 'Movie',
+    episodes: 1,
+    duration: '1 hr 25 min',
+    aired: { from: '2024-11-08T00:00:00+00:00' },
+    season: null,
+    year: 2024,
+    relations: [rel('Prequel', 40028), rel('Sequel', 99004)]
+  }),
+  anime(99004, {
+    title: 'Shingeki no Kyojin: Futuro',
+    type: 'TV',
+    episodes: null,
+    status: 'Not yet aired',
+    aired: { from: null },
+    season: null,
+    year: null,
+    relations: [rel('Prequel', 99003)]
+  })
 ];
-const AOT_JUNIOR = anime(31, { title: 'Shingeki! Kyojin Chuugakkou', title_english: 'Attack on Titan: Junior High', episodes: 12, aired: { from: '2015-10-04T00:00:00+00:00' }, score: 6.9 });
+const AOT_JUNIOR = anime(31, {
+  title: 'Shingeki! Kyojin Chuugakkou',
+  title_english: 'Attack on Titan: Junior High',
+  episodes: 12,
+  aired: { from: '2015-10-04T00:00:00+00:00' },
+  score: 6.9
+});
 
-const NARUTO = anime(20, { title: 'Naruto', title_english: 'Naruto', episodes: 220, aired: { from: '2002-10-03T00:00:00+00:00' }, year: 2002, relations: [rel('Sequel', 1735)] });
-const SHIPPUDEN = anime(1735, { title: 'Naruto: Shippuuden', title_english: 'Naruto Shippuden', episodes: 500, aired: { from: '2007-02-15T00:00:00+00:00' }, year: 2007, relations: [rel('Prequel', 20)] });
-const NARUTO_LAST = anime(10589, { title: 'The Last: Naruto the Movie', title_english: 'The Last: Naruto the Movie', type: 'Movie', episodes: 1, aired: { from: '2014-12-06T00:00:00+00:00' }, year: 2014 });
-const BORUTO = anime(34566, { title: 'Boruto: Naruto Next Generations', title_english: 'Boruto: Naruto Next Generations', episodes: 293, aired: { from: '2017-04-05T00:00:00+00:00' }, year: 2017 });
+const NARUTO = anime(20, {
+  title: 'Naruto',
+  title_english: 'Naruto',
+  episodes: 220,
+  aired: { from: '2002-10-03T00:00:00+00:00' },
+  year: 2002,
+  relations: [rel('Sequel', 1735)]
+});
+const SHIPPUDEN = anime(1735, {
+  title: 'Naruto: Shippuuden',
+  title_english: 'Naruto Shippuden',
+  episodes: 500,
+  aired: { from: '2007-02-15T00:00:00+00:00' },
+  year: 2007,
+  relations: [rel('Prequel', 20)]
+});
+const NARUTO_LAST = anime(10589, {
+  title: 'The Last: Naruto the Movie',
+  title_english: 'The Last: Naruto the Movie',
+  type: 'Movie',
+  episodes: 1,
+  aired: { from: '2014-12-06T00:00:00+00:00' },
+  year: 2014
+});
+const BORUTO = anime(34566, {
+  title: 'Boruto: Naruto Next Generations',
+  title_english: 'Boruto: Naruto Next Generations',
+  episodes: 293,
+  aired: { from: '2017-04-05T00:00:00+00:00' },
+  year: 2017
+});
 
-const ONE_PIECE = anime(21, { title: 'One Piece', title_english: 'One Piece', episodes: null, status: 'Currently Airing', aired: { from: '1999-10-20T00:00:00+00:00' }, season: 'fall', year: 1999 });
-const ONE_PIECE_RED = anime(50410, { title: 'One Piece Film: Red', title_english: 'One Piece Film: Red', type: 'Movie', episodes: 1, aired: { from: '2022-08-06T00:00:00+00:00' }, year: 2022 });
+const ONE_PIECE = anime(21, {
+  title: 'One Piece',
+  title_english: 'One Piece',
+  episodes: null,
+  status: 'Currently Airing',
+  aired: { from: '1999-10-20T00:00:00+00:00' },
+  season: 'fall',
+  year: 1999
+});
+const ONE_PIECE_RED = anime(50410, {
+  title: 'One Piece Film: Red',
+  title_english: 'One Piece Film: Red',
+  type: 'Movie',
+  episodes: 1,
+  aired: { from: '2022-08-06T00:00:00+00:00' },
+  year: 2022
+});
 
 // Roteador: monta o `fetchJson` de um MediaService de teste. `epCount` = quantos episódios cada anime tem na listagem.
 function jikanDb(animes, { searches = {}, epCount = {} } = {}) {
   const byId = new Map(animes.map(a => [a.mal_id, a]));
   const calls = [];
-  const handler = (url) => {
+  const handler = url => {
     calls.push(url);
     const u = new URL(url);
     let m;
@@ -103,7 +230,8 @@ function jikanDb(animes, { searches = {}, epCount = {} } = {}) {
       const page = Number(u.searchParams.get('page') || 1);
       const from = (page - 1) * 100;
       const data = [];
-      for (let n = from + 1; n <= Math.min(total, from + 100); n++) data.push({ mal_id: n, title: `Ep ${n}`, aired: '2013-04-07T00:00:00+00:00', duration: 1440 });
+      for (let n = from + 1; n <= Math.min(total, from + 100); n++)
+        data.push({ mal_id: n, title: `Ep ${n}`, aired: '2013-04-07T00:00:00+00:00', duration: 1440 });
       return { pagination: { has_next_page: from + 100 < total }, data };
     }
     throw new Error(`URL inesperada na Jikan simulada: ${url}`);
@@ -112,15 +240,35 @@ function jikanDb(animes, { searches = {}, epCount = {} } = {}) {
 }
 
 function tvmazeShow(id, name, o = {}) {
-  return { show: { id, name, type: 'Scripted', genres: ['Drama'], premiered: '2020-01-01', status: 'Ended', rating: { average: null }, image: null, summary: '', ...o } };
+  return {
+    show: {
+      id,
+      name,
+      type: 'Scripted',
+      genres: ['Drama'],
+      premiered: '2020-01-01',
+      status: 'Ended',
+      rating: { average: null },
+      image: null,
+      summary: '',
+      ...o
+    }
+  };
 }
 
 // Serviço com Jikan simulada (rápida: sem espera real) e TVMaze/TMDB roteados pelo mesmo `fetchJson`.
 function newService({ animes = [], searches = {}, epCount = {}, tvmaze = {}, tmdb = null, tmdbKey = '', extra = {} } = {}) {
   const jdb = jikanDb(animes, { searches, epCount });
   const svc = new MediaService({
-    dataDir: newDir(), tvmazeBase: 'http://tvmaze.invalid', jikanBase: 'http://jikan.invalid/v4', tmdbBase: 'http://tmdb.invalid/3',
-    tmdbKey, sleep: async () => {}, jikan: { minIntervalMs: 0 }, anilistEnabled: false, ...extra
+    dataDir: newDir(),
+    tvmazeBase: 'http://tvmaze.invalid',
+    jikanBase: 'http://jikan.invalid/v4',
+    tmdbBase: 'http://tmdb.invalid/3',
+    tmdbKey,
+    sleep: async () => {},
+    jikan: { minIntervalMs: 0 },
+    anilistEnabled: false,
+    ...extra
   });
   svc.urls = [];
   svc.fetchJson = async (url, opts) => {
@@ -128,7 +276,7 @@ function newService({ animes = [], searches = {}, epCount = {}, tvmaze = {}, tmd
     if (url.startsWith('http://jikan.invalid')) return jdb.handler(url);
     if (url.startsWith('http://tvmaze.invalid/search/shows')) {
       const q = new URL(url).searchParams.get('q').toLowerCase();
-      return (tvmaze[q] || []);
+      return tvmaze[q] || [];
     }
     if (url.startsWith('http://tmdb.invalid') && tmdb) return tmdb(url, opts);
     throw new Error(`URL inesperada: ${url}`);
@@ -175,7 +323,14 @@ test('relevância: título igual vence título que só começa com a consulta', 
 
 test('franchiseKey junta temporadas/partes da mesma obra e separa subtítulos e spin-offs', () => {
   const k = franchiseKey('Attack on Titan');
-  for (const t of ['Attack on Titan Season 2', 'Attack on Titan Season 3 Part 2', 'Attack on Titan: The Final Season', 'Attack on Titan: Final Season', 'Attack on Titan 2nd Season', 'Attack on Titan Part 2']) {
+  for (const t of [
+    'Attack on Titan Season 2',
+    'Attack on Titan Season 3 Part 2',
+    'Attack on Titan: The Final Season',
+    'Attack on Titan: Final Season',
+    'Attack on Titan 2nd Season',
+    'Attack on Titan Part 2'
+  ]) {
     assert.equal(franchiseKey(t), k, t);
   }
   assert.notEqual(franchiseKey('Attack on Titan: Junior High'), k);
@@ -186,9 +341,20 @@ test('franchiseKey junta temporadas/partes da mesma obra e separa subtítulos e 
 
 test('sameWork: mesmo id da MAL, ou mesmo tipo + título em comum + anos próximos; tipos/anos diferentes não se misturam', () => {
   assert.ok(sameWork({ id: 1, type: 'anime', mal_id: 5, name: 'A' }, { id: 2, type: 'anime', mal_ids: [4, 5], name: 'B' }));
-  assert.ok(sameWork({ id: 1, type: 'tv', name: 'Crossed Wires', first_air_date: '2022-02-18' }, { id: 2, type: 'tv', name: 'Fios Cruzados', original_name: 'Crossed Wires', first_air_date: '2022-02-17' }));
+  assert.ok(
+    sameWork(
+      { id: 1, type: 'tv', name: 'Crossed Wires', first_air_date: '2022-02-18' },
+      { id: 2, type: 'tv', name: 'Fios Cruzados', original_name: 'Crossed Wires', first_air_date: '2022-02-17' }
+    )
+  );
   assert.equal(sameWork({ id: 1, type: 'movie', name: 'Death Note' }, { id: 2, type: 'anime', name: 'Death Note' }), false);
-  assert.equal(sameWork({ id: 1, type: 'tv', name: 'The Office', first_air_date: '2001-07-09' }, { id: 2, type: 'tv', name: 'The Office', first_air_date: '2005-03-24' }), false);
+  assert.equal(
+    sameWork(
+      { id: 1, type: 'tv', name: 'The Office', first_air_date: '2001-07-09' },
+      { id: 2, type: 'tv', name: 'The Office', first_air_date: '2005-03-24' }
+    ),
+    false
+  );
 });
 
 // =====================================================================================================================
@@ -198,7 +364,10 @@ test('sameWork: mesmo id da MAL, ou mesmo tipo + título em comum + anos próxim
 function fakeClock() {
   const c = { t: 1_000_000, slept: [] };
   c.now = () => c.t;
-  c.sleep = async (ms) => { c.slept.push(ms); c.t += ms; };
+  c.sleep = async ms => {
+    c.slept.push(ms);
+    c.t += ms;
+  };
   return c;
 }
 
@@ -212,7 +381,15 @@ test('Jikan: opções undefined (ex.: jikanBase não informada) não apagam os v
 test('Jikan: a fila espaça as requisições (respeita ~3 req/s) mesmo com pedidos simultâneos', async () => {
   const clock = fakeClock();
   const stamps = [];
-  const client = new JikanClient({ fetchJson: async () => { stamps.push(clock.now()); return { data: [] }; }, sleep: clock.sleep, now: clock.now, minIntervalMs: 400 });
+  const client = new JikanClient({
+    fetchJson: async () => {
+      stamps.push(clock.now());
+      return { data: [] };
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 400
+  });
   await Promise.all([1, 2, 3, 4, 5].map(i => client.get(`/anime?q=a${i}`)));
   assert.equal(stamps.length, 5);
   for (let i = 1; i < stamps.length; i++) assert.ok(stamps[i] - stamps[i - 1] >= 400, `intervalo ${stamps[i] - stamps[i - 1]}`);
@@ -221,14 +398,35 @@ test('Jikan: a fila espaça as requisições (respeita ~3 req/s) mesmo com pedid
 test('Jikan: teto por minuto — acima dele o pedido espera a janela ou, se a espera for longa, vira RATE_LIMITED sem tocar na rede', async () => {
   const clock = fakeClock();
   let calls = 0;
-  const client = new JikanClient({ fetchJson: async () => { calls++; return { data: [] }; }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0, perMinute: 3, maxWaitMs: 5000 });
+  const client = new JikanClient({
+    fetchJson: async () => {
+      calls++;
+      return { data: [] };
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0,
+    perMinute: 3,
+    maxWaitMs: 5000
+  });
   for (let i = 0; i < 3; i++) await client.get(`/anime?q=x${i}`);
   await assert.rejects(client.get('/anime?q=x9'), err => err.code === 'RATE_LIMITED' && err.httpStatus === 429 && err.retryAfterMs > 0);
   assert.equal(calls, 3);
 
   // com uma espera aceitável (<= maxWaitMs) ele espera e segue
-  const client2 = new JikanClient({ fetchJson: async () => { calls++; return { data: [] }; }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0, perMinute: 2, maxWaitMs: 70000 });
-  await client2.get('/anime?q=a'); await client2.get('/anime?q=b');
+  const client2 = new JikanClient({
+    fetchJson: async () => {
+      calls++;
+      return { data: [] };
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0,
+    perMinute: 2,
+    maxWaitMs: 70000
+  });
+  await client2.get('/anime?q=a');
+  await client2.get('/anime?q=b');
   const before = clock.now();
   await client2.get('/anime?q=c');
   assert.ok(clock.now() - before >= 59000, 'esperou a janela de 60 s');
@@ -237,8 +435,19 @@ test('Jikan: teto por minuto — acima dele o pedido espera a janela ou, se a es
 test('Jikan: fila lotada recusa em vez de acumular', async () => {
   const clock = fakeClock();
   let release;
-  const gate = new Promise(r => { release = r; });
-  const client = new JikanClient({ fetchJson: async () => { await gate; return { data: [] }; }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0, maxQueue: 3 });
+  const gate = new Promise(r => {
+    release = r;
+  });
+  const client = new JikanClient({
+    fetchJson: async () => {
+      await gate;
+      return { data: [] };
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0,
+    maxQueue: 3
+  });
   const ps = [1, 2, 3].map(i => client.get(`/anime?q=q${i}`));
   await assert.rejects(client.get('/anime?q=extra'), err => err.code === 'RATE_LIMITED');
   release();
@@ -249,21 +458,43 @@ test('Jikan: 429 tenta de novo com espera crescente e Retry-After; esgotadas as 
   const clock = fakeClock();
   let n = 0;
   const flaky = new JikanClient({
-    fetchJson: async () => { n++; if (n <= 2) throw mediaErrors.rateLimited(n === 1 ? undefined : 3000); return { data: ['ok'] }; },
-    sleep: clock.sleep, now: clock.now, minIntervalMs: 0
+    fetchJson: async () => {
+      n++;
+      if (n <= 2) throw mediaErrors.rateLimited(n === 1 ? undefined : 3000);
+      return { data: ['ok'] };
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0
   });
   assert.deepEqual((await flaky.get('/anime?q=a')).data, ['ok']);
   assert.equal(n, 3);
   assert.deepEqual(clock.slept, [1000, 3000]); // 1ª: backoff 1000 · 2ª: Retry-After 3000 (maior que 2000)
 
   let m = 0;
-  const dead = new JikanClient({ fetchJson: async () => { m++; throw mediaErrors.rateLimited(); }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0 });
+  const dead = new JikanClient({
+    fetchJson: async () => {
+      m++;
+      throw mediaErrors.rateLimited();
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0
+  });
   await assert.rejects(dead.get('/anime?q=a'), err => err.code === 'RATE_LIMITED');
   assert.equal(m, 3, '1 tentativa + 2 novas');
 
   // 404 não repete
   let k = 0;
-  const missing = new JikanClient({ fetchJson: async () => { k++; throw mediaErrors.notFound(); }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0 });
+  const missing = new JikanClient({
+    fetchJson: async () => {
+      k++;
+      throw mediaErrors.notFound();
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0
+  });
   await assert.rejects(missing.getAnimeFull(1), err => err.code === 'NOT_FOUND');
   assert.equal(k, 1);
 });
@@ -271,7 +502,16 @@ test('Jikan: 429 tenta de novo com espera crescente e Retry-After; esgotadas as 
 test('Jikan: cache com validade e pedidos iguais simultâneos viram uma requisição; falhas não são cacheadas', async () => {
   const clock = fakeClock();
   let calls = 0;
-  const client = new JikanClient({ fetchJson: async () => { calls++; return { data: [{ mal_id: 1 }] }; }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0, searchTtlMs: 1000 });
+  const client = new JikanClient({
+    fetchJson: async () => {
+      calls++;
+      return { data: [{ mal_id: 1 }] };
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0,
+    searchTtlMs: 1000
+  });
   await Promise.all([client.searchAnime('a'), client.searchAnime('a'), client.searchAnime('a')]);
   assert.equal(calls, 1);
   await client.searchAnime('a');
@@ -281,7 +521,16 @@ test('Jikan: cache com validade e pedidos iguais simultâneos viram uma requisi�
   assert.equal(calls, 2, 'cache expirou');
 
   let fails = 0;
-  const bad = new JikanClient({ fetchJson: async () => { fails++; throw mediaErrors.upstream(); }, sleep: clock.sleep, now: clock.now, minIntervalMs: 0, retries: 0 });
+  const bad = new JikanClient({
+    fetchJson: async () => {
+      fails++;
+      throw mediaErrors.upstream();
+    },
+    sleep: clock.sleep,
+    now: clock.now,
+    minIntervalMs: 0,
+    retries: 0
+  });
   await assert.rejects(bad.searchAnime('z'));
   await assert.rejects(bad.searchAnime('z'));
   assert.equal(fails, 2);
@@ -289,7 +538,7 @@ test('Jikan: cache com validade e pedidos iguais simultâneos viram uma requisi�
 
 test('Jikan: respostas malformadas ou de erro viram erros tipados', async () => {
   const clock = fakeClock();
-  const mk = (resp) => new JikanClient({ fetchJson: async () => resp, sleep: clock.sleep, now: clock.now, minIntervalMs: 0 });
+  const mk = resp => new JikanClient({ fetchJson: async () => resp, sleep: clock.sleep, now: clock.now, minIntervalMs: 0 });
   await assert.rejects(mk({ status: 400, message: 'x' }).searchAnime('a'), err => err.code === 'UPSTREAM');
   await assert.rejects(mk({ data: { mal_id: 999, title: 'outro' } }).getAnimeFull(1), err => err.code === 'NOT_FOUND');
   await assert.rejects(mk({ status: 404, type: 'BadResponseException' }).getAnimeFull(1), err => err.code === 'NOT_FOUND');
@@ -306,8 +555,16 @@ test('busca "Frieren": a obra aparece UMA vez (local em PT + MAL + TVMaze) e o r
     searches: { frieren: [52991, 59978] },
     tvmaze: {
       frieren: [
-        tvmazeShow(900, 'Frieden'), tvmazeShow(901, 'Friheden'), tvmazeShow(902, '2 frères'), tvmazeShow(903, 'Oscar Freire 279'),
-        tvmazeShow(904, "Frieren: Beyond Journey's End", { type: 'Animation', language: 'Japanese', genres: ['Anime', 'Fantasy'], premiered: '2023-09-29' })
+        tvmazeShow(900, 'Frieden'),
+        tvmazeShow(901, 'Friheden'),
+        tvmazeShow(902, '2 frères'),
+        tvmazeShow(903, 'Oscar Freire 279'),
+        tvmazeShow(904, "Frieren: Beyond Journey's End", {
+          type: 'Animation',
+          language: 'Japanese',
+          genres: ['Anime', 'Fantasy'],
+          premiered: '2023-09-29'
+        })
       ]
     }
   });
@@ -330,11 +587,25 @@ test('busca "Frieren": a obra aparece UMA vez (local em PT + MAL + TVMaze) e o r
 
 test('busca "Frieren" com a Jikan fora do ar: o seed (amostra) continua aparecendo, só uma vez, com aviso', async () => {
   const svc = newService({
-    animes: [], searches: {}, extra: { jikan: { minIntervalMs: 0, retries: 0 } },
-    tvmaze: { frieren: [tvmazeShow(904, "Frieren: Beyond Journey's End", { type: 'Animation', language: 'Japanese', genres: ['Anime'], premiered: '2023-09-29' })] }
+    animes: [],
+    searches: {},
+    extra: { jikan: { minIntervalMs: 0, retries: 0 } },
+    tvmaze: {
+      frieren: [
+        tvmazeShow(904, "Frieren: Beyond Journey's End", {
+          type: 'Animation',
+          language: 'Japanese',
+          genres: ['Anime'],
+          premiered: '2023-09-29'
+        })
+      ]
+    }
   });
   const jikanFetch = svc.fetchJson;
-  svc.fetchJson = async (url, o) => { if (url.startsWith('http://jikan.invalid')) throw mediaErrors.upstream(); return jikanFetch(url, o); };
+  svc.fetchJson = async (url, o) => {
+    if (url.startsWith('http://jikan.invalid')) throw mediaErrors.upstream();
+    return jikanFetch(url, o);
+  };
 
   const { items, warnings } = await svc.searchDetailed('Frieren', 'all');
   assert.equal(items.length, 1);
@@ -357,10 +628,17 @@ test('busca "Naruto": cada entrada uma vez, "Naruto" primeiro; depois de ingerir
 
   const work = await svc.ingest(first[0].id);
   assert.equal(work.type, 'anime');
-  assert.deepEqual(work.mal_ids.sort((a, b) => a - b), [20, 1735]);
+  assert.deepEqual(
+    work.mal_ids.sort((a, b) => a - b),
+    [20, 1735]
+  );
   const second = await svc.search('Naruto', 'all');
   assertUnique(second);
-  assert.equal(second.filter(i => i.mal_ids ? i.mal_ids.includes(1735) || i.mal_id === 1735 : false).length, 1, 'Shippuden só aparece dentro da obra já ingerida');
+  assert.equal(
+    second.filter(i => (i.mal_ids ? i.mal_ids.includes(1735) || i.mal_id === 1735 : false)).length,
+    1,
+    'Shippuden só aparece dentro da obra já ingerida'
+  );
   assert.equal(second[0].id, work.id);
 });
 
@@ -393,7 +671,7 @@ test('busca "One Piece": a série (título igual) vem antes do filme', async () 
 });
 
 test('busca em japonês: acha pelo título japonês, uma vez, e o local do seed é a mesma obra', async () => {
-  const svc = newService({ animes: AOT.slice(0, 3), searches: { '進撃の巨人': [16498, 25777, 35760] } });
+  const svc = newService({ animes: AOT.slice(0, 3), searches: { 進撃の巨人: [16498, 25777, 35760] } });
   const items = await svc.search('進撃の巨人', 'anime');
   assert.equal(items.length, 1);
   assert.equal(items[0].id, toInternalId('jikan', 16498));
@@ -415,8 +693,12 @@ test('busca por tipo: anime não chama TVMaze; série não chama a Jikan; sem ch
 
 test('em "série", animação ocidental continua série e anime do TVMaze não aparece se a Jikan respondeu', async () => {
   const svc = newService({
-    animes: [NARUTO], searches: { naruto: [20] },
-    tvmaze: { naruto: [tvmazeShow(495, 'Naruto', { type: 'Animation', language: 'Japanese', genres: ['Anime'], premiered: '2002-10-03' })], simpsons: [tvmazeShow(83, 'The Simpsons', { type: 'Animation', language: 'English', genres: ['Comedy'], premiered: '1989-12-17' })] }
+    animes: [NARUTO],
+    searches: { naruto: [20] },
+    tvmaze: {
+      naruto: [tvmazeShow(495, 'Naruto', { type: 'Animation', language: 'Japanese', genres: ['Anime'], premiered: '2002-10-03' })],
+      simpsons: [tvmazeShow(83, 'The Simpsons', { type: 'Animation', language: 'English', genres: ['Comedy'], premiered: '1989-12-17' })]
+    }
   });
   assert.deepEqual(names(await svc.search('Naruto', 'tv')), [], 'anime não é série');
   const all = await svc.search('Naruto', 'all');
@@ -428,16 +710,25 @@ test('em "série", animação ocidental continua série e anime do TVMaze não a
 });
 
 test('uma fonte com 429 não derruba as outras (aviso); se TODAS falham e nada local casa, o erro tipado sobe', async () => {
-  const svc = newService({ animes: [], tvmaze: { zzzz: [tvmazeShow(5, 'Zzzz Show')] }, extra: { jikan: { minIntervalMs: 0, retries: 0 } } });
+  const svc = newService({
+    animes: [],
+    tvmaze: { zzzz: [tvmazeShow(5, 'Zzzz Show')] },
+    extra: { jikan: { minIntervalMs: 0, retries: 0 } }
+  });
   const orig = svc.fetchJson;
-  svc.fetchJson = async (url, o) => { if (url.startsWith('http://jikan.invalid')) throw mediaErrors.rateLimited(4000); return orig(url, o); };
+  svc.fetchJson = async (url, o) => {
+    if (url.startsWith('http://jikan.invalid')) throw mediaErrors.rateLimited(4000);
+    return orig(url, o);
+  };
 
   const ok = await svc.searchDetailed('zzzz', 'all');
   assert.deepEqual(names(ok.items), ['Zzzz Show']);
   assert.equal(ok.warnings[0].code, 'RATE_LIMITED');
   assert.equal(ok.warnings[0].retryAfterSec, 4);
 
-  svc.fetchJson = async () => { throw mediaErrors.rateLimited(4000); };
+  svc.fetchJson = async () => {
+    throw mediaErrors.rateLimited(4000);
+  };
   await assert.rejects(svc.searchDetailed('qqqqqq', 'all'), err => err.code === 'RATE_LIMITED' && err.httpStatus === 429);
   // resultados locais continuam saindo mesmo com tudo fora do ar
   const local = await svc.searchDetailed('breaking bad', 'all');
@@ -476,7 +767,16 @@ test('ingestão de anime de obra única: dados mapeados, nada inventado, episód
 });
 
 test('ingestão sem nota/imagem/gêneros: devolve null/[] (nada de 8.0, "Drama" ou foto de banco de imagens)', async () => {
-  const bare = anime(777, { title: 'Obscuro', score: null, images: {}, genres: [], themes: [], synopsis: null, episodes: 2, status: 'Weird Status' });
+  const bare = anime(777, {
+    title: 'Obscuro',
+    score: null,
+    images: {},
+    genres: [],
+    themes: [],
+    synopsis: null,
+    episodes: 2,
+    status: 'Weird Status'
+  });
   const svc = newService({ animes: [bare], epCount: { 777: 2 } });
   const w = await svc.ingest(toInternalId('jikan', 777));
   assert.equal(w.vote_average, null);
@@ -488,7 +788,15 @@ test('ingestão sem nota/imagem/gêneros: devolve null/[] (nada de 8.0, "Drama" 
 });
 
 test('TVMaze sem nota/imagem/gêneros também não inventa nada, e status vem em português', () => {
-  const m = MediaService.mapTvmazeShow({ id: 1, name: 'X', type: 'Scripted', genres: [], rating: { average: null }, image: null, status: 'Running' });
+  const m = MediaService.mapTvmazeShow({
+    id: 1,
+    name: 'X',
+    type: 'Scripted',
+    genres: [],
+    rating: { average: null },
+    image: null,
+    status: 'Running'
+  });
   assert.equal(m.vote_average, null);
   assert.deepEqual(m.genres, []);
   assert.equal(m.poster_path, null);
@@ -504,15 +812,34 @@ test('franquia (etapa 2): Attack on Titan vira UMA obra com temporadas na ordem 
   assert.equal(work.id, 1429);
   assert.equal(svc.findLocal(toInternalId('jikan', 25777)), null, 'nenhuma segunda obra com o id pedido');
   assert.equal(work.name, 'Attack on Titan', 'nome vem da 1ª entrada da franquia');
-  assert.deepEqual(work.mal_ids.sort((a, b) => a - b), [16498, 25777, 35760, 38524, 40028, 99003, 99004].sort((a, b) => a - b));
-  assert.deepEqual(work.seasons.map(s => s.season_number), [1, 2, 3, 4, 5, 6]);
-  assert.deepEqual(work.seasons.map(s => s.name), [
-    'Temporada 1 · Primavera 2013', 'Temporada 2 · Primavera 2017', 'Temporada 3 · Verão 2018', 'Temporada 4 · Primavera 2019',
-    'Temporada 5 · Outono 2020', 'Filme: Attack on Titan: The Last Attack'
-  ]);
-  assert.deepEqual(work.seasons.map(s => s.episodes.length), [25, 12, 12, 10, 16, 1]);
+  assert.deepEqual(
+    work.mal_ids.sort((a, b) => a - b),
+    [16498, 25777, 35760, 38524, 40028, 99003, 99004].sort((a, b) => a - b)
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.season_number),
+    [1, 2, 3, 4, 5, 6]
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.name),
+    [
+      'Temporada 1 · Primavera 2013',
+      'Temporada 2 · Primavera 2017',
+      'Temporada 3 · Verão 2018',
+      'Temporada 4 · Primavera 2019',
+      'Temporada 5 · Outono 2020',
+      'Filme: Attack on Titan: The Last Attack'
+    ]
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.episodes.length),
+    [25, 12, 12, 10, 16, 1]
+  );
   assert.equal(work.seasons[5].episodes[0].runtime, 85);
-  assert.deepEqual(work.franchise.entries.map(e => e.mal_id), [16498, 25777, 35760, 38524, 40028, 99003]);
+  assert.deepEqual(
+    work.franchise.entries.map(e => e.mal_id),
+    [16498, 25777, 35760, 38524, 40028, 99003]
+  );
   assert.equal(work.franchise.truncated, false);
   assert.equal(work.status, 'Finalizada');
   assert.equal(work.vote_average, 8.55);
@@ -525,14 +852,22 @@ test('franquia (etapa 2): Attack on Titan vira UMA obra com temporadas na ordem 
 test('franquia: pedir a 1ª entrada ou a última dá a mesma estrutura de temporadas (números estáveis)', async () => {
   const a = await newService({ animes: AOT }).ingest(toInternalId('jikan', 16498));
   const b = await newService({ animes: AOT }).ingest(toInternalId('jikan', 40028));
-  assert.deepEqual(a.seasons.map(s => [s.season_number, s.name, s.episodes.length]), b.seasons.map(s => [s.season_number, s.name, s.episodes.length]));
+  assert.deepEqual(
+    a.seasons.map(s => [s.season_number, s.name, s.episodes.length]),
+    b.seasons.map(s => [s.season_number, s.name, s.episodes.length])
+  );
 });
 
 test('franquia: o limite de entradas evita varrer o grafo inteiro e marca truncated', async () => {
-  const chain = Array.from({ length: 30 }, (_, i) => anime(500 + i, {
-    title: `Cadeia ${i + 1}`, episodes: 2, aired: { from: `${2000 + i}-01-01T00:00:00+00:00` }, year: 2000 + i,
-    relations: [...(i > 0 ? [rel('Prequel', 499 + i)] : []), ...(i < 29 ? [rel('Sequel', 501 + i)] : [])]
-  }));
+  const chain = Array.from({ length: 30 }, (_, i) =>
+    anime(500 + i, {
+      title: `Cadeia ${i + 1}`,
+      episodes: 2,
+      aired: { from: `${2000 + i}-01-01T00:00:00+00:00` },
+      year: 2000 + i,
+      relations: [...(i > 0 ? [rel('Prequel', 499 + i)] : []), ...(i < 29 ? [rel('Sequel', 501 + i)] : [])]
+    })
+  );
   const svc = newService({ animes: chain });
   const w = await svc.ingest(toInternalId('jikan', 500));
   assert.equal(w.franchise.truncated, true);
@@ -544,13 +879,19 @@ test('franquia: sem lista de episódios usa a contagem real da MAL (sem títulos
   const noList = anime(600, { title: 'Sem Lista', episodes: 3 });
   const svc = newService({ animes: [noList], epCount: { 600: 0 } });
   const w = await svc.ingest(toInternalId('jikan', 600));
-  assert.deepEqual(w.seasons[0].episodes.map(e => e.name), ['Episódio 1', 'Episódio 2', 'Episódio 3']);
+  assert.deepEqual(
+    w.seasons[0].episodes.map(e => e.name),
+    ['Episódio 1', 'Episódio 2', 'Episódio 3']
+  );
 
   const a = anime(610, { title: 'Parte A', relations: [rel('Sequel', 611)] });
   const b = anime(611, { title: 'Parte B', relations: [rel('Prequel', 610)] });
   const flaky = newService({ animes: [a, b], extra: { jikan: { minIntervalMs: 0, retries: 0 } } });
   const orig = flaky.fetchJson;
-  flaky.fetchJson = async (url, o) => { if (url.includes('/611/full')) throw mediaErrors.upstream(); return orig(url, o); };
+  flaky.fetchJson = async (url, o) => {
+    if (url.includes('/611/full')) throw mediaErrors.upstream();
+    return orig(url, o);
+  };
   const before = fs.readFileSync(flaky.catalogPath, 'utf-8');
   await assert.rejects(flaky.ingest(toInternalId('jikan', 610)), err => err.code === 'UPSTREAM');
   assert.equal(fs.readFileSync(flaky.catalogPath, 'utf-8'), before, 'catálogo intacto');
@@ -564,8 +905,10 @@ test('franquia: sem lista de episódios usa a contagem real da MAL (sem títulos
 
 test('textos da Jikan passam pelo sanitizador (HTML e URLs perigosas)', async () => {
   const evil = anime(700, {
-    title: '<img src=x onerror=alert(1)>Mau', synopsis: '<script>alert(1)</script>Sinopse <b>ok</b> (Source: MAL)',
-    images: { jpg: { large_image_url: 'javascript:alert(1)' } }, genres: [{ name: '<i>Ação</i>' }]
+    title: '<img src=x onerror=alert(1)>Mau',
+    synopsis: '<script>alert(1)</script>Sinopse <b>ok</b> (Source: MAL)',
+    images: { jpg: { large_image_url: 'javascript:alert(1)' } },
+    genres: [{ name: '<i>Ação</i>' }]
   });
   const w = await newService({ animes: [evil], epCount: { 700: 1 } }).ingest(toInternalId('jikan', 700));
   assert.equal(w.name, 'Mau');
@@ -595,20 +938,88 @@ function tmdbRouter() {
     const u = new URL(url);
     const p = u.pathname.replace('/3', '');
     if (p === '/search/tv') {
-      return { results: [
-        { id: 95396, name: 'Fios Cruzados', original_name: 'Crossed Wires', overview: 'Sinopse', poster_path: '/p.jpg', backdrop_path: '/b.jpg', vote_average: 8.4, vote_count: 3000, first_air_date: '2022-02-18', genre_ids: [18, 9648], original_language: 'en' },
-        { id: 1, name: 'Naruto do TMDB', original_name: 'ナルト', genre_ids: [16, 10759], original_language: 'ja', first_air_date: '2002-10-03' },
-        { id: 2, name: 'Sem nota', poster_path: null, vote_average: 0, vote_count: 0, genre_ids: [], first_air_date: '' }
-      ] };
+      return {
+        results: [
+          {
+            id: 95396,
+            name: 'Fios Cruzados',
+            original_name: 'Crossed Wires',
+            overview: 'Sinopse',
+            poster_path: '/p.jpg',
+            backdrop_path: '/b.jpg',
+            vote_average: 8.4,
+            vote_count: 3000,
+            first_air_date: '2022-02-18',
+            genre_ids: [18, 9648],
+            original_language: 'en'
+          },
+          {
+            id: 1,
+            name: 'Naruto do TMDB',
+            original_name: 'ナルト',
+            genre_ids: [16, 10759],
+            original_language: 'ja',
+            first_air_date: '2002-10-03'
+          },
+          { id: 2, name: 'Sem nota', poster_path: null, vote_average: 0, vote_count: 0, genre_ids: [], first_air_date: '' }
+        ]
+      };
     }
     if (p === '/search/movie') {
-      return { results: [{ id: 155, title: 'Noite Sombria', original_title: 'Dark Night', overview: 'Filme', poster_path: '/m.jpg', vote_average: 8.5, vote_count: 30000, release_date: '2008-07-16', genre_ids: [28, 80], original_language: 'en' }] };
+      return {
+        results: [
+          {
+            id: 155,
+            title: 'Noite Sombria',
+            original_title: 'Dark Night',
+            overview: 'Filme',
+            poster_path: '/m.jpg',
+            vote_average: 8.5,
+            vote_count: 30000,
+            release_date: '2008-07-16',
+            genre_ids: [28, 80],
+            original_language: 'en'
+          }
+        ]
+      };
     }
-    if (p === '/movie/155') return { id: 155, title: 'Batman: O Cavaleiro das Trevas', original_title: 'The Dark Knight', runtime: 152, status: 'Released', overview: 'Filme', poster_path: '/m.jpg', vote_average: 8.5, vote_count: 30000, release_date: '2008-07-16', genres: [{ id: 28, name: 'Ação' }] };
-    if (p === '/tv/95396') return { id: 95396, name: 'Fios Cruzados', original_name: 'Crossed Wires', status: 'Returning Series', overview: 'Sinopse', first_air_date: '2022-02-18', vote_average: 8.4, vote_count: 3000, genres: [{ id: 18, name: 'Drama' }], episode_run_time: [50], seasons: [{ season_number: 0 }, { season_number: 1 }, { season_number: 2 }] };
+    if (p === '/movie/155')
+      return {
+        id: 155,
+        title: 'Batman: O Cavaleiro das Trevas',
+        original_title: 'The Dark Knight',
+        runtime: 152,
+        status: 'Released',
+        overview: 'Filme',
+        poster_path: '/m.jpg',
+        vote_average: 8.5,
+        vote_count: 30000,
+        release_date: '2008-07-16',
+        genres: [{ id: 28, name: 'Ação' }]
+      };
+    if (p === '/tv/95396')
+      return {
+        id: 95396,
+        name: 'Fios Cruzados',
+        original_name: 'Crossed Wires',
+        status: 'Returning Series',
+        overview: 'Sinopse',
+        first_air_date: '2022-02-18',
+        vote_average: 8.4,
+        vote_count: 3000,
+        genres: [{ id: 18, name: 'Drama' }],
+        episode_run_time: [50],
+        seasons: [{ season_number: 0 }, { season_number: 1 }, { season_number: 2 }]
+      };
     let m;
     if ((m = /^\/tv\/95396\/season\/(\d+)$/.exec(p))) {
-      return { name: `Temporada ${m[1]}`, episodes: [{ episode_number: 1, name: 'Bom Dia', runtime: 55, air_date: '2022-02-18', overview: 'x', still_path: '/e.jpg' }, { episode_number: 2, name: '<b>Metade</b>', air_date: '2022-02-18' }] };
+      return {
+        name: `Temporada ${m[1]}`,
+        episodes: [
+          { episode_number: 1, name: 'Bom Dia', runtime: 55, air_date: '2022-02-18', overview: 'x', still_path: '/e.jpg' },
+          { episode_number: 2, name: '<b>Metade</b>', air_date: '2022-02-18' }
+        ]
+      };
     }
     throw mediaErrors.notFound();
   };
@@ -627,8 +1038,10 @@ test('TMDB desligado sem chave: série e filme não chamam o TMDB', async () => 
 test('TMDB com chave: busca série+filme em pt-BR, deduplica com o TVMaze, exclui anime e não inventa nota', async () => {
   const router = tmdbRouter();
   const svc = newService({
-    tmdb: router, tmdbKey: 'chave-de-teste',
-    animes: [], tvmaze: { 'crossed wires': [tvmazeShow(44, 'Crossed Wires', { premiered: '2022-02-18' })] }
+    tmdb: router,
+    tmdbKey: 'chave-de-teste',
+    animes: [],
+    tvmaze: { 'crossed wires': [tvmazeShow(44, 'Crossed Wires', { premiered: '2022-02-18' })] }
   });
   const tv = await svc.search('crossed wires', 'tv');
   // "Fios Cruzados" (TMDB, original_name Crossed Wires) e "Crossed Wires" (TVMaze) são a mesma obra => fica a do TMDB
@@ -638,12 +1051,18 @@ test('TMDB com chave: busca série+filme em pt-BR, deduplica com o TVMaze, exclu
   assert.equal(tv[0].poster_path, 'https://image.tmdb.org/t/p/w500/p.jpg');
   assert.deepEqual(tv[0].genres, ['Drama', 'Mistério']);
   assert.ok(router.calls.every(c => c.url.includes('language=pt-BR')));
-  assert.ok(router.calls.every(c => c.url.includes('api_key=chave-de-teste')), 'chave v3 vai na URL');
+  assert.ok(
+    router.calls.every(c => c.url.includes('api_key=chave-de-teste')),
+    'chave v3 vai na URL'
+  );
 
   const sem = await newService({ tmdb: router, tmdbKey: 'k' }).search('sem nota', 'tv');
   assert.equal(sem[0].vote_average, null);
   assert.equal(sem[0].poster_path, null);
-  assert.ok(!(await newService({ tmdb: router, tmdbKey: 'k' }).search('naruto do tmdb', 'tv')).some(i => i.name === 'Naruto do TMDB'), 'animação japonesa é do domínio da Jikan');
+  assert.ok(
+    !(await newService({ tmdb: router, tmdbKey: 'k' }).search('naruto do tmdb', 'tv')).some(i => i.name === 'Naruto do TMDB'),
+    'animação japonesa é do domínio da Jikan'
+  );
 
   const found = await svc.search('noite sombria', 'movie');
   assert.equal(found.length, 1);
@@ -679,7 +1098,10 @@ test('ingestão TMDB: filme com duração e série com temporadas (sem a tempora
 
   const tv = await svc.ingest(toInternalId('tmdb_tv', 95396));
   assert.equal(tv.id, 20095396);
-  assert.deepEqual(tv.seasons.map(s => s.season_number), [1, 2]);
+  assert.deepEqual(
+    tv.seasons.map(s => s.season_number),
+    [1, 2]
+  );
   assert.equal(tv.seasons[0].episodes[0].runtime, 55);
   assert.equal(tv.seasons[0].episodes[1].name, 'Metade');
   assert.equal(tv.seasons[0].episodes[1].runtime, 50, 'duração média da série quando o episódio não informa');
@@ -689,7 +1111,12 @@ test('ingestão TMDB: filme com duração e série com temporadas (sem a tempora
 });
 
 test('TMDB: 401 vira erro tipado sem expor a chave', async () => {
-  const svc = newService({ tmdb: () => { throw mediaErrors.upstream('A fonte externa recusou o acesso (verifique a chave configurada no servidor).'); }, tmdbKey: 'segredo-123' });
+  const svc = newService({
+    tmdb: () => {
+      throw mediaErrors.upstream('A fonte externa recusou o acesso (verifique a chave configurada no servidor).');
+    },
+    tmdbKey: 'segredo-123'
+  });
   const { items, warnings } = await svc.searchDetailed('batman', 'movie');
   assert.ok(items.length >= 1, 'catálogo local continua respondendo');
   assert.equal(warnings[0].source, 'tmdb');
@@ -697,9 +1124,23 @@ test('TMDB: 401 vira erro tipado sem expor a chave', async () => {
 });
 
 test('título do seed com parênteses ("Ruptura (Severance)") é a mesma obra que o TMDB/TVMaze chamam de Ruptura ou Severance', async () => {
-  const router = (url) => {
+  const router = url => {
     const p = new URL(url).pathname.replace('/3', '');
-    if (p === '/search/tv') return { results: [{ id: 95396, name: 'Ruptura', original_name: 'Severance', vote_average: 8.4, vote_count: 3000, first_air_date: '2022-02-18', genre_ids: [18], original_language: 'en' }] };
+    if (p === '/search/tv')
+      return {
+        results: [
+          {
+            id: 95396,
+            name: 'Ruptura',
+            original_name: 'Severance',
+            vote_average: 8.4,
+            vote_count: 3000,
+            first_air_date: '2022-02-18',
+            genre_ids: [18],
+            original_language: 'en'
+          }
+        ]
+      };
     return { results: [] };
   };
   const svc = newService({ tmdb: router, tmdbKey: 'k', tvmaze: { severance: [tvmazeShow(44, 'Severance', { premiered: '2022-02-18' })] } });

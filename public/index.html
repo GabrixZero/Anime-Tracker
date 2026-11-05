@@ -1,729 +1,1130 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-  <title>ShowVault · Rastreador de Séries, Filmes e Animes</title>
-  <meta name="description" content="Acompanhe séries, filmes e animes: progresso episódio por episódio, diário de anotações com histórico de versões e estatísticas de tempo assistido.">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <title>ShowVault · Rastreador de Séries, Filmes e Animes</title>
+    <meta
+      name="description"
+      content="Acompanhe séries, filmes e animes: progresso episódio por episódio, diário de anotações com histórico de versões e estatísticas de tempo assistido."
+    />
 
-  <!-- Fontes Google: Outfit e Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Fontes Google: Outfit e Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Arquitetura CSS Modular (layout.css vem depois de views.css: contém os breakpoints) -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0a0b10">
-  <link rel="icon" type="image/png" sizes="192x192" href="img/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="img/icons/icon-192.png">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/views.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/auth-tvtime.css">
-  <link rel="stylesheet" href="css/status.css">
-  <link rel="stylesheet" href="css/a11y.css">
-</head>
-<body>
-  <!-- Acessibilidade (S07): atalho para quem navega por teclado -->
-  <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+    <!-- Arquitetura CSS Modular (layout.css vem depois de views.css: contém os breakpoints) -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#0a0b10" />
+    <link rel="icon" type="image/png" sizes="192x192" href="img/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/views.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/auth-tvtime.css" />
+    <link rel="stylesheet" href="css/status.css" />
+    <link rel="stylesheet" href="css/a11y.css" />
+  </head>
+  <body>
+    <!-- Acessibilidade (S07): atalho para quem navega por teclado -->
+    <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
 
-  <div id="app" class="app-container">
+    <div id="app" class="app-container">
+      <!-- BARRA SUPERIOR / HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <button
+            type="button"
+            class="brand"
+            id="brand-logo"
+            aria-label="ShowVault: ir para A Seguir"
+            data-action="goto-tab"
+            data-goto="next-up"
+          >
+            <span class="brand-badge">
+              <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+              </svg>
+            </span>
+            <span class="brand-text">
+              <span class="brand-title">SHOW<strong>VAULT</strong></span>
+              <span class="brand-subtitle">Séries, filmes e animes</span>
+            </span>
+          </button>
 
-    <!-- BARRA SUPERIOR / HEADER -->
-    <header class="app-header">
-      <div class="header-left">
-        <button type="button" class="brand" id="brand-logo" aria-label="ShowVault: ir para A Seguir" data-action="goto-tab" data-goto="next-up">
-          <span class="brand-badge">
-            <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
-            </svg>
-          </span>
-          <span class="brand-text">
-            <span class="brand-title">SHOW<strong>VAULT</strong></span>
-            <span class="brand-subtitle">Séries, filmes e animes</span>
-          </span>
-        </button>
-
-        <!-- No celular esta navegação vira a barra de abas fixa na parte de baixo (layout.css).
+          <!-- No celular esta navegação vira a barra de abas fixa na parte de baixo (layout.css).
              Padrão de abas (S07): role=tablist/tab, aria-selected e tabindex são mantidos por utils/a11y.js a partir da classe "active". -->
-        <nav class="main-nav" id="main-nav" role="tablist" aria-label="Seções do ShowVault">
-          <button class="nav-tab active" data-tab="next-up" id="tab-btn-next-up" role="tab" aria-selected="true" aria-controls="view-next-up">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span class="nav-label">A Seguir</span>
-            <span class="badge" id="badge-next-up">0</span>
-          </button>
-
-          <button class="nav-tab" data-tab="watchlist" id="tab-btn-watchlist" role="tab" aria-selected="false" tabindex="-1" aria-controls="view-watchlist">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-            <span class="nav-label"><span class="nav-long">Minha Lista</span><span class="nav-short">Lista</span></span>
-            <span class="badge" id="badge-watchlist">0</span>
-          </button>
-
-          <button class="nav-tab" data-tab="calendar" id="tab-btn-calendar" role="tab" aria-selected="false" tabindex="-1" aria-controls="view-calendar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span class="nav-label"><span class="nav-long">Agenda</span><span class="nav-short">Agenda</span></span>
-          </button>
-
-          <button class="nav-tab" data-tab="diary" id="tab-btn-diary" role="tab" aria-selected="false" tabindex="-1" aria-controls="view-diary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            <span class="nav-label"><span class="nav-long">Meu Diário</span><span class="nav-short">Diário</span></span>
-            <span class="badge badge-accent" id="badge-diary">0</span>
-          </button>
-
-          <button class="nav-tab" data-tab="stats" id="tab-btn-stats" role="tab" aria-selected="false" tabindex="-1" aria-controls="view-stats">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span class="nav-label"><span class="nav-long">Estatísticas</span><span class="nav-short">Estat.</span></span>
-          </button>
-
-          <button class="nav-tab" data-tab="explore" id="tab-btn-explore" role="tab" aria-selected="false" tabindex="-1" aria-controls="view-explore">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span class="nav-label"><span class="nav-long">Explorar</span><span class="nav-short">Explorar</span></span>
-          </button>
-        </nav>
-      </div>
-
-      <div class="header-right">
-        <!-- Selo de sincronização: o texto é decidido pelo syncService (visitante = só neste aparelho; conta = nuvem/offline/erro) -->
-        <div class="sync-indicator" id="sync-status">
-          <span class="status-dot pulsing" aria-hidden="true"></span>
-          <span class="status-label" id="sync-label">Só neste aparelho</span>
-        </div>
-
-        <button type="button" class="btn-icon" id="btn-open-backup" title="Backup e dados" aria-label="Backup e dados" aria-haspopup="dialog">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-
-        <!-- Área de Login do Usuário -->
-        <div class="user-auth-zone">
-          <button type="button" class="btn btn-sm btn-primary" id="btn-open-auth" aria-haspopup="dialog">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Entrar<span class="auth-btn-extra"> / Cadastrar</span></span>
-          </button>
-
-          <div class="user-logged-profile hidden" id="user-logged-profile">
-            <img class="user-avatar" id="user-avatar-img" src="" alt="Avatar do usuário">
-            <div class="user-info-text">
-              <span class="user-display-name" id="user-display-name">Usuário</span>
-              <span class="user-cloud-badge" id="user-cloud-badge"></span>
-            </div>
-            <button type="button" class="btn-icon-tiny" id="btn-open-account" data-action="open-account" aria-haspopup="dialog" title="Minha conta" aria-label="Minha conta">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <nav class="main-nav" id="main-nav" role="tablist" aria-label="Seções do ShowVault">
+            <button
+              class="nav-tab active"
+              data-tab="next-up"
+              id="tab-btn-next-up"
+              role="tab"
+              aria-selected="true"
+              aria-controls="view-next-up"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              <span class="nav-label">A Seguir</span>
+              <span class="badge" id="badge-next-up">0</span>
             </button>
-            <button type="button" class="btn-icon-tiny" id="btn-logout" title="Sair da Conta" aria-label="Sair da conta">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+
+            <button
+              class="nav-tab"
+              data-tab="watchlist"
+              id="tab-btn-watchlist"
+              role="tab"
+              aria-selected="false"
+              tabindex="-1"
+              aria-controls="view-watchlist"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
+                <polyline points="17 2 12 7 7 2" />
+              </svg>
+              <span class="nav-label"><span class="nav-long">Minha Lista</span><span class="nav-short">Lista</span></span>
+              <span class="badge" id="badge-watchlist">0</span>
             </button>
-          </div>
-        </div>
-      </div>
-    </header>
 
-    <!-- CONTEÚDO PRINCIPAL (TABS) -->
-    <main class="app-main" id="main-content" tabindex="-1">
-      <h1 class="sr-only">ShowVault: rastreador de séries, filmes e animes</h1>
-
-      <!-- ================= ABA 1: A SEGUIR (NEXT UP) ================= -->
-      <section class="tab-content active" id="view-next-up" role="tabpanel" aria-labelledby="tab-btn-next-up">
-        <div class="section-hero">
-          <div class="hero-text">
-            <h2>Prontos para Assistir</h2>
-            <p>Seus próximos episódios e filmes na fila. Marque com 1 clique ou adicione sua anotação no diário.</p>
-          </div>
-          <div class="hero-actions">
-            <span class="hero-pill" id="next-up-counter-pill">Carregando fila...</span>
-          </div>
-        </div>
-
-        <div class="type-filter-row" role="group" aria-label="Filtrar a fila por tipo">
-          <button type="button" class="type-pill-btn active" data-type="all" aria-pressed="true">Todos</button>
-          <button type="button" class="type-pill-btn" data-type="tv" aria-pressed="false">Séries</button>
-          <button type="button" class="type-pill-btn" data-type="anime" aria-pressed="false">Animes</button>
-          <button type="button" class="type-pill-btn" data-type="movie" aria-pressed="false">Filmes na Lista</button>
-        </div>
-
-        <div class="next-up-grid" id="next-up-container"></div>
-
-        <div class="empty-state hidden" id="next-up-empty">
-          <div class="empty-icon empty-icon--success">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <h3 class="empty-title">Você está em dia com tudo!</h3>
-          <p class="empty-text">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
-          <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
-        </div>
-      </section>
-
-      <!-- ================= ABA 2: MINHA LISTA (WATCHLIST) ================= -->
-      <section class="tab-content" id="view-watchlist" role="tabpanel" aria-labelledby="tab-btn-watchlist">
-        <div class="section-header-row">
-          <div>
-            <h2>Minha Lista</h2>
-            <p>Seu cofre pessoal de séries, filmes e animes com progresso detalhado.</p>
-          </div>
-
-          <div class="filter-pills" id="watchlist-filters" role="group" aria-label="Filtrar a lista por status">
-            <button type="button" class="pill-btn active" data-filter="all" aria-pressed="true">Todos (<span id="count-all">0</span>)</button>
-            <button type="button" class="pill-btn" data-filter="watching" aria-pressed="false">Em Andamento (<span id="count-watching">0</span>)</button>
-            <button type="button" class="pill-btn" data-filter="completed" aria-pressed="false">Finalizados (<span id="count-completed">0</span>)</button>
-            <button type="button" class="pill-btn" data-filter="plan_to_watch" aria-pressed="false">Quero Ver (<span id="count-plan">0</span>)</button>
-          </div>
-        </div>
-
-        <div class="type-filter-row" role="group" aria-label="Filtrar a lista por tipo">
-          <button type="button" class="type-pill-btn active" data-cat="all" aria-pressed="true">Todos</button>
-          <button type="button" class="type-pill-btn" data-cat="tv" aria-pressed="false">Séries</button>
-          <button type="button" class="type-pill-btn" data-cat="anime" aria-pressed="false">Animes</button>
-          <button type="button" class="type-pill-btn" data-cat="movie" aria-pressed="false">Filmes</button>
-        </div>
-
-        <div class="example-bar hidden" id="watchlist-example-bar">
-          <p class="example-bar-text" id="watchlist-example-text"></p>
-          <button type="button" class="btn btn-sm btn-outline" id="btn-remove-example" data-action="remove-example" aria-describedby="watchlist-example-text">Remover exemplo</button>
-        </div>
-
-        <div class="shows-grid" id="watchlist-container"></div>
-
-        <div class="empty-state hidden" id="watchlist-empty">
-          <div class="empty-icon empty-icon--muted">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-          </div>
-          <h3 class="empty-title" id="watchlist-empty-title">Sua lista está vazia</h3>
-          <p class="empty-text" id="watchlist-empty-text">Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns títulos de exemplo.</p>
-          <div class="empty-actions">
-            <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
-            <button type="button" class="btn btn-outline" id="btn-watchlist-example" data-focus-key="empty:example" data-action="load-example">Carregar exemplo</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= ABA: AGENDA (S15) ================= -->
-      <section class="tab-content" id="view-calendar" role="tabpanel" aria-labelledby="tab-btn-calendar">
-        <div class="section-hero">
-          <div class="hero-text">
-            <h2>Agenda de Lançamentos</h2>
-            <p>Os episódios das obras da sua lista por dia de exibição. Marque como assistido direto daqui.</p>
-          </div>
-          <div class="hero-actions">
-            <span class="hero-pill" id="calendar-counter-pill">Carregando agenda...</span>
-          </div>
-        </div>
-
-        <div class="type-filter-row" role="group" aria-label="Período da agenda">
-          <button type="button" class="type-pill-btn active" data-range="week" aria-pressed="true">Semana</button>
-          <button type="button" class="type-pill-btn" data-range="next7" aria-pressed="false">7 dias</button>
-          <button type="button" class="type-pill-btn" data-range="next30" aria-pressed="false">30 dias</button>
-        </div>
-
-        <p class="calendar-notice hidden" id="calendar-notice" role="status"></p>
-
-        <div class="calendar-days" id="calendar-container"></div>
-
-        <div class="empty-state hidden" id="calendar-empty"></div>
-      </section>
-
-      <!-- ================= ABA 3: MEU DIÁRIO (DIARY) ================= -->
-      <section class="tab-content" id="view-diary" role="tabpanel" aria-labelledby="tab-btn-diary">
-        <div class="section-header-row">
-          <div>
-            <h2>Meu Diário de Episódios & Filmes</h2>
-            <p>Todas as suas anotações, reações e personagens destaque, guardados neste aparelho (e na sua conta, se você estiver conectado).</p>
-          </div>
-
-          <div class="header-controls">
-            <input type="text" id="diary-search-input" class="input-field" placeholder="Buscar anotação ou personagem..." aria-label="Buscar nas anotações do diário">
-            <button type="button" class="btn btn-secondary" id="btn-export-notes-md">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Exportar (.md)</span>
+            <button
+              class="nav-tab"
+              data-tab="calendar"
+              id="tab-btn-calendar"
+              role="tab"
+              aria-selected="false"
+              tabindex="-1"
+              aria-controls="view-calendar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <span class="nav-label"><span class="nav-long">Agenda</span><span class="nav-short">Agenda</span></span>
             </button>
+
+            <button
+              class="nav-tab"
+              data-tab="diary"
+              id="tab-btn-diary"
+              role="tab"
+              aria-selected="false"
+              tabindex="-1"
+              aria-controls="view-diary"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              <span class="nav-label"><span class="nav-long">Meu Diário</span><span class="nav-short">Diário</span></span>
+              <span class="badge badge-accent" id="badge-diary">0</span>
+            </button>
+
+            <button
+              class="nav-tab"
+              data-tab="stats"
+              id="tab-btn-stats"
+              role="tab"
+              aria-selected="false"
+              tabindex="-1"
+              aria-controls="view-stats"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+              <span class="nav-label"><span class="nav-long">Estatísticas</span><span class="nav-short">Estat.</span></span>
+            </button>
+
+            <button
+              class="nav-tab"
+              data-tab="explore"
+              id="tab-btn-explore"
+              role="tab"
+              aria-selected="false"
+              tabindex="-1"
+              aria-controls="view-explore"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span class="nav-label"><span class="nav-long">Explorar</span><span class="nav-short">Explorar</span></span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="header-right">
+          <!-- Selo de sincronização: o texto é decidido pelo syncService (visitante = só neste aparelho; conta = nuvem/offline/erro) -->
+          <div class="sync-indicator" id="sync-status">
+            <span class="status-dot pulsing" aria-hidden="true"></span>
+            <span class="status-label" id="sync-label">Só neste aparelho</span>
           </div>
-        </div>
 
-        <div class="type-filter-row type-filter-row--scroll" id="emotion-filters" role="group" aria-label="Filtrar anotações por reação">
-          <button type="button" class="emotion-filter-btn type-pill-btn active" data-emotion="all" aria-pressed="true">Todas as Reações</button>
-          <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="awesome" aria-pressed="false">😍 Adorei</button>
-          <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="fun" aria-pressed="false">😂 Divertido</button>
-          <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="mindblown" aria-pressed="false">😱 Chocado</button>
-          <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="sad" aria-pressed="false">😢 Triste</button>
-          <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="disappointed" aria-pressed="false">😡 Decepcionado</button>
-        </div>
+          <button
+            type="button"
+            class="btn-icon"
+            id="btn-open-backup"
+            title="Backup e dados"
+            aria-label="Backup e dados"
+            aria-haspopup="dialog"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
 
-        <div id="diary-container"></div>
+          <!-- Área de Login do Usuário -->
+          <div class="user-auth-zone">
+            <button type="button" class="btn btn-sm btn-primary" id="btn-open-auth" aria-haspopup="dialog">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span>Entrar<span class="auth-btn-extra"> / Cadastrar</span></span>
+            </button>
 
-        <div class="empty-state hidden" id="diary-empty">
-          <div class="empty-icon empty-icon--muted">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          </div>
-          <h3 class="empty-title">Nenhuma anotação registrada ainda</h3>
-          <p class="empty-text">Abra um episódio ou filme e clique em "Anotar": o que você escrever aparece aqui, com negrito, itálico, citação e spoiler.</p>
-        </div>
-      </section>
-
-      <!-- ================= ABA 4: ESTATÍSTICAS ================= -->
-      <section class="tab-content" id="view-stats" role="tabpanel" aria-labelledby="tab-btn-stats">
-        <div class="section-header-row">
-          <div>
-            <h2>Seu Tempo de Vida em Telas</h2>
-            <p>Estimativa a partir da duração das obras que você assistiu. Quando a fonte não informa a duração, contamos 45 min por episódio e 120 min por filme.</p>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card stat-card--hero">
-            <div class="stat-hero-icon">
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="stat-hero-body">
-              <span class="stat-kicker">TEMPO TOTAL GASTO</span>
-              <div class="stat-time">
-                <span><strong id="time-months">0</strong><span aria-hidden="true">m</span><span class="sr-only"> meses</span></span>
-                <span><strong id="time-days">0</strong><span aria-hidden="true">d</span><span class="sr-only"> dias</span></span>
-                <span><strong id="time-hours">0</strong><span aria-hidden="true">h</span><span class="sr-only"> horas</span></span>
-                <span><strong id="time-minutes">0</strong><span aria-hidden="true">min</span><span class="sr-only"> minutos</span></span>
+            <div class="user-logged-profile hidden" id="user-logged-profile">
+              <img class="user-avatar" id="user-avatar-img" src="" alt="Avatar do usuário" />
+              <div class="user-info-text">
+                <span class="user-display-name" id="user-display-name">Usuário</span>
+                <span class="user-cloud-badge" id="user-cloud-badge"></span>
               </div>
-              <span class="stat-subtext" id="stat-minutes-subtext">0 minutos assistidos</span>
+              <button
+                type="button"
+                class="btn-icon-tiny"
+                id="btn-open-account"
+                data-action="open-account"
+                aria-haspopup="dialog"
+                title="Minha conta"
+                aria-label="Minha conta"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                  />
+                </svg>
+              </button>
+              <button type="button" class="btn-icon-tiny" id="btn-logout" title="Sair da Conta" aria-label="Sair da conta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTEÚDO PRINCIPAL (TABS) -->
+      <main class="app-main" id="main-content" tabindex="-1">
+        <h1 class="sr-only">ShowVault: rastreador de séries, filmes e animes</h1>
+
+        <!-- ================= ABA 1: A SEGUIR (NEXT UP) ================= -->
+        <section class="tab-content active" id="view-next-up" role="tabpanel" aria-labelledby="tab-btn-next-up">
+          <div class="section-hero">
+            <div class="hero-text">
+              <h2>Prontos para Assistir</h2>
+              <p>Seus próximos episódios e filmes na fila. Marque com 1 clique ou adicione sua anotação no diário.</p>
+            </div>
+            <div class="hero-actions">
+              <span class="hero-pill" id="next-up-counter-pill">Carregando fila...</span>
             </div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon stat-icon--yellow">
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-            </div>
-            <span class="stat-number" id="stat-episodes-count">0</span>
-            <span class="stat-label">Obras & Episódios</span>
+          <div class="type-filter-row" role="group" aria-label="Filtrar a fila por tipo">
+            <button type="button" class="type-pill-btn active" data-type="all" aria-pressed="true">Todos</button>
+            <button type="button" class="type-pill-btn" data-type="tv" aria-pressed="false">Séries</button>
+            <button type="button" class="type-pill-btn" data-type="anime" aria-pressed="false">Animes</button>
+            <button type="button" class="type-pill-btn" data-type="movie" aria-pressed="false">Filmes na Lista</button>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon stat-icon--green">
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <span class="stat-number" id="stat-shows-completed">0</span>
-            <span class="stat-label">Finalizadas</span>
-          </div>
+          <div class="next-up-grid" id="next-up-container"></div>
 
-          <div class="stat-card">
-            <div class="stat-icon stat-icon--cyan">
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            </div>
-            <span class="stat-number" id="stat-notes-count">0</span>
-            <span class="stat-label">Anotações Salvas</span>
-          </div>
-        </div>
-
-        <div class="stats-panels">
-          <div class="stat-panel">
-            <h3>Distribuição de Reações</h3>
-            <p>Como as obras fizeram você se sentir</p>
-            <div id="stats-emotions-chart"></div>
-          </div>
-
-          <div class="stat-panel">
-            <h3>Suas notas</h3>
-            <p id="stats-rating-summary">Média das notas que você deu (0 a 10)</p>
-            <div id="stats-rating-chart"></div>
-            <h4 class="stat-subtitle">Obras mais bem avaliadas</h4>
-            <div id="stats-rating-top"></div>
-          </div>
-
-          <div class="stat-panel">
-            <h3>Top Gêneros</h3>
-            <p>Categorias mais frequentes</p>
-            <div id="stats-genres-list"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= ABA 5: EXPLORAR ================= -->
-      <section class="tab-content" id="view-explore" role="tabpanel" aria-labelledby="tab-btn-explore">
-        <div class="explore-hero">
-          <h2 class="explore-title">Explorar</h2>
-          <p class="explore-sub">Pesquise séries, filmes e animes e adicione à sua lista.</p>
-
-          <div class="search-bar" role="search">
-            <input type="text" id="explore-search-input" aria-label="Buscar título" placeholder="Busque qualquer título (ex: Attack on Titan, Oppenheimer, Breaking Bad)...">
-            <button type="button" class="btn btn-primary" id="btn-search-shows">Pesquisar</button>
-          </div>
-        </div>
-
-        <div class="type-filter-row center" role="group" aria-label="Filtrar a busca por tipo">
-          <button type="button" class="type-pill-btn active" data-explore-type="all" aria-pressed="true">Todos</button>
-          <button type="button" class="type-pill-btn" data-explore-type="tv" aria-pressed="false">Séries</button>
-          <button type="button" class="type-pill-btn" data-explore-type="anime" aria-pressed="false">Animes</button>
-          <button type="button" class="type-pill-btn" data-explore-type="movie" aria-pressed="false">Filmes</button>
-        </div>
-
-        <div class="section-title-wrap">
-          <h3 class="section-title" id="explore-results-title" aria-live="polite">Catálogo</h3>
-        </div>
-
-        <div class="shows-grid" id="explore-container"></div>
-      </section>
-    </main>
-
-    <!-- ================= MODAL: ENTRAR / CADASTRAR ================= -->
-    <div class="tvtime-auth-overlay hidden" id="tvtime-auth-modal">
-      <div class="tvtime-auth-card" role="dialog" aria-modal="true" aria-labelledby="tvtime-auth-title">
-        <div class="tvtime-auth-backdrop" aria-hidden="true"></div>
-        <button type="button" class="tvtime-auth-close" id="btn-close-tvtime-auth" aria-label="Fechar janela de entrada" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
-
-        <div class="tvtime-auth-content">
-          <div class="tvtime-auth-header">
-            <div class="tvtime-badge-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+          <div class="empty-state hidden" id="next-up-empty">
+            <div class="empty-icon empty-icon--success">
+              <svg
+                viewBox="0 0 24 24"
+                width="48"
+                height="48"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
             </div>
-            <h2 id="tvtime-auth-title">Bem-vindo ao <span>ShowVault</span></h2>
-            <p>Acompanhe seus episódios e guarde suas anotações. Com uma conta, sua lista fica salva e sincronizada entre aparelhos.</p>
+            <h3 class="empty-title">Você está em dia com tudo!</h3>
+            <p class="empty-text">Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.</p>
+            <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
+          </div>
+        </section>
+
+        <!-- ================= ABA 2: MINHA LISTA (WATCHLIST) ================= -->
+        <section class="tab-content" id="view-watchlist" role="tabpanel" aria-labelledby="tab-btn-watchlist">
+          <div class="section-header-row">
+            <div>
+              <h2>Minha Lista</h2>
+              <p>Seu cofre pessoal de séries, filmes e animes com progresso detalhado.</p>
+            </div>
+
+            <div class="filter-pills" id="watchlist-filters" role="group" aria-label="Filtrar a lista por status">
+              <button type="button" class="pill-btn active" data-filter="all" aria-pressed="true">
+                Todos (<span id="count-all">0</span>)
+              </button>
+              <button type="button" class="pill-btn" data-filter="watching" aria-pressed="false">
+                Em Andamento (<span id="count-watching">0</span>)
+              </button>
+              <button type="button" class="pill-btn" data-filter="completed" aria-pressed="false">
+                Finalizados (<span id="count-completed">0</span>)
+              </button>
+              <button type="button" class="pill-btn" data-filter="plan_to_watch" aria-pressed="false">
+                Quero Ver (<span id="count-plan">0</span>)
+              </button>
+            </div>
           </div>
 
-          <!-- Login com Google: só aparece se o servidor tiver GOOGLE_CLIENT_ID (o authView.js mostra e carrega o botão oficial) -->
-          <div id="google-signin-section" class="hidden">
-            <div id="google-signin-button" class="google-signin-slot"></div>
-            <div class="tvtime-divider">
-              <span>ou com e-mail</span>
+          <div class="type-filter-row" role="group" aria-label="Filtrar a lista por tipo">
+            <button type="button" class="type-pill-btn active" data-cat="all" aria-pressed="true">Todos</button>
+            <button type="button" class="type-pill-btn" data-cat="tv" aria-pressed="false">Séries</button>
+            <button type="button" class="type-pill-btn" data-cat="anime" aria-pressed="false">Animes</button>
+            <button type="button" class="type-pill-btn" data-cat="movie" aria-pressed="false">Filmes</button>
+          </div>
+
+          <div class="example-bar hidden" id="watchlist-example-bar">
+            <p class="example-bar-text" id="watchlist-example-text"></p>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline"
+              id="btn-remove-example"
+              data-action="remove-example"
+              aria-describedby="watchlist-example-text"
+            >
+              Remover exemplo
+            </button>
+          </div>
+
+          <div class="shows-grid" id="watchlist-container"></div>
+
+          <div class="empty-state hidden" id="watchlist-empty">
+            <div class="empty-icon empty-icon--muted">
+              <svg
+                viewBox="0 0 24 24"
+                width="48"
+                height="48"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
+                <polyline points="17 2 12 7 7 2" />
+              </svg>
+            </div>
+            <h3 class="empty-title" id="watchlist-empty-title">Sua lista está vazia</h3>
+            <p class="empty-text" id="watchlist-empty-text">
+              Explore o catálogo e adicione títulos para registrar seu progresso e suas notas. Quer só ver como funciona? Carregue alguns
+              títulos de exemplo.
+            </p>
+            <div class="empty-actions">
+              <button type="button" class="btn btn-primary" data-action="goto-tab" data-goto="explore">Explorar</button>
+              <button
+                type="button"
+                class="btn btn-outline"
+                id="btn-watchlist-example"
+                data-focus-key="empty:example"
+                data-action="load-example"
+              >
+                Carregar exemplo
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ABA: AGENDA (S15) ================= -->
+        <section class="tab-content" id="view-calendar" role="tabpanel" aria-labelledby="tab-btn-calendar">
+          <div class="section-hero">
+            <div class="hero-text">
+              <h2>Agenda de Lançamentos</h2>
+              <p>Os episódios das obras da sua lista por dia de exibição. Marque como assistido direto daqui.</p>
+            </div>
+            <div class="hero-actions">
+              <span class="hero-pill" id="calendar-counter-pill">Carregando agenda...</span>
             </div>
           </div>
 
-          <div class="tvtime-auth-tabs" id="tvtime-auth-tabs" role="tablist" aria-label="Entrar ou cadastrar">
-            <button type="button" class="tvtime-tab-btn active" id="tvtime-tab-login" role="tab" aria-selected="true" aria-controls="tvtime-auth-form">Entrar</button>
-            <button type="button" class="tvtime-tab-btn" id="tvtime-tab-register" role="tab" aria-selected="false" tabindex="-1" aria-controls="tvtime-auth-form">Cadastrar</button>
+          <div class="type-filter-row" role="group" aria-label="Período da agenda">
+            <button type="button" class="type-pill-btn active" data-range="week" aria-pressed="true">Semana</button>
+            <button type="button" class="type-pill-btn" data-range="next7" aria-pressed="false">7 dias</button>
+            <button type="button" class="type-pill-btn" data-range="next30" aria-pressed="false">30 dias</button>
           </div>
 
-          <form class="tvtime-form" id="tvtime-auth-form" novalidate>
-            <div class="tvtime-field hidden" id="tvtime-name-field">
-              <label for="input-tvtime-name">Seu Nome / Apelido</label>
-              <input type="text" id="input-tvtime-name" placeholder="Ex: Gabriel" maxlength="60" autocomplete="nickname">
+          <p class="calendar-notice hidden" id="calendar-notice" role="status"></p>
+
+          <div class="calendar-days" id="calendar-container"></div>
+
+          <div class="empty-state hidden" id="calendar-empty"></div>
+        </section>
+
+        <!-- ================= ABA 3: MEU DIÁRIO (DIARY) ================= -->
+        <section class="tab-content" id="view-diary" role="tabpanel" aria-labelledby="tab-btn-diary">
+          <div class="section-header-row">
+            <div>
+              <h2>Meu Diário de Episódios & Filmes</h2>
+              <p>
+                Todas as suas anotações, reações e personagens destaque, guardados neste aparelho (e na sua conta, se você estiver
+                conectado).
+              </p>
             </div>
 
-            <div class="tvtime-field">
-              <label for="input-tvtime-email">E-mail</label>
-              <input type="email" id="input-tvtime-email" placeholder="seu@email.com" maxlength="254" autocomplete="email" required>
+            <div class="header-controls">
+              <input
+                type="text"
+                id="diary-search-input"
+                class="input-field"
+                placeholder="Buscar anotação ou personagem..."
+                aria-label="Buscar nas anotações do diário"
+              />
+              <button type="button" class="btn btn-secondary" id="btn-export-notes-md">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Exportar (.md)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="type-filter-row type-filter-row--scroll" id="emotion-filters" role="group" aria-label="Filtrar anotações por reação">
+            <button type="button" class="emotion-filter-btn type-pill-btn active" data-emotion="all" aria-pressed="true">
+              Todas as Reações
+            </button>
+            <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="awesome" aria-pressed="false">😍 Adorei</button>
+            <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="fun" aria-pressed="false">😂 Divertido</button>
+            <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="mindblown" aria-pressed="false">😱 Chocado</button>
+            <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="sad" aria-pressed="false">😢 Triste</button>
+            <button type="button" class="emotion-filter-btn type-pill-btn" data-emotion="disappointed" aria-pressed="false">
+              😡 Decepcionado
+            </button>
+          </div>
+
+          <div id="diary-container"></div>
+
+          <div class="empty-state hidden" id="diary-empty">
+            <div class="empty-icon empty-icon--muted">
+              <svg
+                viewBox="0 0 24 24"
+                width="48"
+                height="48"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </div>
+            <h3 class="empty-title">Nenhuma anotação registrada ainda</h3>
+            <p class="empty-text">
+              Abra um episódio ou filme e clique em "Anotar": o que você escrever aparece aqui, com negrito, itálico, citação e spoiler.
+            </p>
+          </div>
+        </section>
+
+        <!-- ================= ABA 4: ESTATÍSTICAS ================= -->
+        <section class="tab-content" id="view-stats" role="tabpanel" aria-labelledby="tab-btn-stats">
+          <div class="section-header-row">
+            <div>
+              <h2>Seu Tempo de Vida em Telas</h2>
+              <p>
+                Estimativa a partir da duração das obras que você assistiu. Quando a fonte não informa a duração, contamos 45 min por
+                episódio e 120 min por filme.
+              </p>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card stat-card--hero">
+              <div class="stat-hero-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="32"
+                  height="32"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <div class="stat-hero-body">
+                <span class="stat-kicker">TEMPO TOTAL GASTO</span>
+                <div class="stat-time">
+                  <span><strong id="time-months">0</strong><span aria-hidden="true">m</span><span class="sr-only"> meses</span></span>
+                  <span><strong id="time-days">0</strong><span aria-hidden="true">d</span><span class="sr-only"> dias</span></span>
+                  <span><strong id="time-hours">0</strong><span aria-hidden="true">h</span><span class="sr-only"> horas</span></span>
+                  <span><strong id="time-minutes">0</strong><span aria-hidden="true">min</span><span class="sr-only"> minutos</span></span>
+                </div>
+                <span class="stat-subtext" id="stat-minutes-subtext">0 minutos assistidos</span>
+              </div>
             </div>
 
-            <div class="tvtime-field">
-              <label for="input-tvtime-password">Senha</label>
-              <input type="password" id="input-tvtime-password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
-              <small id="tvtime-password-hint" class="hidden auth-field-hint">Use de 8 a 128 caracteres.</small>
-              <button type="button" class="auth-switch-link auth-forgot-link" id="btn-forgot-password" data-action="forgot-password" aria-controls="tvtime-forgot-note">Perdi a senha</button>
-              <p id="tvtime-forgot-note" class="hidden auth-field-hint" role="status">Em breve: recuperação por e-mail.</p>
+            <div class="stat-card">
+              <div class="stat-icon stat-icon--yellow">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
+                  <line x1="7" y1="2" x2="7" y2="22" />
+                  <line x1="17" y1="2" x2="17" y2="22" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <line x1="2" y1="7" x2="7" y2="7" />
+                  <line x1="2" y1="17" x2="7" y2="17" />
+                  <line x1="17" y1="17" x2="22" y2="17" />
+                  <line x1="17" y1="7" x2="22" y2="7" />
+                </svg>
+              </div>
+              <span class="stat-number" id="stat-episodes-count">0</span>
+              <span class="stat-label">Obras & Episódios</span>
             </div>
 
-            <!-- Só aparece no cadastro e só se o servidor exigir convite (/api/auth/config -> inviteRequired) -->
-            <div class="tvtime-field hidden" id="tvtime-invite-field">
-              <label for="input-tvtime-invite">Código de convite</label>
-              <input type="text" id="input-tvtime-invite" maxlength="128" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="tvtime-invite-hint">
-              <small id="tvtime-invite-hint" class="auth-field-hint">Este cofre é só para convidados. Use o código que você recebeu.</small>
+            <div class="stat-card">
+              <div class="stat-icon stat-icon--green">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <span class="stat-number" id="stat-shows-completed">0</span>
+              <span class="stat-label">Finalizadas</span>
             </div>
 
-            <p id="tvtime-auth-error" class="hidden auth-form-error" role="alert"></p>
+            <div class="stat-card">
+              <div class="stat-icon stat-icon--cyan">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+              </div>
+              <span class="stat-number" id="stat-notes-count">0</span>
+              <span class="stat-label">Anotações Salvas</span>
+            </div>
+          </div>
 
-            <button type="submit" class="btn-tvtime-submit" id="btn-tvtime-auth-submit">Entrar na Conta</button>
-          </form>
+          <div class="stats-panels">
+            <div class="stat-panel">
+              <h3>Distribuição de Reações</h3>
+              <p>Como as obras fizeram você se sentir</p>
+              <div id="stats-emotions-chart"></div>
+            </div>
 
-          <div class="tvtime-auth-footer">
-            <span id="tvtime-switch-link">Não tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">Cadastre-se grátis</button></span>
+            <div class="stat-panel">
+              <h3>Suas notas</h3>
+              <p id="stats-rating-summary">Média das notas que você deu (0 a 10)</p>
+              <div id="stats-rating-chart"></div>
+              <h4 class="stat-subtitle">Obras mais bem avaliadas</h4>
+              <div id="stats-rating-top"></div>
+            </div>
+
+            <div class="stat-panel">
+              <h3>Top Gêneros</h3>
+              <p>Categorias mais frequentes</p>
+              <div id="stats-genres-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ABA 5: EXPLORAR ================= -->
+        <section class="tab-content" id="view-explore" role="tabpanel" aria-labelledby="tab-btn-explore">
+          <div class="explore-hero">
+            <h2 class="explore-title">Explorar</h2>
+            <p class="explore-sub">Pesquise séries, filmes e animes e adicione à sua lista.</p>
+
+            <div class="search-bar" role="search">
+              <input
+                type="text"
+                id="explore-search-input"
+                aria-label="Buscar título"
+                placeholder="Busque qualquer título (ex: Attack on Titan, Oppenheimer, Breaking Bad)..."
+              />
+              <button type="button" class="btn btn-primary" id="btn-search-shows">Pesquisar</button>
+            </div>
+          </div>
+
+          <div class="type-filter-row center" role="group" aria-label="Filtrar a busca por tipo">
+            <button type="button" class="type-pill-btn active" data-explore-type="all" aria-pressed="true">Todos</button>
+            <button type="button" class="type-pill-btn" data-explore-type="tv" aria-pressed="false">Séries</button>
+            <button type="button" class="type-pill-btn" data-explore-type="anime" aria-pressed="false">Animes</button>
+            <button type="button" class="type-pill-btn" data-explore-type="movie" aria-pressed="false">Filmes</button>
+          </div>
+
+          <div class="section-title-wrap">
+            <h3 class="section-title" id="explore-results-title" aria-live="polite">Catálogo</h3>
+          </div>
+
+          <div class="shows-grid" id="explore-container"></div>
+        </section>
+      </main>
+
+      <!-- ================= MODAL: ENTRAR / CADASTRAR ================= -->
+      <div class="tvtime-auth-overlay hidden" id="tvtime-auth-modal">
+        <div class="tvtime-auth-card" role="dialog" aria-modal="true" aria-labelledby="tvtime-auth-title">
+          <div class="tvtime-auth-backdrop" aria-hidden="true"></div>
+          <button
+            type="button"
+            class="tvtime-auth-close"
+            id="btn-close-tvtime-auth"
+            aria-label="Fechar janela de entrada"
+            title="Fechar (Esc)"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+
+          <div class="tvtime-auth-content">
+            <div class="tvtime-auth-header">
+              <div class="tvtime-badge-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+                </svg>
+              </div>
+              <h2 id="tvtime-auth-title">Bem-vindo ao <span>ShowVault</span></h2>
+              <p>Acompanhe seus episódios e guarde suas anotações. Com uma conta, sua lista fica salva e sincronizada entre aparelhos.</p>
+            </div>
+
+            <!-- Login com Google: só aparece se o servidor tiver GOOGLE_CLIENT_ID (o authView.js mostra e carrega o botão oficial) -->
+            <div id="google-signin-section" class="hidden">
+              <div id="google-signin-button" class="google-signin-slot"></div>
+              <div class="tvtime-divider">
+                <span>ou com e-mail</span>
+              </div>
+            </div>
+
+            <div class="tvtime-auth-tabs" id="tvtime-auth-tabs" role="tablist" aria-label="Entrar ou cadastrar">
+              <button
+                type="button"
+                class="tvtime-tab-btn active"
+                id="tvtime-tab-login"
+                role="tab"
+                aria-selected="true"
+                aria-controls="tvtime-auth-form"
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                class="tvtime-tab-btn"
+                id="tvtime-tab-register"
+                role="tab"
+                aria-selected="false"
+                tabindex="-1"
+                aria-controls="tvtime-auth-form"
+              >
+                Cadastrar
+              </button>
+            </div>
+
+            <form class="tvtime-form" id="tvtime-auth-form" novalidate>
+              <div class="tvtime-field hidden" id="tvtime-name-field">
+                <label for="input-tvtime-name">Seu Nome / Apelido</label>
+                <input type="text" id="input-tvtime-name" placeholder="Ex: Gabriel" maxlength="60" autocomplete="nickname" />
+              </div>
+
+              <div class="tvtime-field">
+                <label for="input-tvtime-email">E-mail</label>
+                <input type="email" id="input-tvtime-email" placeholder="seu@email.com" maxlength="254" autocomplete="email" required />
+              </div>
+
+              <div class="tvtime-field">
+                <label for="input-tvtime-password">Senha</label>
+                <input
+                  type="password"
+                  id="input-tvtime-password"
+                  placeholder="••••••••"
+                  maxlength="128"
+                  autocomplete="current-password"
+                  required
+                />
+                <small id="tvtime-password-hint" class="hidden auth-field-hint">Use de 8 a 128 caracteres.</small>
+                <button
+                  type="button"
+                  class="auth-switch-link auth-forgot-link"
+                  id="btn-forgot-password"
+                  data-action="forgot-password"
+                  aria-controls="tvtime-forgot-note"
+                >
+                  Perdi a senha
+                </button>
+                <p id="tvtime-forgot-note" class="hidden auth-field-hint" role="status">Em breve: recuperação por e-mail.</p>
+              </div>
+
+              <!-- Só aparece no cadastro e só se o servidor exigir convite (/api/auth/config -> inviteRequired) -->
+              <div class="tvtime-field hidden" id="tvtime-invite-field">
+                <label for="input-tvtime-invite">Código de convite</label>
+                <input
+                  type="text"
+                  id="input-tvtime-invite"
+                  maxlength="128"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  aria-describedby="tvtime-invite-hint"
+                />
+                <small id="tvtime-invite-hint" class="auth-field-hint"
+                  >Este cofre é só para convidados. Use o código que você recebeu.</small
+                >
+              </div>
+
+              <p id="tvtime-auth-error" class="hidden auth-form-error" role="alert"></p>
+
+              <button type="submit" class="btn-tvtime-submit" id="btn-tvtime-auth-submit">Entrar na Conta</button>
+            </form>
+
+            <div class="tvtime-auth-footer">
+              <span id="tvtime-switch-link"
+                >Não tem conta?
+                <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">
+                  Cadastre-se grátis
+                </button></span
+              >
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ================= MODAL: MINHA CONTA (S14) ================= -->
-    <div class="tvtime-auth-overlay hidden" id="modal-account">
-      <div class="tvtime-auth-card" role="dialog" aria-modal="true" aria-labelledby="account-title">
-        <div class="tvtime-auth-backdrop" aria-hidden="true"></div>
-        <button type="button" class="tvtime-auth-close" id="btn-close-account" aria-label="Fechar Minha conta" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
+      <!-- ================= MODAL: MINHA CONTA (S14) ================= -->
+      <div class="tvtime-auth-overlay hidden" id="modal-account">
+        <div class="tvtime-auth-card" role="dialog" aria-modal="true" aria-labelledby="account-title">
+          <div class="tvtime-auth-backdrop" aria-hidden="true"></div>
+          <button type="button" class="tvtime-auth-close" id="btn-close-account" aria-label="Fechar Minha conta" title="Fechar (Esc)">
+            <span aria-hidden="true">&times;</span>
+          </button>
 
-        <div class="tvtime-auth-content">
-          <div class="tvtime-auth-header">
-            <h2 id="account-title">Minha <span>conta</span></h2>
-          </div>
-
-          <section class="account-section" aria-labelledby="account-profile-title">
-            <h3 class="account-section-title" id="account-profile-title">Perfil</h3>
-            <div class="account-profile">
-              <img class="user-avatar" id="account-avatar" src="" alt="">
-              <dl class="account-data">
-                <dt>Nome</dt><dd id="account-name"></dd>
-                <dt>E-mail</dt><dd id="account-email"></dd>
-                <dt>Entrada</dt><dd id="account-provider"></dd>
-                <dt>Conta criada em</dt><dd id="account-created"></dd>
-              </dl>
+          <div class="tvtime-auth-content">
+            <div class="tvtime-auth-header">
+              <h2 id="account-title">Minha <span>conta</span></h2>
             </div>
-          </section>
 
-          <section class="account-section" id="account-password-section" aria-labelledby="account-password-title">
-            <h3 class="account-section-title" id="account-password-title">Trocar senha</h3>
-            <form class="tvtime-form" id="account-password-form" novalidate>
-              <div class="tvtime-field">
-                <label for="account-current-password">Senha atual</label>
-                <input type="password" id="account-current-password" maxlength="128" autocomplete="current-password" required>
+            <section class="account-section" aria-labelledby="account-profile-title">
+              <h3 class="account-section-title" id="account-profile-title">Perfil</h3>
+              <div class="account-profile">
+                <img class="user-avatar" id="account-avatar" src="" alt="" />
+                <dl class="account-data">
+                  <dt>Nome</dt>
+                  <dd id="account-name"></dd>
+                  <dt>E-mail</dt>
+                  <dd id="account-email"></dd>
+                  <dt>Entrada</dt>
+                  <dd id="account-provider"></dd>
+                  <dt>Conta criada em</dt>
+                  <dd id="account-created"></dd>
+                </dl>
               </div>
-              <div class="tvtime-field">
-                <label for="account-new-password">Nova senha</label>
-                <input type="password" id="account-new-password" maxlength="128" autocomplete="new-password" aria-describedby="account-new-password-hint" required>
-                <small id="account-new-password-hint" class="auth-field-hint">Use de 8 a 128 caracteres.</small>
-              </div>
-              <div class="tvtime-field">
-                <label for="account-confirm-password">Repita a nova senha</label>
-                <input type="password" id="account-confirm-password" maxlength="128" autocomplete="new-password" required>
-              </div>
-              <p id="account-password-msg" class="hidden auth-form-error" role="alert"></p>
-              <button type="submit" class="btn-tvtime-submit" id="btn-account-password">Trocar senha</button>
-            </form>
-          </section>
+            </section>
 
-          <section class="account-section" aria-labelledby="account-sessions-title">
-            <h3 class="account-section-title" id="account-sessions-title">Sessões</h3>
-            <p class="auth-field-hint">Encerra o login neste e em todos os outros aparelhos. Para voltar, é preciso entrar de novo.</p>
-            <button type="button" class="btn-account-secondary" id="btn-logout-all" data-action="logout-all">Sair de todos os aparelhos</button>
-            <p id="account-sessions-msg" class="hidden auth-form-error" role="alert"></p>
-          </section>
+            <section class="account-section" id="account-password-section" aria-labelledby="account-password-title">
+              <h3 class="account-section-title" id="account-password-title">Trocar senha</h3>
+              <form class="tvtime-form" id="account-password-form" novalidate>
+                <div class="tvtime-field">
+                  <label for="account-current-password">Senha atual</label>
+                  <input type="password" id="account-current-password" maxlength="128" autocomplete="current-password" required />
+                </div>
+                <div class="tvtime-field">
+                  <label for="account-new-password">Nova senha</label>
+                  <input
+                    type="password"
+                    id="account-new-password"
+                    maxlength="128"
+                    autocomplete="new-password"
+                    aria-describedby="account-new-password-hint"
+                    required
+                  />
+                  <small id="account-new-password-hint" class="auth-field-hint">Use de 8 a 128 caracteres.</small>
+                </div>
+                <div class="tvtime-field">
+                  <label for="account-confirm-password">Repita a nova senha</label>
+                  <input type="password" id="account-confirm-password" maxlength="128" autocomplete="new-password" required />
+                </div>
+                <p id="account-password-msg" class="hidden auth-form-error" role="alert"></p>
+                <button type="submit" class="btn-tvtime-submit" id="btn-account-password">Trocar senha</button>
+              </form>
+            </section>
 
-          <section class="account-section account-danger" aria-labelledby="account-delete-title">
-            <h3 class="account-section-title" id="account-delete-title">Excluir conta</h3>
-            <p class="auth-field-hint">Apaga a conta e toda a sua biblioteca, de forma definitiva. Não dá para desfazer.</p>
-            <form class="tvtime-form" id="account-delete-form" novalidate>
-              <div class="tvtime-field" id="account-delete-password-field">
-                <label for="account-delete-password">Digite sua senha para confirmar</label>
-                <input type="password" id="account-delete-password" maxlength="128" autocomplete="current-password" required>
-              </div>
-              <p id="account-delete-google-note" class="hidden auth-field-hint">Contas entradas pelo Google precisam ser confirmadas pelo Google, o que ainda não está disponível nesta tela.</p>
-              <p id="account-delete-msg" class="hidden auth-form-error" role="alert"></p>
-              <button type="submit" class="btn-account-danger" id="btn-account-delete">Excluir minha conta</button>
-            </form>
-          </section>
+            <section class="account-section" aria-labelledby="account-sessions-title">
+              <h3 class="account-section-title" id="account-sessions-title">Sessões</h3>
+              <p class="auth-field-hint">Encerra o login neste e em todos os outros aparelhos. Para voltar, é preciso entrar de novo.</p>
+              <button type="button" class="btn-account-secondary" id="btn-logout-all" data-action="logout-all">
+                Sair de todos os aparelhos
+              </button>
+              <p id="account-sessions-msg" class="hidden auth-form-error" role="alert"></p>
+            </section>
+
+            <section class="account-section account-danger" aria-labelledby="account-delete-title">
+              <h3 class="account-section-title" id="account-delete-title">Excluir conta</h3>
+              <p class="auth-field-hint">Apaga a conta e toda a sua biblioteca, de forma definitiva. Não dá para desfazer.</p>
+              <form class="tvtime-form" id="account-delete-form" novalidate>
+                <div class="tvtime-field" id="account-delete-password-field">
+                  <label for="account-delete-password">Digite sua senha para confirmar</label>
+                  <input type="password" id="account-delete-password" maxlength="128" autocomplete="current-password" required />
+                </div>
+                <p id="account-delete-google-note" class="hidden auth-field-hint">
+                  Contas entradas pelo Google precisam ser confirmadas pelo Google, o que ainda não está disponível nesta tela.
+                </p>
+                <p id="account-delete-msg" class="hidden auth-form-error" role="alert"></p>
+                <button type="submit" class="btn-account-danger" id="btn-account-delete">Excluir minha conta</button>
+              </form>
+            </section>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ================= MODAL: DETALHES DA OBRA & TEMPORADAS ================= -->
-    <div class="modal-overlay hidden" id="modal-show-detail">
-      <div class="modal-container modal-container--split modal-container--detail" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
-        <button type="button" class="modal-close-btn" id="btn-close-show-modal" aria-label="Fechar detalhes da obra" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
+      <!-- ================= MODAL: DETALHES DA OBRA & TEMPORADAS ================= -->
+      <div class="modal-overlay hidden" id="modal-show-detail">
+        <div
+          class="modal-container modal-container--split modal-container--detail"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="detail-modal-title"
+        >
+          <button type="button" class="modal-close-btn" id="btn-close-show-modal" aria-label="Fechar detalhes da obra" title="Fechar (Esc)">
+            <span aria-hidden="true">&times;</span>
+          </button>
 
-        <div class="modal-scroll">
-          <div id="show-modal-header" class="show-modal-header"></div>
+          <div class="modal-scroll">
+            <div id="show-modal-header" class="show-modal-header"></div>
 
-          <div class="modal-body">
-            <div id="movie-detail-body" class="hidden"></div>
+            <div class="modal-body">
+              <div id="movie-detail-body" class="hidden"></div>
 
-            <div id="series-detail-body">
-              <div id="show-seasons-tabs" class="season-tabs" role="tablist" aria-label="Temporadas"></div>
+              <div id="series-detail-body">
+                <div id="show-seasons-tabs" class="season-tabs" role="tablist" aria-label="Temporadas"></div>
 
-              <div class="season-summary-bar">
-                <div id="season-stats-summary" class="season-summary">Progresso: <strong>0/0</strong></div>
-                <div class="season-batch-actions">
-                  <button type="button" class="btn btn-sm btn-outline" id="btn-batch-check-season"><span aria-hidden="true">✓</span> Marcar Temporada Inteira</button>
-                  <button type="button" class="btn btn-sm btn-ghost" id="btn-batch-uncheck-season">Desmarcar Temporada</button>
+                <div class="season-summary-bar">
+                  <div id="season-stats-summary" class="season-summary">Progresso: <strong>0/0</strong></div>
+                  <div class="season-batch-actions">
+                    <button type="button" class="btn btn-sm btn-outline" id="btn-batch-check-season">
+                      <span aria-hidden="true">✓</span> Marcar Temporada Inteira
+                    </button>
+                    <button type="button" class="btn btn-sm btn-ghost" id="btn-batch-uncheck-season">Desmarcar Temporada</button>
+                  </div>
+                </div>
+
+                <div id="show-episodes-container" role="tabpanel"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= MODAL: DIÁRIO DE EPISÓDIO BLINDADO ================= -->
+      <div class="modal-overlay hidden" id="modal-episode-note">
+        <div
+          class="modal-container modal-container--split modal-container--note"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="note-ep-title"
+        >
+          <button type="button" class="modal-close-btn" id="btn-close-note-modal" aria-label="Fechar anotação" title="Fechar (Esc)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+
+          <div class="note-header">
+            <div>
+              <span class="note-badge" id="note-ep-code">S01E01</span>
+              <h3 class="note-title" id="note-ep-title">Nome do Episódio</h3>
+              <span class="note-show-title" id="note-show-title">Nome da Obra</span>
+            </div>
+
+            <div class="note-save-status" id="note-save-status">
+              <span class="save-dot"></span>
+              <span class="save-text">Salvo neste aparelho</span>
+            </div>
+          </div>
+
+          <div class="modal-scroll">
+            <div class="note-body">
+              <div class="note-watched-row">
+                <label>
+                  <input type="checkbox" id="note-watched-toggle" />
+                  <span>Marcar como Assistido</span>
+                </label>
+              </div>
+
+              <!-- Seletor de emoções (rótulos e ícones: tabela única em js/utils/emotions.js; tests/emotions.test.js confere este HTML) -->
+              <div>
+                <span class="note-label" id="note-emotion-label">Sua reação:</span>
+                <div class="emotion-grid" id="note-emotion-selector" role="group" aria-labelledby="note-emotion-label">
+                  <button type="button" class="emotion-btn" data-emotion="awesome" aria-pressed="false">
+                    <span class="emotion-emoji" aria-hidden="true">😍</span><span class="emotion-label">Adorei</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emotion="fun" aria-pressed="false">
+                    <span class="emotion-emoji" aria-hidden="true">😂</span><span class="emotion-label">Divertido</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emotion="mindblown" aria-pressed="false">
+                    <span class="emotion-emoji" aria-hidden="true">😱</span><span class="emotion-label">Chocado</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emotion="sad" aria-pressed="false">
+                    <span class="emotion-emoji" aria-hidden="true">😢</span><span class="emotion-label">Triste</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emotion="disappointed" aria-pressed="false">
+                    <span class="emotion-emoji" aria-hidden="true">😡</span><span class="emotion-label">Decepcionado</span>
+                  </button>
                 </div>
               </div>
 
-              <div id="show-episodes-container" role="tabpanel"></div>
+              <div>
+                <label class="note-label" for="note-character-input">Personagem ou Destaque:</label>
+                <input type="text" id="note-character-input" class="input-field" placeholder="Ex: Eren Yeager, Walter White, Richie..." />
+              </div>
+
+              <!-- Editor com salvamento automático. Markdown simples (S08): **negrito**, *itálico*, > citação, >!spoiler!< -->
+              <div class="note-editor">
+                <div class="note-toolbar">
+                  <span class="note-toolbar-title">Sua anotação (salva sozinha):</span>
+                  <div class="note-toolbar-tools">
+                    <button type="button" class="tool-btn" data-insert="**" aria-label="Negrito"><strong>B</strong></button>
+                    <button type="button" class="tool-btn" data-insert="*" aria-label="Itálico"><em>I</em></button>
+                    <button type="button" class="tool-btn" data-insert="> " aria-label="Citação">❝</button>
+                    <button type="button" class="tool-btn" data-insert=">!spoiler!<" aria-label="Spoiler (escondido até clicar)">
+                      Spoiler
+                    </button>
+                    <button
+                      type="button"
+                      class="tool-btn tool-btn--history hidden"
+                      id="btn-note-history"
+                      aria-expanded="false"
+                      aria-controls="note-history-panel"
+                      aria-label="Histórico de versões desta anotação"
+                    >
+                      Histórico
+                    </button>
+                  </div>
+                </div>
+
+                <textarea
+                  id="note-textarea"
+                  class="note-textarea"
+                  rows="7"
+                  placeholder="Escreva o que achou... O texto é salvo sozinho neste aparelho enquanto você digita."
+                ></textarea>
+
+                <div class="note-counters">
+                  <span id="note-word-count">0 palavras · 0 caracteres</span>
+                  <span id="note-last-saved">Nunca editado</span>
+                </div>
+
+                <!-- Histórico de versões: até 5 textos anteriores; "Restaurar" troca o texto e guarda o atual como nova versão -->
+                <div class="note-history hidden" id="note-history-panel" role="region" aria-label="Versões anteriores da anotação">
+                  <div class="note-history-head">
+                    <strong>Versões anteriores</strong>
+                    <span>Ao restaurar, o texto atual fica guardado no histórico.</span>
+                  </div>
+                  <ul class="note-history-list" id="note-history-list"></ul>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div class="note-footer">
+            <button class="btn btn-primary" id="btn-save-note-modal">Concluir & Fechar</button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ================= MODAL: DIÁRIO DE EPISÓDIO BLINDADO ================= -->
-    <div class="modal-overlay hidden" id="modal-episode-note">
-      <div class="modal-container modal-container--split modal-container--note" role="dialog" aria-modal="true" aria-labelledby="note-ep-title">
-        <button type="button" class="modal-close-btn" id="btn-close-note-modal" aria-label="Fechar anotação" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
+      <!-- ================= MODAL: BACKUP ================= -->
+      <div class="modal-overlay hidden" id="modal-backup">
+        <div class="modal-container modal-container--backup" role="dialog" aria-modal="true" aria-labelledby="backup-title">
+          <button
+            type="button"
+            class="modal-close-btn"
+            id="btn-close-backup-modal"
+            aria-label="Fechar central de backup"
+            title="Fechar (Esc)"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h3 class="backup-title" id="backup-title">Backup e dados</h3>
+          <p class="backup-sub">Seus dados são 100% seus. Exporte e importe quando quiser.</p>
 
-        <div class="note-header">
-          <div>
-            <span class="note-badge" id="note-ep-code">S01E01</span>
-            <h3 class="note-title" id="note-ep-title">Nome do Episódio</h3>
-            <span class="note-show-title" id="note-show-title">Nome da Obra</span>
-          </div>
+          <div class="backup-list">
+            <div class="backup-row">
+              <div>
+                <h4>Exportar Backup (JSON)</h4>
+                <p>Todas as séries, animes, filmes e notas.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-download-json-backup">Baixar .JSON</button>
+            </div>
 
-          <div class="note-save-status" id="note-save-status">
-            <span class="save-dot"></span>
-            <span class="save-text">Salvo neste aparelho</span>
-          </div>
-        </div>
-
-        <div class="modal-scroll">
-          <div class="note-body">
-            <div class="note-watched-row">
-              <label>
-                <input type="checkbox" id="note-watched-toggle">
-                <span>Marcar como Assistido</span>
+            <div class="backup-row">
+              <div>
+                <h4>Restaurar Backup (JSON)</h4>
+                <p>Carregue seu arquivo de backup.</p>
+              </div>
+              <label class="btn btn-outline btn-sm">
+                <input type="file" id="input-import-backup" accept=".json" />
+                Restaurar .JSON
               </label>
             </div>
 
-            <!-- Seletor de emoções (rótulos e ícones: tabela única em js/utils/emotions.js; tests/emotions.test.js confere este HTML) -->
-            <div>
-              <span class="note-label" id="note-emotion-label">Sua reação:</span>
-              <div class="emotion-grid" id="note-emotion-selector" role="group" aria-labelledby="note-emotion-label">
-                <button type="button" class="emotion-btn" data-emotion="awesome" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">😍</span><span class="emotion-label">Adorei</span></button>
-                <button type="button" class="emotion-btn" data-emotion="fun" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">😂</span><span class="emotion-label">Divertido</span></button>
-                <button type="button" class="emotion-btn" data-emotion="mindblown" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">😱</span><span class="emotion-label">Chocado</span></button>
-                <button type="button" class="emotion-btn" data-emotion="sad" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">😢</span><span class="emotion-label">Triste</span></button>
-                <button type="button" class="emotion-btn" data-emotion="disappointed" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">😡</span><span class="emotion-label">Decepcionado</span></button>
+            <div class="backup-row">
+              <div>
+                <h4>Importar da MyAnimeList</h4>
+                <p>Arquivo .xml da exportação da MAL. Você vê uma prévia antes de confirmar.</p>
               </div>
+              <label class="btn btn-outline btn-sm">
+                <input type="file" id="input-import-mal" accept=".xml,text/xml,application/xml" />
+                Importar .XML
+              </label>
             </div>
 
-            <div>
-              <label class="note-label" for="note-character-input">Personagem ou Destaque:</label>
-              <input type="text" id="note-character-input" class="input-field" placeholder="Ex: Eren Yeager, Walter White, Richie...">
+            <div class="backup-row">
+              <div>
+                <h4>Importar do TV Time</h4>
+                <p>Arquivo .csv do pedido de dados do TV Time. Correspondências incertas passam por revisão.</p>
+              </div>
+              <label class="btn btn-outline btn-sm">
+                <input type="file" id="input-import-tvtime" accept=".csv,text/csv" />
+                Importar .CSV
+              </label>
             </div>
 
-            <!-- Editor com salvamento automático. Markdown simples (S08): **negrito**, *itálico*, > citação, >!spoiler!< -->
-            <div class="note-editor">
-              <div class="note-toolbar">
-                <span class="note-toolbar-title">Sua anotação (salva sozinha):</span>
-                <div class="note-toolbar-tools">
-                  <button type="button" class="tool-btn" data-insert="**" aria-label="Negrito"><strong>B</strong></button>
-                  <button type="button" class="tool-btn" data-insert="*" aria-label="Itálico"><em>I</em></button>
-                  <button type="button" class="tool-btn" data-insert="> " aria-label="Citação">❝</button>
-                  <button type="button" class="tool-btn" data-insert=">!spoiler!<" aria-label="Spoiler (escondido até clicar)">Spoiler</button>
-                  <button type="button" class="tool-btn tool-btn--history hidden" id="btn-note-history" aria-expanded="false" aria-controls="note-history-panel" aria-label="Histórico de versões desta anotação">Histórico</button>
-                </div>
+            <div class="backup-row">
+              <div>
+                <h4>Exportar para planilha (CSV)</h4>
+                <p>Lista simples: título, situação, nota e episódios.</p>
               </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv">Baixar .CSV</button>
+            </div>
 
-              <textarea id="note-textarea" class="note-textarea" rows="7" placeholder="Escreva o que achou... O texto é salvo sozinho neste aparelho enquanto você digita."></textarea>
-
-              <div class="note-counters">
-                <span id="note-word-count">0 palavras · 0 caracteres</span>
-                <span id="note-last-saved">Nunca editado</span>
+            <div class="backup-row">
+              <div>
+                <h4>Exportar animes (XML da MyAnimeList)</h4>
+                <p>Para importar na MAL. Só animes com id da MAL; notas com decimais são arredondadas.</p>
               </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-mal-xml">Baixar .XML</button>
+            </div>
 
-              <!-- Histórico de versões: até 5 textos anteriores; "Restaurar" troca o texto e guarda o atual como nova versão -->
-              <div class="note-history hidden" id="note-history-panel" role="region" aria-label="Versões anteriores da anotação">
-                <div class="note-history-head">
-                  <strong>Versões anteriores</strong>
-                  <span>Ao restaurar, o texto atual fica guardado no histórico.</span>
-                </div>
-                <ul class="note-history-list" id="note-history-list"></ul>
-              </div>
+            <div class="backup-reset">
+              <h4>Resetar Base de Dados</h4>
+              <button class="btn btn-danger-outline btn-sm" id="btn-reset-database">Resetar Dados Locais</button>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="note-footer">
-          <button class="btn btn-primary" id="btn-save-note-modal">Concluir & Fechar</button>
+      <!-- ================= MODAL: IMPORTAR HISTÓRICO (S16) ================= -->
+      <div class="modal-overlay hidden" id="modal-import">
+        <div class="modal-container modal-container--backup" role="dialog" aria-modal="true" aria-labelledby="import-title">
+          <button type="button" class="modal-close-btn" id="btn-close-import-modal" aria-label="Fechar importação" title="Fechar (Esc)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h3 class="backup-title" id="import-title">Importar</h3>
+          <div id="import-body"></div>
         </div>
       </div>
+
+      <!-- TOAST CONTAINER -->
+      <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
     </div>
 
-    <!-- ================= MODAL: BACKUP ================= -->
-    <div class="modal-overlay hidden" id="modal-backup">
-      <div class="modal-container modal-container--backup" role="dialog" aria-modal="true" aria-labelledby="backup-title">
-        <button type="button" class="modal-close-btn" id="btn-close-backup-modal" aria-label="Fechar central de backup" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
-        <h3 class="backup-title" id="backup-title">Backup e dados</h3>
-        <p class="backup-sub">Seus dados são 100% seus. Exporte e importe quando quiser.</p>
-
-        <div class="backup-list">
-          <div class="backup-row">
-            <div>
-              <h4>Exportar Backup (JSON)</h4>
-              <p>Todas as séries, animes, filmes e notas.</p>
-            </div>
-            <button class="btn btn-primary btn-sm" id="btn-download-json-backup">Baixar .JSON</button>
-          </div>
-
-          <div class="backup-row">
-            <div>
-              <h4>Restaurar Backup (JSON)</h4>
-              <p>Carregue seu arquivo de backup.</p>
-            </div>
-            <label class="btn btn-outline btn-sm">
-              <input type="file" id="input-import-backup" accept=".json">
-              Restaurar .JSON
-            </label>
-          </div>
-
-          <div class="backup-row">
-            <div>
-              <h4>Importar da MyAnimeList</h4>
-              <p>Arquivo .xml da exportação da MAL. Você vê uma prévia antes de confirmar.</p>
-            </div>
-            <label class="btn btn-outline btn-sm">
-              <input type="file" id="input-import-mal" accept=".xml,text/xml,application/xml">
-              Importar .XML
-            </label>
-          </div>
-
-          <div class="backup-row">
-            <div>
-              <h4>Importar do TV Time</h4>
-              <p>Arquivo .csv do pedido de dados do TV Time. Correspondências incertas passam por revisão.</p>
-            </div>
-            <label class="btn btn-outline btn-sm">
-              <input type="file" id="input-import-tvtime" accept=".csv,text/csv">
-              Importar .CSV
-            </label>
-          </div>
-
-          <div class="backup-row">
-            <div>
-              <h4>Exportar para planilha (CSV)</h4>
-              <p>Lista simples: título, situação, nota e episódios.</p>
-            </div>
-            <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv">Baixar .CSV</button>
-          </div>
-
-          <div class="backup-row">
-            <div>
-              <h4>Exportar animes (XML da MyAnimeList)</h4>
-              <p>Para importar na MAL. Só animes com id da MAL; notas com decimais são arredondadas.</p>
-            </div>
-            <button type="button" class="btn btn-secondary btn-sm" id="btn-export-mal-xml">Baixar .XML</button>
-          </div>
-
-          <div class="backup-reset">
-            <h4>Resetar Base de Dados</h4>
-            <button class="btn btn-danger-outline btn-sm" id="btn-reset-database">Resetar Dados Locais</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ================= MODAL: IMPORTAR HISTÓRICO (S16) ================= -->
-    <div class="modal-overlay hidden" id="modal-import">
-      <div class="modal-container modal-container--backup" role="dialog" aria-modal="true" aria-labelledby="import-title">
-        <button type="button" class="modal-close-btn" id="btn-close-import-modal" aria-label="Fechar importação" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
-        <h3 class="backup-title" id="import-title">Importar</h3>
-        <div id="import-body"></div>
-      </div>
-    </div>
-
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
-  </div>
-
-  <!-- Scripts em Ordem de Dependência MVC -->
-  <script src="js/utils/dom.js"></script>
-  <script src="js/utils/actions.js"></script>
-  <script src="js/utils/emotions.js"></script>
-  <script src="js/utils/markdown.js"></script>
-  <script src="js/utils/mediaDisplay.js"></script>
-  <script src="js/utils/viewKit.js"></script>
-  <script src="js/utils/dialog.js"></script>
-  <script src="js/utils/a11y.js"></script>
-  <script src="js/utils/libraryMerge.js"></script>
-  <script src="js/utils/rating.js"></script>
-  <script src="js/utils/watchStatus.js"></script>
-  <script src="js/utils/calendar.js"></script>
-  <script src="js/utils/backupValidator.js"></script>
-  <script src="js/utils/migrations.js"></script>
-  <script src="js/api/apiClient.js"></script>
-  <script src="js/models/state.js"></script>
-  <script src="js/services/syncService.js"></script>
-  <script src="js/views/authView.js"></script>
-  <script src="js/views/accountView.js"></script>
-  <script src="js/views/nextUpView.js"></script>
-  <script src="js/views/watchlistView.js"></script>
-  <script src="js/views/diaryView.js"></script>
-  <script src="js/views/statsView.js"></script>
-  <script src="js/views/calendarView.js"></script>
-  <script src="js/utils/importExport.js"></script>
-  <script src="js/views/importView.js"></script>
-  <script src="js/views/exploreView.js"></script>
-  <script src="js/views/detailModalView.js"></script>
-  <script src="js/controllers/appController.js"></script>
-  <script src="js/controllers/actionHandlers.js"></script>
-  <script src="js/pwa.js"></script>
-</body>
+    <!-- Scripts em Ordem de Dependência MVC -->
+    <script src="js/utils/dom.js"></script>
+    <script src="js/utils/actions.js"></script>
+    <script src="js/utils/emotions.js"></script>
+    <script src="js/utils/markdown.js"></script>
+    <script src="js/utils/mediaDisplay.js"></script>
+    <script src="js/utils/viewKit.js"></script>
+    <script src="js/utils/dialog.js"></script>
+    <script src="js/utils/a11y.js"></script>
+    <script src="js/utils/libraryMerge.js"></script>
+    <script src="js/utils/rating.js"></script>
+    <script src="js/utils/watchStatus.js"></script>
+    <script src="js/utils/calendar.js"></script>
+    <script src="js/utils/backupValidator.js"></script>
+    <script src="js/utils/migrations.js"></script>
+    <script src="js/api/apiClient.js"></script>
+    <script src="js/models/state.js"></script>
+    <script src="js/services/syncService.js"></script>
+    <script src="js/views/authView.js"></script>
+    <script src="js/views/accountView.js"></script>
+    <script src="js/views/nextUpView.js"></script>
+    <script src="js/views/watchlistView.js"></script>
+    <script src="js/views/diaryView.js"></script>
+    <script src="js/views/statsView.js"></script>
+    <script src="js/views/calendarView.js"></script>
+    <script src="js/utils/importExport.js"></script>
+    <script src="js/views/importView.js"></script>
+    <script src="js/views/exploreView.js"></script>
+    <script src="js/views/detailModalView.js"></script>
+    <script src="js/controllers/appController.js"></script>
+    <script src="js/controllers/actionHandlers.js"></script>
+    <script src="js/pwa.js"></script>
+  </body>
 </html>
