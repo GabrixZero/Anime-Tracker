@@ -70,6 +70,10 @@ module.exports = {
   // Login com Google: o botão só aparece e a rota só funciona com o Client ID configurado (D-16).
   GOOGLE_CLIENT_ID: (process.env.GOOGLE_CLIENT_ID || '').trim(),
 
+  // Cadastro por convite (S14): INVITE_CODES = lista separada por vírgula, cada código vale UMA vez. Vazio/ausente = convite desligado.
+  // Lido a cada uso (não congelado ao carregar) para os testes poderem ligar e desligar o convite. Nunca é registrado em log.
+  get INVITE_CODES() { return (process.env.INVITE_CODES || '').split(',').map(s => s.trim()).filter(Boolean); },
+
   // Origens externas autorizadas a chamar a API (CORS). Vazio = só o próprio site (mesma origem).
   CORS_ORIGINS: listFromEnv('CORS_ORIGINS'),
   TRUST_PROXY: parseTrustProxy(process.env.TRUST_PROXY),

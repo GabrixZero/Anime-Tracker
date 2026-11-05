@@ -98,6 +98,9 @@
               <span class="user-display-name" id="user-display-name">Usuário</span>
               <span class="user-cloud-badge" id="user-cloud-badge"></span>
             </div>
+            <button type="button" class="btn-icon-tiny" id="btn-open-account" data-action="open-account" aria-haspopup="dialog" title="Minha conta" aria-label="Minha conta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
             <button type="button" class="btn-icon-tiny" id="btn-logout" title="Sair da Conta" aria-label="Sair da conta">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>
@@ -359,6 +362,15 @@
               <label for="input-tvtime-password">Senha</label>
               <input type="password" id="input-tvtime-password" placeholder="••••••••" maxlength="128" autocomplete="current-password" required>
               <small id="tvtime-password-hint" class="hidden auth-field-hint">Use de 8 a 128 caracteres.</small>
+              <button type="button" class="auth-switch-link auth-forgot-link" id="btn-forgot-password" data-action="forgot-password" aria-controls="tvtime-forgot-note">Perdi a senha</button>
+              <p id="tvtime-forgot-note" class="hidden auth-field-hint" role="status">Em breve: recuperação por e-mail.</p>
+            </div>
+
+            <!-- Só aparece no cadastro e só se o servidor exigir convite (/api/auth/config -> inviteRequired) -->
+            <div class="tvtime-field hidden" id="tvtime-invite-field">
+              <label for="input-tvtime-invite">Código de convite</label>
+              <input type="text" id="input-tvtime-invite" maxlength="128" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="tvtime-invite-hint">
+              <small id="tvtime-invite-hint" class="auth-field-hint">Este cofre é só para convidados. Use o código que você recebeu.</small>
             </div>
 
             <p id="tvtime-auth-error" class="hidden auth-form-error" role="alert"></p>
@@ -369,6 +381,75 @@
           <div class="tvtime-auth-footer">
             <span id="tvtime-switch-link">Não tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">Cadastre-se grátis</button></span>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MODAL: MINHA CONTA (S14) ================= -->
+    <div class="tvtime-auth-overlay hidden" id="modal-account">
+      <div class="tvtime-auth-card" role="dialog" aria-modal="true" aria-labelledby="account-title">
+        <div class="tvtime-auth-backdrop" aria-hidden="true"></div>
+        <button type="button" class="tvtime-auth-close" id="btn-close-account" aria-label="Fechar Minha conta" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
+
+        <div class="tvtime-auth-content">
+          <div class="tvtime-auth-header">
+            <h2 id="account-title">Minha <span>conta</span></h2>
+          </div>
+
+          <section class="account-section" aria-labelledby="account-profile-title">
+            <h3 class="account-section-title" id="account-profile-title">Perfil</h3>
+            <div class="account-profile">
+              <img class="user-avatar" id="account-avatar" src="" alt="">
+              <dl class="account-data">
+                <dt>Nome</dt><dd id="account-name"></dd>
+                <dt>E-mail</dt><dd id="account-email"></dd>
+                <dt>Entrada</dt><dd id="account-provider"></dd>
+                <dt>Conta criada em</dt><dd id="account-created"></dd>
+              </dl>
+            </div>
+          </section>
+
+          <section class="account-section" id="account-password-section" aria-labelledby="account-password-title">
+            <h3 class="account-section-title" id="account-password-title">Trocar senha</h3>
+            <form class="tvtime-form" id="account-password-form" novalidate>
+              <div class="tvtime-field">
+                <label for="account-current-password">Senha atual</label>
+                <input type="password" id="account-current-password" maxlength="128" autocomplete="current-password" required>
+              </div>
+              <div class="tvtime-field">
+                <label for="account-new-password">Nova senha</label>
+                <input type="password" id="account-new-password" maxlength="128" autocomplete="new-password" aria-describedby="account-new-password-hint" required>
+                <small id="account-new-password-hint" class="auth-field-hint">Use de 8 a 128 caracteres.</small>
+              </div>
+              <div class="tvtime-field">
+                <label for="account-confirm-password">Repita a nova senha</label>
+                <input type="password" id="account-confirm-password" maxlength="128" autocomplete="new-password" required>
+              </div>
+              <p id="account-password-msg" class="hidden auth-form-error" role="alert"></p>
+              <button type="submit" class="btn-tvtime-submit" id="btn-account-password">Trocar senha</button>
+            </form>
+          </section>
+
+          <section class="account-section" aria-labelledby="account-sessions-title">
+            <h3 class="account-section-title" id="account-sessions-title">Sessões</h3>
+            <p class="auth-field-hint">Encerra o login neste e em todos os outros aparelhos. Para voltar, é preciso entrar de novo.</p>
+            <button type="button" class="btn-account-secondary" id="btn-logout-all" data-action="logout-all">Sair de todos os aparelhos</button>
+            <p id="account-sessions-msg" class="hidden auth-form-error" role="alert"></p>
+          </section>
+
+          <section class="account-section account-danger" aria-labelledby="account-delete-title">
+            <h3 class="account-section-title" id="account-delete-title">Excluir conta</h3>
+            <p class="auth-field-hint">Apaga a conta e toda a sua biblioteca, de forma definitiva. Não dá para desfazer.</p>
+            <form class="tvtime-form" id="account-delete-form" novalidate>
+              <div class="tvtime-field" id="account-delete-password-field">
+                <label for="account-delete-password">Digite sua senha para confirmar</label>
+                <input type="password" id="account-delete-password" maxlength="128" autocomplete="current-password" required>
+              </div>
+              <p id="account-delete-google-note" class="hidden auth-field-hint">Contas entradas pelo Google precisam ser confirmadas pelo Google, o que ainda não está disponível nesta tela.</p>
+              <p id="account-delete-msg" class="hidden auth-form-error" role="alert"></p>
+              <button type="submit" class="btn-account-danger" id="btn-account-delete">Excluir minha conta</button>
+            </form>
+          </section>
         </div>
       </div>
     </div>
@@ -540,6 +621,7 @@
   <script src="js/models/state.js"></script>
   <script src="js/services/syncService.js"></script>
   <script src="js/views/authView.js"></script>
+  <script src="js/views/accountView.js"></script>
   <script src="js/views/nextUpView.js"></script>
   <script src="js/views/watchlistView.js"></script>
   <script src="js/views/diaryView.js"></script>

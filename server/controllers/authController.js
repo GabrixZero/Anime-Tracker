@@ -2,6 +2,7 @@
 const config = require('../config/config');
 const googleAuth = require('../services/googleAuth');
 const accountService = require('../services/accountService');
+const inviteService = require('../services/inviteService');
 const { issueToken } = require('../middleware/auth');
 const { sendError } = require('../utils/httpErrors');
 const {
@@ -18,6 +19,9 @@ const {
 const MSG_BAD_CREDENTIALS = 'E-mail ou senha incorretos.';
 const MSG_REGISTER_FAILED = 'Não foi possível criar a conta com esses dados. Se você já tem cadastro, use a aba "Entrar".';
 
+// Serve para código errado, ausente ou já usado: não revela qual dos casos aconteceu.
+const MSG_INVITE_INVALID = 'Código de convite inválido ou já utilizado. Peça um novo código a quem convidou você.';
+
 const defaultAvatar = email => `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(email)}`;
 const nameFromEmail = email => email.split('@')[0].slice(0, 60);
 
@@ -28,14 +32,24 @@ function authSuccess(res, status, message, user) {
 class AuthController {
   // Público: o frontend decide se mostra o botão do Google (e com qual Client ID, que não é segredo).
   publicConfig(req, res) {
-    return res.json({ googleClientId: googleAuth.isConfigured() ? config.GOOGLE_CLIENT_ID : null });
+    return res.json({
+      googleClientId: googleAuth.isConfigured() ? config.GOOGLE_CLIENT_ID : null,
+      inviteRequired: inviteService.isEnabled() // só diz se pede convite; nunca os códigos
+    });
   }
 
   async register(req, res) {
     const input = validateRegister(req.body);
     if (!input.ok) return sendInvalid(res, input);
 
+    let reservedInvite = null;
     try {
+      if (inviteService.isEnabled()) {
+        const code = req.body && typeof req.body.inviteCode === 'string' ? req.body.inviteCode : '';
+        reservedInvite = inviteService.reserve(code);
+        if (!reservedInvite) return res.status(403).json({ error: MSG_INVITE_INVALID, code: 'INVITE_INVALID' });
+      }
+
       const { email, password, name, avatar } = input.value;
       const user = await UserModel.create({
         name: name || nameFromEmail(email),
@@ -46,6 +60,7 @@ class AuthController {
       });
       return authSuccess(res, 201, 'Conta criada com sucesso!', user);
     } catch (err) {
+      try { inviteService.release(reservedInvite); } catch { /* o código fica usado; o erro original é o que importa */ }
       if (err && err.code === 'EMAIL_TAKEN') {
         return res.status(409).json({ error: MSG_REGISTER_FAILED, code: 'REGISTER_FAILED' });
       }
@@ -162,6 +177,17 @@ class AuthController {
       return res.json({ message: 'Senha alterada com sucesso.', token: issueToken(user) });
     } catch (err) {
       return sendError(res, err, 'Erro ao trocar a senha.', 'auth/change-password');
+    }
+  }
+
+  // "Sair de todos os aparelhos": todos os tokens emitidos até agora (inclusive o deste aparelho) deixam de valer.
+  // O cliente apaga o token local; para entrar de novo é preciso fazer login.
+  logoutAll(req, res) {
+    try {
+      if (!UserModel.revokeSessions(req.userId)) return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
+      return res.json({ message: 'Todas as sessões foram encerradas.' });
+    } catch (err) {
+      return sendError(res, err, 'Erro ao encerrar as sessões.', 'auth/logout-all');
     }
   }
 

@@ -66,11 +66,32 @@ class ApiClient {
   }
 
   // --- AUTENTICAÇÃO ---
-  async register(name, email, password) {
+  async register(name, email, password, inviteCode) {
     return this.request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, email, password, ...(inviteCode ? { inviteCode } : {}) })
     });
+  }
+
+  // Troca a senha; devolve um token novo para este aparelho (os outros caem).
+  async changePassword(currentPassword, newPassword) {
+    return this.request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+  }
+
+  // Exclui a conta e a biblioteca no servidor. Conta com senha: { password }. Conta Google: { credential }.
+  async deleteAccount(confirmation) {
+    return this.request('/auth/account', {
+      method: 'DELETE',
+      body: JSON.stringify(confirmation)
+    });
+  }
+
+  // "Sair de todos os aparelhos": invalida todos os tokens da conta, inclusive o deste aparelho.
+  async logoutAll() {
+    return this.request('/auth/logout-all', { method: 'POST', body: '{}' });
   }
 
   async login(email, password) {

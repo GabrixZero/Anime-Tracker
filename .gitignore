@@ -19,6 +19,8 @@ Thumbs.db
 server/data/users.json
 server/data/libraries/
 server/data/jwt.secret
+# Convites já usados (S14; só hashes)
+server/data/invites.json
 
 server/data/mediaCatalog.runtime.json
 server/data/mediaCatalog.json

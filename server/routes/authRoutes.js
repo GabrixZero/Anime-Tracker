@@ -12,6 +12,7 @@ router.post('/google', limits.google, authController.googleAuth);
 
 router.get('/me', requireActiveUser, authController.me);
 router.post('/change-password', requireActiveUser, limits.sensitive, authController.changePassword);
+router.post('/logout-all', requireActiveUser, limits.sensitive, authController.logoutAll);
 router.delete('/account', requireActiveUser, limits.sensitive, authController.deleteAccount);
 
 module.exports = router;
