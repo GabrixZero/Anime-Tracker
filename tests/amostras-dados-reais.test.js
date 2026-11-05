@@ -373,3 +373,144 @@ test('(g) obras do TMDB (seed, 20M, 30M) vencem em até 90 dias e o seed é atua
   const offline = newService(dir, { key: '' });
   assert.equal(offline.refreshTtlMs(offline.findLocal(1396)), null);
 });
+
+// ---------------------------------------------------------------- (h) pré-busca em segundo plano
+
+test('(h) pré-busca: uma de cada vez, com pausa entre elas, no limite da rodada, pulando fonte desligada (animes)', async () => {
+  const svc = newService(newDir());
+  const sleeps = [];
+  svc.sleep = async ms => sleeps.push(ms);
+  const order = [];
+  let running = 0;
+  let maxRunning = 0;
+  const realIngest = svc.ingest.bind(svc);
+  svc.ingest = async id => {
+    order.push(id);
+    running++;
+    maxRunning = Math.max(maxRunning, running);
+    await new Promise(resolve => setImmediate(resolve));
+    try {
+      return await realIngest(id);
+    } finally {
+      running--;
+    }
+  };
+  const out = await svc.prefetchSamples({ limit: 3, pauseMs: 2000 });
+  assert.equal(out.checked, 3);
+  assert.equal(order.length, 3);
+  assert.equal(maxRunning, 1, 'nunca duas ao mesmo tempo');
+  assert.deepEqual(sleeps, [2000, 2000], 'pausa entre as obras (não depois da última)');
+  const anime = new Set([1429, 85937, 95479, 209867, 13916]);
+  assert.ok(!order.some(id => anime.has(id)), 'AniList/Jikan desligadas: animes pulados');
+  assert.ok(out.fetched.includes(1396), 'a série que a fonte falsa conhece foi trocada pela real');
+  assert.equal(MediaService.isTitleOnly(svc.findLocal(1396)), false);
+});
+
+test('(h) pré-busca: sem chave do TMDB (e animes desligados) não tenta nada', async () => {
+  const svc = newService(newDir(), { key: '' });
+  svc.ingest = async () => assert.fail('não deveria ingerir');
+  assert.deepEqual(await svc.prefetchSamples({ limit: 16, pauseMs: 0 }), { checked: 0, fetched: [], failed: [] });
+});
+
+test('(h) pré-busca: respeita a espera de 30 min depois de uma falha', async () => {
+  const svc = newService(newDir());
+  svc.tmdbFake.calls.length = 0;
+  const only = svc.catalog.filter(m => m.id === 872585); // a fonte falsa não conhece este filme: falha
+  svc.catalog = only;
+  const t0 = Date.now();
+  const first = await svc.prefetchSamples({ limit: 5, pauseMs: 0, now: t0 });
+  assert.equal(first.failed.length, 1);
+  const again = await svc.prefetchSamples({ limit: 5, pauseMs: 0, now: t0 + 10 * 60 * 1000 });
+  assert.equal(again.checked, 0, 'ainda dentro dos 30 min');
+  const later = await svc.prefetchSamples({ limit: 5, pauseMs: 0, now: t0 + 31 * 60 * 1000 });
+  assert.equal(later.checked, 1, 'passados 30 min tenta de novo');
+});
+
+test('(h) pré-busca: fonte com disjuntor aberto é pulada', async () => {
+  const anilistSvc = new MediaService({ dataDir: newDir(), seedPath: REAL_SEED, tmdbKey: '', anilistEnabled: true, jikanEnabled: false });
+  const anime = anilistSvc.findLocal(1429);
+  assert.equal(anilistSvc.isSampleSourceReady(anime), true);
+  anilistSvc.anilist.breaker.failure(Object.assign(new Error('x'), { unreachable: true }));
+  if (!anilistSvc.anilist.breaker.isOpen) {
+    for (let i = 0; i < 5; i++) anilistSvc.anilist.breaker.failure(new Error('x'));
+  }
+  assert.equal(anilistSvc.anilist.breaker.isOpen, true);
+  assert.equal(anilistSvc.isSampleSourceReady(anime), false);
+});
+
+test('(h) laço: intervalo 0 não liga nada; com intervalo, cada rodada chama a pré-busca com o limite e a pausa configurados', async () => {
+  const off = newService(newDir());
+  off.startRefreshLoop({ intervalMs: 0, initialDelayMs: 1, log: () => {} });
+  assert.equal(off.refreshTimers.length, 0);
+
+  const svc = newService(newDir());
+  const seen = [];
+  svc.refreshDueWorks = async () => ({ checked: 0, refreshed: [], failed: [] });
+  svc.prefetchSamples = async opts => {
+    seen.push(opts);
+    return { checked: 0, fetched: [], failed: [] };
+  };
+  svc.startRefreshLoop({ intervalMs: 20, initialDelayMs: 5, sampleLimit: 4, samplePauseMs: 7, log: () => {} });
+  await new Promise(resolve => setTimeout(resolve, 120));
+  svc.stopRefreshLoop();
+  assert.ok(seen.length >= 1);
+  assert.deepEqual(seen[0], { limit: 4, pauseMs: 7 });
+});
+
+// ---------------------------------------------------------------- (i) GET /api/media/:id de amostra
+
+function callGetById(controller, id, userId) {
+  const res = {
+    code: 200,
+    body: null,
+    set() {
+      return this;
+    },
+    status(c) {
+      this.code = c;
+      return this;
+    },
+    json(b) {
+      this.body = b;
+      return this;
+    }
+  };
+  return controller.getById({ params: { id: String(id) }, query: {}, userId }, res).then(() => res);
+}
+
+test('(i) GET de amostra só-título: anônimo recebe pending sem 401; logado troca pela obra real; sem chave devolve o que existe', async () => {
+  const mediaService = require('../server/services/mediaService');
+  const controller = require('../server/controllers/mediaController');
+  const donor = newService(newDir());
+  Object.assign(mediaService, { catalog: donor.catalog, seedById: donor.seedById, writeBlockedBy: null });
+  mediaService.dataDir = donor.dataDir;
+  mediaService.saveCatalog = donor.saveCatalog.bind(donor);
+  mediaService.backupBeforeMigration = () => true;
+  mediaService.tmdb.fetchJson = async url => donor.tmdbFake(url);
+  mediaService.tmdb.apiKey = '';
+
+  // anônimo
+  let res = await callGetById(controller, 1396, undefined);
+  assert.equal(res.code, 200);
+  assert.equal(res.body.data.pending, true);
+  assert.equal(res.body.data.name, 'Breaking Bad');
+  assert.equal(res.body.data.overview, undefined, 'nada inventado');
+
+  // logado, mas sem chave: devolve o que existe
+  res = await callGetById(controller, 1396, 'u1');
+  assert.equal(res.code, 200);
+  assert.equal(res.body.data.pending, true);
+
+  // logado, com a fonte configurada: a obra real ocupa o lugar
+  mediaService.tmdb.apiKey = 'chave-falsa';
+  res = await callGetById(controller, 1396, 'u2');
+  assert.equal(res.code, 200);
+  assert.equal(res.body.data.pending, undefined);
+  assert.equal(res.body.data.seasons.length, 5);
+  assert.ok(res.body.data.ingestedAt);
+
+  // depois da troca, o anônimo já lê a obra real
+  res = await callGetById(controller, 1396, undefined);
+  assert.equal(res.body.data.pending, undefined);
+  assert.equal(res.body.data.seasons.length, 5);
+});

@@ -187,6 +187,21 @@ class ExploreView {
     return parts.join(' · ');
   }
 
+  // Amostra só com título (o servidor ainda não baixou a obra real): sem imagem, nota, gênero, data nem temporadas.
+  isDataPending(item) {
+    return Boolean(
+      item.pending ||
+      (!item.isExternal &&
+        item.light &&
+        !item.poster_path &&
+        item.vote_average == null &&
+        !(Array.isArray(item.genres) && item.genres.length) &&
+        !item.first_air_date &&
+        !item.season_count &&
+        !item.episode_count)
+    );
+  }
+
   render(items, notice = '') {
     const MD = window.MediaDisplay; // S08: "Sem nota"/"Sem gênero"/imagem local quando a fonte não informa
     const trackedIds = new Set(window.appState ? window.appState.data.trackedShows.map(t => t.showId) : []);
@@ -231,6 +246,7 @@ class ExploreView {
               <span>${escapeHtml(this.metaText(item))}</span>
               <span>${escapeHtml(MD.genresText(item.genres, 2))}</span>
             </div>
+            ${this.isDataPending(item) ? '<p class="muted pending-note" role="status">Dados ainda não carregados da fonte.</p>' : ''}
 
             <div class="show-card-actions">
               ${

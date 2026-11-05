@@ -2,6 +2,8 @@
 // SHOWVAULT · VIEW DETALHES DE OBRA & DIÁRIO BLINDADO (MVC)
 // ================================================================
 
+const PENDING_TEXT = 'Dados ainda não carregados da fonte.';
+
 class DetailModalView {
   constructor() {
     this.detailModal = document.getElementById('modal-show-detail');
@@ -12,6 +14,7 @@ class DetailModalView {
     this.mode = 'full';
     this.currentNoteEp = { showId: null, seasonNum: null, epNum: null, isMovie: false };
     this.autoSaveTimer = null;
+    this.pendingIds = new Set(); // obras abertas cujos dados a fonte ainda não entregou (zera ao abrir o quadro)
     this.detailToken = 0; // invalida o carregamento de detalhe de uma obra que já não é a aberta
     this.bindEvents();
   }
@@ -150,7 +153,38 @@ class DetailModalView {
         this.switchSeason(keepSeason);
     } else if (window.appState.hasEpisodes(showId)) {
       // o detalhe completo falhou, mas o resumo já mostra os episódios: segue com ele
-    } else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
+    } else if (window.appState.detailsStatus === 'error') {
+      this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
+    } else {
+      // Amostra só com título (o lote público não a devolve): logado, tenta trocá-la pela obra real; senão avisa que faltam os dados.
+      if (await this.fetchPendingWork(showId, token)) return;
+      if (token !== this.detailToken || !this.isOpenFor(showId)) return;
+      this.pendingIds.add(Number(showId));
+      this.open(showId);
+    }
+  }
+
+  // Logado: GET /api/media/:id (o servidor baixa a obra real). Devolve true se a obra completa chegou e o quadro foi redesenhado.
+  async fetchPendingWork(showId, token) {
+    const sync = window.syncService;
+    if (!sync || !sync.isLoggedIn()) return false;
+    try {
+      const res = await window.apiClient.getById(showId);
+      if (token !== this.detailToken || !this.isOpenFor(showId)) return true;
+      const data = res && res.data;
+      if (!data || data.pending || data.light || (data.type !== 'movie' && !Array.isArray(data.seasons))) return false;
+      window.appState.cacheMediaDetail(data);
+      this.open(showId);
+      return true;
+    } catch (err) {
+      console.warn('Não foi possível carregar a obra agora:', err.message);
+      return false;
+    }
+  }
+
+  // Obra sem dados da fonte (o servidor marcou `pending` ou a tentativa de carregar não trouxe a obra)?
+  isPendingMedia(media) {
+    return Boolean(media && !media.isExternal && (media.pending || this.pendingIds.has(media.id)));
   }
 
   // Sem episódios para mostrar (carregando, erro ou obra que ainda não foi adicionada): limpa abas e lista antigas.
@@ -197,6 +231,7 @@ class DetailModalView {
     if (!media) return;
 
     const isOpen = !this.detailModal.classList.contains('hidden');
+    if (!isOpen) this.pendingIds.clear();
     this.applyMode(mode === 'explore' || mode === 'full' ? mode : isOpen ? this.mode : 'full');
     const explore = this.mode === 'explore';
 
@@ -230,6 +265,7 @@ class DetailModalView {
         <h2 class="modal-title" id="detail-modal-title">${escapeHtml(media.name)}</h2>
         <div class="modal-meta">${metaParts}</div>
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
+        ${this.isPendingMedia(media) ? `<p class="muted pending-note" role="status">${escapeHtml(PENDING_TEXT)}</p>` : ''}
         <div class="modal-actions">
           ${
             explore && tracked && media.type === 'movie'
@@ -272,7 +308,11 @@ class DetailModalView {
       if (!Array.isArray(media.seasons)) {
         // lista leve (episódios a caminho) ou resultado de busca externo (sem episódios até a obra ser adicionada)
         this.renderNoEpisodes(
-          media.isExternal ? 'Os episódios aparecem depois que a obra é adicionada à lista.' : 'Carregando episódios...'
+          media.isExternal
+            ? 'Os episódios aparecem depois que a obra é adicionada à lista.'
+            : this.isPendingMedia(media)
+              ? PENDING_TEXT
+              : 'Carregando episódios...'
         );
       } else {
         if (!explore) {
@@ -286,7 +326,7 @@ class DetailModalView {
     }
 
     this.detailModal.classList.remove('hidden');
-    if (!window.appState.hasDetail(media.id) && !media.isExternal) this.loadDetail(media.id);
+    if (!window.appState.hasDetail(media.id) && !media.isExternal && !this.isPendingMedia(media)) this.loadDetail(media.id);
   }
 
   // Modo completo: caixa do filme (assistido/pendente, duração, anotação e botões de marcar/anotar).

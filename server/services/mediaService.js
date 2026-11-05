@@ -1004,9 +1004,72 @@ class MediaService {
     return out;
   }
 
-  // Conferência automática: de tempos em tempos atualiza as obras vencidas. Só o servidor de verdade liga isto (server.js); os testes não.
-  startRefreshLoop({ intervalMs = 30 * 60 * 1000, initialDelayMs = 60 * 1000, limit = 5, log = console.log } = {}) {
+  // Amostra do seed que ainda precisa da obra real: só título (nunca baixada) ou cópia antiga de série/filme (TMDB) do seed.
+  // (Anime antigo com temporadas segue exibível e não entra aqui: a ingestão devolveria a própria cópia.)
+  isPendingSample(item) {
+    if (!item || !this.isSeedSample(item)) return false;
+    if (MediaService.isTitleOnly(item)) return true;
+    const seedEntry = this.seedById.get(item.id);
+    return Boolean(seedEntry && /^tmdb_/.test(seedEntry.source || ''));
+  }
+
+  // A fonte desta amostra está ligada (chave/ligada no servidor) e sem disjuntor aberto? Sem isso nem vale tentar baixar.
+  isSampleSourceReady(item) {
+    const seedEntry = item && this.seedById.get(item.id);
+    if (!seedEntry) return false;
+    if (/^tmdb_/.test(seedEntry.source || '')) return Boolean(this.tmdb.enabled) && !(this.tmdb.breaker && this.tmdb.breaker.isOpen);
+    return (
+      (this.anilistEnabled && !this.anilist.breaker.isOpen) ||
+      (this.jikanEnabled && Boolean(seedEntry.mal_id) && !this.jikan.breaker.isOpen)
+    );
+  }
+
+  // Pré-busca em segundo plano: baixa as amostras do seed pendentes, UMA de cada vez, com pausa entre elas (`pauseMs`), no máximo
+  // `limit` por rodada (poupa os limites de taxa das fontes). Pula fonte desligada/sem chave/com disjuntor aberto e quem falhou há
+  // menos de 30 min. Não escreve URL nem chave em lugar nenhum. Devolve {checked, fetched:[id], failed:[{id, code}]}.
+  async prefetchSamples({ limit = 5, pauseMs = 2000, now = Date.now() } = {}) {
+    const out = { checked: 0, fetched: [], failed: [] };
+    if (this.writeBlockedBy) return out;
+    const todo = this.catalog
+      .filter(
+        m =>
+          this.isPendingSample(m) &&
+          this.isSampleSourceReady(m) &&
+          now - (this.refreshAttempts.get(m.id) || 0) >= REFRESH_RETRY_AFTER_FAILURE_MS
+      )
+      .slice(0, limit);
+    for (const item of todo) {
+      if (out.checked > 0 && pauseMs > 0) await this.sleep(pauseMs);
+      out.checked++;
+      try {
+        const work = await this.ingest(item.id);
+        if (work && work.ingestedAt) {
+          this.refreshAttempts.delete(item.id);
+          out.fetched.push(item.id);
+        } else {
+          this.refreshAttempts.set(item.id, now);
+        }
+      } catch (err) {
+        this.refreshAttempts.set(item.id, now);
+        out.failed.push({ id: item.id, code: (err && err.code) || 'ERRO' });
+        if (err && (err.breakerOpen || err.code === 'RATE_LIMITED')) break;
+      }
+    }
+    return out;
+  }
+
+  // Conferência automática: de tempos em tempos atualiza as obras vencidas e pré-busca as amostras do seed. Só o servidor de verdade
+  // liga isto (server.js); os testes não. Com intervalo 0 (ou negativo) nada roda.
+  startRefreshLoop({
+    intervalMs = 30 * 60 * 1000,
+    initialDelayMs = 60 * 1000,
+    limit = 5,
+    sampleLimit = 5,
+    samplePauseMs = 2000,
+    log = console.log
+  } = {}) {
     this.stopRefreshLoop();
+    if (!(intervalMs > 0)) return this;
     const tick = async () => {
       if (this.refreshing) return;
       this.refreshing = true;
@@ -1015,6 +1078,12 @@ class MediaService {
         if (res.refreshed.length || res.failed.length) {
           log(
             `[MediaService] Atualização de obras: ${res.refreshed.length} atualizada(s)${res.failed.length ? `, ${res.failed.length} com falha (tenta depois)` : ''}.`
+          );
+        }
+        const pre = await this.prefetchSamples({ limit: sampleLimit, pauseMs: samplePauseMs });
+        if (pre.fetched.length || pre.failed.length) {
+          log(
+            `[MediaService] Pré-busca de amostras: ${pre.fetched.length} baixada(s)${pre.failed.length ? `, ${pre.failed.length} com falha (tenta depois)` : ''}.`
           );
         }
       } catch (err) {

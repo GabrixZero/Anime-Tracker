@@ -259,7 +259,10 @@ test('CSP: o servidor envia o cabeçalho em páginas e na API, e o HTML servido 
 
   // Tudo que o index.html carrega é do próprio site, de Google Fonts, ou das origens liberadas
   const page = await (await fetch(base + '/')).text();
-  const external = [...page.matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map(m => new URL(m[1]).origin);
+  // (os links <a href> dos créditos não carregam nada: a CSP só vale para recursos)
+  const external = [...page.matchAll(/<(?:script|link|img|iframe)\b[^>]*?(?:src|href)="(https?:\/\/[^"]+)"/g)].map(
+    m => new URL(m[1]).origin
+  );
   const allowed = new Set(['https://fonts.googleapis.com', 'https://fonts.gstatic.com']);
   for (const origin of external) assert.ok(allowed.has(origin), `origem não prevista na CSP: ${origin}`);
   // e cada arquivo local referenciado existe e é servido

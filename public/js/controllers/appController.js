@@ -206,6 +206,10 @@ class AppController {
       try {
         this.showToast('Buscando os episódios da obra...', 'info');
         const res = await window.apiClient.getById(numId);
+        if (res && res.data && res.data.pending) {
+          this.showToast('Dados ainda não carregados da fonte. Tente de novo em instantes.', 'info');
+          return;
+        }
         if (res && res.data) {
           window.appState.cacheMediaDetail(res.data);
           // S13: o servidor pode devolver a obra com OUTRO id (a mesma obra já estava no catálogo, ou ocupou o lugar da amostra do seed)
