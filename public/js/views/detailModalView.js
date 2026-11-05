@@ -160,7 +160,7 @@ class DetailModalView {
         : '<span>Sem nota</span>',
       MD.yearText(media.first_air_date) ? `<span>${escapeHtml(MD.yearText(media.first_air_date))}</span>` : '',
       `<span>${escapeHtml(MD.genresText(media.genres))}</span>`,
-      MD.runtimeText(media.runtime) ? `<span>${escapeHtml(MD.runtimeText(media.runtime))}</span>` : ''
+      media.type !== 'movie' && MD.runtimeText(media.runtime) ? `<span>${escapeHtml(MD.runtimeText(media.runtime))}</span>` : ''
     ]
       .filter(Boolean)
       .join('<span>•</span>');
@@ -173,8 +173,13 @@ class DetailModalView {
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
         <div class="modal-actions">
           ${
-            tracked
+            tracked && media.type === 'movie'
               ? `
+            <span class="in-list-chip" data-focus-key="detail:in-list">✓ Na sua lista</span>
+            <button type="button" class="btn btn-sm btn-secondary" data-focus-key="detail:primary" data-action="remove-from-list" data-show="${toInt(media.id)}">Remover da Lista</button>
+          `
+              : tracked
+                ? `
             <button type="button" class="btn btn-sm btn-secondary" data-focus-key="detail:primary" data-action="remove-from-list" data-show="${toInt(media.id)}">Remover da Lista</button>
             <label class="status-picker">
               <span class="status-picker-label">Status</span>
@@ -182,7 +187,7 @@ class DetailModalView {
             </label>
             ${window.Rating.ratingControlHtml({ showId: media.id, name: media.name, rating: tracked.rating, idPrefix: 'detail-rating' })}
           `
-              : `
+                : `
             <button type="button" class="btn btn-sm btn-primary" data-focus-key="detail:primary" data-action="add-to-list" data-show="${toInt(media.id)}">+ Adicionar à Lista</button>
           `
           }
@@ -192,34 +197,9 @@ class DetailModalView {
 
     if (media.type === 'movie') {
       seriesBody.classList.add('hidden');
-      movieBody.classList.remove('hidden');
 
-      const isWatched = window.appState.isWatched(media.id);
-      const note = window.appState.getNote(media.id);
-      const hasNote = note && note.text && note.text.trim();
-
-      movieBody.innerHTML = `
-        <div class="movie-actions-box">
-          <div>
-            <h3>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h3>
-            <p>${
-              window.MediaDisplay.knownRuntime(media.runtime)
-                ? `Duração: ${escapeHtml(window.MediaDisplay.knownRuntime(media.runtime))} minutos, contados nas estatísticas ao marcar.`
-                : 'Duração não informada pela fonte; as estatísticas usam 120 min como estimativa.'
-            }</p>
-            ${hasNote ? `<p class="movie-quote">"${escapeHtml(this.notePreview(note.text, 75))}"</p>` : ''}
-          </div>
-
-          <div class="movie-btn-group">
-            <button type="button" class="btn ${isWatched ? 'btn-secondary' : 'btn-primary'}" data-focus-key="detail:movie-check" data-action="quick-check" data-show="${toInt(media.id)}">
-              ${isWatched ? 'Desmarcar Filme' : '✓ Marcar como Assistido'}
-            </button>
-            <button type="button" class="btn btn-outline" data-focus-key="detail:movie-note" data-action="open-note" data-show="${toInt(media.id)}">
-              ${hasNote ? 'Editar Anotação' : 'Anotar no Diário'}
-            </button>
-          </div>
-        </div>
-      `;
+      movieBody.innerHTML = ''; // D-AV3-3: o quadro do filme é só o cabeçalho (título, nota, ano, gênero, sinopse e botão)
+      movieBody.classList.add('hidden');
     } else {
       movieBody.classList.add('hidden');
       seriesBody.classList.remove('hidden');

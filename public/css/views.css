@@ -879,38 +879,6 @@
   margin-left: 0.5rem;
 }
 
-.movie-actions-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem 1.5rem;
-  padding: 1.25rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-sm);
-}
-
-.movie-actions-box h3 {
-  color: #ffffff;
-  font-size: 1.05rem;
-  margin-bottom: 0.25rem;
-}
-.movie-actions-box p {
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-}
-.movie-actions-box .movie-quote {
-  color: var(--tvtime-yellow);
-  margin-top: 0.4rem;
-  font-weight: 600;
-}
-.movie-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
 /* ---------- Modal de anotação ---------- */
 .note-header {
   padding: 1.75rem 4rem 1.25rem 2rem;

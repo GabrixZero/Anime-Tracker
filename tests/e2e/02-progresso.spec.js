@@ -131,17 +131,20 @@ test.describe('progresso', () => {
     await expect(listCard(page, 'Breaking Bad').locator('select.status-select')).toHaveValue('completed');
   });
 
-  test('filme: marcar como assistido finaliza e entra nas estatísticas com a duração', async ({ page }) => {
+  test('filme: quadro enxuto; marcar como assistido (pela lógica) finaliza e entra nas estatísticas com a duração', async ({ page }) => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Interestelar (Interstellar)', exact: true }));
     await expect(modal(page)).toBeVisible();
-    await expect(page.locator('#movie-detail-body h3')).toHaveText('Filme Pendente para Assistir');
-
-    await tap(page.getByRole('button', { name: '✓ Marcar como Assistido' }));
-    await expect(page.locator('#movie-detail-body h3')).toHaveText('✓ Filme Assistido no Seu Diário');
-    await expect(page.getByRole('button', { name: 'Desmarcar Filme' })).toBeVisible();
-    await expect(page.locator('#detail-status-select')).toHaveValue('completed');
+    // D-AV3-3: o quadro do filme é só o essencial (sem botões de assistido/diário); a lógica de marcar continua no estado
+    await expect(modal(page).getByText('Na sua lista')).toBeVisible();
+    await expect(modal(page).getByRole('button', { name: /Marcar como Assistido|Desmarcar Filme|Anotar no Diário/ })).toHaveCount(0);
+    await expect(modal(page).getByText('Duração não informada')).toHaveCount(0);
+    await expect(modal(page).getByText('Nota do catálogo')).toHaveCount(0);
     await page.keyboard.press('Escape');
+    await page.evaluate(() => {
+      const t = window.appState.data.trackedShows.find(x => window.appState.getMedia(x.showId).name.startsWith('Interestelar'));
+      window.appController.quickCheck(t.showId);
+    });
 
     await expect(listCard(page, 'Interestelar (Interstellar)').locator('.show-progress-info')).toContainText('Filme Assistido (100%)');
     await gotoTab(page, 'next-up'); // as abas ocultas se atualizam ao abrir (S09)
