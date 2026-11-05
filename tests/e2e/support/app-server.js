@@ -13,7 +13,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const SERVER_JS = path.join(ROOT, 'server.js');
 const GUARD = path.join(__dirname, '..', 'fake-sources', 'network-guard.js');
-const SEED = path.join(ROOT, 'server', 'data', 'mediaCatalog.seed.json');
+const SEED = path.join(ROOT, 'tests', 'fixtures', 'seed-teste.json');
 const TMP_PREFIX = 'showvault-e2e-';
 
 // Variáveis do ambiente de quem roda os testes que mudariam o comportamento do app: o servidor de teste nunca as herda.

@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Fluxo completo da API com STORAGE=sqlite (S10): cadastro, login, biblioteca, exclusão de conta, catálogo e /health,
 // mais a partida real do servidor (server.js) migrando JSON antigos. Tudo em pasta temporária.
 const test = require('node:test');

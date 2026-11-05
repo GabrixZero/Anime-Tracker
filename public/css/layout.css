@@ -1035,3 +1035,25 @@
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* ---------- Créditos dos dados (rodapé) ---------- */
+.app-credits {
+  max-width: 1100px;
+  margin: 2rem auto 0;
+  padding: 1rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--bg-card-border);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.app-credits h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+.app-credits p {
+  margin: 0 0 0.35rem;
+}
+.app-credits a {
+  color: inherit;
+  text-decoration: underline;
+}

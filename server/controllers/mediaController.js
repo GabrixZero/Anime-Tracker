@@ -50,6 +50,22 @@ function readQuery(req) {
 
 // Decide se pode servir/ingerir a obra: leitura de obra existente é pública; ingestão exige login e respeita o limite.
 async function resolveMedia(req, id) {
+  // Amostra do seed (só título ou cópia antiga de série/filme): anônimo recebe o que existe, marcado `pending` (nunca 401). Logado, com a
+  // fonte configurada, a ingestão troca a amostra pela obra real; sem chave/rede devolve o que existe, sem inventar.
+  const local = mediaService.findLocal(id);
+  if (local && mediaService.isPendingSample(local)) {
+    const pending = () => (local.seasons ? { ...local, pending: true } : { ...toListItem(local), pending: true });
+    if (!req.userId || !mediaService.isSampleSourceReady(local)) return pending();
+    const limit = ingestLimiter.hit(req.userId);
+    if (!limit.ok) throw mediaErrors.tooManyRequests(limit.retryAfterSec);
+    try {
+      return await mediaService.ingest(id);
+    } catch (err) {
+      if (err && ['SOURCE_NOT_CONFIGURED', 'UPSTREAM', 'RATE_LIMITED', 'CATALOG_UNAVAILABLE', 'NOT_FOUND'].includes(err.code))
+        return pending();
+      throw err;
+    }
+  }
   // já está no catálogo (pelo próprio id ou por outro id da mesma obra, S13): público, sem ingestão
   const existing = mediaService.resolveExisting(id);
   if (existing) return existing;

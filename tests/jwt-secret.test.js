@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Segredo JWT (D-15): local e único fora de produção, obrigatório e forte em produção. Nada aqui toca em server/data real.
 const test = require('node:test');
 const assert = require('node:assert/strict');

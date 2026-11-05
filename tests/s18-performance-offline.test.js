@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S18 · resumo por obra (/batch?summary=1), migração de imagens, service worker e manifesto. Sem rede externa.
 const test = require('node:test');
 const assert = require('node:assert/strict');

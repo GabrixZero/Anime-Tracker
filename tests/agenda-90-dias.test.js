@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Agenda de 90 dias (parte servidor): data BR de filmes (TMDB release_dates), grade recente da AniList e validade de filmes não lançados.
 // Tudo com fetch falso: nenhum teste usa a internet.
 const test = require('node:test');
@@ -197,7 +198,8 @@ test('validade: filme não lançado vence como "Em breve" (24h); filme já lanç
     day,
     'status ainda não é Lançado'
   );
-  assert.equal(svc.refreshTtlMs({ ...base, first_air_date: '2026-05-01', status: 'Lançado' }, now), null, 'lançado');
+  // Termos do TMDB (cache de no máximo 6 meses): filme lançado vence em 90 dias, não mais "nunca"
+  assert.equal(svc.refreshTtlMs({ ...base, first_air_date: '2026-05-01', status: 'Lançado' }, now), 90 * day, 'lançado');
 
   const old = { ...base, first_air_date: '', status: '', refreshedAt: '2026-06-10T00:00:00.000Z' };
   assert.equal(svc.isRefreshDue(old, now), true, 'passou de 24h desde a última atualização');

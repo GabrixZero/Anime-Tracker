@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes da S06 (animes e busca): Jikan com respostas SIMULADAS (nenhuma requisição real), fila/throttle/429, deduplicação,
 // relevância, franquia (temporadas pelas relações Sequel/Prequel) e TMDB opcional. Nada escreve em server/data real.
 // Desde a S13 a AniList é a fonte principal de anime: aqui ela fica DESLIGADA (anilistEnabled: false) para exercitar a Jikan
@@ -1089,15 +1090,18 @@ test('TMDB com token v4 usa cabeçalho Authorization (e nunca a chave na URL)', 
 test('ingestão TMDB: filme com duração e série com temporadas (sem a temporada 0), ids nas faixas tmdb', async () => {
   const router = tmdbRouter();
   const svc = newService({ tmdb: router, tmdbKey: 'k' });
+  // 155 e 95396 são obras do seed (Batman e Ruptura): a obra real do TMDB ocupa o lugar da amostra, com o id do seed
   const movie = await svc.ingest(toInternalId('tmdb_movie', 155));
-  assert.equal(movie.id, 30000155);
+  assert.equal(movie.id, 155);
+  assert.equal(svc.findLocal(30000155), null, 'nenhuma segunda obra na faixa do TMDB');
   assert.equal(movie.type, 'movie');
   assert.equal(movie.runtime, 152);
   assert.equal(movie.status, 'Lançado');
-  assert.equal(svc.findLocal(155).id, 155, 'Batman do seed intacto');
+  assert.equal(svc.findLocal(155).ingestedAt, movie.ingestedAt, 'a amostra do Batman foi trocada pela obra real');
 
   const tv = await svc.ingest(toInternalId('tmdb_tv', 95396));
-  assert.equal(tv.id, 20095396);
+  assert.equal(tv.id, 95396);
+  assert.equal(svc.findLocal(20095396), null);
   assert.deepEqual(
     tv.seasons.map(s => s.season_number),
     [1, 2]
@@ -1146,5 +1150,5 @@ test('título do seed com parênteses ("Ruptura (Severance)") é a mesma obra qu
   const svc = newService({ tmdb: router, tmdbKey: 'k', tvmaze: { severance: [tvmazeShow(44, 'Severance', { premiered: '2022-02-18' })] } });
   const items = await svc.search('severance', 'all');
   assert.equal(items.length, 1);
-  assert.equal(items[0].id, 95396, 'a obra local vence');
+  assert.equal(items[0].catalog_id, 95396, 'é a obra do seed: o resultado do TMDB leva o id dela em catalog_id');
 });

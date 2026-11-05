@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S09 · lista leve × detalhe, paginação, /batch, compressão e cabeçalhos de cache (rotas reais, dados sintéticos em pasta temporária).
 // Nenhuma requisição externa: as fontes são simuladas.
 const test = require('node:test');
