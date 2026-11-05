@@ -8,7 +8,7 @@ const {
   openApp,
   gotoTab,
   toast,
-  loadExample,
+  seedLibrary,
   queueCard,
   listCard,
   newUser,
@@ -30,15 +30,12 @@ const trackedIds = async page => (await serverLibrary(page)).trackedShows.map(t 
 const expectServerTracks = async (page, ids) => expect.poll(() => trackedIds(page)).toEqual([...ids].sort((a, b) => a - b));
 
 test.describe('sincronização', () => {
-  test('dois aparelhos: login traz tudo, remoção de um chega ao outro (obra a obra e "Remover exemplo")', async ({
-    page: phone,
-    device
-  }, testInfo) => {
+  test('dois aparelhos: login traz tudo, remoção de um chega ao outro (obra a obra)', async ({ page: phone, device }, testInfo) => {
     const user = newUser(testInfo, 'sync');
 
-    // ---- Aparelho A (celular): conta nova, exemplo e 1º episódio de Breaking Bad ----
+    // ---- Aparelho A (celular): conta nova, biblioteca semeada e 1º episódio de Breaking Bad ----
     await signInWithApi(phone, user);
-    await loadExample(phone);
+    await seedLibrary(phone);
     await tap(queueCard(phone, 'Breaking Bad').getByRole('button', { name: /^Marcar como assistido: Breaking Bad/ }));
     await expectServerTracks(phone, [INTERSTELAR, OPPENHEIMER, BREAKING_BAD, ATTACK_ON_TITAN]);
     await expect.poll(async () => Object.keys((await serverLibrary(phone)).watchedEpisodes)).toEqual(['1396_s1_e1']);
@@ -71,9 +68,17 @@ test.describe('sincronização', () => {
     await expect(listCard(phone, 'Interestelar (Interstellar)')).toHaveCount(1);
     await expect(listCard(phone, 'Breaking Bad').locator('.show-progress-info')).toContainText('1/3 eps');
 
-    // ---- A usa "Remover exemplo": só o que está sem uso sai (Interestelar e Attack on Titan; Breaking Bad ficou, já foi usado) ----
-    await tap(phone.getByRole('button', { name: 'Remover exemplo' }));
-    await expect(toast(phone, 'Exemplo removido: 2 títulos. O que você já usou ficou na lista.')).toBeVisible();
+    // ---- A remove Interestelar e Attack on Titan, um por vez (Breaking Bad fica, já foi usado) ----
+    for (const [name, badge] of [
+      ['Interestelar (Interstellar)', '2'],
+      ['Attack on Titan (Shingeki no Kyojin)', '1']
+    ]) {
+      await tap(phone.getByRole('button', { name, exact: true }));
+      await tap(phone.getByRole('button', { name: 'Remover da Lista' }));
+      await expect(toast(phone, 'Removido da sua lista.')).toBeVisible();
+      await phone.keyboard.press('Escape');
+      await expect(phone.locator('#badge-watchlist')).toHaveText(badge);
+    }
     await expectServerTracks(phone, [BREAKING_BAD]);
     const tombstones = (await serverLibrary(phone)).tombstones.shows;
     for (const id of [OPPENHEIMER, INTERSTELAR, ATTACK_ON_TITAN]) expect(tombstones).toHaveProperty(String(id));
@@ -106,7 +111,7 @@ test.describe('sincronização', () => {
     guard.allow(/ERR_INTERNET_DISCONNECTED/, /\[API Error\] \/user\/library/);
     const user = newUser(testInfo, 'offline');
     await signInWithApi(phone, user);
-    await loadExample(phone);
+    await seedLibrary(phone);
     await expectServerTracks(phone, [INTERSTELAR, OPPENHEIMER, BREAKING_BAD, ATTACK_ON_TITAN]);
 
     await context.setOffline(true);
@@ -138,7 +143,7 @@ test.describe('sincronização', () => {
   }, testInfo) => {
     const user = newUser(testInfo, 'reset');
     await signInWithApi(phone, user);
-    await loadExample(phone);
+    await seedLibrary(phone);
     await expectServerTracks(phone, [INTERSTELAR, OPPENHEIMER, BREAKING_BAD, ATTACK_ON_TITAN]);
     const { page: laptop } = await device();
     await openApp(laptop);

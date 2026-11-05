@@ -8,7 +8,6 @@ class StatsView {
     let totalMinutes = 0;
     let totalWatchedEpisodes = 0;
     const emotionsCount = window.Emotions.emptyCounts(); // tabela única de emoções (utils/emotions.js)
-    const genresCount = {};
 
     Object.keys(state.data.watchedEpisodes).forEach(key => {
       const item = state.data.watchedEpisodes[key];
@@ -23,18 +22,12 @@ class StatsView {
         const media = state.getMedia(parsed.showId);
         if (media) {
           totalMinutes += (media.runtime || 120) * (item.rewatchCount || 1);
-          (media.genres || []).forEach(g => {
-            genresCount[g] = (genresCount[g] || 0) + 1;
-          });
         }
       } else {
         const { showId, seasonNum, epNum } = parsed;
 
         const media = state.getMedia(showId);
         if (media) {
-          (media.genres || []).forEach(g => {
-            genresCount[g] = (genresCount[g] || 0) + 1;
-          });
           // S09: episódio por índice da obra (antes: duas varreduras lineares por episódio assistido)
           const ep = state.getEpisode(showId, seasonNum, epNum);
           const seasonExists = !!ep || (Array.isArray(media.seasons) && media.seasons.some(s => s.season_number === seasonNum));
@@ -101,15 +94,15 @@ class StatsView {
     this.renderRatings(state);
 
     // Top Gêneros
-    const sortedGenres = Object.entries(genresCount)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+    // Uma contagem por obra que está em Minha Lista (utils/genreStats.js), não por episódio assistido
+    const sortedGenres = window.GenreStats.countGenres(state.data.trackedShows, id => state.getMedia(id), 5);
     if (sortedGenres.length === 0) {
-      document.getElementById('stats-genres-list').innerHTML = `<p class="muted">Nenhuma obra assistida ainda.</p>`;
+      document.getElementById('stats-genres-list').innerHTML =
+        `<p class="muted">Adicione obras com gênero à sua lista para ver o ranking.</p>`;
     } else {
-      const maxGenre = sortedGenres[0][1] || 1;
+      const maxGenre = sortedGenres[0].count || 1;
       document.getElementById('stats-genres-list').innerHTML = sortedGenres
-        .map(([genre, count]) => {
+        .map(({ genre, count }) => {
           const pct = Math.round((count / maxGenre) * 100);
           return `
           <div class="stat-bar-row">
@@ -138,13 +131,11 @@ StatsView.prototype.renderRatings = function (state) {
   const top = document.getElementById('stats-rating-top');
   if (!summary || !chart || !top) return;
 
-  if (stats.count === 0) {
-    summary.textContent = 'Média das notas que você deu (0 a 10)';
-    chart.innerHTML = '<p class="muted">Você ainda não deu nenhuma nota. Abra uma obra da lista e use "Minha nota".</p>';
-    top.innerHTML = '';
-    return;
-  }
-  summary.textContent = `Média: ${stats.average.toFixed(1)} (${stats.count} ${stats.count === 1 ? 'obra avaliada' : 'obras avaliadas'})`;
+  // Grade completa sempre (vazia = todas as faixas em 0); sem nota nenhuma, só o resumo muda
+  summary.textContent =
+    stats.count === 0
+      ? 'Média das notas que você deu (0 a 10)'
+      : `Média: ${stats.average.toFixed(1)} (${stats.count} ${stats.count === 1 ? 'obra avaliada' : 'obras avaliadas'})`;
   const maxCount = Math.max(...stats.distribution.map(b => b.count), 1);
   chart.innerHTML = stats.distribution
     .map(band => {
@@ -159,6 +150,10 @@ StatsView.prototype.renderRatings = function (state) {
       </div>`;
     })
     .join('');
+  if (stats.count === 0) {
+    top.innerHTML = '<p class="muted">Nenhuma obra avaliada ainda.</p>';
+    return;
+  }
   top.innerHTML = `<ol class="rating-top-list">${stats.top
     .map(
       item =>

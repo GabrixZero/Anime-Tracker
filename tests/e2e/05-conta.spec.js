@@ -9,7 +9,7 @@ const {
   openApp,
   gotoTab,
   toast,
-  loadExample,
+  seedLibrary,
   queueCard,
   listCard,
   newUser,
@@ -38,16 +38,25 @@ test.describe('contas', () => {
 
     // validações do navegador (sem ir ao servidor)
     await tap(page.locator('#btn-tvtime-auth-submit'));
-    await expect(authError(page)).toHaveText('Informe o e-mail.');
+    await expect(page.locator('#tvtime-email-error')).toHaveText('Informe o e-mail.');
+    await expect(page.locator('#tvtime-password-error')).toHaveText('Informe a senha.');
+    await expect(page.locator('#input-tvtime-email')).toBeFocused();
+    await expect(page.locator('#input-tvtime-email')).toHaveAttribute('aria-invalid', 'true');
     await page.locator('#input-tvtime-email').fill('isto-nao-e-um-email');
+    await expect(page.locator('#tvtime-email-error')).toBeHidden(); // digitar de novo limpa o aviso do campo
     await tap(page.locator('#btn-tvtime-auth-submit'));
-    await expect(authError(page)).toHaveText('E-mail inválido. Use o formato nome@exemplo.com.');
+    await expect(page.locator('#tvtime-email-error')).toHaveText('E-mail inválido. Use o formato nome@exemplo.com.');
     await page.locator('#input-tvtime-email').fill(user.email);
     await page.locator('#input-tvtime-password').fill('1234567');
+    await expect(page.locator('#tvtime-password-error')).toHaveText('A senha precisa ter pelo menos 8 caracteres.'); // aviso enquanto digita
+    await page.locator('#input-tvtime-password').fill('somenteletras');
+    await expect(page.locator('#tvtime-password-error')).toHaveText('Falta pelo menos um número.');
+    await page.locator('#input-tvtime-password').fill('12345678');
     await tap(page.locator('#btn-tvtime-auth-submit'));
-    await expect(authError(page)).toHaveText('A senha precisa ter pelo menos 8 caracteres.');
-    await page.locator('#input-tvtime-password').fill(user.password); // digitar de novo limpa o aviso
-    await expect(authError(page)).toBeHidden();
+    await expect(page.locator('#tvtime-password-error')).toHaveText('Falta pelo menos uma letra.');
+    await expect(page.locator('#input-tvtime-password')).toBeFocused();
+    await page.locator('#input-tvtime-password').fill(user.password);
+    await expect(page.locator('#tvtime-password-error')).toBeHidden();
 
     await page.locator('#input-tvtime-name').fill(user.name);
     await tap(page.locator('#btn-tvtime-auth-submit'));
@@ -126,10 +135,10 @@ test.describe('contas', () => {
     const beto = newUser(testInfo, 'beto');
     await openApp(page);
 
-    // Ana cadastra, carrega o exemplo e assiste ao 1º episódio de Breaking Bad
+    // Ana cadastra, semeia a biblioteca e assiste ao 1º episódio de Breaking Bad
     await registerViaUi(page, ana);
     await gotoTab(page, 'next-up');
-    await loadExample(page);
+    await seedLibrary(page);
     await tap(queueCard(page, 'Breaking Bad').getByRole('button', { name: /^Marcar como assistido: Breaking Bad/ }));
     await expect(toast(page, 'Marcado como assistido!')).toBeVisible();
     await expect.poll(async () => Object.keys((await serverLibrary(page)).watchedEpisodes)).toEqual(['1396_s1_e1']); // já está na nuvem

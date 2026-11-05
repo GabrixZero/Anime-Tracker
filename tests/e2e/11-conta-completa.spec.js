@@ -15,6 +15,16 @@ const openAccount = async page => {
 };
 
 test.describe('minha conta', () => {
+  test('os ícones de Minha conta e de Sair são visíveis e grandes o bastante para clicar', async ({ page }, testInfo) => {
+    await signInWithApi(page, newUser(testInfo, 'icones'));
+    for (const id of ['#btn-open-account', '#btn-logout']) {
+      const box = await page.locator(id).boundingBox();
+      expect(box, `${id} precisa estar na tela`).not.toBeNull();
+      expect(box.width, `${id} largura`).toBeGreaterThanOrEqual(24);
+      expect(box.height, `${id} altura`).toBeGreaterThanOrEqual(24);
+    }
+  });
+
   test('perfil, trocar senha (com avisos) e entrar de novo com a senha nova', async ({ page, guard }, testInfo) => {
     guard.allow(/status of 403/, /\[API Error\] \/auth\/change-password/);
     const user = newUser(testInfo, 'senha');
@@ -23,7 +33,6 @@ test.describe('minha conta', () => {
 
     await expect(page.locator('#account-name')).toHaveText(user.name);
     await expect(page.locator('#account-email')).toHaveText(user.email);
-    await expect(page.locator('#account-provider')).toHaveText('E-mail e senha');
 
     const message = page.locator('#account-password-msg');
     await page.locator('#account-current-password').fill(user.password);

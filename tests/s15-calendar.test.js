@@ -5,7 +5,6 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const C = require('../public/js/utils/calendar');
-const W = require('../public/js/utils/watchStatus');
 
 const pub = path.join(__dirname, '..', 'public');
 const read = (...p) => fs.readFileSync(path.join(pub, ...p), 'utf8');
@@ -109,9 +108,12 @@ function make(medias, { watched = [], statuses = {} } = {}) {
     tracked,
     getMedia: id => byId.get(id) || null,
     isWatched: (id, s, e) => watchedSet.has(keyOf(id, s, e)),
-    includeTracked: t => W.isQueueStatus(t.status),
+    includeTracked: t => t.status !== 'dropped',
     build(range) {
       return C.buildAgenda(tracked, this.getMedia, this.isWatched, HOJE, { range, includeTracked: this.includeTracked });
+    },
+    undated() {
+      return C.buildUndated(tracked, this.getMedia, HOJE, { includeTracked: this.includeTracked });
     }
   };
 }
@@ -194,15 +196,38 @@ test('buildAgenda: episódio assistido vem marcado', () => {
   );
 });
 
-test('buildAgenda: só status da fila (Assistindo / Quero ver); Finalizado, Pausado e Desisti ficam de fora', () => {
+test('buildAgenda: todos os status entram, menos Desisti', () => {
   const medias = ['a', 'b', 'c', 'd', 'e'].map((n, i) => show(i + 1, `Obra ${n}`, 'tv', [ep(1, 1, '2026-11-05')]));
   const statuses = { 1: 'watching', 2: 'plan_to_watch', 3: 'completed', 4: 'paused', 5: 'dropped' };
   assert.deepEqual(
     make(medias, { statuses })
       .build('next7')
       .map(i => i.showId),
-    [1, 2]
+    [1, 2, 3, 4]
   );
+});
+
+test('buildUndated: obra sem data futura aparece; Desisti não; data fora do período não conta como sem data', () => {
+  const semEps = show(1, 'Zeta sem episódios', 'tv', []);
+  const soPassado = show(2, 'Alfa só passado', 'anime', [ep(1, 1, '2026-10-01'), ep(1, 2, null)]);
+  const longe = show(3, 'Longe', 'tv', [ep(1, 1, '2027-03-01')]); // fora do next30, mas tem data futura
+  const hoje = show(4, 'Hoje', 'tv', [ep(1, 1, HOJE)]);
+  const filmeSemData = { id: 5, name: 'Filme sem data', type: 'movie', first_air_date: null };
+  const filmePassado = { id: 6, name: 'Filme antigo', type: 'movie', first_air_date: '2020-01-01' };
+  const filmeFuturo = { id: 7, name: 'Filme futuro', type: 'movie', first_air_date: '2027-01-01' };
+  const desisti = show(8, 'Desisti', 'tv', []);
+  const pausado = show(9, 'Pausada', 'tv', []);
+  const finalizado = show(10, 'Finalizada', 'tv', []);
+  const a = make([semEps, soPassado, longe, hoje, filmeSemData, filmePassado, filmeFuturo, desisti, pausado, finalizado], {
+    statuses: { 8: 'dropped', 9: 'paused', 10: 'completed' }
+  });
+  assert.deepEqual(
+    a.undated().map(o => o.showName),
+    ['Alfa só passado', 'Filme antigo', 'Filme sem data', 'Finalizada', 'Pausada', 'Zeta sem episódios']
+  );
+  assert.deepEqual(a.undated()[0], { showId: 2, showName: 'Alfa só passado', type: 'anime' });
+  assert.deepEqual(C.buildUndated(null, a.getMedia, HOJE), []);
+  assert.deepEqual(C.buildUndated(a.tracked, a.getMedia, 'invalida'), []);
 });
 
 test('buildAgenda: obra sem detalhe carregado e tipo desconhecido não quebram', () => {

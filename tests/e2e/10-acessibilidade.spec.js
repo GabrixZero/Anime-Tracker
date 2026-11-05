@@ -6,7 +6,7 @@
 const { AxeBuilder } = require('@axe-core/playwright');
 const { test, expect } = require('./support/fixtures');
 const fs = require('fs');
-const { openApp, gotoTab, loadExample, queueCard, tap, newUser, signInWithApi } = require('./support/helpers');
+const { openApp, gotoTab, seedLibrary, queueCard, tap, newUser, signInWithApi } = require('./support/helpers');
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
@@ -47,8 +47,8 @@ test.describe('acessibilidade (axe-core)', () => {
 
     await openApp(page);
     await check('A Seguir (vazia)');
-    await loadExample(page);
-    await check('A Seguir (com exemplo)');
+    await seedLibrary(page);
+    await check('A Seguir (com obras)');
 
     await gotoTab(page, 'watchlist');
     await check('Minha Lista');
@@ -123,7 +123,7 @@ test.describe('acessibilidade (axe-core)', () => {
     };
     await openApp(page);
     await signInWithApi(page, newUser(testInfo, 'axe'));
-    await loadExample(page);
+    await seedLibrary(page);
 
     await gotoTab(page, 'calendar');
     await expect(page.locator('#view-calendar')).toBeVisible();

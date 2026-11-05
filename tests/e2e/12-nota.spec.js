@@ -2,14 +2,14 @@
 'use strict';
 
 const { test, expect } = require('./support/fixtures');
-const { openApp, gotoTab, toast, loadExample, listCard, tap } = require('./support/helpers');
+const { openApp, gotoTab, toast, seedLibrary, listCard, tap } = require('./support/helpers');
 
 const modal = page => page.locator('#modal-show-detail');
 
 test.describe('nota pessoal', () => {
   test.beforeEach(async ({ page }) => {
     await openApp(page);
-    await loadExample(page);
+    await seedLibrary(page);
   });
 
   test('dar nota 6.6 no modal aparece no cartão e nas estatísticas; remover limpa tudo', async ({ page }) => {
@@ -53,6 +53,7 @@ test.describe('nota pessoal', () => {
     await expect(toast(page, 'Nota removida.').first()).toBeVisible();
     await expect(listCard(page, 'Breaking Bad').locator('.rating-user-badge')).toHaveCount(0);
     await gotoTab(page, 'stats');
-    await expect(page.locator('#stats-rating-chart')).toContainText('ainda não deu nenhuma nota');
+    await expect(page.locator('#stats-rating-summary')).toContainText('Média das notas');
+    await expect(page.locator('#stats-rating-top')).toContainText('Nenhuma obra avaliada ainda');
   });
 });

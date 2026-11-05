@@ -192,9 +192,26 @@
   border: 1px solid var(--accent-emerald);
 }
 
-/* ---------- Minha Lista: filtros de status ---------- */
+/* ---------- Minha Lista: filtros de tipo e de status na mesma linha (quebram em telas estreitas) ---------- */
+.watchlist-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.watchlist-filters-row > * {
+  min-width: 0;
+}
+
+.watchlist-filters-row .type-filter-row {
+  margin-bottom: 0;
+}
+
 .filter-pills {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   background: var(--bg-surface);
   padding: 0.3rem;
@@ -1127,28 +1144,7 @@
    S08 · Markdown das anotações, spoiler, histórico de versões e estado vazio
    ================================================================ */
 
-/* Faixa "Remover exemplo" na Minha Lista (S13): aparece enquanto houver títulos do exemplo ainda sem uso */
-.example-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin: 0 0 1.25rem;
-  padding: 0.75rem 1rem;
-  background: var(--bg-surface);
-  border: 1px dashed var(--bg-card-border);
-  border-radius: var(--radius-sm);
-}
-
-.example-bar-text {
-  margin: 0;
-  flex: 1 1 16rem;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-/* Botões lado a lado no estado vazio (Explorar + Carregar exemplo) */
+/* Botões do estado vazio, centralizados e com quebra de linha */
 .empty-actions {
   display: flex;
   flex-wrap: wrap;

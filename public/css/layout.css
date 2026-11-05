@@ -262,12 +262,19 @@
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0.2rem;
+  padding: 0.35rem;
   display: flex;
   align-items: center;
 }
 
-.btn-icon-tiny:hover {
+.btn-icon-tiny svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.btn-icon-tiny:hover,
+.btn-icon-tiny:focus-visible {
   color: var(--accent-rose);
 }
 
@@ -563,12 +570,10 @@
     min-width: 0;
   }
 
-  /* Filtros de status: 2x2 */
+  /* Filtros de status: quebram em linhas dentro da faixa de filtros */
   .filter-pills {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
     gap: 0.3rem;
+    max-width: 100%;
   }
   .pill-btn {
     padding: 0.55rem 0.5rem;

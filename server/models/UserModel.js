@@ -197,6 +197,22 @@ class UserModel {
     return true;
   }
 
+  // Guarda (ou limpa, com ext=null) qual arquivo de foto a conta tem. avatarUpdatedAt muda a cada troca (o front usa para renovar a imagem).
+  setPhoto(id, ext) {
+    const users = this.getAll();
+    const user = users.find(u => u.id === id);
+    if (!user) return false;
+    if (ext) {
+      user.photoExt = ext;
+      user.avatarUpdatedAt = new Date().toISOString();
+    } else {
+      delete user.photoExt;
+      delete user.avatarUpdatedAt;
+    }
+    this.saveAll(users);
+    return true;
+  }
+
   // Versão sem a senha e sem campos internos, segura para devolver à API.
   toPublic(user) {
     if (!user) return null;
@@ -206,7 +222,9 @@ class UserModel {
       email: user.email,
       avatar: user.avatar,
       provider: user.provider,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
+      hasPhoto: !!user.photoExt,
+      avatarUpdatedAt: user.photoExt ? user.avatarUpdatedAt || null : null
     };
   }
 }

@@ -130,10 +130,15 @@ async function localLibrary(page) {
 // Atalhos de tela
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-// "Carregar exemplo" no estado vazio de A Seguir: 4 obras (Interestelar, Oppenheimer, Breaking Bad, Attack on Titan) como "Quero ver".
-async function loadExample(page) {
-  await page.locator('#next-up-empty').getByRole('button', { name: 'Carregar exemplo' }).click();
-  await expect(toast(page, 'Exemplo carregado: 4 títulos')).toBeVisible();
+// Semeia a biblioteca com 4 obras do catálogo (Interestelar, Oppenheimer, Breaking Bad, Attack on Titan) como "Quero ver",
+// pelo mesmo caminho do botão "Adicionar" (busca o detalhe e adiciona; o app grava e sincroniza sozinho).
+const SEED_SHOW_IDS = [157336, 872585, 1396, 1429];
+async function seedLibrary(page) {
+  await page.evaluate(async ids => {
+    await window.appController.ensureDetails(ids);
+    ids.forEach(id => window.appState.addShow(id));
+    window.appController.refreshAll();
+  }, SEED_SHOW_IDS);
   await expect(page.locator('#badge-watchlist')).toHaveText('4');
 }
 
@@ -170,6 +175,6 @@ module.exports = {
   signInWithApi,
   serverLibrary,
   localLibrary,
-  loadExample,
+  seedLibrary,
   horizontalOverflow
 };

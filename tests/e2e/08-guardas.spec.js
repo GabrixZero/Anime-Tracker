@@ -6,7 +6,7 @@
 
 const { test, expect } = require('./support/fixtures');
 const { freePort, prepareDataDir, removeDataDir, startApp } = require('./support/app-server');
-const { openApp, gotoTab, loadExample, tap, horizontalOverflow } = require('./support/helpers');
+const { openApp, gotoTab, seedLibrary, tap, horizontalOverflow } = require('./support/helpers');
 
 test.describe('detector de problemas do navegador', () => {
   test('enxerga erro de console, exceção e violação de CSP (a prova de que "zero erros" não é vazio)', async ({ page, guard }) => {
@@ -40,7 +40,7 @@ test.describe('detector de problemas do navegador', () => {
 
   test('a primeira visita, o catálogo e um login não geram nenhum erro, violação ou pedido externo', async ({ page, guard }) => {
     await openApp(page);
-    await loadExample(page);
+    await seedLibrary(page);
     await gotoTab(page, 'explore');
     await expect(page.locator('#explore-container .show-card').first()).toBeVisible();
     await gotoTab(page, 'stats');
@@ -105,8 +105,8 @@ test.describe('largura em 375 px', () => {
 
     await openApp(page);
     await fits('A Seguir (vazia)');
-    await loadExample(page);
-    await fits('A Seguir (com exemplo)');
+    await seedLibrary(page);
+    await fits('A Seguir (com obras)');
     await gotoTab(page, 'watchlist');
     await fits('Minha Lista');
     await gotoTab(page, 'diary');

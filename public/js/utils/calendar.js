@@ -145,6 +145,34 @@
     return items;
   }
 
+  // Obras da lista SEM nenhuma estreia/episódio com data conhecida de hoje em diante (independe do período do filtro):
+  // filme sem data futura; série/anime sem episódio datado >= hoje. Obra com data fora do período escolhido NÃO entra aqui.
+  // Obra sem detalhe carregado ou de tipo desconhecido é ignorada. Retorna [{ showId, showName, type }] ordenado por nome.
+  function buildUndated(trackedList, getMedia, todayKey, { includeTracked } = {}) {
+    if (!parseDay(todayKey) || !Array.isArray(trackedList)) return [];
+    const futureDay = value => {
+      const day = parseDay(String(value || '').slice(0, 10));
+      return !!day && keyOf(day.y, day.m, day.d) >= todayKey;
+    };
+    const out = [];
+    const seen = new Set();
+    for (const tracked of trackedList) {
+      if (!tracked || seen.has(tracked.showId)) continue;
+      seen.add(tracked.showId);
+      if (typeof includeTracked === 'function' && !includeTracked(tracked)) continue;
+      const media = getMedia(tracked.showId);
+      if (!media) continue;
+      let hasFuture;
+      if (media.type === 'movie') hasFuture = futureDay(media.first_air_date);
+      else if (media.type === 'tv' || media.type === 'anime') {
+        hasFuture = (media.seasons || []).some(season => (season.episodes || []).some(ep => futureDay(ep.air_date)));
+      } else continue;
+      if (!hasFuture) out.push({ showId: media.id, showName: media.name, type: media.type });
+    }
+    out.sort((a, b) => String(a.showName).localeCompare(String(b.showName), 'pt-BR'));
+    return out;
+  }
+
   // Agrupa itens já ordenados por dia: [{ key, y, m, d, weekday, daysFromToday, items }]. Os rótulos ("Hoje"...) ficam na view.
   function groupByDay(items) {
     const groups = [];
@@ -168,7 +196,7 @@
     return groups;
   }
 
-  const api = { parseDay, dayKey, addDays, diffDays, weekday, startOfWeek, weekRange, rangeBounds, buildAgenda, groupByDay };
+  const api = { parseDay, dayKey, addDays, diffDays, weekday, startOfWeek, weekRange, rangeBounds, buildAgenda, buildUndated, groupByDay };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root) root.Calendar = api;
 })(typeof window !== 'undefined' ? window : null);

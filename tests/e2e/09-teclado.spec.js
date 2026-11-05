@@ -1,9 +1,9 @@
 // S12 · Teclado: o fluxo principal inteiro só com Tab / Shift+Tab / Enter / Espaço / setas / Esc (S07): atalho "Pular para o conteúdo", abas,
-// carregar o exemplo, marcar episódio, abrir a obra, janelas que prendem o Tab e devolvem o foco, busca no Explorar. Roda em desktop e mobile.
+// semear a biblioteca, marcar episódio, abrir a obra, janelas que prendem o Tab e devolvem o foco, busca no Explorar. Roda em desktop e mobile.
 'use strict';
 
 const { test, expect } = require('./support/fixtures');
-const { openApp, waitForBoot } = require('./support/helpers');
+const { openApp, waitForBoot, seedLibrary } = require('./support/helpers');
 
 // Aperta Tab (ou Shift+Tab) até o foco chegar num elemento que combina com `selector`; falha com o caminho percorrido se não chegar.
 async function tabTo(page, selector, { shift = false, max = 60 } = {}) {
@@ -30,7 +30,7 @@ const focusInside = (page, dialogSelector) =>
   }, dialogSelector);
 
 test.describe('teclado', () => {
-  test('atalho para o conteúdo, abas com setas, exemplo, marcar episódio e abrir a obra', async ({ page }) => {
+  test('atalho para o conteúdo, abas com setas, marcar episódio e abrir a obra', async ({ page }) => {
     await openApp(page);
 
     // 1º Tab = "Pular para o conteúdo"; Enter leva o foco para a área principal
@@ -40,12 +40,9 @@ test.describe('teclado', () => {
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-content')).toBeFocused();
 
-    // "Carregar exemplo" só com Tab + Enter
-    await tabTo(page, '#next-up-empty [data-action="load-example"]');
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#badge-watchlist')).toHaveText('4');
+    // biblioteca com 4 títulos (semeada pelo helper)
+    await seedLibrary(page);
     await expect(page.locator('#next-up-counter-pill')).toHaveText('4 títulos na fila');
-    // (o foco depois do "Carregar exemplo" é o BUG do teste fixme abaixo: aqui o Tab simplesmente segue em frente)
 
     // marcar o 1º item da fila com Enter; o foco continua num botão "Assistido" (o do próximo item, já que este saiu da fila)
     await tabTo(page, '#next-up-container .btn-check-episode');
@@ -82,17 +79,6 @@ test.describe('teclado', () => {
     await expect(page.locator('#modal-show-detail')).toBeHidden();
     await expect(page.locator(`[data-focus-key="${opener}"]`)).toBeFocused();
     expect(await page.evaluate(() => document.querySelector('#main-content').hasAttribute('inert'))).toBe(false);
-  });
-
-  // (S19) Corrigido: depois de "Carregar exemplo" o foco vai para a fila de A Seguir.
-  test('depois de "Carregar exemplo" pelo teclado o foco não pode cair no <body>', async ({ page }) => {
-    await openApp(page);
-    await tabTo(page, '#next-up-empty [data-action="load-example"]');
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#badge-watchlist')).toHaveText('4');
-    expect(await page.evaluate(() => document.activeElement !== document.body && document.activeElement !== document.documentElement)).toBe(
-      true
-    );
   });
 
   test('abas: setas, Home/End e Enter trocam de aba; o foco acompanha', async ({ page }) => {

@@ -1,9 +1,9 @@
 // S12 · Progresso: marcar episódio (A Seguir e modal), temporada inteira, status por obra e filme assistido.
-// Visitante com o exemplo carregado (Breaking Bad: 3 episódios; Interestelar: filme de 169 min). Roda em desktop e mobile.
+// Visitante com a biblioteca semeada (Breaking Bad: 3 episódios; Interestelar: filme de 169 min). Roda em desktop e mobile.
 'use strict';
 
 const { test, expect } = require('./support/fixtures');
-const { openApp, gotoTab, toast, loadExample, queueCard, listCard, tap } = require('./support/helpers');
+const { openApp, gotoTab, toast, seedLibrary, queueCard, listCard, tap } = require('./support/helpers');
 
 const modal = page => page.locator('#modal-show-detail');
 const episodeCheck = (page, n) => page.locator(`#show-episodes-container .episode-row[data-ep="${n}"] .episode-check`);
@@ -11,7 +11,7 @@ const episodeCheck = (page, n) => page.locator(`#show-episodes-container .episod
 test.describe('progresso', () => {
   test.beforeEach(async ({ page }) => {
     await openApp(page);
-    await loadExample(page);
+    await seedLibrary(page);
   });
 
   test('A Seguir: marcar o episódio avança a fila e a série termina como "Finalizado"', async ({ page }) => {

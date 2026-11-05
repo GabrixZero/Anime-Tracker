@@ -2,8 +2,7 @@
 //   { ok: true, value: {...limpo...} }  ou  { ok: false, error: 'primeira mensagem', fields: { campo: 'mensagem' } }
 // e nunca lança: entrada inválida vira HTTP 400 com mensagem clara (nunca 500).
 
-const PASSWORD_MIN = 8;
-const PASSWORD_MAX = 128;
+const { PASSWORD_MIN, PASSWORD_MAX, checkPasswordRules } = require('../../public/js/utils/passwordRules');
 const NAME_MAX = 60;
 const EMAIL_MAX = 254;
 const AVATAR_MAX = 500;
@@ -48,12 +47,10 @@ function checkEmail(raw) {
   return { value: email };
 }
 
+// Senha nova (cadastro/troca): regra única em public/js/utils/passwordRules.js, a mesma usada pelo navegador.
 function checkNewPassword(raw, label = 'A senha') {
-  if (typeof raw !== 'string' || raw === '') return { error: `${label} é obrigatória.` };
-  if (raw.length < PASSWORD_MIN) return { error: `${label} precisa ter pelo menos ${PASSWORD_MIN} caracteres.` };
-  if (raw.length > PASSWORD_MAX) return { error: `${label} pode ter no máximo ${PASSWORD_MAX} caracteres.` };
-  if (raw.trim() === '') return { error: `${label} não pode ser só espaços.` };
-  return { value: raw };
+  const r = checkPasswordRules(raw, label);
+  return r.ok ? { value: raw } : { error: r.error };
 }
 
 // Senha já existente (login/confirmações): sem mínimo, para não trancar contas antigas; só limita tipo e tamanho.

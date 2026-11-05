@@ -118,6 +118,50 @@ class ApiClient {
     return this.request('/auth/me');
   }
 
+  // --- FOTO DE PERFIL ---
+  // Corpo binário (a imagem já recortada pelo navegador). Devolve { user }.
+  async uploadAvatar(blob) {
+    const token = localStorage.getItem('showvault_auth_token');
+    const res = await fetch(`${this.baseUrl}/user/avatar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': blob.type, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: blob
+    });
+    return this.readAvatarResponse(res);
+  }
+
+  async deleteAvatar() {
+    return this.readAvatarResponse(await fetch(`${this.baseUrl}/user/avatar`, { method: 'DELETE', headers: this.getHeaders() }));
+  }
+
+  // <img src> não manda Authorization: baixa a foto com o token e devolve o Blob (ou null se a conta não tem foto).
+  async fetchAvatar() {
+    const token = localStorage.getItem('showvault_auth_token');
+    const res = await fetch(`${this.baseUrl}/user/avatar`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('Não foi possível carregar a foto de perfil.');
+    return res.blob();
+  }
+
+  async readAvatarResponse(res) {
+    let data = {};
+    try {
+      data = await res.json();
+    } catch {
+      /* sem corpo JSON */
+    }
+    if (res.status === 401 && localStorage.getItem('showvault_auth_token')) {
+      localStorage.removeItem('showvault_auth_token');
+      window.dispatchEvent(new CustomEvent('showvault:auth-expired'));
+    }
+    if (!res.ok) {
+      const error = new Error(data.error || 'Erro na requisição à API.');
+      error.status = res.status;
+      throw error;
+    }
+    return data;
+  }
+
   // --- BIBLIOTECA DO USUÁRIO ---
   async getLibrary() {
     return this.request('/user/library');
