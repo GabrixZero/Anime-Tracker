@@ -5,7 +5,18 @@
 
 const { test, expect } = require('./support/fixtures');
 const { EXPECTED } = require('./fake-sources/data');
-const { openApp, gotoTab, toast, queueCard, newUser, signInWithApi, seedLibrary, horizontalOverflow, tap } = require('./support/helpers');
+const {
+  openApp,
+  gotoTab,
+  toast,
+  queueCard,
+  listCard,
+  newUser,
+  signInWithApi,
+  seedLibrary,
+  horizontalOverflow,
+  tap
+} = require('./support/helpers');
 
 const { calendar } = EXPECTED;
 
@@ -90,13 +101,45 @@ test.describe('Agenda', () => {
     await expect(page.locator('#calendar-empty')).toContainText('Sua lista está vazia');
     await expect(page.locator('#calendar-counter-pill')).toHaveText('0 episódios');
 
-    // obras semeadas não têm episódios futuros: o período fica vazio, mas com dica
+    // com todas as obras em Desisti não sobra nada elegível: estado vazio com a regra nova
     await gotoTab(page, 'next-up');
     await seedLibrary(page);
+    await page.evaluate(() => {
+      window.appState.data.trackedShows.forEach(t => window.appState.setShowStatus(t.showId, 'dropped'));
+      window.appController.refreshAll();
+    });
     await gotoTab(page, 'calendar');
     await expect(page.locator('#calendar-empty')).toContainText('Nenhum episódio nesse período');
-    await expect(page.locator('#calendar-empty')).toContainText('Tente outro período');
+    await expect(page.locator('#calendar-empty')).toContainText('exceto as que você desistiu');
     await expect(page.locator('#calendar-container .calendar-item')).toHaveCount(0);
+  });
+
+  test('obras sem data prevista aparecem no fim e obra em Desisti não aparece na Agenda', async ({ page }) => {
+    await openApp(page);
+    await gotoTab(page, 'next-up');
+    await seedLibrary(page); // 4 obras "Quero ver", sem episódio futuro
+
+    await gotoTab(page, 'watchlist');
+    const status = listCard(page, 'Breaking Bad').locator('select.status-select');
+    await status.selectOption({ label: 'Desisti' });
+    await expect(toast(page, 'Status: Desisti.')).toBeVisible();
+
+    await gotoTab(page, 'calendar');
+    const undated = page.locator('#calendar-container .calendar-undated');
+    await expect(undated.locator('.calendar-day-title')).toHaveText('Sem data prevista');
+    await expect(undated.locator('.calendar-item')).toHaveCount(3);
+    await expect(undated.locator('.calendar-item-show').filter({ hasText: 'Breaking Bad' })).toHaveCount(0);
+    await expect(undated.locator('.calendar-item-show').filter({ hasText: 'Attack on Titan' })).toHaveCount(1);
+    await expect(undated.locator('[data-action="quick-check"]')).toHaveCount(0); // sem botão de marcar episódio
+    await expect(page.locator('#calendar-counter-pill')).toHaveText('0 episódios · 3 sem data');
+    await expect(page.locator('#calendar-empty')).toBeHidden();
+
+    // a seção não depende do período
+    await tap(page.locator('[data-range="next30"]'));
+    await expect(undated.locator('.calendar-item')).toHaveCount(3);
+
+    await tap(undated.getByRole('button', { name: 'Ver detalhes: Attack on Titan' }));
+    await expect(page.locator('#modal-show-detail')).toBeVisible();
   });
 
   test('se a atualização das fontes falhar, mostra um aviso discreto e continua com os dados salvos', async ({ page, guard }, testInfo) => {
