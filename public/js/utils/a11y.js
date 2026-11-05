@@ -122,6 +122,7 @@
       D.register(doc.getElementById('modal-account'), { dialog: '.tvtime-auth-card', initialFocus: '#account-current-password' });
       D.register(doc.getElementById('modal-show-detail'), { dialog: '.modal-container', initialFocus: 'dialog' });
       D.register(doc.getElementById('modal-episode-note'), { dialog: '.modal-container', initialFocus: '#note-textarea' });
+      D.register(doc.getElementById('modal-import'), { dialog: '.modal-container', initialFocus: 'dialog' });
       D.register(doc.getElementById('modal-backup'), { dialog: '.modal-container', initialFocus: 'dialog' });
     }
 

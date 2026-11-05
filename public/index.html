@@ -630,11 +630,58 @@
             </label>
           </div>
 
+          <div class="backup-row">
+            <div>
+              <h4>Importar da MyAnimeList</h4>
+              <p>Arquivo .xml da exportação da MAL. Você vê uma prévia antes de confirmar.</p>
+            </div>
+            <label class="btn btn-outline btn-sm">
+              <input type="file" id="input-import-mal" accept=".xml,text/xml,application/xml">
+              Importar .XML
+            </label>
+          </div>
+
+          <div class="backup-row">
+            <div>
+              <h4>Importar do TV Time</h4>
+              <p>Arquivo .csv do pedido de dados do TV Time. Correspondências incertas passam por revisão.</p>
+            </div>
+            <label class="btn btn-outline btn-sm">
+              <input type="file" id="input-import-tvtime" accept=".csv,text/csv">
+              Importar .CSV
+            </label>
+          </div>
+
+          <div class="backup-row">
+            <div>
+              <h4>Exportar para planilha (CSV)</h4>
+              <p>Lista simples: título, situação, nota e episódios.</p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv">Baixar .CSV</button>
+          </div>
+
+          <div class="backup-row">
+            <div>
+              <h4>Exportar animes (XML da MyAnimeList)</h4>
+              <p>Para importar na MAL. Só animes com id da MAL; notas com decimais são arredondadas.</p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-export-mal-xml">Baixar .XML</button>
+          </div>
+
           <div class="backup-reset">
             <h4>Resetar Base de Dados</h4>
             <button class="btn btn-danger-outline btn-sm" id="btn-reset-database">Resetar Dados Locais</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ================= MODAL: IMPORTAR HISTÓRICO (S16) ================= -->
+    <div class="modal-overlay hidden" id="modal-import">
+      <div class="modal-container modal-container--backup" role="dialog" aria-modal="true" aria-labelledby="import-title">
+        <button type="button" class="modal-close-btn" id="btn-close-import-modal" aria-label="Fechar importação" title="Fechar (Esc)"><span aria-hidden="true">&times;</span></button>
+        <h3 class="backup-title" id="import-title">Importar</h3>
+        <div id="import-body"></div>
       </div>
     </div>
 
@@ -667,6 +714,8 @@
   <script src="js/views/diaryView.js"></script>
   <script src="js/views/statsView.js"></script>
   <script src="js/views/calendarView.js"></script>
+  <script src="js/utils/importExport.js"></script>
+  <script src="js/views/importView.js"></script>
   <script src="js/views/exploreView.js"></script>
   <script src="js/views/detailModalView.js"></script>
   <script src="js/controllers/appController.js"></script>

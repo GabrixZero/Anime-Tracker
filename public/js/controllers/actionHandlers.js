@@ -48,6 +48,12 @@
   // "Perdi a senha": por enquanto só um aviso (a recuperação por e-mail ainda não existe)
   A.on('forgot-password', () => document.getElementById('tvtime-forgot-note').classList.remove('hidden'));
 
+  // Importar histórico (S16)
+  A.on('import-apply', () => window.importView.apply());
+  A.on('import-cancel', () => window.importView.cancel());
+  A.on('import-close', () => window.importView.cancel());
+  A.onChange('import-choice', el => window.importView.setChoice(A.int(el, 'index'), el.value));
+
   // Minha conta (S14)
   A.on('open-account', () => window.accountView.open());
   A.on('logout-all', () => window.accountView.handleLogoutAll());
