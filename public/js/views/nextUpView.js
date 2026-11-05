@@ -63,7 +63,8 @@ class NextUpView {
       episodeNumber: next.episodeNumber,
       title: ep.name,
       runtime: ep.runtime,
-      overview: ep.overview,
+      // sinopse do episódio; se a fonte não tem (animes) ou só o resumo foi baixado, a sinopse da obra (o CSS limita a 2 linhas)
+      overview: ep.overview || media.overview,
       still_path: ep.still_path || media.backdrop_path || media.poster_path
     };
   }

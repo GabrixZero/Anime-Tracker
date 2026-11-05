@@ -1,3 +1,8 @@
+const { truncateText } = require('./sanitize');
+
+// Sinopse curta do resumo (D-FX-1): o cartão do "A Seguir" mostra descrição sem baixar o detalhe completo.
+const SUMMARY_OVERVIEW_MAX = 240;
+
 // Lista leve × detalhe (S09).
 // As listas (`/trending`, `/search`) devolvem só o que um cartão precisa: nome, pôster, nota, ano, gêneros e contagens.
 // Temporadas/episódios (o grosso do peso) e sinopse só vêm no detalhe (`GET /api/media/:id` ou `GET /api/media/batch`).
@@ -42,13 +47,16 @@ function toListItem(item) {
 }
 
 // Resumo por obra (S18): o que o app precisa para a lista, o "A Seguir", as estatísticas e a Agenda sem baixar o detalhe completo.
-// Vem o item leve + temporadas com episódios ENXUTOS (número, nome, data, duração, miniatura). Ficam de fora a sinopse da obra,
-// as sinopses dos episódios, os títulos alternativos e a franquia (o modal pede o detalhe completo quando a obra é aberta).
+// Vem o item leve + temporadas com episódios ENXUTOS (número, nome, data, duração, miniatura) + sinopse CURTA da obra
+// (truncada em ~240 caracteres; só aparece quando a fonte tem texto, nunca inventada). Ficam de fora a sinopse completa, as sinopses
+// dos episódios (pesam ~8x mais que a da obra), os títulos alternativos e a franquia (o modal pede o detalhe completo quando a obra é aberta).
 // `summary: true` avisa o app de que ainda não é o detalhe completo.
 function toSummaryItem(item) {
   const out = toListItem(item);
   delete out.light;
   out.summary = true;
+  const overview = truncateText(item.overview, SUMMARY_OVERVIEW_MAX);
+  if (overview) out.overview = overview;
   if (item.backdrop_path) out.backdrop_path = item.backdrop_path;
   if (Array.isArray(item.seasons)) {
     out.seasons = item.seasons.map(season => ({
@@ -71,4 +79,4 @@ function toSearchItem(item) {
   return item && item.isExternal ? item : toListItem(item);
 }
 
-module.exports = { toListItem, toSearchItem, toSummaryItem };
+module.exports = { toListItem, toSearchItem, toSummaryItem, SUMMARY_OVERVIEW_MAX };

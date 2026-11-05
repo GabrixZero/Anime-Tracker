@@ -27,4 +27,19 @@ function safeHttpUrl(value, fallback = '') {
   return /^https?:\/\//i.test(v) ? v : fallback;
 }
 
-module.exports = { stripHtml, stripHtmlList, safeHttpUrl };
+// Sinopse curta (resumo leve da lista): corta em ponto de palavra e termina em reticências. O texto do catálogo já passou por
+// stripHtml (sem tags nem entidades), então não há HTML/entidade para quebrar; cuida-se só de par substituto (emoji) e espaços.
+function truncateText(value, max = 240) {
+  if (typeof value !== 'string') return '';
+  const text = value.replace(/\s+/g, ' ').trim();
+  if (text.length <= max) return text;
+  let cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  if (lastSpace >= max * 0.6)
+    cut = cut.slice(0, lastSpace); // volta ao fim da palavra anterior (se houver uma razoável)
+  else if (/[\uD800-\uDBFF]$/.test(cut)) cut = cut.slice(0, -1); // sem espaço: não deixa meio emoji
+  cut = cut.replace(/[\s,;:.\-–—!?(]+$/, '');
+  return cut ? `${cut}…` : '';
+}
+
+module.exports = { stripHtml, stripHtmlList, safeHttpUrl, truncateText };
