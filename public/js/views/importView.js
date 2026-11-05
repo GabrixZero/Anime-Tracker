@@ -7,24 +7,26 @@
 class ImportView {
   constructor() {
     this.MAL_OFFSET = 10000000;
-    this.SEARCH_GAP_MS = 1100;       // a busca aceita 60 por minuto
-    this.RATE_WAIT_MS = 65000;       // limite de ingestões do servidor (30 a cada 10 min): espera e tenta de novo
+    this.SEARCH_GAP_MS = 1100; // a busca aceita 60 por minuto
+    this.RATE_WAIT_MS = 65000; // limite de ingestões do servidor (30 a cada 10 min): espera e tenta de novo
     this.MAX_RATE_RETRIES = 40;
     this.reset();
     this.bind();
   }
 
   reset() {
-    this.step = 'idle';      // idle | working | review | applying | done
-    this.source = '';        // 'mal' | 'tvtime'
-    this.token = 0;          // sobe a cada nova importação/cancelamento: tarefas antigas se encerram
-    this.rows = [];          // itens a revisar/aplicar
+    this.step = 'idle'; // idle | working | review | applying | done
+    this.source = ''; // 'mal' | 'tvtime'
+    this.token = 0; // sobe a cada nova importação/cancelamento: tarefas antigas se encerram
+    this.rows = []; // itens a revisar/aplicar
     this.skipped = [];
     this.progress = { done: 0, total: 0, note: '' };
     this.report = null;
   }
 
-  $(id) { return document.getElementById(id); }
+  $(id) {
+    return document.getElementById(id);
+  }
 
   bind() {
     const mal = this.$('input-import-mal');
@@ -43,7 +45,10 @@ class ImportView {
     event.target.value = '';
     if (!file) return;
     const limit = window.ImportExport.MAX_FILE_CHARS;
-    if (file.size > limit) { window.appController.showToast('Arquivo grande demais (máximo 20 MB).', 'error'); return; }
+    if (file.size > limit) {
+      window.appController.showToast('Arquivo grande demais (máximo 20 MB).', 'error');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => this.start(source, String(reader.result || ''));
     reader.onerror = () => window.appController.showToast('Não consegui ler o arquivo.', 'error');
@@ -75,7 +80,9 @@ class ImportView {
     try {
       this.rows = source === 'mal' ? await this.resolveMal(parsed.items, token) : await this.resolveTvTime(parsed.items, token);
     } catch (err) {
-      if (token === this.token) { this.failed(err); }
+      if (token === this.token) {
+        this.failed(err);
+      }
       return;
     }
     if (token !== this.token) return;
@@ -95,7 +102,9 @@ class ImportView {
     this.$('modal-import').classList.add('hidden');
   }
 
-  sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   // Chamada à API que espera e repete quando o servidor pede calma (429).
   async withRetry(token, fn) {
@@ -143,18 +152,32 @@ class ImportView {
       }
       window.appState.cacheMediaDetail(work);
       const entry = ((work.franchise && work.franchise.entries) || []).find(e => e.mal_id === item.malId);
-      const seasonNumber = entry ? entry.season_number : (work.seasons[0] && work.seasons[0].season_number);
+      const seasonNumber = entry ? entry.season_number : work.seasons[0] && work.seasons[0].season_number;
       const season = work.seasons.find(s => s.season_number === seasonNumber);
       if (!season || !Array.isArray(season.episodes)) {
         rows.push({ kind: 'missing', label: item.title, reason: 'temporada não encontrada no catálogo' });
         continue;
       }
-      const numbers = season.episodes.map(e => e.episode_number).filter(Number.isInteger).sort((a, b) => a - b);
+      const numbers = season.episodes
+        .map(e => e.episode_number)
+        .filter(Number.isInteger)
+        .sort((a, b) => a - b);
       const count = item.status === 'completed' && item.watched === 0 ? numbers.length : Math.min(item.watched, numbers.length);
-      const episodes = numbers.slice(0, count).map(n => ({ season: seasonNumber, episode: n, at: item.finishDate || item.startDate || '' }));
+      const episodes = numbers
+        .slice(0, count)
+        .map(n => ({ season: seasonNumber, episode: n, at: item.finishDate || item.startDate || '' }));
       let row = byWork.get(work.id);
       if (!row) {
-        row = { kind: 'ok', showId: work.id, isMovie: false, label: work.name || item.title, statuses: [], rating: null, episodes: [], parts: 0 };
+        row = {
+          kind: 'ok',
+          showId: work.id,
+          isMovie: false,
+          label: work.name || item.title,
+          statuses: [],
+          rating: null,
+          episodes: [],
+          parts: 0
+        };
         byWork.set(work.id, row);
         rows.push(row);
       }
@@ -177,7 +200,7 @@ class ImportView {
       let problem = '';
       try {
         const res = await this.withRetry(token, () => window.apiClient.search(item.name, item.movie ? 'movie' : 'all'));
-        results = (res && Array.isArray(res.data)) ? res.data : [];
+        results = res && Array.isArray(res.data) ? res.data : [];
       } catch (err) {
         if (token !== this.token) return [];
         problem = this.reasonFor(err);
@@ -260,18 +283,32 @@ class ImportView {
         } else {
           const res = await this.finalizeTvTime(row, token);
           if (res.failed) failures.push({ label: row.label, reason: res.failed });
-          else { entry = res.entry; ignoredEpisodes += res.ignored || 0; }
+          else {
+            entry = res.entry;
+            ignoredEpisodes += res.ignored || 0;
+          }
         }
         this.progress.done++;
         this.renderProgress();
         if (!entry) continue;
         const prev = merged.get(entry.showId);
-        if (prev) { prev.episodes.push(...entry.episodes); } else { merged.set(entry.showId, entry); entries.push(entry); }
+        if (prev) {
+          prev.episodes.push(...entry.episodes);
+        } else {
+          merged.set(entry.showId, entry);
+          entries.push(entry);
+        }
       }
       const { data, report } = window.ImportExport.applyEntries(window.appState.data, entries);
-      const clean = window.validateBackup(data);       // mesma validação do backup
+      const clean = window.validateBackup(data); // mesma validação do backup
       window.appState.applyImported(clean);
-      this.report = { ...report, failures, ignoredEpisodes, missing: this.rows.filter(r => r.kind === 'missing'), ignoredChoices: this.rows.filter(r => r.kind === 'uncertain' && r.choice < 0).length };
+      this.report = {
+        ...report,
+        failures,
+        ignoredEpisodes,
+        missing: this.rows.filter(r => r.kind === 'missing'),
+        ignoredChoices: this.rows.filter(r => r.kind === 'uncertain' && r.choice < 0).length
+      };
     } catch (err) {
       if (token === this.token) this.failed(err);
       return;
@@ -302,14 +339,25 @@ class ImportView {
       const items = [];
       this.rows.forEach((r, i) => {
         if (r.kind !== 'uncertain') return;
-        const options = ['<option value="-1" selected>Ignorar esta obra</option>']
-          .concat(r.candidates.map((c, j) => `<option value="${j}">${esc(c.name)}${c.first_air_date ? ` (${esc(String(c.first_air_date).slice(0, 4))})` : ''} · ${esc(c.type)}</option>`));
+        const options = ['<option value="-1" selected>Ignorar esta obra</option>'].concat(
+          r.candidates.map(
+            (c, j) =>
+              `<option value="${j}">${esc(c.name)}${c.first_air_date ? ` (${esc(String(c.first_air_date).slice(0, 4))})` : ''} · ${esc(c.type)}</option>`
+          )
+        );
         items.push(`<li class="import-item"><label for="import-choice-${i}"><strong>${esc(r.label)}</strong>${r.year ? ` (${esc(r.year)})` : ''} — qual é a certa?</label>
           <select id="import-choice-${i}" class="import-select" data-change-action="import-choice" data-index="${i}">${options.join('')}</select></li>`);
       });
       box.innerHTML = `<p class="import-summary" id="import-summary" role="status"></p>
         ${unsure.length ? `<h4 class="import-h">Revise as correspondências incertas (${unsure.length})</h4><ul class="import-list">${items.join('')}</ul>` : ''}
-        ${missing.length ? `<details class="import-details"><summary>Não encontradas (${missing.length})</summary><ul class="import-list">${missing.slice(0, 200).map(r => `<li>${esc(r.label)} — ${esc(r.reason)}</li>`).join('')}</ul></details>` : ''}
+        ${
+          missing.length
+            ? `<details class="import-details"><summary>Não encontradas (${missing.length})</summary><ul class="import-list">${missing
+                .slice(0, 200)
+                .map(r => `<li>${esc(r.label)} — ${esc(r.reason)}</li>`)
+                .join('')}</ul></details>`
+            : ''
+        }
         <div class="import-actions">
           <button type="button" class="btn btn-primary" data-action="import-apply"${ok.length || unsure.length ? '' : ' disabled'}>Confirmar e adicionar</button>
           <button type="button" class="btn btn-outline" data-action="import-cancel">Cancelar</button>
@@ -323,14 +371,22 @@ class ImportView {
         `Obras na importação: ${r.shows} (${r.showsNew} novas na sua lista).`,
         `Episódios marcados como vistos: ${r.episodesAdded}${r.episodesExisting ? ` (outros ${r.episodesExisting} já estavam marcados)` : ''}.`
       ];
-      if (r.conflicts.length) lines.push(`Conflitos: ${r.conflicts.length} obra(s) já estavam na lista com situação/nota diferente; mantive a sua.`);
+      if (r.conflicts.length)
+        lines.push(`Conflitos: ${r.conflicts.length} obra(s) já estavam na lista com situação/nota diferente; mantive a sua.`);
       if (r.ignoredChoices) lines.push(`Ignoradas por sua escolha: ${r.ignoredChoices}.`);
       if (r.missing.length) lines.push(`Não encontradas: ${r.missing.length}.`);
       if (r.failures.length) lines.push(`Falharam ao baixar: ${r.failures.length}.`);
       if (r.ignoredEpisodes) lines.push(`Episódios que o catálogo não tem: ${r.ignoredEpisodes}.`);
       if (this.skipped.length) lines.push(`Linhas do arquivo ignoradas: ${this.skipped.length}.`);
       box.innerHTML = `<h4 class="import-h">Pronto!</h4><ul class="import-list">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
-        ${r.conflicts.length ? `<details class="import-details"><summary>Ver conflitos</summary><ul class="import-list">${r.conflicts.slice(0, 200).map(c => `<li>${esc((window.appState.getMedia(c.showId) || {}).name || `#${c.showId}`)}: ${esc(c.what)}</li>`).join('')}</ul></details>` : ''}
+        ${
+          r.conflicts.length
+            ? `<details class="import-details"><summary>Ver conflitos</summary><ul class="import-list">${r.conflicts
+                .slice(0, 200)
+                .map(c => `<li>${esc((window.appState.getMedia(c.showId) || {}).name || `#${c.showId}`)}: ${esc(c.what)}</li>`)
+                .join('')}</ul></details>`
+            : ''
+        }
         <div class="import-actions"><button type="button" class="btn btn-primary" data-action="import-close">Fechar</button></div>`;
     }
   }
@@ -385,11 +441,27 @@ class ImportView {
         total = 1;
         watched = st.data.watchedEpisodes[`${t.showId}_movie`] && st.data.watchedEpisodes[`${t.showId}_movie`].watched ? 1 : 0;
       } else if (m) {
-        for (const s of m.seasons || []) { total += (s.episodes || []).length; watched += this.watchedCount(t.showId, s, (s.episodes || []).length); }
+        for (const s of m.seasons || []) {
+          total += (s.episodes || []).length;
+          watched += this.watchedCount(t.showId, s, (s.episodes || []).length);
+        }
       }
-      return { showId: t.showId, title: m ? m.name : `#${t.showId}`, type: m ? m.type : '', status: st.getStatus(t), rating: window.Rating.normalizeRating(t.rating), watched, total, addedAt: t.addedAt };
+      return {
+        showId: t.showId,
+        title: m ? m.name : `#${t.showId}`,
+        type: m ? m.type : '',
+        status: st.getStatus(t),
+        rating: window.Rating.normalizeRating(t.rating),
+        watched,
+        total,
+        addedAt: t.addedAt
+      };
     });
-    this.download(`showvault-lista-${new Date().toISOString().slice(0, 10)}.csv`, window.ImportExport.exportCsv(rows), 'text/csv;charset=utf-8');
+    this.download(
+      `showvault-lista-${new Date().toISOString().slice(0, 10)}.csv`,
+      window.ImportExport.exportCsv(rows),
+      'text/csv;charset=utf-8'
+    );
     window.appController.showToast('Lista exportada em CSV!', 'success');
   }
 
@@ -400,9 +472,12 @@ class ImportView {
     for (const t of st.data.trackedShows) {
       const m = st.getMedia(t.showId);
       if (!m || m.type !== 'anime') continue;
-      const list = (m.franchise && Array.isArray(m.franchise.entries) && m.franchise.entries.length)
-        ? m.franchise.entries
-        : [{ mal_id: m.mal_id, season_number: (m.seasons && m.seasons[0] && m.seasons[0].season_number) || 1, kind: 'TV', title: m.name }];
+      const list =
+        m.franchise && Array.isArray(m.franchise.entries) && m.franchise.entries.length
+          ? m.franchise.entries
+          : [
+              { mal_id: m.mal_id, season_number: (m.seasons && m.seasons[0] && m.seasons[0].season_number) || 1, kind: 'TV', title: m.name }
+            ];
       const rating = window.Rating.normalizeRating(t.rating);
       for (const e of list) {
         if (!Number.isInteger(e.mal_id)) continue;
@@ -411,16 +486,30 @@ class ImportView {
         const watched = season ? this.watchedCount(t.showId, season, total) : 0;
         let status = st.getStatus(t);
         if (total > 0 && watched >= total) status = 'completed';
-        else if (watched === 0) status = (status === 'dropped' || status === 'paused') ? status : 'plan_to_watch';
+        else if (watched === 0) status = status === 'dropped' || status === 'paused' ? status : 'plan_to_watch';
         else if (status === 'completed' || status === 'plan_to_watch') status = 'watching';
         entries.push({
-          malId: e.mal_id, title: e.title || m.name, type: KIND[String(e.kind).toUpperCase()] || 'TV', episodes: total, watched, status,
+          malId: e.mal_id,
+          title: e.title || m.name,
+          type: KIND[String(e.kind).toUpperCase()] || 'TV',
+          episodes: total,
+          watched,
+          status,
           score: rating === null ? 0 : Math.round(rating)
         });
       }
     }
-    this.download(`showvault-mal-${new Date().toISOString().slice(0, 10)}.xml`, window.ImportExport.exportMalXml(entries), 'application/xml;charset=utf-8');
-    window.appController.showToast(entries.length ? 'XML (formato MyAnimeList) exportado! Notas com decimais foram arredondadas.' : 'Nenhum anime com id da MyAnimeList na sua lista.', entries.length ? 'success' : 'info');
+    this.download(
+      `showvault-mal-${new Date().toISOString().slice(0, 10)}.xml`,
+      window.ImportExport.exportMalXml(entries),
+      'application/xml;charset=utf-8'
+    );
+    window.appController.showToast(
+      entries.length
+        ? 'XML (formato MyAnimeList) exportado! Notas com decimais foram arredondadas.'
+        : 'Nenhum anime com id da MyAnimeList na sua lista.',
+      entries.length ? 'success' : 'info'
+    );
   }
 }
 

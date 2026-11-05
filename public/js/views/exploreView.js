@@ -2,9 +2,9 @@
 // SHOWVAULT · VIEW DE EXPLORAÇÃO & BUSCA NA API (MVC)
 // ================================================================
 
-const SEARCH_DEBOUNCE_MS = 400;   // espera o usuário parar de digitar antes de buscar (a Jikan limita ~3 req/s)
-const SEARCH_MIN_CHARS = 2;       // digitando: só busca com 2+ letras (Enter e o botão buscam qualquer tamanho)
-const EXPLORE_PAGE_SIZE = 60;     // obras por página na lista do catálogo (S09); "Mostrar mais" traz as próximas
+const SEARCH_DEBOUNCE_MS = 400; // espera o usuário parar de digitar antes de buscar (a Jikan limita ~3 req/s)
+const SEARCH_MIN_CHARS = 2; // digitando: só busca com 2+ letras (Enter e o botão buscam qualquer tamanho)
+const EXPLORE_PAGE_SIZE = 60; // obras por página na lista do catálogo (S09); "Mostrar mais" traz as próximas
 
 class ExploreView {
   constructor() {
@@ -12,15 +12,14 @@ class ExploreView {
     this.titleEl = document.getElementById('explore-results-title');
     this.typeFilter = 'all';
     this.searchQuery = '';
-    this.requestSeq = 0;        // só a resposta da requisição mais recente é exibida
+    this.requestSeq = 0; // só a resposta da requisição mais recente é exibida
     this.debounceTimer = null;
-    this.items = [];            // itens já exibidos (a lista paginada cresce com "Mostrar mais")
+    this.items = []; // itens já exibidos (a lista paginada cresce com "Mostrar mais")
     this.notice = '';
     this.hasMore = false;
     this.loadingMore = false;
     this.bindEvents();
   }
-
 
   bindEvents() {
     // Filtros de Categoria (Todos, Séries, Animes, Filmes)
@@ -47,7 +46,7 @@ class ExploreView {
 
     if (searchBtn) searchBtn.addEventListener('click', doSearch);
     if (searchInput) {
-      searchInput.addEventListener('keydown', (e) => {
+      searchInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') doSearch();
       });
       // Busca enquanto digita, com atraso (debounce): uma requisição só quando a pessoa para de digitar.
@@ -67,7 +66,7 @@ class ExploreView {
       return 'Muitas buscas em pouco tempo ou o serviço de catálogo pediu para aguardar. Espere alguns segundos e tente de novo.';
     }
     if (err && err.status === 502) return 'A fonte externa do catálogo está indisponível agora. Tente de novo em instantes.';
-    if (err && err.status === 503) return (err.message || 'O catálogo está temporariamente indisponível.');
+    if (err && err.status === 503) return err.message || 'O catálogo está temporariamente indisponível.';
     if (err && !err.status) return 'Sem conexão com o servidor. Verifique sua internet e tente de novo.';
     return (err && err.message) || 'Não foi possível carregar o catálogo.';
   }
@@ -92,11 +91,11 @@ class ExploreView {
         if (this.titleEl) this.titleEl.textContent = `Catálogo (${response ? (response.total ?? response.count) : 0})`;
       }
 
-      const items = (response && response.data) ? response.data : [];
+      const items = response && response.data ? response.data : [];
       if (window.appState) window.appState.cacheMediaList(items);
       this.container.removeAttribute('aria-busy');
 
-      const warnings = (response && Array.isArray(response.warnings)) ? response.warnings : [];
+      const warnings = response && Array.isArray(response.warnings) ? response.warnings : [];
       const notice = this.renderWarnings(warnings);
       this.items = items;
       this.notice = notice;
@@ -138,7 +137,7 @@ class ExploreView {
     try {
       const response = await window.apiClient.getTrending(this.typeFilter, { limit: EXPLORE_PAGE_SIZE, offset: this.items.length });
       if (seq !== this.requestSeq) return;
-      const more = (response && response.data) ? response.data : [];
+      const more = response && response.data ? response.data : [];
       if (window.appState) window.appState.cacheMediaList(more);
       this.items = this.items.concat(more);
       this.hasMore = !!(response && response.hasMore) && more.length > 0;
@@ -157,11 +156,18 @@ class ExploreView {
   renderWarnings(warnings) {
     if (!warnings.length) return '';
     // aviso com `fallback` = a fonte reserva respondeu no lugar da que falhou: os resultados estão completos, nada a avisar
-    const texts = [...new Set(warnings.filter(w => !w.fallback).map(w => {
-      if (w.code === 'NOT_CONFIGURED') return w.message;
-      if (w.code === 'RATE_LIMITED') return `Uma fonte pediu para aguardar${w.retryAfterSec ? ` (~${w.retryAfterSec} s)` : ''}; alguns resultados podem estar faltando. Tente de novo em instantes.`;
-      return 'Uma fonte do catálogo está indisponível; alguns resultados podem estar faltando.';
-    }))];
+    const texts = [
+      ...new Set(
+        warnings
+          .filter(w => !w.fallback)
+          .map(w => {
+            if (w.code === 'NOT_CONFIGURED') return w.message;
+            if (w.code === 'RATE_LIMITED')
+              return `Uma fonte pediu para aguardar${w.retryAfterSec ? ` (~${w.retryAfterSec} s)` : ''}; alguns resultados podem estar faltando. Tente de novo em instantes.`;
+            return 'Uma fonte do catálogo está indisponível; alguns resultados podem estar faltando.';
+          })
+      )
+    ];
     return texts.map(t => `<div class="grid-message grid-message--info" role="status">${escapeHtml(t)}</div>`).join('');
   }
 
@@ -170,7 +176,7 @@ class ExploreView {
   metaText(item) {
     if (item.type === 'movie') return window.MediaDisplay.runtimeText(item.runtime) || 'Filme';
     // obra do catálogo: a lista leve traz `season_count`; o detalhe completo traz as temporadas
-    const seasonCount = Array.isArray(item.seasons) ? item.seasons.length : (Number(item.season_count) || 0);
+    const seasonCount = Array.isArray(item.seasons) ? item.seasons.length : Number(item.season_count) || 0;
     if (seasonCount > 0) {
       return `${seasonCount} ${seasonCount === 1 ? 'temporada' : 'temporadas'}`;
     }
@@ -185,18 +191,21 @@ class ExploreView {
     const MD = window.MediaDisplay; // S08: "Sem nota"/"Sem gênero"/imagem local quando a fonte não informa
     const trackedIds = new Set(window.appState ? window.appState.data.trackedShows.map(t => t.showId) : []);
 
-    this.container.innerHTML = notice + items.map(item => {
-      // S13: resultado externo que é a MESMA obra de uma que o catálogo já tem (amostra do seed): `catalog_id` é o id dela
-      const ownId = item.catalog_id && trackedIds.has(item.catalog_id) ? item.catalog_id : item.id;
-      const isTracked = trackedIds.has(ownId);
+    this.container.innerHTML =
+      notice +
+      items
+        .map(item => {
+          // S13: resultado externo que é a MESMA obra de uma que o catálogo já tem (amostra do seed): `catalog_id` é o id dela
+          const ownId = item.catalog_id && trackedIds.has(item.catalog_id) ? item.catalog_id : item.id;
+          const isTracked = trackedIds.has(ownId);
 
-      const typeBadge = window.ViewKit.typeBadge(item.type);
+          const typeBadge = window.ViewKit.typeBadge(item.type);
 
-      // Temporada/cour de exibição ("Outono 2023") quando a fonte informa; senão o ano.
-      const when = item.season_label || MD.yearText(item.first_air_date);
-      const fullTitle = item.original_name ? `${item.name} (${item.original_name})` : item.name;
+          // Temporada/cour de exibição ("Outono 2023") quando a fonte informa; senão o ano.
+          const when = item.season_label || MD.yearText(item.first_air_date);
+          const fullTitle = item.original_name ? `${item.name} (${item.original_name})` : item.name;
 
-      return `
+          return `
         <div class="show-card">
           <div class="show-poster-wrap">
             <img class="show-poster"
@@ -219,20 +228,28 @@ class ExploreView {
             </div>
 
             <div class="show-card-actions">
-              ${isTracked ? `
+              ${
+                isTracked
+                  ? `
                 <button type="button" class="btn btn-sm btn-secondary" data-focus-key="ex:${toInt(item.id)}:action" data-action="open-detail" data-show="${toInt(ownId)}">
                   Ver no Cofre
                 </button>
-              ` : `
+              `
+                  : `
                 <button type="button" class="btn btn-sm btn-primary" data-focus-key="ex:${toInt(item.id)}:action" data-action="add-to-list" data-show="${toInt(item.id)}">
                   + Adicionar à Lista
                 </button>
-              `}
+              `
+              }
             </div>
           </div>
         </div>
       `;
-    }).join('') + (this.hasMore ? `<div class="grid-message"><button type="button" class="btn btn-secondary" data-focus-key="ex:more:load" data-action="load-more">Mostrar mais</button></div>` : '');
+        })
+        .join('') +
+      (this.hasMore
+        ? `<div class="grid-message"><button type="button" class="btn btn-secondary" data-focus-key="ex:more:load" data-action="load-more">Mostrar mais</button></div>`
+        : '');
   }
 }
 

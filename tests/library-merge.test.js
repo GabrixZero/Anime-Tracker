@@ -6,17 +6,32 @@ const LM = require('../public/js/utils/libraryMerge');
 const WS = require('../public/js/utils/watchStatus');
 
 const NOW = Date.parse('2026-11-01T12:00:00.000Z');
-const iso = (offsetMin) => new Date(NOW + offsetMin * 60000).toISOString();
-const lib = (parts = {}) => ({ trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: LM.emptyTombstones(), resetAt: '', ...parts });
+const iso = offsetMin => new Date(NOW + offsetMin * 60000).toISOString();
+const lib = (parts = {}) => ({
+  trackedShows: [],
+  watchedEpisodes: {},
+  episodeNotes: {},
+  tombstones: LM.emptyTombstones(),
+  resetAt: '',
+  ...parts
+});
 const show = (showId, status, minutes, extra = {}) => ({ showId, status, addedAt: iso(-1000), updatedAt: iso(minutes), ...extra });
 const watched = (minutes, extra = {}) => ({ watched: true, watchedAt: iso(minutes), updatedAt: iso(minutes), rewatchCount: 1, ...extra });
 const note = (text, minutes) => ({ text, emotion: null, character: '', updatedAt: iso(minutes), snapshots: [] });
 const merge = (a, b) => LM.merge(a, b, { now: NOW });
-const ids = (l) => l.trackedShows.map(s => s.showId).sort((a, b) => a - b);
+const ids = l => l.trackedShows.map(s => s.showId).sort((a, b) => a - b);
 
 test('merge: união — nada que existe só de um lado se perde', () => {
-  const local = lib({ trackedShows: [show(1, 'watching', -10)], watchedEpisodes: { '1_s1_e1': watched(-10) }, episodeNotes: { '1_s1_e1': note('local', -10) } });
-  const remote = lib({ trackedShows: [show(2, 'completed', -20)], watchedEpisodes: { '2_s1_e1': watched(-20) }, episodeNotes: { '2_s1_e1': note('remota', -20) } });
+  const local = lib({
+    trackedShows: [show(1, 'watching', -10)],
+    watchedEpisodes: { '1_s1_e1': watched(-10) },
+    episodeNotes: { '1_s1_e1': note('local', -10) }
+  });
+  const remote = lib({
+    trackedShows: [show(2, 'completed', -20)],
+    watchedEpisodes: { '2_s1_e1': watched(-20) },
+    episodeNotes: { '2_s1_e1': note('remota', -20) }
+  });
   const out = merge(local, remote);
   assert.deepEqual(ids(out), [1, 2]);
   assert.deepEqual(Object.keys(out.watchedEpisodes).sort(), ['1_s1_e1', '2_s1_e1']);
@@ -24,7 +39,11 @@ test('merge: união — nada que existe só de um lado se perde', () => {
 });
 
 test('merge: aceita bibliotecas antigas (sem tombstones/updatedAt) e não altera os argumentos', () => {
-  const oldRemote = { trackedShows: [{ showId: 5, status: 'watching', addedAt: iso(-50) }], watchedEpisodes: { '5_s1_e1': { watched: true, watchedAt: iso(-50), rewatchCount: 1 } }, episodeNotes: {} };
+  const oldRemote = {
+    trackedShows: [{ showId: 5, status: 'watching', addedAt: iso(-50) }],
+    watchedEpisodes: { '5_s1_e1': { watched: true, watchedAt: iso(-50), rewatchCount: 1 } },
+    episodeNotes: {}
+  };
   const oldLocal = { trackedShows: [{ showId: 6, status: 'plan_to_watch', addedAt: iso(-40) }], watchedEpisodes: {}, episodeNotes: {} };
   const snapshotBefore = JSON.stringify([oldLocal, oldRemote]);
   const out = merge(oldLocal, oldRemote);
@@ -71,7 +90,10 @@ test('merge: empate exato entre item e marca — o item fica (nunca perder dado 
 
 test('merge: episódio desmarcado em um aparelho some no outro; marcar de novo depois volta', () => {
   const stale = lib({ watchedEpisodes: { '1_s1_e1': watched(-60), '1_s1_e2': watched(-60) } });
-  const unmarked = lib({ watchedEpisodes: { '1_s1_e2': watched(-60) }, tombstones: { shows: {}, watched: { '1_s1_e1': iso(-10) }, notes: {} } });
+  const unmarked = lib({
+    watchedEpisodes: { '1_s1_e2': watched(-60) },
+    tombstones: { shows: {}, watched: { '1_s1_e1': iso(-10) }, notes: {} }
+  });
   const out = merge(stale, unmarked);
   assert.deepEqual(Object.keys(out.watchedEpisodes), ['1_s1_e2']);
   assert.equal(out.tombstones.watched['1_s1_e1'], iso(-10));
@@ -83,7 +105,10 @@ test('merge: episódio desmarcado em um aparelho some no outro; marcar de novo d
 });
 
 test('merge: rewatchCount fica com o maior e o episódio marcado dos dois lados continua marcado', () => {
-  const out = merge(lib({ watchedEpisodes: { '1_s1_e1': watched(-5, { rewatchCount: 2 }) } }), lib({ watchedEpisodes: { '1_s1_e1': watched(-9, { rewatchCount: 4 }) } }));
+  const out = merge(
+    lib({ watchedEpisodes: { '1_s1_e1': watched(-5, { rewatchCount: 2 }) } }),
+    lib({ watchedEpisodes: { '1_s1_e1': watched(-9, { rewatchCount: 4 }) } })
+  );
   assert.equal(out.watchedEpisodes['1_s1_e1'].rewatchCount, 4);
   assert.equal(out.watchedEpisodes['1_s1_e1'].watched, true);
 });
@@ -91,7 +116,10 @@ test('merge: rewatchCount fica com o maior e o episódio marcado dos dois lados 
 test('merge: nota mais nova vence; nota apagada (marca) some no outro aparelho', () => {
   const out = merge(lib({ episodeNotes: { '1_s1_e1': note('velha', -30) } }), lib({ episodeNotes: { '1_s1_e1': note('nova', -3) } }));
   assert.equal(out.episodeNotes['1_s1_e1'].text, 'nova');
-  const deleted = merge(lib({ episodeNotes: { '1_s1_e1': note('x', -30) } }), lib({ tombstones: { shows: {}, watched: {}, notes: { '1_s1_e1': iso(-5) } } }));
+  const deleted = merge(
+    lib({ episodeNotes: { '1_s1_e1': note('x', -30) } }),
+    lib({ tombstones: { shows: {}, watched: {}, notes: { '1_s1_e1': iso(-5) } } })
+  );
   assert.deepEqual(deleted.episodeNotes, {});
 });
 
@@ -108,8 +136,14 @@ test('merge: relógio adiantado — a data futura é aparada para agora + 5 min 
 });
 
 test('merge: preserva a ordem das obras (a lista não é reordenada por id)', () => {
-  const out = merge(lib({ trackedShows: [show(50, 'watching', -9), show(7, 'watching', -8)] }), lib({ trackedShows: [show(900, 'watching', -7)] }));
-  assert.deepEqual(out.trackedShows.map(s => s.showId), [900, 50, 7]);
+  const out = merge(
+    lib({ trackedShows: [show(50, 'watching', -9), show(7, 'watching', -8)] }),
+    lib({ trackedShows: [show(900, 'watching', -7)] })
+  );
+  assert.deepEqual(
+    out.trackedShows.map(s => s.showId),
+    [900, 50, 7]
+  );
 });
 
 test('merge: resetAt ("zerar a conta") descarta tudo anterior e mantém o que veio depois', () => {
@@ -148,7 +182,7 @@ test('merge: é comutativo e idempotente em cenários sem empate', () => {
     episodeNotes: { '1_s1_e1': note('b', -10) },
     tombstones: { shows: { 2: iso(-4) }, watched: {}, notes: {} }
   });
-  const sortShows = (l) => ({ ...l, trackedShows: [...l.trackedShows].sort((x, y) => x.showId - y.showId) });
+  const sortShows = l => ({ ...l, trackedShows: [...l.trackedShows].sort((x, y) => x.showId - y.showId) });
   assert.deepEqual(sortShows(merge(a, b)), sortShows(merge(b, a)));
   const once = merge(a, b);
   assert.deepEqual(sortShows(merge(once, a)), sortShows(once));
@@ -163,7 +197,14 @@ test('replaceWith: importar backup — o que sumiu vira marca de exclusão, o im
     episodeNotes: { '1_s1_e1': note('x', -100) },
     tombstones: { shows: { 7: iso(-50) }, watched: {}, notes: {} }
   });
-  const imported = lib({ trackedShows: [{ showId: 2, status: 'completed', addedAt: iso(-2000) }, { showId: 7, status: 'watching', addedAt: iso(-3000) }], watchedEpisodes: {}, episodeNotes: {} });
+  const imported = lib({
+    trackedShows: [
+      { showId: 2, status: 'completed', addedAt: iso(-2000) },
+      { showId: 7, status: 'watching', addedAt: iso(-3000) }
+    ],
+    watchedEpisodes: {},
+    episodeNotes: {}
+  });
   const out = LM.replaceWith(current, imported, { now: NOW });
   assert.deepEqual(ids(out), [2, 7]);
   assert.equal(out.trackedShows.find(s => s.showId === 2).updatedAt, new Date(NOW).toISOString());
@@ -173,7 +214,10 @@ test('replaceWith: importar backup — o que sumiu vira marca de exclusão, o im
   assert.ok(out.tombstones.notes['1_s1_e1']);
 
   // um aparelho desatualizado, ao mesclar com o resultado, adota a importação (não ressuscita o que foi descartado)
-  const staleDevice = lib({ trackedShows: [show(1, 'watching', -100), show(2, 'watching', -100)], watchedEpisodes: { '1_s1_e1': watched(-100) } });
+  const staleDevice = lib({
+    trackedShows: [show(1, 'watching', -100), show(2, 'watching', -100)],
+    watchedEpisodes: { '1_s1_e1': watched(-100) }
+  });
   const merged = LM.merge(staleDevice, out, { now: NOW + 1000 });
   assert.deepEqual(ids(merged), [2, 7]);
   assert.equal(merged.trackedShows.find(s => s.showId === 2).status, 'completed');
@@ -243,7 +287,11 @@ test('watchStatus: status inicial e transições automáticas', () => {
 test('watchStatus: effectiveStatus corrige só itens antigos e a fila ignora Finalizado/Pausado/Desisti', () => {
   const all = (s, e) => true;
   assert.equal(WS.effectiveStatus({ status: 'watching' }, series, all), 'completed', 'item antigo, tudo assistido');
-  assert.equal(WS.effectiveStatus({ status: 'watching', updatedAt: iso(-1) }, series, all), 'watching', 'item novo: vale o que o usuário escolheu');
+  assert.equal(
+    WS.effectiveStatus({ status: 'watching', updatedAt: iso(-1) }, series, all),
+    'watching',
+    'item novo: vale o que o usuário escolheu'
+  );
   assert.equal(WS.effectiveStatus({ status: 'paused' }, series, all), 'paused');
   assert.equal(WS.effectiveStatus({ status: '???' }, null, all), 'watching');
   assert.equal(WS.effectiveStatus({ status: '' }, null, all), 'watching');

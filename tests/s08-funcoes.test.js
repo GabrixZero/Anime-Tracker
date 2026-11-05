@@ -20,7 +20,10 @@ test('tabela de emoções: 5 ids únicos com rótulo e ícone, imutável', () =>
   assert.equal(new Set(Emotions.LIST.map(e => e.label)).size, 5);
   assert.equal(new Set(Emotions.LIST.map(e => e.icon)).size, 5);
   for (const e of Emotions.LIST) assert.ok(e.id && e.label && e.icon);
-  assert.throws(() => { 'use strict'; Emotions.LIST[0].label = 'outro'; }, TypeError);
+  assert.throws(() => {
+    'use strict';
+    Emotions.LIST[0].label = 'outro';
+  }, TypeError);
   assert.equal(Emotions.label('fun'), 'Divertido');
   assert.equal(Emotions.label('disappointed'), 'Decepcionado');
   assert.equal(Emotions.withIcon('awesome'), '😍 Adorei');
@@ -33,26 +36,44 @@ test('tabela de emoções: 5 ids únicos com rótulo e ícone, imutável', () =>
 });
 
 test('modal de anotação e filtros do diário (index.html) usam exatamente a tabela de emoções', () => {
-  const modal = [...html.matchAll(/<button type="button" class="emotion-btn" data-emotion="([a-z]+)" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">([^<]+)<\/span><span class="emotion-label">([^<]+)<\/span><\/button>/g)]
-    .map(m => ({ id: m[1], icon: m[2], label: m[3] }));
-  assert.deepEqual(modal, Emotions.LIST.map(e => ({ id: e.id, icon: e.icon, label: e.label })), 'botões do modal divergem de emotions.js');
+  // o Prettier quebra o HTML em várias linhas: compara sem os espaços entre as tags
+  const flat = html.replace(/>\s+</g, '><').replace(/\s+/g, ' ').replace(/" >/g, '">');
+  const modal = [
+    ...flat.matchAll(
+      /<button type="button" class="emotion-btn" data-emotion="([a-z]+)" aria-pressed="false"><span class="emotion-emoji" aria-hidden="true">([^<]+)<\/span><span class="emotion-label">([^<]+)<\/span><\/button>/g
+    )
+  ].map(m => ({ id: m[1], icon: m[2], label: m[3] }));
+  assert.deepEqual(
+    modal,
+    Emotions.LIST.map(e => ({ id: e.id, icon: e.icon, label: e.label })),
+    'botões do modal divergem de emotions.js'
+  );
 
-  const filters = [...html.matchAll(/<button type="button" class="emotion-filter-btn type-pill-btn[^"]*" data-emotion="([a-z]+)" aria-pressed="(?:true|false)">([^<]+)<\/button>/g)]
-    .map(m => ({ id: m[1], text: m[2] }))
+  const filters = [
+    ...flat.matchAll(
+      /<button type="button" class="emotion-filter-btn type-pill-btn[^"]*" data-emotion="([a-z]+)" aria-pressed="(?:true|false)">([^<]+)<\/button>/g
+    )
+  ]
+    .map(m => ({ id: m[1], text: m[2].trim() }))
     .filter(f => f.id !== 'all');
-  assert.deepEqual(filters, Emotions.LIST.map(e => ({ id: e.id, text: `${e.icon} ${e.label}` })), 'filtros do diário divergem de emotions.js');
+  assert.deepEqual(
+    filters,
+    Emotions.LIST.map(e => ({ id: e.id, text: `${e.icon} ${e.label}` })),
+    'filtros do diário divergem de emotions.js'
+  );
 });
 
 test('diário e estatísticas não repetem rótulos de emoção (leem a tabela)', () => {
   for (const f of ['diaryView.js', 'statsView.js']) {
     const src = read('js', 'views', f);
     assert.ok(/Emotions\./.test(src), `${f} não usa window.Emotions`);
-    for (const old of ['Engraçado', 'Ruim', "'Adorei'", "'Chocado'", "'Triste'"]) assert.ok(!src.includes(old), `${f} ainda tem o rótulo fixo ${old}`);
+    for (const old of ['Engraçado', 'Ruim', "'Adorei'", "'Chocado'", "'Triste'"])
+      assert.ok(!src.includes(old), `${f} ainda tem o rótulo fixo ${old}`);
   }
 });
 
 test('emotions.js, markdown.js e mediaDisplay.js carregam antes das views no index.html', () => {
-  const at = (s) => html.indexOf(`<script src="js/utils/${s}.js">`);
+  const at = s => html.indexOf(`<script src="js/utils/${s}.js">`);
   for (const s of ['emotions', 'markdown', 'mediaDisplay']) {
     assert.ok(at(s) > at('dom') && at(s) < html.indexOf('js/views/nextUpView.js'), `${s}.js fora de ordem`);
   }
@@ -95,11 +116,12 @@ test('imagem reserva é um arquivo local (nada de Unsplash nem de terceiros no f
     assert.match(fs.readFileSync(path.join(pub, file), 'utf8'), /^<svg\b/);
   }
   const offenders = [];
-  const walk = (dir) => {
+  const walk = dir => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, entry.name);
       if (entry.isDirectory()) walk(p);
-      else if (/\.(js|html|css|svg)$/.test(entry.name) && /unsplash/i.test(fs.readFileSync(p, 'utf8'))) offenders.push(path.relative(pub, p));
+      else if (/\.(js|html|css|svg)$/.test(entry.name) && /unsplash/i.test(fs.readFileSync(p, 'utf8')))
+        offenders.push(path.relative(pub, p));
     }
   };
   walk(pub);
@@ -120,7 +142,18 @@ test('views não inventam nota 8.0, duração 120/45 nem "Drama" como valor exib
 // ---------------------------------------------------------------- rótulos
 
 test('rótulos não vazam implementação nem prometem o que não existe', () => {
-  for (const bad of ['Explorar API', 'Pesquisar API', 'TV Show Time Replica', 'TV Time Replica', 'Destaques da API', 'Catálogo da API', 'Local-First', 'persistência atômica', 'Blindagem', 'Auto-Save 350ms']) {
+  for (const bad of [
+    'Explorar API',
+    'Pesquisar API',
+    'TV Show Time Replica',
+    'TV Time Replica',
+    'Destaques da API',
+    'Catálogo da API',
+    'Local-First',
+    'persistência atômica',
+    'Blindagem',
+    'Auto-Save 350ms'
+  ]) {
     assert.ok(!html.includes(bad), `index.html ainda tem "${bad}"`);
   }
   const explore = read('js', 'views', 'exploreView.js');
@@ -144,5 +177,6 @@ test('o editor tem botão de histórico e painel de versões; o diário renderiz
   assert.match(html, /id="note-history-list"/);
   assert.match(read('js', 'views', 'diaryView.js'), /NoteMarkdown\.render\(e\.text\)/);
   // a barra do editor insere exatamente a sintaxe que o renderizador entende
-  for (const insert of ['data-insert="**"', 'data-insert="*"', 'data-insert="> "', 'data-insert=">!spoiler!<"']) assert.ok(html.includes(insert), insert);
+  for (const insert of ['data-insert="**"', 'data-insert="*"', 'data-insert="> "', 'data-insert=">!spoiler!<"'])
+    assert.ok(html.includes(insert), insert);
 });

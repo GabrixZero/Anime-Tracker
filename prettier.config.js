@@ -1,6 +1,4 @@
-// Prettier: config mínima que acompanha o estilo atual do projeto (aspas simples, ponto e vírgula, 140 colunas).
-// `npm run format:check` confere só os arquivos da fase A da S10 (veja package.json); o resto do código será formatado com cuidado,
-// depois que as sessões paralelas terminarem, para não gerar conflitos de merge.
+// Prettier: config mínima do projeto (aspas simples, ponto e vírgula, 140 colunas). `npm run format:check` cobre o repositório inteiro (S19).
 module.exports = {
   singleQuote: true,
   semi: true,

@@ -24,7 +24,8 @@ test('MAL XML: lê campos, status, nota 1–10 como está e descarta item sem id
 });
 
 test('MAL XML: recusa DOCTYPE/ENTITY (XXE), arquivo errado e arquivo enorme', () => {
-  const evil = '<?xml version="1.0"?><!DOCTYPE x [<!ENTITY a SYSTEM "file:///etc/passwd">]><myanimelist><anime><series_animedb_id>1</series_animedb_id><series_title>&a;</series_title></anime></myanimelist>';
+  const evil =
+    '<?xml version="1.0"?><!DOCTYPE x [<!ENTITY a SYSTEM "file:///etc/passwd">]><myanimelist><anime><series_animedb_id>1</series_animedb_id><series_title>&a;</series_title></anime></myanimelist>';
   assert.throws(() => IE.parseMalXml(evil), /DOCTYPE|ENTITY/);
   assert.throws(() => IE.parseMalXml('<html></html>'), /MyAnimeList/);
   assert.throws(() => IE.parseMalXml('x'.repeat(IE.MAX_FILE_CHARS + 1)), /grande demais/);
@@ -33,13 +34,18 @@ test('MAL XML: recusa DOCTYPE/ENTITY (XXE), arquivo errado e arquivo enorme', ()
 });
 
 test('MAL XML: entidades desconhecidas não são expandidas', () => {
-  const xml = '<myanimelist><anime><series_animedb_id>7</series_animedb_id><series_title>A&bomba;B&#60;i&#x3E;</series_title></anime></myanimelist>';
+  const xml =
+    '<myanimelist><anime><series_animedb_id>7</series_animedb_id><series_title>A&bomba;B&#60;i&#x3E;</series_title></anime></myanimelist>';
   assert.equal(IE.parseMalXml(xml).items[0].title, 'AB<i>');
 });
 
 test('CSV: aspas, vírgulas, quebras de linha e BOM', () => {
   const rows = IE.parseCsv('\uFEFFa,b\r\n"x, y","linha1\nlinha2"\r\n"aspas ""duplas""",z\r\n');
-  assert.deepEqual(rows, [['a', 'b'], ['x, y', 'linha1\nlinha2'], ['aspas "duplas"', 'z']]);
+  assert.deepEqual(rows, [
+    ['a', 'b'],
+    ['x, y', 'linha1\nlinha2'],
+    ['aspas "duplas"', 'z']
+  ]);
 });
 
 test('TV Time CSV: agrupa por obra, filmes à parte e ignora linhas sem episódio', () => {
@@ -73,11 +79,31 @@ test('combineStatuses: temporadas da mesma franquia', () => {
 
 test('applyEntries: soma sem apagar, mantém o que já existe, relata conflitos e passa pelo validateBackup', () => {
   const data = LibraryMerge.emptyData();
-  data.trackedShows.push({ showId: 10000900, status: 'paused', addedAt: '2024-01-01T00:00:00.000Z', updatedAt: '2024-01-01T00:00:00.000Z', rating: 5 });
-  data.watchedEpisodes['10000900_s1_e1'] = { watched: true, watchedAt: '2024-01-01T00:00:00.000Z', updatedAt: '2024-01-01T00:00:00.000Z', rewatchCount: 1 };
+  data.trackedShows.push({
+    showId: 10000900,
+    status: 'paused',
+    addedAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
+    rating: 5
+  });
+  data.watchedEpisodes['10000900_s1_e1'] = {
+    watched: true,
+    watchedAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
+    rewatchCount: 1
+  };
   data.tombstones.shows['10000901'] = '2024-01-02T00:00:00.000Z';
   const entries = [
-    { showId: 10000900, isMovie: false, status: 'watching', rating: 8, episodes: [{ season: 1, episode: 1, at: '' }, { season: 1, episode: 2, at: '2024-05-05T00:00:00.000Z' }] },
+    {
+      showId: 10000900,
+      isMovie: false,
+      status: 'watching',
+      rating: 8,
+      episodes: [
+        { season: 1, episode: 1, at: '' },
+        { season: 1, episode: 2, at: '2024-05-05T00:00:00.000Z' }
+      ]
+    },
     { showId: 10000901, isMovie: false, status: 'watching', rating: 7.5, episodes: [{ season: 1, episode: 1, at: '' }] },
     { showId: 555, isMovie: true, status: 'completed', rating: null, episodes: [], movieAt: '' }
   ];
@@ -99,7 +125,9 @@ test('applyEntries: soma sem apagar, mantém o que já existe, relata conflitos 
 });
 
 test('nota fora do formato novo é ignorada (nunca arredonda)', () => {
-  const { data } = IE.applyEntries(LibraryMerge.emptyData(), [{ showId: 1, isMovie: false, status: 'watching', rating: 8.55, episodes: [] }]);
+  const { data } = IE.applyEntries(LibraryMerge.emptyData(), [
+    { showId: 1, isMovie: false, status: 'watching', rating: 8.55, episodes: [] }
+  ]);
   assert.equal(data.trackedShows[0].rating, undefined);
 });
 

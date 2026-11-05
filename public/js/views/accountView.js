@@ -13,14 +13,14 @@ class AccountView {
 
   bindEvents() {
     document.getElementById('btn-close-account').addEventListener('click', () => this.close());
-    this.modal.addEventListener('click', (e) => {
+    this.modal.addEventListener('click', e => {
       if (e.target === this.modal) this.close();
     });
-    document.getElementById('account-password-form').addEventListener('submit', (e) => {
+    document.getElementById('account-password-form').addEventListener('submit', e => {
       e.preventDefault();
       this.handleChangePassword();
     });
-    document.getElementById('account-delete-form').addEventListener('submit', (e) => {
+    document.getElementById('account-delete-form').addEventListener('submit', e => {
       e.preventDefault();
       this.handleDelete();
     });
@@ -48,7 +48,7 @@ class AccountView {
   async open() {
     this.modal.classList.remove('hidden');
     ['account-password-msg', 'account-sessions-msg', 'account-delete-msg'].forEach(id => this.showMessage(id, ''));
-    ['account-current-password', 'account-new-password', 'account-confirm-password', 'account-delete-password'].forEach((id) => {
+    ['account-current-password', 'account-new-password', 'account-confirm-password', 'account-delete-password'].forEach(id => {
       document.getElementById(id).value = '';
     });
     try {
@@ -71,9 +71,8 @@ class AccountView {
     document.getElementById('account-email').textContent = user.email || '';
     document.getElementById('account-provider').textContent = isGoogle ? 'Google' : 'E-mail e senha';
     const created = user.createdAt ? new Date(user.createdAt) : null;
-    document.getElementById('account-created').textContent = created && !Number.isNaN(created.getTime())
-      ? created.toLocaleDateString('pt-BR')
-      : '—';
+    document.getElementById('account-created').textContent =
+      created && !Number.isNaN(created.getTime()) ? created.toLocaleDateString('pt-BR') : '—';
     const avatar = document.getElementById('account-avatar');
     avatar.src = window.safeUrl ? window.safeUrl(user.avatar) : '';
     avatar.alt = `Avatar de ${user.name || 'usuário'}`;
@@ -87,7 +86,9 @@ class AccountView {
 
   setBusy(buttonIds, busy) {
     this.busy = busy;
-    buttonIds.forEach((id) => { document.getElementById(id).disabled = busy; });
+    buttonIds.forEach(id => {
+      document.getElementById(id).disabled = busy;
+    });
   }
 
   async handleChangePassword() {
@@ -113,7 +114,7 @@ class AccountView {
       const res = await window.apiClient.changePassword(current, next);
       // Os outros aparelhos caem; este recebe um token novo.
       if (res && res.token) localStorage.setItem('showvault_auth_token', res.token);
-      ['account-current-password', 'account-new-password', 'account-confirm-password'].forEach((id) => {
+      ['account-current-password', 'account-new-password', 'account-confirm-password'].forEach(id => {
         document.getElementById(id).value = '';
       });
       window.appController.showToast('Senha alterada com sucesso. Os outros aparelhos precisarão entrar de novo.', 'success');

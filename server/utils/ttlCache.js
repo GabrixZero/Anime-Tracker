@@ -10,7 +10,10 @@ class TtlCache {
   get(key, ttlMs = this.ttlMs) {
     const hit = this.map.get(key);
     if (!hit) return undefined;
-    if (this.now() - hit.at >= ttlMs) { this.map.delete(key); return undefined; }
+    if (this.now() - hit.at >= ttlMs) {
+      this.map.delete(key);
+      return undefined;
+    }
     return hit.value;
   }
 
@@ -20,8 +23,12 @@ class TtlCache {
     this.map.set(key, { at: this.now(), value });
   }
 
-  clear() { this.map.clear(); }
-  get size() { return this.map.size; }
+  clear() {
+    this.map.clear();
+  }
+  get size() {
+    return this.map.size;
+  }
 }
 
 module.exports = TtlCache;

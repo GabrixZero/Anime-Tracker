@@ -26,7 +26,19 @@ const totalEpisodes = work => work.seasons.reduce((n, s) => n + s.episodes.lengt
 // Seed mínimo (sem nenhum anime): para provar o id pedido sem a troca de amostras do seed.
 function seedWithoutAnime() {
   const file = path.join(T.newDir(), 'seed.json');
-  fs.writeFileSync(file, JSON.stringify([{ id: 1396, type: 'tv', name: 'Breaking Bad', overview: 'x', genres: ['Drama'], seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'Piloto' }] }] }]));
+  fs.writeFileSync(
+    file,
+    JSON.stringify([
+      {
+        id: 1396,
+        type: 'tv',
+        name: 'Breaking Bad',
+        overview: 'x',
+        genres: ['Drama'],
+        seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'Piloto' }] }]
+      }
+    ])
+  );
   return file;
 }
 
@@ -37,8 +49,13 @@ function seedWithoutAnime() {
 function rawClient(extra = {}) {
   const calls = [];
   const client = new AniListClient({
-    fetchJson: async (url, opts) => { calls.push(JSON.parse(opts.body).variables); return respond(JSON.parse(opts.body)); },
-    sleep: async () => {}, minIntervalMs: 0, ...extra
+    fetchJson: async (url, opts) => {
+      calls.push(JSON.parse(opts.body).variables);
+      return respond(JSON.parse(opts.body));
+    },
+    sleep: async () => {},
+    minIntervalMs: 0,
+    ...extra
   });
   client.calls = calls;
   return client;
@@ -92,8 +109,14 @@ test('cliente: busca vazia não consulta; resposta de erro vira erro tipado; cac
   assert.equal(client.calls.length, 1);
 
   const err = res => new AniListClient({ fetchJson: async () => res, sleep: async () => {}, minIntervalMs: 0, retries: 0 });
-  await assert.rejects(err({ errors: [{ message: 'Not Found.', status: 404 }], data: { Media: null } }).getMedia({ id: 1 }), e => e.code === 'NOT_FOUND');
-  await assert.rejects(err({ errors: [{ message: 'Too Many Requests.', status: 429 }], data: null }).searchAnime('a'), e => e.code === 'RATE_LIMITED');
+  await assert.rejects(
+    err({ errors: [{ message: 'Not Found.', status: 404 }], data: { Media: null } }).getMedia({ id: 1 }),
+    e => e.code === 'NOT_FOUND'
+  );
+  await assert.rejects(
+    err({ errors: [{ message: 'Too Many Requests.', status: 429 }], data: null }).searchAnime('a'),
+    e => e.code === 'RATE_LIMITED'
+  );
   await assert.rejects(err({ errors: [{ message: 'Validation', status: 400 }], data: null }).searchAnime('a'), e => e.code === 'UPSTREAM');
   await assert.rejects(err('lixo').searchAnime('a'), e => e.code === 'UPSTREAM');
   await assert.rejects(err({ data: { Page: { media: 'x' } } }).searchAnime('a'), e => e.code === 'UPSTREAM');
@@ -107,40 +130,80 @@ test('cliente: busca vazia não consulta; resposta de erro vira erro tipado; cac
 test('franquia Frieren: S1 + S2 viram temporadas; a 3ª (anunciada, sem episódios) fica de fora; datas só quando a AniList sabe', async () => {
   const client = rawClient();
   const franchise = await client.getFranchise({ idMal: 52991 });
-  assert.deepEqual(franchise.nodes.map(n => n.id).sort((a, b) => a - b), [154587, 182255, 209939]);
+  assert.deepEqual(
+    franchise.nodes.map(n => n.id).sort((a, b) => a - b),
+    [154587, 182255, 209939]
+  );
   assert.equal(franchise.truncated, false);
 
   const work = mapper.buildAnimeWork(toInternalId('jikan', 52991), { malId: 52991 }, franchise);
   assert.equal(work.id, 10052991);
   assert.equal(work.mal_id, 52991);
-  assert.deepEqual(work.mal_ids.sort((a, b) => a - b), [52991, 59978, 63816]);
-  assert.deepEqual(work.anilist_ids.sort((a, b) => a - b), [154587, 182255, 209939]);
-  assert.deepEqual(work.seasons.map(s => s.name), ['Temporada 1 · Outono 2023', 'Temporada 2 · Inverno 2026']);
-  assert.deepEqual(work.seasons.map(s => s.episodes.length), [28, 10]);
-  assert.deepEqual(work.franchise.entries.map(e => [e.anilist_id, e.mal_id, e.season_number, e.kind]), [[154587, 52991, 1, 'TV'], [182255, 59978, 2, 'TV']]);
+  assert.deepEqual(
+    work.mal_ids.sort((a, b) => a - b),
+    [52991, 59978, 63816]
+  );
+  assert.deepEqual(
+    work.anilist_ids.sort((a, b) => a - b),
+    [154587, 182255, 209939]
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.name),
+    ['Temporada 1 · Outono 2023', 'Temporada 2 · Inverno 2026']
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.episodes.length),
+    [28, 10]
+  );
+  assert.deepEqual(
+    work.franchise.entries.map(e => [e.anilist_id, e.mal_id, e.season_number, e.kind]),
+    [
+      [154587, 52991, 1, 'TV'],
+      [182255, 59978, 2, 'TV']
+    ]
+  );
   assert.equal(work.status, 'Finalizada');
   assert.equal(work.name, `Frieren: Beyond Journey${RSQUO}s End`);
 
   const s1 = work.seasons[0].episodes;
-  assert.deepEqual(s1[0], { episode_number: 1, name: 'Episódio 1', runtime: 24, air_date: '2023-09-29', overview: '', still_path: null }, 'sem título (AniList não tem); o 1º episódio estreia na data de início');
+  assert.deepEqual(
+    s1[0],
+    { episode_number: 1, name: 'Episódio 1', runtime: 24, air_date: '2023-09-29', overview: '', still_path: null },
+    'sem título (AniList não tem); o 1º episódio estreia na data de início'
+  );
   assert.equal(s1[1].air_date, '', 'episódios 2 a 4 não estão na grade da AniList: sem data, nada inventado');
   assert.equal(s1[4].air_date, '2023-10-06', 'episódio 5 vem da grade (airingAt 1696600800, UTC)');
   assert.equal(s1[27].episode_number, 28);
-  assert.ok(work.seasons[1].episodes.every(e => /^\d{4}-\d{2}-\d{2}$/.test(e.air_date)), 'a 2ª temporada tem a grade inteira');
+  assert.ok(
+    work.seasons[1].episodes.every(e => /^\d{4}-\d{2}-\d{2}$/.test(e.air_date)),
+    'a 2ª temporada tem a grade inteira'
+  );
 });
 
 test('franquia Naruto: série, filme, especial e Boruto na ordem de exibição; Boruto Part 2 (anunciada) fica de fora', async () => {
   const franchise = await rawClient().getFranchise({ idMal: 20 });
   assert.equal(franchise.nodes.length, 6);
   const work = mapper.buildAnimeWork(10000020, { malId: 20 }, franchise);
-  assert.deepEqual(work.seasons.map(s => s.episodes.length), [220, 500, 1, 1, 293]);
-  assert.deepEqual(work.seasons.map(s => s.name.split(':')[0]), ['Temporada 1 · Outono 2002', 'Temporada 2 · Inverno 2007', 'Filme', 'Especial', 'Temporada 3 · Primavera 2017'].map(n => n.split(':')[0]));
+  assert.deepEqual(
+    work.seasons.map(s => s.episodes.length),
+    [220, 500, 1, 1, 293]
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.name.split(':')[0]),
+    ['Temporada 1 · Outono 2002', 'Temporada 2 · Inverno 2007', 'Filme', 'Especial', 'Temporada 3 · Primavera 2017'].map(
+      n => n.split(':')[0]
+    )
+  );
   assert.ok(work.seasons[2].name.startsWith('Filme: Boruto: Naruto the Movie'));
   assert.equal(work.seasons[2].episodes[0].runtime, 95, 'filme: 1 episódio com a duração real');
   assert.equal(work.seasons[1].episodes[499].air_date, '2017-03-23', 'últimos episódios do Shippuden estão na grade');
   assert.equal(work.seasons[1].episodes[300].air_date, '', 'sem grade: sem data');
   assert.equal(work.status, 'Finalizada');
-  assert.deepEqual(work.mal_ids, [20, 1735, 32365, 34566, 28755, 54687].sort((a, b) => a - b).sort((a, b) => work.mal_ids.indexOf(a) - work.mal_ids.indexOf(b)), 'inclui até a entrada sem episódios (para a busca não mostrá-la de novo)');
+  assert.deepEqual(
+    work.mal_ids,
+    [20, 1735, 32365, 34566, 28755, 54687].sort((a, b) => a - b).sort((a, b) => work.mal_ids.indexOf(a) - work.mal_ids.indexOf(b)),
+    'inclui até a entrada sem episódios (para a busca não mostrá-la de novo)'
+  );
 });
 
 test('franquia Attack on Titan: 9 entradas (temporadas, OVA e especiais), uma sem idMal; o limite de entradas marca truncated', async () => {
@@ -148,11 +211,24 @@ test('franquia Attack on Titan: 9 entradas (temporadas, OVA e especiais), uma se
   const franchise = await client.getFranchise({ idMal: 16498 });
   assert.equal(franchise.nodes.length, 9);
   const work = mapper.buildAnimeWork(10016498, { malId: 16498 }, franchise);
-  assert.deepEqual(work.seasons.map(s => s.episodes.length), [25, 2, 12, 12, 10, 16, 12, 1, 1]);
-  assert.deepEqual(work.seasons.map(s => s.name.replace(/:.*/, '')), [
-    'Temporada 1 · Primavera 2013', 'OVA', 'Temporada 2 · Primavera 2017', 'Temporada 3 · Verão 2018', 'Temporada 4 · Primavera 2019',
-    'Temporada 5 · Inverno 2021', 'Temporada 6 · Inverno 2022', 'Especial', 'Especial'
-  ]);
+  assert.deepEqual(
+    work.seasons.map(s => s.episodes.length),
+    [25, 2, 12, 12, 10, 16, 12, 1, 1]
+  );
+  assert.deepEqual(
+    work.seasons.map(s => s.name.replace(/:.*/, '')),
+    [
+      'Temporada 1 · Primavera 2013',
+      'OVA',
+      'Temporada 2 · Primavera 2017',
+      'Temporada 3 · Verão 2018',
+      'Temporada 4 · Primavera 2019',
+      'Temporada 5 · Inverno 2021',
+      'Temporada 6 · Inverno 2022',
+      'Especial',
+      'Especial'
+    ]
+  );
   assert.equal(work.mal_ids.length, 8, 'a entrada sem idMal não entra em mal_ids...');
   assert.equal(work.anilist_ids.length, 9, '...mas está em anilist_ids');
   assert.equal(work.franchise.entries.filter(e => e.mal_id === undefined).length, 1);
@@ -177,7 +253,22 @@ test('franquia One Piece: sem total de episódios, vale até o último já exibi
 });
 
 test('mapper: nada inventado quando a fonte não traz (sem nota, imagem, gêneros, duração, datas)', () => {
-  const bare = { id: 999001, idMal: null, type: 'ANIME', format: 'TV', status: 'RELEASING', episodes: 3, title: { romaji: 'Obra Sem Dados', english: null, native: null }, synonyms: [], startDate: {}, genres: [], coverImage: null, bannerImage: null, description: null, duration: null };
+  const bare = {
+    id: 999001,
+    idMal: null,
+    type: 'ANIME',
+    format: 'TV',
+    status: 'RELEASING',
+    episodes: 3,
+    title: { romaji: 'Obra Sem Dados', english: null, native: null },
+    synonyms: [],
+    startDate: {},
+    genres: [],
+    coverImage: null,
+    bannerImage: null,
+    description: null,
+    duration: null
+  };
   const entry = mapper.mapAnimeSearchEntry(bare);
   assert.equal(entry.id, toInternalId('anilist', 999001));
   assert.equal(entry.vote_average, null);
@@ -190,9 +281,22 @@ test('mapper: nada inventado quando a fonte não traz (sem nota, imagem, gênero
   assert.equal(entry.name, 'Obra Sem Dados');
   assert.equal(entry.original_name, '');
   const eps = mapper.episodesFor(bare);
-  assert.deepEqual(eps.map(e => [e.name, e.runtime, e.air_date]), [['Episódio 1', null, ''], ['Episódio 2', null, ''], ['Episódio 3', null, '']]);
+  assert.deepEqual(
+    eps.map(e => [e.name, e.runtime, e.air_date]),
+    [
+      ['Episódio 1', null, ''],
+      ['Episódio 2', null, ''],
+      ['Episódio 3', null, '']
+    ]
+  );
   // textos externos passam pelo sanitizador (HTML e URLs perigosas)
-  const evil = mapper.mapAnimeBase({ ...bare, title: { romaji: '<img src=x onerror=alert(1)>Obra' }, description: '<script>alert(1)</script>Sinopse<br>linha 2', coverImage: { large: 'javascript:alert(1)' }, bannerImage: 'data:text/html,x' });
+  const evil = mapper.mapAnimeBase({
+    ...bare,
+    title: { romaji: '<img src=x onerror=alert(1)>Obra' },
+    description: '<script>alert(1)</script>Sinopse<br>linha 2',
+    coverImage: { large: 'javascript:alert(1)' },
+    bannerImage: 'data:text/html,x'
+  });
   assert.equal(evil.name, 'Obra');
   assert.equal(evil.overview, 'Sinopse linha 2');
   assert.equal(evil.poster_path, null);
@@ -213,7 +317,10 @@ test('busca "Frieren" (Jikan fora do ar): as temporadas viram UMA obra, a amostr
   assert.equal(main.id, toInternalId('jikan', 52991));
   assert.equal(main.name, `Frieren: Beyond Journey${RSQUO}s End`);
   assert.equal(main.related_count, 2, 'S2 e S3 agrupadas');
-  assert.deepEqual(main.mal_ids.sort((a, b) => a - b), [52991, 59978, 63816]);
+  assert.deepEqual(
+    main.mal_ids.sort((a, b) => a - b),
+    [52991, 59978, 63816]
+  );
   assert.equal(main.catalog_id, 209867, 'é a mesma obra da amostra do seed (Frieren e a Jornada para o Além)');
   assert.ok(!items.some(i => i.id === 209867), 'a amostra não aparece de novo');
   assert.equal(main.isExternal, true);
@@ -222,7 +329,11 @@ test('busca "Frieren" (Jikan fora do ar): as temporadas viram UMA obra, a amostr
   assert.equal(svc.callsTo('jikan').length, 0, 'a Jikan (reserva) não é consultada quando a AniList responde');
   assert.equal(svc.callsTo('anilist').length, 1);
   const { opts } = svc.callsTo('anilist')[0];
-  assert.deepEqual([opts.method, opts.headers['Content-Type'], opts.retries429, opts.timeoutMs], ['POST', 'application/json', 0, 6000], 'GraphQL por POST, sem retry próprio, com limite de espera');
+  assert.deepEqual(
+    [opts.method, opts.headers['Content-Type'], opts.retries429, opts.timeoutMs],
+    ['POST', 'application/json', 0, 6000],
+    'GraphQL por POST, sem retry próprio, com limite de espera'
+  );
 });
 
 test('busca "Naruto": "Naruto" primeiro, cada entrada uma vez, sem duplicatas; depois de ingerir a franquia, Shippuden não reaparece', async () => {
@@ -254,7 +365,10 @@ test('busca "Attack on Titan" e "進撃の巨人": a franquia vira um resultado 
     assert.equal(items[0].catalog_id, 1429);
     assert.ok(!items.some(i => i.id === 1429));
     assert.equal(items.filter(i => (i.mal_ids || []).includes(16498)).length, 1);
-    assert.ok(items.some(i => i.id === toInternalId('anilist', 162314)), 'entrada sem idMal entra pela faixa da AniList');
+    assert.ok(
+      items.some(i => i.id === toInternalId('anilist', 162314)),
+      'entrada sem idMal entra pela faixa da AniList'
+    );
   }
 });
 
@@ -281,31 +395,76 @@ test('busca por tipo: série não chama a AniList; anime não chama o TVMaze (co
 
 // Jikan simulada mínima (formato real da API v4) para os testes de reserva
 const jikanAnime = (id, o = {}) => ({
-  mal_id: id, title: `Anime ${id}`, title_english: null, title_japanese: null, title_synonyms: [], titles: [], type: 'TV', episodes: 12, status: 'Finished Airing',
-  aired: { from: '2013-04-07T00:00:00+00:00' }, duration: '24 min per ep', score: 8.5, season: 'spring', year: 2013, synopsis: 'Sinopse.', genres: [{ name: 'Action' }], themes: [],
-  images: { jpg: { image_url: `https://cdn.myanimelist.net/images/anime/${id}.jpg` } }, relations: [], ...o
+  mal_id: id,
+  title: `Anime ${id}`,
+  title_english: null,
+  title_japanese: null,
+  title_synonyms: [],
+  titles: [],
+  type: 'TV',
+  episodes: 12,
+  status: 'Finished Airing',
+  aired: { from: '2013-04-07T00:00:00+00:00' },
+  duration: '24 min per ep',
+  score: 8.5,
+  season: 'spring',
+  year: 2013,
+  synopsis: 'Sinopse.',
+  genres: [{ name: 'Action' }],
+  themes: [],
+  images: { jpg: { image_url: `https://cdn.myanimelist.net/images/anime/${id}.jpg` } },
+  relations: [],
+  ...o
 });
-const JIKAN_FRIEREN = jikanAnime(52991, { title: 'Sousou no Frieren', title_english: "Frieren: Beyond Journey's End", title_japanese: '葬送のフリーレン', episodes: 3, aired: { from: '2023-09-29T00:00:00+00:00' }, season: 'fall', year: 2023 });
+const JIKAN_FRIEREN = jikanAnime(52991, {
+  title: 'Sousou no Frieren',
+  title_english: "Frieren: Beyond Journey's End",
+  title_japanese: '葬送のフリーレン',
+  episodes: 3,
+  aired: { from: '2023-09-29T00:00:00+00:00' },
+  season: 'fall',
+  year: 2023
+});
 function jikanHandler(animes) {
   const byId = new Map(animes.map(a => [a.mal_id, a]));
-  return (url) => {
+  return url => {
     const u = new URL(url);
     let m;
-    if (u.pathname === '/v4/anime') return { data: animes.filter(a => (a.title + (a.title_english || '')).toLowerCase().includes(u.searchParams.get('q').toLowerCase())) };
-    if ((m = /^\/v4\/anime\/(\d+)\/full$/.exec(u.pathname))) { const a = byId.get(Number(m[1])); if (!a) throw mediaErrors.notFound(); return { data: a }; }
+    if (u.pathname === '/v4/anime')
+      return {
+        data: animes.filter(a => (a.title + (a.title_english || '')).toLowerCase().includes(u.searchParams.get('q').toLowerCase()))
+      };
+    if ((m = /^\/v4\/anime\/(\d+)\/full$/.exec(u.pathname))) {
+      const a = byId.get(Number(m[1]));
+      if (!a) throw mediaErrors.notFound();
+      return { data: a };
+    }
     if ((m = /^\/v4\/anime\/(\d+)\/episodes$/.exec(u.pathname))) {
       const a = byId.get(Number(m[1]));
-      return { pagination: { has_next_page: false }, data: Array.from({ length: a.episodes || 0 }, (_, i) => ({ mal_id: i + 1, title: `Título ${i + 1}`, aired: '2023-09-29T00:00:00+00:00', duration: 1440 })) };
+      return {
+        pagination: { has_next_page: false },
+        data: Array.from({ length: a.episodes || 0 }, (_, i) => ({
+          mal_id: i + 1,
+          title: `Título ${i + 1}`,
+          aired: '2023-09-29T00:00:00+00:00',
+          duration: 1440
+        }))
+      };
     }
     throw new Error(`URL inesperada na Jikan simulada: ${url}`);
   };
 }
-const anilistDown = () => { throw mediaErrors.upstream('Tempo esgotado na fonte externa.', { unreachable: true }); };
+const anilistDown = () => {
+  throw mediaErrors.upstream('Tempo esgotado na fonte externa.', { unreachable: true });
+};
 
 test('reserva: AniList fora do ar -> a Jikan responde; o aviso da AniList fica (fallback) e o disjuntor evita esperar de novo', async () => {
   const svc = newService({ handlers: { anilist: anilistDown, jikan: jikanHandler([JIKAN_FRIEREN]) } });
   const { items, warnings } = await svc.searchDetailed('Frieren', 'anime');
-  assert.deepEqual(warnings.map(w => [w.source, w.code, w.fallback]), [['anilist', 'UPSTREAM', 'jikan']]);
+  assert.deepEqual(
+    warnings.map(w => [w.source, w.code, w.fallback]),
+    [['anilist', 'UPSTREAM', 'jikan']]
+  );
   assert.equal(items.length, 1);
   assert.equal(items[0].id, toInternalId('jikan', 52991));
   assert.equal(items[0].catalog_id, 209867, 'a troca da amostra do seed vale também para a reserva');
@@ -314,15 +473,29 @@ test('reserva: AniList fora do ar -> a Jikan responde; o aviso da AniList fica (
 
   // segunda busca: o disjuntor da AniList está aberto, nenhuma requisição nova a ela
   const again = await svc.searchDetailed('Frieren x', 'anime');
-  assert.deepEqual(again.warnings.map(w => w.fallback), ['jikan']);
+  assert.deepEqual(
+    again.warnings.map(w => w.fallback),
+    ['jikan']
+  );
   assert.equal(svc.callsTo('anilist').length, 1, 'AniList não foi consultada de novo');
 });
 
 test('reserva: AniList com 429 também cai para a Jikan e o aviso leva o tempo de espera', async () => {
-  const svc = newService({ handlers: { anilist: () => { throw mediaErrors.rateLimited(30000); }, jikan: jikanHandler([JIKAN_FRIEREN]) }, extra: { anilist: { minIntervalMs: 0, retries: 0 } } });
+  const svc = newService({
+    handlers: {
+      anilist: () => {
+        throw mediaErrors.rateLimited(30000);
+      },
+      jikan: jikanHandler([JIKAN_FRIEREN])
+    },
+    extra: { anilist: { minIntervalMs: 0, retries: 0 } }
+  });
   const { items, warnings } = await svc.searchDetailed('Frieren', 'anime');
   assert.equal(items.length, 1);
-  assert.deepEqual(warnings.map(w => [w.source, w.code, w.retryAfterSec, w.fallback]), [['anilist', 'RATE_LIMITED', 30, 'jikan']]);
+  assert.deepEqual(
+    warnings.map(w => [w.source, w.code, w.retryAfterSec, w.fallback]),
+    [['anilist', 'RATE_LIMITED', 30, 'jikan']]
+  );
 });
 
 test('reserva: uma lista VAZIA da AniList é uma resposta (a obra não existe) e não aciona a Jikan', async () => {
@@ -336,20 +509,54 @@ test('reserva: uma lista VAZIA da AniList é uma resposta (a obra não existe) e
 test('reserva: AniList e Jikan fora do ar -> o catálogo local responde com um aviso por fonte; sem nada local, sobe o erro tipado', async () => {
   const svc = newService({ handlers: { anilist: anilistDown } });
   const local = await svc.searchDetailed('Death Note', 'anime');
-  assert.deepEqual(local.items.map(i => i.id), [13916], 'a amostra do seed continua aparecendo, uma vez');
-  assert.deepEqual(local.warnings.map(w => [w.source, w.code, w.fallback]), [['anilist', 'UPSTREAM', undefined], ['jikan', 'UPSTREAM', undefined]]);
+  assert.deepEqual(
+    local.items.map(i => i.id),
+    [13916],
+    'a amostra do seed continua aparecendo, uma vez'
+  );
+  assert.deepEqual(
+    local.warnings.map(w => [w.source, w.code, w.fallback]),
+    [
+      ['anilist', 'UPSTREAM', undefined],
+      ['jikan', 'UPSTREAM', undefined]
+    ]
+  );
 
-  await assert.rejects(newService({ handlers: { anilist: anilistDown } }).searchDetailed('algo que ninguém tem', 'anime'), e => e.code === 'UPSTREAM');
+  await assert.rejects(
+    newService({ handlers: { anilist: anilistDown } }).searchDetailed('algo que ninguém tem', 'anime'),
+    e => e.code === 'UPSTREAM'
+  );
   // 429 da AniList e Jikan fora: o "aguarde" (429) é o erro mais útil
-  const limited = newService({ handlers: { anilist: () => { throw mediaErrors.rateLimited(9000); } }, extra: { anilist: { minIntervalMs: 0, retries: 0 } } });
+  const limited = newService({
+    handlers: {
+      anilist: () => {
+        throw mediaErrors.rateLimited(9000);
+      }
+    },
+    extra: { anilist: { minIntervalMs: 0, retries: 0 } }
+  });
   await assert.rejects(limited.searchDetailed('algo que ninguém tem', 'anime'), e => e.code === 'RATE_LIMITED' && e.retryAfterMs === 9000);
 });
 
 test('anime com as duas fontes desligadas ainda acha o que é anime no TVMaze (reserva final)', async () => {
-  const show = { show: { id: 321, name: 'Naruto TVMaze', type: 'Animation', language: 'Japanese', genres: ['Anime'], premiered: '2002-10-03', status: 'Ended', summary: '<p>x</p>' } };
+  const show = {
+    show: {
+      id: 321,
+      name: 'Naruto TVMaze',
+      type: 'Animation',
+      language: 'Japanese',
+      genres: ['Anime'],
+      premiered: '2002-10-03',
+      status: 'Ended',
+      summary: '<p>x</p>'
+    }
+  };
   const svc = newService({ extra: { anilistEnabled: false, jikanEnabled: false }, handlers: { tvmaze: () => [show] } });
   const { items } = await svc.searchDetailed('Naruto TVMaze', 'anime');
-  assert.deepEqual(items.map(i => i.id), [1000321]);
+  assert.deepEqual(
+    items.map(i => i.id),
+    [1000321]
+  );
   assert.equal(svc.callsTo('anilist').length + svc.callsTo('jikan').length, 0);
 });
 
@@ -364,17 +571,23 @@ test('ingestão pela AniList: Naruto vira UMA obra (id pedido), grava em disco c
   assert.equal(work.id, 10000020);
   assert.equal(work.type, 'anime');
   assert.equal(work.name, 'Naruto');
-  assert.deepEqual(work.seasons.map(s => s.episodes.length), [220, 500, 1, 1, 293]);
+  assert.deepEqual(
+    work.seasons.map(s => s.episodes.length),
+    [220, 500, 1, 1, 293]
+  );
   assert.equal(work.status, 'Finalizada');
   assert.ok(work.ingestedAt && work.refreshedAt === work.ingestedAt, 'primeira vez: as duas marcas iguais');
   assert.equal(svc.callsTo('jikan').length, 1, 'tentou os títulos na Jikan (fora do ar) uma vez e não insistiu');
-  assert.ok(work.seasons[0].episodes.every(e => /^Episódio \d+$/.test(e.name)), 'sem a Jikan: "Episódio N"');
+  assert.ok(
+    work.seasons[0].episodes.every(e => /^Episódio \d+$/.test(e.name)),
+    'sem a Jikan: "Episódio N"'
+  );
 
   const onDisk = JSON.parse(fs.readFileSync(path.join(dir, 'mediaCatalog.runtime.json'), 'utf-8')).find(m => m.id === 10000020);
   assert.equal(onDisk.seasons.length, 5);
 
   const before = svc.calls.length;
-  const alias = await svc.ingest(10001735);   // Shippuden: já está dentro da franquia gravada
+  const alias = await svc.ingest(10001735); // Shippuden: já está dentro da franquia gravada
   assert.equal(alias.id, 10000020);
   assert.equal(svc.calls.length, before, 'nenhuma requisição nova');
   assert.equal(svc.catalog.filter(m => (m.mal_ids || []).includes(1735)).length, 1, 'uma única obra no catálogo');
@@ -384,10 +597,7 @@ test('ingestão pela AniList: Naruto vira UMA obra (id pedido), grava em disco c
 });
 
 test('ingestão: títulos de episódio vêm da Jikan quando ela responde (e só preenchem o que a AniList não tinha)', async () => {
-  const jikan = jikanHandler([
-    jikanAnime(52991, { episodes: 28 }),
-    jikanAnime(59978, { episodes: 10, status: 'Finished Airing' })
-  ]);
+  const jikan = jikanHandler([jikanAnime(52991, { episodes: 28 }), jikanAnime(59978, { episodes: 10, status: 'Finished Airing' })]);
   const svc = newService({ handlers: { jikan }, extra: { seedPath: seedWithoutAnime() } });
   const work = await svc.ingest(10052991);
   assert.equal(work.id, 10052991);
@@ -398,15 +608,22 @@ test('ingestão: títulos de episódio vêm da Jikan quando ela responde (e só 
   assert.equal(s1[0].runtime, 24);
   assert.equal(work.seasons[1].episodes[9].name, 'Título 10');
   assert.ok(!svc.callsTo('jikan').some(c => c.url.includes('/63816/')), 'temporada anunciada não consulta a Jikan');
-  assert.ok(svc.callsTo('jikan').every(c => c.opts.timeoutMs === 3000), 'complemento: espera no máximo 3 s por resposta da Jikan (fora do ar custa pouco)');
+  assert.ok(
+    svc.callsTo('jikan').every(c => c.opts.timeoutMs === 3000),
+    'complemento: espera no máximo 3 s por resposta da Jikan (fora do ar custa pouco)'
+  );
 });
 
 test('ingestão: a Jikan com erro no meio não atrapalha (segue com "Episódio N") e uma entrada sem lista na MAL não derruba as outras', async () => {
   let n = 0;
-  const jikan = (url) => {
+  const jikan = url => {
     n++;
-    if (url.includes('/52991/')) throw mediaErrors.notFound();           // essa entrada não tem lista de episódios
-    if (url.includes('/59978/')) return { pagination: { has_next_page: false }, data: [{ mal_id: 1, title: 'Só este', aired: '2026-01-16T00:00:00+00:00', duration: 1440 }] };
+    if (url.includes('/52991/')) throw mediaErrors.notFound(); // essa entrada não tem lista de episódios
+    if (url.includes('/59978/'))
+      return {
+        pagination: { has_next_page: false },
+        data: [{ mal_id: 1, title: 'Só este', aired: '2026-01-16T00:00:00+00:00', duration: 1440 }]
+      };
     throw new Error('inesperado');
   };
   const svc = newService({ handlers: { jikan }, extra: { seedPath: seedWithoutAnime() } });
@@ -416,7 +633,14 @@ test('ingestão: a Jikan com erro no meio não atrapalha (segue com "Episódio N
   assert.equal(work.seasons[1].episodes[1].name, 'Episódio 2');
   assert.equal(n, 2);
 
-  const broken = newService({ handlers: { jikan: () => { throw mediaErrors.upstream(); } }, extra: { seedPath: seedWithoutAnime() } });
+  const broken = newService({
+    handlers: {
+      jikan: () => {
+        throw mediaErrors.upstream();
+      }
+    },
+    extra: { seedPath: seedWithoutAnime() }
+  });
   const ok = await broken.ingest(10052991);
   assert.equal(totalEpisodes(ok), 38);
 });
@@ -429,14 +653,18 @@ test('amostra do seed x fonte externa: ingerir Attack on Titan pelo id externo t
   assert.equal(totalEpisodes(sample), 2, 'a amostra tem 2 episódios inventados');
   assert.equal(svc.needsIngest(10025777), true, 'a amostra não conta como "já existe": precisa ser trocada');
 
-  const work = await svc.ingest(toInternalId('jikan', 25777));   // pedido pela Season 2, no meio da cadeia
+  const work = await svc.ingest(toInternalId('jikan', 25777)); // pedido pela Season 2, no meio da cadeia
   assert.equal(work.id, 1429, 'ocupa o lugar da amostra: quem já tinha a amostra na lista continua com a mesma obra');
   assert.equal(totalEpisodes(work), 91);
   assert.equal(work.mal_id, 25777, 'mal_id = o pedido (como na S06); a franquia inteira está em mal_ids');
   assert.ok(work.mal_ids.includes(16498));
   assert.equal(MediaService.isSeedSample(svc.findLocal(1429)), false);
   assert.equal(svc.findLocal(10025777), null);
-  assert.equal(svc.catalog.filter(m => (m.mal_ids || []).includes(16498) || m.mal_id === 16498).length, 1, 'uma única obra de Attack on Titan');
+  assert.equal(
+    svc.catalog.filter(m => (m.mal_ids || []).includes(16498) || m.mal_id === 16498).length,
+    1,
+    'uma única obra de Attack on Titan'
+  );
   assert.equal(svc.needsIngest(10016498), false);
   assert.equal(svc.resolveExisting(10016498).id, 1429, 'a 1ª temporada, pelo id externo, devolve a mesma obra');
 
@@ -472,7 +700,7 @@ test('dois pedidos ao mesmo tempo por temporadas diferentes da mesma franquia gr
 
 test('anime só da AniList (sem idMal): ingestão pela faixa 40.000.000+, id pedido, alias pelas entradas da MAL', async () => {
   const svc = newService({ extra: { seedPath: seedWithoutAnime() } });
-  const id = toInternalId('anilist', 162314);   // "THE FINAL CHAPTERS Special 2": sem idMal na AniList
+  const id = toInternalId('anilist', 162314); // "THE FINAL CHAPTERS Special 2": sem idMal na AniList
   assert.equal(svc.canIngest(id), true);
   const work = await svc.ingest(id);
   assert.equal(work.id, id);
@@ -487,30 +715,72 @@ test('anime só da AniList (sem idMal): ingestão pela faixa 40.000.000+, id ped
 });
 
 test('ingestão: AniList fora do ar -> Jikan faz o mesmo trabalho (id pedido); as duas falhando sobe o erro mais útil', async () => {
-  const jikan = jikanHandler([jikanAnime(52991, { title: 'Sousou no Frieren', episodes: 3, aired: { from: '2023-09-29T00:00:00+00:00' }, season: 'fall', year: 2023, relations: [{ relation: 'Sequel', entry: [{ mal_id: 59978, type: 'anime' }] }] }), jikanAnime(59978, { title: 'Sousou no Frieren 2nd Season', episodes: 2, aired: { from: '2026-01-16T00:00:00+00:00' }, season: 'winter', year: 2026, relations: [{ relation: 'Prequel', entry: [{ mal_id: 52991, type: 'anime' }] }] })]);
+  const jikan = jikanHandler([
+    jikanAnime(52991, {
+      title: 'Sousou no Frieren',
+      episodes: 3,
+      aired: { from: '2023-09-29T00:00:00+00:00' },
+      season: 'fall',
+      year: 2023,
+      relations: [{ relation: 'Sequel', entry: [{ mal_id: 59978, type: 'anime' }] }]
+    }),
+    jikanAnime(59978, {
+      title: 'Sousou no Frieren 2nd Season',
+      episodes: 2,
+      aired: { from: '2026-01-16T00:00:00+00:00' },
+      season: 'winter',
+      year: 2026,
+      relations: [{ relation: 'Prequel', entry: [{ mal_id: 52991, type: 'anime' }] }]
+    })
+  ]);
   const svc = newService({ handlers: { anilist: anilistDown, jikan }, extra: { seedPath: seedWithoutAnime() } });
   const work = await svc.ingest(10052991);
   assert.equal(work.id, 10052991);
-  assert.deepEqual(work.seasons.map(s => s.episodes.length), [3, 2]);
+  assert.deepEqual(
+    work.seasons.map(s => s.episodes.length),
+    [3, 2]
+  );
   assert.equal(work.seasons[0].episodes[0].name, 'Título 1', 'títulos reais da Jikan');
   assert.equal(work.seasons[0].name, 'Temporada 1 · Outono 2023');
   assert.ok(work.ingestedAt && work.refreshedAt);
 
-  const mk = (a, j) => newService({ handlers: { anilist: () => { throw a; }, jikan: () => { throw j; } }, extra: { seedPath: seedWithoutAnime(), anilist: { minIntervalMs: 0, retries: 0 } } });
+  const mk = (a, j) =>
+    newService({
+      handlers: {
+        anilist: () => {
+          throw a;
+        },
+        jikan: () => {
+          throw j;
+        }
+      },
+      extra: { seedPath: seedWithoutAnime(), anilist: { minIntervalMs: 0, retries: 0 } }
+    });
   await assert.rejects(mk(mediaErrors.rateLimited(5000), mediaErrors.upstream()).ingest(10000020), e => e.code === 'RATE_LIMITED');
   await assert.rejects(mk(mediaErrors.upstream(), mediaErrors.notFound()).ingest(10000020), e => e.code === 'UPSTREAM');
   await assert.rejects(mk(mediaErrors.notFound(), mediaErrors.notFound()).ingest(10000020), e => e.code === 'NOT_FOUND');
   // AniList não conhece a obra (404) mas a Jikan conhece: serve a Jikan
-  const j = newService({ handlers: { anilist: () => { throw mediaErrors.notFound(); }, jikan }, extra: { seedPath: seedWithoutAnime() } });
+  const j = newService({
+    handlers: {
+      anilist: () => {
+        throw mediaErrors.notFound();
+      },
+      jikan
+    },
+    extra: { seedPath: seedWithoutAnime() }
+  });
   assert.equal((await j.ingest(10052991)).seasons.length, 2);
   // faixa só da AniList não tem reserva: o erro da AniList sobe
-  await assert.rejects(newService({ handlers: { anilist: anilistDown }, extra: { seedPath: seedWithoutAnime() } }).ingest(toInternalId('anilist', 162314)), e => e.code === 'UPSTREAM');
+  await assert.rejects(
+    newService({ handlers: { anilist: anilistDown }, extra: { seedPath: seedWithoutAnime() } }).ingest(toInternalId('anilist', 162314)),
+    e => e.code === 'UPSTREAM'
+  );
 });
 
 test('AniList fora do ar com o disjuntor aberto: a ingestão cai para a Jikan na hora, sem esperar outro timeout', async () => {
   const jikan = jikanHandler([jikanAnime(20, { title: 'Naruto', episodes: 2 })]);
   const svc = newService({ handlers: { anilist: anilistDown, jikan }, extra: { seedPath: seedWithoutAnime() } });
-  await svc.searchDetailed('Naruto', 'anime');                     // a busca já derrubou o disjuntor
+  await svc.searchDetailed('Naruto', 'anime'); // a busca já derrubou o disjuntor
   assert.equal(svc.anilist.breaker.isOpen, true);
   const n = svc.callsTo('anilist').length;
   const work = await svc.ingest(10000020);

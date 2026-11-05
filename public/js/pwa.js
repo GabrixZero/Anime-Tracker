@@ -10,7 +10,11 @@
   function onNetworkChange() {
     const offline = navigator.onLine === false;
     document.body.classList.toggle('is-offline', offline);
-    if (offline) toast('Sem conexão: você pode consultar sua lista. O que mudar fica salvo neste aparelho e sincroniza quando a internet voltar.', 'info');
+    if (offline)
+      toast(
+        'Sem conexão: você pode consultar sua lista. O que mudar fica salvo neste aparelho e sincroniza quando a internet voltar.',
+        'info'
+      );
     else if (window.__wasOffline) toast('Conexão de volta.', 'success');
     window.__wasOffline = offline;
   }

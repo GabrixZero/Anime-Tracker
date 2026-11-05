@@ -44,9 +44,9 @@ function requireActiveUser(req, res, next) {
     try {
       const info = UserModel.authInfo(req.userId);
       if (
-        !info
-        || (info.passwordChangedAtSec && (req.tokenIssuedAt || 0) < info.passwordChangedAtSec)
-        || req.tokenVersion !== info.tokenVersion
+        !info ||
+        (info.passwordChangedAtSec && (req.tokenIssuedAt || 0) < info.passwordChangedAtSec) ||
+        req.tokenVersion !== info.tokenVersion
       ) {
         return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
       }

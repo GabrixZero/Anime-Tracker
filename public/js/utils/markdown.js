@@ -28,17 +28,11 @@
   }
 
   // *itálico* (sem espaço colado nos asteriscos e sem asterisco dentro)
-  const italic = (s) => s.replace(
-    new RegExp(`\\*([^\\s*]|[^\\s*][^*\\n]{0,${MAX_RUN - 2}}?[^\\s*])\\*`, 'g'),
-    '<em>$1</em>'
-  );
+  const italic = s => s.replace(new RegExp(`\\*([^\\s*]|[^\\s*][^*\\n]{0,${MAX_RUN - 2}}?[^\\s*])\\*`, 'g'), '<em>$1</em>');
 
   // ***negrito e itálico*** e **negrito** (dentro do negrito ainda pode haver *itálico*)
   function bolds(s) {
-    const re = new RegExp(
-      `\\*\\*\\*(\\S|\\S[^\\n]{0,${MAX_RUN - 2}}?\\S)\\*\\*\\*|\\*\\*(\\S|\\S[^\\n]{0,${MAX_RUN - 2}}?\\S)\\*\\*`,
-      'g'
-    );
+    const re = new RegExp(`\\*\\*\\*(\\S|\\S[^\\n]{0,${MAX_RUN - 2}}?\\S)\\*\\*\\*|\\*\\*(\\S|\\S[^\\n]{0,${MAX_RUN - 2}}?\\S)\\*\\*`, 'g');
     let out = '';
     let last = 0;
     let m;
@@ -61,7 +55,8 @@
       if (b < 0) break; // sem fechamento: fica como texto (e nada mais adiante pode fechar)
       const inner = s.slice(a + SPOILER_OPEN.length, b);
       const end = b + SPOILER_CLOSE.length;
-      if (!inner.trim()) { // ">!!<" vazio: texto comum
+      if (!inner.trim()) {
+        // ">!!<" vazio: texto comum
         out += bolds(s.slice(pos, end));
         pos = end;
         continue;
@@ -74,8 +69,8 @@
   }
 
   // ">" no começo da linha é citação, exceto ">!" (começo de spoiler)
-  const isQuote = (line) => line.charAt(0) === '>' && line.charAt(1) !== '!';
-  const stripQuote = (line) => line.replace(/^> ?/, '');
+  const isQuote = line => line.charAt(0) === '>' && line.charAt(1) !== '!';
+  const stripQuote = line => line.replace(/^> ?/, '');
 
   function render(text) {
     if (typeof text !== 'string' || text === '') return '';
@@ -106,7 +101,10 @@
   function toPlainText(text, { hideSpoilers = true } = {}) {
     if (typeof text !== 'string') return '';
     let s = text.replace(/\r\n?/g, '\n');
-    s = s.split('\n').map(line => (isQuote(line) ? stripQuote(line) : line)).join('\n');
+    s = s
+      .split('\n')
+      .map(line => (isQuote(line) ? stripQuote(line) : line))
+      .join('\n');
     let out = '';
     let pos = 0;
     for (;;) {
@@ -142,15 +140,18 @@
   // Um único ouvido no documento cobre todos os spoilers (diário, prévias, qualquer tela).
   if (typeof document !== 'undefined' && typeof document.addEventListener === 'function' && !root.__noteMarkdownBound) {
     root.__noteMarkdownBound = true;
-    const target = (e) => (e.target && e.target.closest ? e.target.closest('.md-spoiler') : null);
-    document.addEventListener('click', (e) => {
+    const target = e => (e.target && e.target.closest ? e.target.closest('.md-spoiler') : null);
+    document.addEventListener('click', e => {
       const el = target(e);
       if (el) toggleSpoiler(el);
     });
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const el = target(e);
-      if (el) { e.preventDefault(); toggleSpoiler(el); }
+      if (el) {
+        e.preventDefault();
+        toggleSpoiler(el);
+      }
     });
   }
 })(typeof window !== 'undefined' ? window : globalThis);

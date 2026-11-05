@@ -10,7 +10,8 @@ const AVATAR_MAX = 500;
 const CREDENTIAL_MAX = 4096; // ID token do Google (JWT) fica bem abaixo disso
 
 // Formato do <input type="email"> do HTML5 (sem aspas/comentários), exigindo ao menos um ponto no domínio.
-const EMAIL_RE = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+const EMAIL_RE =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 // eslint-disable-next-line no-control-regex
 const CONTROL_OR_ANGLE_RE = /[\u0000-\u001f\u007f<>]/;
 
@@ -22,7 +23,11 @@ function result(value, fields) {
   return { ok: false, error: fields[keys[0]], fields };
 }
 
-const badBody = () => ({ ok: false, error: 'Corpo da requisição inválido. Envie um JSON.', fields: { body: 'Corpo da requisição inválido. Envie um JSON.' } });
+const badBody = () => ({
+  ok: false,
+  error: 'Corpo da requisição inválido. Envie um JSON.',
+  fields: { body: 'Corpo da requisição inválido. Envie um JSON.' }
+});
 
 // --- campos individuais: devolvem { value } ou { error } ---
 
@@ -30,8 +35,14 @@ function checkEmail(raw) {
   if (typeof raw !== 'string' || raw.trim() === '') return { error: 'Informe o e-mail.' };
   const email = raw.trim().toLowerCase();
   const [local] = email.split('@');
-  if (email.length > EMAIL_MAX || local.length > 64 || !EMAIL_RE.test(email)
-    || local.startsWith('.') || local.endsWith('.') || local.includes('..')) {
+  if (
+    email.length > EMAIL_MAX ||
+    local.length > 64 ||
+    !EMAIL_RE.test(email) ||
+    local.startsWith('.') ||
+    local.endsWith('.') ||
+    local.includes('..')
+  ) {
     return { error: 'E-mail inválido. Use o formato nome@exemplo.com.' };
   }
   return { value: email };

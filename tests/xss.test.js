@@ -27,8 +27,19 @@ test('safeUrl só aceita http(s) e data:image', () => {
   assert.equal(dom.safeUrl('https://exemplo.com/a.jpg'), 'https://exemplo.com/a.jpg');
   assert.equal(dom.safeUrl('http://exemplo.com/a.jpg'), 'http://exemplo.com/a.jpg');
   assert.ok(dom.safeUrl('data:image/png;base64,AAAA'));
-  const bad = ['javascript:alert(1)', ' JaVaScRiPt:alert(1)', 'data:text/html,<script>alert(1)</script>',
-    'vbscript:x', '//evil.com/x.png', 'file:///etc/passwd', '', null, undefined, 42, {}];
+  const bad = [
+    'javascript:alert(1)',
+    ' JaVaScRiPt:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'vbscript:x',
+    '//evil.com/x.png',
+    'file:///etc/passwd',
+    '',
+    null,
+    undefined,
+    42,
+    {}
+  ];
   for (const b of bad) assert.equal(dom.safeUrl(b), '', String(b));
 });
 
@@ -70,7 +81,10 @@ test('validateBackup aceita backup válido e descarta campos extras', () => {
 test('validateBackup recusa backups malformados ou malignos', () => {
   const base = { trackedShows: [], watchedEpisodes: {}, episodeNotes: {} };
   const bad = [
-    null, 'texto', [], {},
+    null,
+    'texto',
+    [],
+    {},
     { ...base, trackedShows: {} },
     { ...base, trackedShows: [{ showId: '1' }] },
     { ...base, trackedShows: [{ showId: 1 }, { showId: 1 }] },
@@ -101,15 +115,24 @@ test('validateBackup do navegador e LibraryModel.validate dão o mesmo resultado
     {
       trackedShows: [{ showId: 7, status: 'watching', addedAt: 'a' }],
       watchedEpisodes: { '7_s2_e3': { watched: true, rewatchCount: 5 } },
-      episodeNotes: { '7_movie': { text: 't', emotion: 'sad', character: 'c', updatedAt: 'u', snapshots: [{ text: 's', updatedAt: 'u', z: 1 }] } }
+      episodeNotes: {
+        '7_movie': { text: 't', emotion: 'sad', character: 'c', updatedAt: 'u', snapshots: [{ text: 's', updatedAt: 'u', z: 1 }] }
+      }
     },
     { trackedShows: [], watchedEpisodes: { '1_movie': { watched: 'yes', rewatchCount: -3 } }, episodeNotes: {} },
     // S03: updatedAt, marcas de exclusão e resetAt
     {
-      trackedShows: [{ showId: 3, status: 'paused', addedAt: 'a', updatedAt: '2026-10-26T10:00:00.000Z' }, { showId: 4, status: 'x', updatedAt: 'lixo' }],
+      trackedShows: [
+        { showId: 3, status: 'paused', addedAt: 'a', updatedAt: '2026-10-26T10:00:00.000Z' },
+        { showId: 4, status: 'x', updatedAt: 'lixo' }
+      ],
       watchedEpisodes: { '3_s1_e1': { watched: true, watchedAt: 'w', updatedAt: '2026-10-26T10:00:00.000Z', rewatchCount: 1 } },
       episodeNotes: {},
-      tombstones: { shows: { 9: '2026-10-26T11:00:00.000Z' }, watched: { '3_s1_e2': '2026-10-26T11:00:00.000Z' }, notes: { '3_movie': '2026-10-26T11:00:00.000Z' } },
+      tombstones: {
+        shows: { 9: '2026-10-26T11:00:00.000Z' },
+        watched: { '3_s1_e2': '2026-10-26T11:00:00.000Z' },
+        notes: { '3_movie': '2026-10-26T11:00:00.000Z' }
+      },
       resetAt: '2026-10-25T00:00:00.000Z'
     },
     { trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: null, resetAt: 12345 }

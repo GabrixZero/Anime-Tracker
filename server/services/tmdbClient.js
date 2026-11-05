@@ -10,32 +10,69 @@ const MAX_SEASONS = 40;
 
 // Nomes dos gêneros em pt-BR (a busca só devolve os números; evita uma requisição extra por consulta).
 const GENRES_PT = {
-  28: 'Ação', 12: 'Aventura', 16: 'Animação', 35: 'Comédia', 80: 'Crime', 99: 'Documentário', 18: 'Drama', 10751: 'Família',
-  14: 'Fantasia', 36: 'História', 27: 'Terror', 10402: 'Música', 9648: 'Mistério', 10749: 'Romance', 878: 'Ficção científica',
-  10770: 'Cinema TV', 53: 'Suspense', 10752: 'Guerra', 37: 'Faroeste', 10759: 'Ação e aventura', 10762: 'Infantil', 10763: 'Notícias',
-  10764: 'Reality', 10765: 'Ficção científica e fantasia', 10766: 'Novela', 10767: 'Talk show', 10768: 'Guerra e política'
+  28: 'Ação',
+  12: 'Aventura',
+  16: 'Animação',
+  35: 'Comédia',
+  80: 'Crime',
+  99: 'Documentário',
+  18: 'Drama',
+  10751: 'Família',
+  14: 'Fantasia',
+  36: 'História',
+  27: 'Terror',
+  10402: 'Música',
+  9648: 'Mistério',
+  10749: 'Romance',
+  878: 'Ficção científica',
+  10770: 'Cinema TV',
+  53: 'Suspense',
+  10752: 'Guerra',
+  37: 'Faroeste',
+  10759: 'Ação e aventura',
+  10762: 'Infantil',
+  10763: 'Notícias',
+  10764: 'Reality',
+  10765: 'Ficção científica e fantasia',
+  10766: 'Novela',
+  10767: 'Talk show',
+  10768: 'Guerra e política'
 };
 const TV_STATUS_PT = {
-  'Returning Series': 'Em Exibição', 'In Production': 'Em produção', Planned: 'Planejada', Pilot: 'Piloto',
-  Ended: 'Finalizada', Canceled: 'Cancelada'
+  'Returning Series': 'Em Exibição',
+  'In Production': 'Em produção',
+  Planned: 'Planejada',
+  Pilot: 'Piloto',
+  Ended: 'Finalizada',
+  Canceled: 'Cancelada'
 };
 const MOVIE_STATUS_PT = {
-  Released: 'Lançado', 'Post Production': 'Em pós-produção', 'In Production': 'Em produção', Planned: 'Planejado',
-  Rumored: 'Rumor', Canceled: 'Cancelado'
+  Released: 'Lançado',
+  'Post Production': 'Em pós-produção',
+  'In Production': 'Em produção',
+  Planned: 'Planejado',
+  Rumored: 'Rumor',
+  Canceled: 'Cancelado'
 };
 
 const img = (path, size) => (typeof path === 'string' && path.startsWith('/') ? `${IMG}/${size}${path}` : null);
-const dateOnly = v => { const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(v || '')); return m ? m[1] : ''; };
+const dateOnly = v => {
+  const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(v || ''));
+  return m ? m[1] : '';
+};
 const rating = (avg, count) => (Number(avg) > 0 && Number(count) > 0 ? Number(avg) : null);
 
 function genreNames(raw) {
   const list = Array.isArray(raw) ? raw : [];
-  return list.map(g => (g && typeof g === 'object' ? stripHtml(g.name, 60) : GENRES_PT[g])).filter(Boolean).slice(0, 6);
+  return list
+    .map(g => (g && typeof g === 'object' ? stripHtml(g.name, 60) : GENRES_PT[g]))
+    .filter(Boolean)
+    .slice(0, 6);
 }
 
 // Animação japonesa é do domínio da Jikan (anime): o TMDB não decide sozinho o que é anime.
 function isTmdbAnime(entry) {
-  const ids = Array.isArray(entry.genre_ids) ? entry.genre_ids : (Array.isArray(entry.genres) ? entry.genres.map(g => g && g.id) : []);
+  const ids = Array.isArray(entry.genre_ids) ? entry.genre_ids : Array.isArray(entry.genres) ? entry.genres.map(g => g && g.id) : [];
   return ids.includes(16) && entry.original_language === 'ja';
 }
 
@@ -49,7 +86,9 @@ class TmdbClient {
     this.cache = new TtlCache({ max: 200, now });
   }
 
-  get enabled() { return Boolean(this.apiKey); }
+  get enabled() {
+    return Boolean(this.apiKey);
+  }
 
   // Token v4 (JWT, começa com "eyJ") vai no cabeçalho; chave v3 vai na URL. A chave nunca aparece em mensagens de erro.
   async get(path, params = {}, { ttlMs = this.searchTtlMs } = {}) {
@@ -71,13 +110,17 @@ class TmdbClient {
   async searchTv(q) {
     const json = await this.get('/search/tv', { query: q, include_adult: 'false', page: '1' });
     if (!json || !Array.isArray(json.results)) throw mediaErrors.upstream('Resposta inesperada do TMDB.');
-    return json.results.filter(r => r && Number.isSafeInteger(r.id) && r.id > 0 && typeof r.name === 'string' && r.name && !isTmdbAnime(r)).map(TmdbClient.mapTv);
+    return json.results
+      .filter(r => r && Number.isSafeInteger(r.id) && r.id > 0 && typeof r.name === 'string' && r.name && !isTmdbAnime(r))
+      .map(TmdbClient.mapTv);
   }
 
   async searchMovie(q) {
     const json = await this.get('/search/movie', { query: q, include_adult: 'false', page: '1' });
     if (!json || !Array.isArray(json.results)) throw mediaErrors.upstream('Resposta inesperada do TMDB.');
-    return json.results.filter(r => r && Number.isSafeInteger(r.id) && r.id > 0 && typeof r.title === 'string' && r.title && !isTmdbAnime(r)).map(TmdbClient.mapMovie);
+    return json.results
+      .filter(r => r && Number.isSafeInteger(r.id) && r.id > 0 && typeof r.title === 'string' && r.title && !isTmdbAnime(r))
+      .map(TmdbClient.mapMovie);
   }
 
   // --- Detalhes (ingestão) ---------------------------------------------------------------------
@@ -93,7 +136,9 @@ class TmdbClient {
     const tv = await this.get(`/tv/${tmdbId}`, {}, { ttlMs: 60 * 60 * 1000 });
     if (!tv || tv.id !== tmdbId || !tv.name) throw mediaErrors.notFound();
     const numbers = (Array.isArray(tv.seasons) ? tv.seasons : [])
-      .map(s => s && s.season_number).filter(n => Number.isInteger(n) && n > 0).slice(0, MAX_SEASONS);
+      .map(s => s && s.season_number)
+      .filter(n => Number.isInteger(n) && n > 0)
+      .slice(0, MAX_SEASONS);
     const seasons = [];
     for (const n of numbers) {
       const s = await this.get(`/tv/${tmdbId}/season/${n}`, {}, { ttlMs: 60 * 60 * 1000 });
@@ -102,7 +147,7 @@ class TmdbClient {
         .map(e => ({
           episode_number: e.episode_number,
           name: stripHtml(e.name, 300) || `Episódio ${e.episode_number}`,
-          runtime: Number(e.runtime) > 0 ? Number(e.runtime) : (Number(tv.episode_run_time && tv.episode_run_time[0]) || null),
+          runtime: Number(e.runtime) > 0 ? Number(e.runtime) : Number(tv.episode_run_time && tv.episode_run_time[0]) || null,
           air_date: dateOnly(e.air_date),
           overview: stripHtml(e.overview),
           still_path: safeHttpUrl(img(e.still_path, 'w300'), null)

@@ -27,9 +27,7 @@
     if (!Array.isArray(trackedShows) || !isPlainObject(watchedEpisodes) || !isPlainObject(episodeNotes)) {
       throw new Error('Backup inválido: faltam trackedShows, watchedEpisodes ou episodeNotes.');
     }
-    if (trackedShows.length > MAX_SHOWS
-      || Object.keys(watchedEpisodes).length > MAX_KEYS
-      || Object.keys(episodeNotes).length > MAX_KEYS) {
+    if (trackedShows.length > MAX_SHOWS || Object.keys(watchedEpisodes).length > MAX_KEYS || Object.keys(episodeNotes).length > MAX_KEYS) {
       throw new Error('Backup grande demais.');
     }
 
@@ -73,13 +71,13 @@
         emotion: typeof n.emotion === 'string' ? n.emotion.slice(0, 40) : null,
         character: str(n.character, 200),
         updatedAt: str(n.updatedAt, 40),
-        snapshots: snapshots
-          .filter(isPlainObject)
-          .map(s => ({ text: str(s.text, MAX_TEXT), updatedAt: str(s.updatedAt, 40) }))
+        snapshots: snapshots.filter(isPlainObject).map(s => ({ text: str(s.text, MAX_TEXT), updatedAt: str(s.updatedAt, 40) }))
       };
     }
 
-    const fail = () => { throw new Error('Backup inválido: item incorreto em tombstones.'); };
+    const fail = () => {
+      throw new Error('Backup inválido: item incorreto em tombstones.');
+    };
     const tombstones = merge().cleanTombstones(payload.tombstones, fail);
     const resetAt = merge().cleanStamp(payload.resetAt);
 

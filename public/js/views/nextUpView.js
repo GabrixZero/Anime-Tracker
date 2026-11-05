@@ -12,7 +12,6 @@ class NextUpView {
     this.bindEvents();
   }
 
-
   bindEvents() {
     document.querySelectorAll('#view-next-up .type-pill-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -44,7 +43,7 @@ class NextUpView {
         showId: media.id,
         showName: media.name,
         type: media.type,
-        title: "Filme Completo",
+        title: 'Filme Completo',
         runtime: media.runtime,
         overview: media.overview,
         still_path: media.backdrop_path || media.poster_path
@@ -73,7 +72,7 @@ class NextUpView {
     const queue = [];
     const state = window.appState;
     if (!state || !state.data || !state.data.trackedShows) return queue;
-    state.data.trackedShows.forEach((tracked) => {
+    state.data.trackedShows.forEach(tracked => {
       const item = this.queueItemFor(tracked);
       if (item) queue.push(item);
     });
@@ -105,7 +104,7 @@ class NextUpView {
 
   render() {
     const state = window.appState;
-    const trackedCount = (state && state.data && state.data.trackedShows) ? state.data.trackedShows.length : 0;
+    const trackedCount = state && state.data && state.data.trackedShows ? state.data.trackedShows.length : 0;
 
     // Obras da lista ainda sem episódios (o detalhe chega em lote do servidor, S09): mostra o carregamento em vez de uma fila errada.
     if (state && trackedCount > 0 && state.detailsStatus !== 'idle' && state.data.trackedShows.some(t => !state.hasEpisodes(t.showId))) {
@@ -139,7 +138,8 @@ class NextUpView {
     // Caso 1: Usuário não possui nenhuma obra na lista
     if (trackedCount === 0) {
       this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
-        iconSvg: '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>',
+        iconSvg:
+          '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>',
         title: 'Sua lista está vazia',
         text: 'Você ainda não adicionou nenhuma série, anime ou filme. Explore o catálogo para começar, ou carregue alguns títulos de exemplo para ver o app funcionando (você remove quando quiser).',
         narrow: true,
@@ -155,22 +155,26 @@ class NextUpView {
     if (this.typeFilter !== 'all') {
       const typeLabel = this.typeFilter === 'tv' ? 'séries' : this.typeFilter === 'anime' ? 'animes' : 'filmes';
       this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
-        iconSvg: '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+        iconSvg:
+          '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
         title: `Nenhum título pendente em ${typeLabel}`,
         text: 'Todos os seus lançamentos desta categoria estão concluídos.',
-        actionsHtml: '<button type="button" class="btn btn-outline" data-focus-key="empty:all" data-action="show-all-types">Ver Todos os Títulos</button>'
+        actionsHtml:
+          '<button type="button" class="btn btn-outline" data-focus-key="empty:all" data-action="show-all-types">Ver Todos os Títulos</button>'
       });
       return;
     }
 
     // Caso 3: O usuário REALMENTE está com tudo em dia
     this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
-      iconSvg: '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      iconSvg:
+        '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
       iconClass: 'empty-icon--success',
       title: 'Você está em dia com tudo!',
       text: 'Nenhum episódio ou filme pendente. Explore novas obras para adicionar à sua maratona.',
       narrow: true,
-      actionsHtml: '<button type="button" class="btn btn-primary" data-focus-key="empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>'
+      actionsHtml:
+        '<button type="button" class="btn btn-primary" data-focus-key="empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>'
     });
   }
 
@@ -179,7 +183,9 @@ class NextUpView {
 
     const codeBadge = item.isMovie ? `FILME` : `T${item.seasonNumber}:E${item.episodeNumber}`;
     // Os botões trazem o episódio em data-*; temporada/episódio ausentes (filme) ficam sem o atributo
-    const epAttrs = (toInt(item.seasonNumber) ? ` data-season="${toInt(item.seasonNumber)}"` : '') + (toInt(item.episodeNumber) ? ` data-episode="${toInt(item.episodeNumber)}"` : '');
+    const epAttrs =
+      (toInt(item.seasonNumber) ? ` data-season="${toInt(item.seasonNumber)}"` : '') +
+      (toInt(item.episodeNumber) ? ` data-episode="${toInt(item.episodeNumber)}"` : '');
 
     return `
       <div class="next-up-card" data-show-id="${toInt(item.showId)}">

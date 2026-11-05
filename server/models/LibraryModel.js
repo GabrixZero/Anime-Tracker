@@ -40,9 +40,7 @@ class LibraryModel {
     if (!Array.isArray(trackedShows) || !isPlainObject(watchedEpisodes) || !isPlainObject(episodeNotes)) {
       throw new Error('Biblioteca inválida: trackedShows, watchedEpisodes e episodeNotes são obrigatórios.');
     }
-    if (trackedShows.length > MAX_SHOWS
-      || Object.keys(watchedEpisodes).length > MAX_KEYS
-      || Object.keys(episodeNotes).length > MAX_KEYS) {
+    if (trackedShows.length > MAX_SHOWS || Object.keys(watchedEpisodes).length > MAX_KEYS || Object.keys(episodeNotes).length > MAX_KEYS) {
       throw new Error('Biblioteca excede o limite de tamanho.');
     }
 
@@ -86,14 +84,14 @@ class LibraryModel {
         emotion: typeof n.emotion === 'string' ? n.emotion.slice(0, 40) : null,
         character: str(n.character, 200),
         updatedAt: str(n.updatedAt, 40),
-        snapshots: snapshots
-          .filter(isPlainObject)
-          .map(s => ({ text: str(s.text, MAX_TEXT), updatedAt: str(s.updatedAt, 40) }))
+        snapshots: snapshots.filter(isPlainObject).map(s => ({ text: str(s.text, MAX_TEXT), updatedAt: str(s.updatedAt, 40) }))
       };
     }
 
     // Marcas de exclusão (D-13) e "zerar a conta" (resetAt): ver public/js/utils/libraryMerge.js
-    const fail = () => { throw new Error('Item inválido em tombstones.'); };
+    const fail = () => {
+      throw new Error('Item inválido em tombstones.');
+    };
     const tombstones = LibraryMerge.cleanTombstones(payload.tombstones, fail);
     const resetAt = LibraryMerge.cleanStamp(payload.resetAt);
 
@@ -135,7 +133,11 @@ class LibraryModel {
     // Se o arquivo atual estiver quebrado, a leitura preserva uma cópia ".corrupt-*" antes de ele ser substituído
     // pelo snapshot do cliente (que é a fonte primária local-first); nesse caso não há o que mesclar.
     let current = null;
-    try { current = this.get(userId); } catch { /* cópia já preservada */ }
+    try {
+      current = this.get(userId);
+    } catch {
+      /* cópia já preservada */
+    }
 
     const supportsMerge = payload.tombstones !== undefined && payload.tombstones !== null;
     const next = supportsMerge && current ? LibraryMerge.merge(incoming, current, { now: Date.now() }) : incoming;
@@ -148,7 +150,11 @@ class LibraryModel {
   // "Resetar + apagar a nuvem": biblioteca vazia com `resetAt` = agora. Os outros aparelhos, ao sincronizar, descartam tudo anterior a essa data.
   clear(userId) {
     const file = this.filePathFor(userId);
-    try { readJson(file); } catch { /* cópia .corrupt-* preservada pela leitura */ }
+    try {
+      readJson(file);
+    } catch {
+      /* cópia .corrupt-* preservada pela leitura */
+    }
     const now = new Date().toISOString();
     const library = { ...LibraryMerge.emptyData(), resetAt: now, schemaVersion: STATE_VERSION, updatedAt: now };
     writeJsonAtomic(file, library, { pretty: false });

@@ -60,7 +60,11 @@ class AuthController {
       });
       return authSuccess(res, 201, 'Conta criada com sucesso!', user);
     } catch (err) {
-      try { inviteService.release(reservedInvite); } catch { /* o código fica usado; o erro original é o que importa */ }
+      try {
+        inviteService.release(reservedInvite);
+      } catch {
+        /* o código fica usado; o erro original é o que importa */
+      }
       if (err && err.code === 'EMAIL_TAKEN') {
         return res.status(409).json({ error: MSG_REGISTER_FAILED, code: 'REGISTER_FAILED' });
       }
@@ -77,9 +81,7 @@ class AuthController {
       const user = UserModel.findByEmail(email);
 
       // E-mail inexistente e contas Google (sem senha) gastam o mesmo tempo e dão a mesma resposta que senha errada.
-      const valid = user && user.password
-        ? await UserModel.verifyPassword(password, user.password)
-        : await UserModel.verifyDummy(password);
+      const valid = user && user.password ? await UserModel.verifyPassword(password, user.password) : await UserModel.verifyDummy(password);
       if (!valid) {
         return res.status(401).json({ error: MSG_BAD_CREDENTIALS, code: 'BAD_CREDENTIALS' });
       }
@@ -141,7 +143,9 @@ class AuthController {
       return authSuccess(res, 200, 'Autenticado via Google com sucesso!', user);
     } catch (err) {
       if (err && err.code === 'EMAIL_TAKEN') {
-        return res.status(409).json({ error: 'Já existe uma conta ShowVault com este e-mail. Entre com e-mail e senha.', code: 'GOOGLE_EMAIL_IN_USE' });
+        return res
+          .status(409)
+          .json({ error: 'Já existe uma conta ShowVault com este e-mail. Entre com e-mail e senha.', code: 'GOOGLE_EMAIL_IN_USE' });
       }
       return sendError(res, err, 'Erro ao autenticar com Google.', 'auth/google');
     }
@@ -208,7 +212,11 @@ class AuthController {
         if (!input.ok) return sendInvalid(res, input);
         let profile = null;
         if (googleAuth.isConfigured()) {
-          try { profile = await googleAuth.verifyIdToken(input.value.credential); } catch { profile = null; }
+          try {
+            profile = await googleAuth.verifyIdToken(input.value.credential);
+          } catch {
+            profile = null;
+          }
         }
         if (!profile || !user.googleId || profile.sub !== user.googleId) {
           return res.status(403).json({ error: 'Confirmação do Google inválida. A conta não foi excluída.', code: 'GOOGLE_INVALID' });

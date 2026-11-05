@@ -11,7 +11,7 @@ class ApiClient {
     const token = localStorage.getItem('showvault_auth_token');
     return {
       'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
     };
   }
 

@@ -22,21 +22,28 @@ if (config.TRUST_PROXY !== false) app.set('trust proxy', config.TRUST_PROXY);
 
 // Cabeçalhos de segurança, com CSP estrita (sem 'unsafe-inline'; ver server/config/csp.js).
 // COOP "same-origin-allow-popups" é o que o popup do Login com Google exige.
-app.use(helmet({
-  contentSecurityPolicy: { useDefaults: false, directives: buildCspDirectives({ isProduction: config.IS_PRODUCTION, googleEnabled: !!config.GOOGLE_CLIENT_ID }) },
-  strictTransportSecurity: config.IS_PRODUCTION ? undefined : false, // HSTS só em produção (HTTPS)
-  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: buildCspDirectives({ isProduction: config.IS_PRODUCTION, googleEnabled: !!config.GOOGLE_CLIENT_ID })
+    },
+    strictTransportSecurity: config.IS_PRODUCTION ? undefined : false, // HSTS só em produção (HTTPS)
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
+  })
+);
 
 // Compressão gzip/deflate das respostas de texto (JSON da API, HTML, CSS, JS). Imagens/SVG pequenos não precisam. (S09)
 app.use(compression());
 
 // CORS: o site e a API são da mesma origem (não precisa de CORS). Só origens listadas em CORS_ORIGINS podem chamar de fora.
-app.use(cors({
-  origin(origin, callback) {
-    callback(null, !origin || config.CORS_ORIGINS.includes(origin) ? true : false);
-  }
-}));
+app.use(
+  cors({
+    origin(origin, callback) {
+      callback(null, !origin || config.CORS_ORIGINS.includes(origin) ? true : false);
+    }
+  })
+);
 
 // Verificação de saúde para a hospedagem/Docker (sem login, sem dados do usuário, sem tocar no disco).
 app.get('/health', (req, res) => {
@@ -68,15 +75,18 @@ app.use('/api', (req, res) => {
 
 // Servidor de Arquivos Estáticos (Frontend MVC)
 // Cache (S09): ETag/Last-Modified sempre; HTML sempre conferido (no-cache); CSS/JS/imagens guardados por STATIC_MAX_AGE_SEC.
-app.use(express.static(path.join(__dirname, '..', 'public'), {
-  etag: true,
-  lastModified: true,
-  maxAge: config.STATIC_MAX_AGE_SEC * 1000,
-  setHeaders(res, filePath) {
-    // HTML, service worker e manifesto sempre conferidos (o navegador precisa ver a versão nova do sw.js na hora; S18)
-    if (/\.html?$/i.test(filePath) || /[\\/]sw\.js$/.test(filePath) || /\.webmanifest$/.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
-  }
-}));
+app.use(
+  express.static(path.join(__dirname, '..', 'public'), {
+    etag: true,
+    lastModified: true,
+    maxAge: config.STATIC_MAX_AGE_SEC * 1000,
+    setHeaders(res, filePath) {
+      // HTML, service worker e manifesto sempre conferidos (o navegador precisa ver a versão nova do sw.js na hora; S18)
+      if (/\.html?$/i.test(filePath) || /[\\/]sw\.js$/.test(filePath) || /\.webmanifest$/.test(filePath))
+        res.setHeader('Cache-Control', 'no-cache');
+    }
+  })
+);
 
 // Fallback SPA (com `root`, uma pasta com ponto no caminho, como .claude/worktrees, não é tratada como arquivo oculto)
 app.use((req, res) => {

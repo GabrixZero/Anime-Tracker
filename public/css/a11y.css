@@ -24,7 +24,9 @@
 }
 
 /* Cartão inteiro clicável: o anel aparece no cartão, não só no título */
-.show-open-btn:focus-visible { outline: none; }
+.show-open-btn:focus-visible {
+  outline: none;
+}
 .show-open-btn:focus-visible::after {
   outline: 3px solid var(--focus-ring);
   outline-offset: -3px;
@@ -37,7 +39,10 @@
   outline-offset: 2px;
 }
 
-::placeholder { color: var(--text-muted); opacity: 1; }
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
 
 /* ---------- Utilitários ---------- */
 .sr-only {
@@ -66,10 +71,14 @@
   transform: translateY(-250%);
 }
 
-.skip-link:focus { transform: none; }
+.skip-link:focus {
+  transform: none;
+}
 
 /* O alvo do atalho não precisa de anel ao receber foco por script */
-.app-main:focus { outline: none; }
+.app-main:focus {
+  outline: none;
+}
 
 /* ---------- Antes <div> clicável, agora <button>: visual idêntico ---------- */
 .brand {
@@ -96,7 +105,9 @@
 }
 
 .link-btn:hover,
-.auth-switch-link:hover { text-decoration: underline; }
+.auth-switch-link:hover {
+  text-decoration: underline;
+}
 
 .auth-switch-link {
   color: var(--tvtime-yellow);
@@ -104,7 +115,9 @@
 }
 
 /* Cartões de obra: o botão do título "estica" e cobre o cartão todo (clique com o mouse continua igual) */
-.show-card { position: relative; }
+.show-card {
+  position: relative;
+}
 
 .show-open-btn {
   display: block;
@@ -115,7 +128,7 @@
 }
 
 .show-open-btn::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -123,12 +136,14 @@
 
 /* A Seguir (S10): o botão do título também cobre o cartão (clicar na miniatura ou no nome abre os detalhes, sem div com clique) */
 .next-up-card .link-btn::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
 }
-.next-up-card .link-btn:focus-visible { outline: none; }
+.next-up-card .link-btn:focus-visible {
+  outline: none;
+}
 .next-up-card .link-btn:focus-visible::after {
   outline: 3px solid var(--focus-ring);
   outline-offset: -3px;
@@ -155,5 +170,8 @@
 }
 
 @media (pointer: coarse) {
-  .episode-check { width: 36px; height: 36px; }
+  .episode-check {
+    width: 36px;
+    height: 36px;
+  }
 }

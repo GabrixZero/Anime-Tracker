@@ -38,8 +38,14 @@ function oldLibrary() {
       { showId: 155, status: 'watching', addedAt: 'a' }
     ],
     watchedEpisodes: {
-      '1396_s1_e1': watched(), '555_s1_e1': watched(), '13615_s2_e3': watched(), '495_s1_e1': watched(),
-      '155_s1_e1': watched(), '155_s4_e12': watched(), '5550_s1_e1': watched(), '1555_s1_e1': watched()
+      '1396_s1_e1': watched(),
+      '555_s1_e1': watched(),
+      '13615_s2_e3': watched(),
+      '495_s1_e1': watched(),
+      '155_s1_e1': watched(),
+      '155_s4_e12': watched(),
+      '5550_s1_e1': watched(),
+      '1555_s1_e1': watched()
     },
     episodeNotes: { '1396_s1_e1': note, '495_s1_e2': note, '155_s2_e1': note, '55_s1_e1': note }
   };
@@ -54,7 +60,10 @@ test('migração v1 -> v2 remove só as referências às 4 obras antigas e prese
 
   assert.equal(changed, true);
   assert.equal(JSON.stringify(input), snapshot, 'não altera o objeto recebido');
-  assert.deepEqual(data.trackedShows.map(t => t.showId), [1396]);
+  assert.deepEqual(
+    data.trackedShows.map(t => t.showId),
+    [1396]
+  );
   assert.deepEqual(Object.keys(data.watchedEpisodes).sort(), ['1396_s1_e1', '1555_s1_e1', '5550_s1_e1']);
   assert.deepEqual(Object.keys(data.episodeNotes).sort(), ['1396_s1_e1', '55_s1_e1']);
   assert.deepEqual(removed, { trackedShows: 4, watchedEpisodes: 5, episodeNotes: 2 });
@@ -69,7 +78,11 @@ test('migração: 155_movie (Batman TMDB) fica; 155_sX_eY (série antiga) sai', 
   const { data } = migrateLibrary(lib, 1);
   assert.deepEqual(Object.keys(data.watchedEpisodes), ['155_movie']);
   assert.deepEqual(Object.keys(data.episodeNotes), ['155_movie']);
-  assert.deepEqual(data.trackedShows.map(t => t.showId), [155], 'com prova do Batman, a obra 155 na lista fica');
+  assert.deepEqual(
+    data.trackedShows.map(t => t.showId),
+    [155],
+    'com prova do Batman, a obra 155 na lista fica'
+  );
 });
 
 test('migração: showId 155 sem nenhuma prova da série antiga é mantido (padrão conservador)', () => {
@@ -99,7 +112,10 @@ test('LibraryModel.get migra uma biblioteca antiga e grava a versão nova', () =
   fs.writeFileSync(path.join(lib.dir, 'usr_a1.json'), JSON.stringify({ ...oldLibrary(), updatedAt: '2026-10-01T00:00:00Z' }));
 
   const got = lib.get('usr_a1');
-  assert.deepEqual(got.trackedShows.map(t => t.showId), [1396]);
+  assert.deepEqual(
+    got.trackedShows.map(t => t.showId),
+    [1396]
+  );
   assert.equal(got.schemaVersion, STATE_VERSION);
   assert.equal(got.updatedAt, '2026-10-01T00:00:00Z');
   const onDisk = JSON.parse(fs.readFileSync(path.join(lib.dir, 'usr_a1.json'), 'utf-8'));
@@ -110,11 +126,18 @@ test('LibraryModel.get migra uma biblioteca antiga e grava a versão nova', () =
 test('LibraryModel.save: cliente antigo (sem versão) é migrado; cliente v2 não perde dados', () => {
   const lib = new LibraryModel(newDir());
   lib.save('usr_b1', oldLibrary());
-  assert.deepEqual(lib.get('usr_b1').trackedShows.map(t => t.showId), [1396]);
+  assert.deepEqual(
+    lib.get('usr_b1').trackedShows.map(t => t.showId),
+    [1396]
+  );
 
   const v2 = { trackedShows: [{ showId: 555, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} };
   lib.save('usr_b2', v2, { stateVersion: STATE_VERSION });
-  assert.deepEqual(lib.get('usr_b2').trackedShows.map(t => t.showId), [555], 'versão atual não é filtrada');
+  assert.deepEqual(
+    lib.get('usr_b2').trackedShows.map(t => t.showId),
+    [555],
+    'versão atual não é filtrada'
+  );
 });
 
 test('LibraryModel.migrateAll migra os arquivos antigos, pula os corrompidos sem tocá-los', () => {
@@ -138,10 +161,17 @@ test('LibraryModel: biblioteca corrompida não vira vazia; salvar preserva uma c
   const file = path.join(lib.dir, 'usr_c1.json');
   fs.writeFileSync(file, '{"trackedShows": [');
 
-  assert.throws(() => lib.get('usr_c1'), err => err instanceof DataCorruptionError);
+  assert.throws(
+    () => lib.get('usr_c1'),
+    err => err instanceof DataCorruptionError
+  );
   assert.equal(fs.readFileSync(file, 'utf-8'), '{"trackedShows": [', 'leitura não altera o arquivo');
 
-  lib.save('usr_c1', { trackedShows: [{ showId: 1, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} }, { stateVersion: STATE_VERSION });
+  lib.save(
+    'usr_c1',
+    { trackedShows: [{ showId: 1, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} },
+    { stateVersion: STATE_VERSION }
+  );
   const copies = fs.readdirSync(lib.dir).filter(f => f.startsWith('usr_c1.json.corrupt-'));
   assert.equal(copies.length, 1);
   assert.equal(fs.readFileSync(path.join(lib.dir, copies[0]), 'utf-8'), '{"trackedShows": [');
@@ -149,10 +179,21 @@ test('LibraryModel: biblioteca corrompida não vira vazia; salvar preserva uma c
 
 test('LibraryModel: biblioteca corrompida com .bak válido é recuperada', () => {
   const lib = new LibraryModel(newDir());
-  lib.save('usr_d1', { trackedShows: [{ showId: 7, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} }, { stateVersion: STATE_VERSION });
-  lib.save('usr_d1', { trackedShows: [{ showId: 8, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} }, { stateVersion: STATE_VERSION });
+  lib.save(
+    'usr_d1',
+    { trackedShows: [{ showId: 7, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} },
+    { stateVersion: STATE_VERSION }
+  );
+  lib.save(
+    'usr_d1',
+    { trackedShows: [{ showId: 8, status: 'watching', addedAt: 'a' }], watchedEpisodes: {}, episodeNotes: {} },
+    { stateVersion: STATE_VERSION }
+  );
   fs.writeFileSync(path.join(lib.dir, 'usr_d1.json'), 'lixo');
-  assert.deepEqual(lib.get('usr_d1').trackedShows.map(t => t.showId), [7]);
+  assert.deepEqual(
+    lib.get('usr_d1').trackedShows.map(t => t.showId),
+    [7]
+  );
 });
 
 test('UserModel: users.json corrompido NÃO vira lista vazia nem é sobrescrito pelo próximo cadastro', async () => {
@@ -168,11 +209,23 @@ test('UserModel: users.json corrompido NÃO vira lista vazia nem é sobrescrito 
   assert.equal(users.getAll().length, 1);
 
   fs.rmSync(`${file}.bak`);
-  assert.throws(() => users.getAll(), err => err instanceof DataCorruptionError);
-  await assert.rejects(() => users.create({ name: 'C', email: 'c@exemplo.test', password: 'senha-de-teste-3' }), err => err.code === 'DATA_CORRUPT');
-  assert.throws(() => users.findByEmail('a@exemplo.test'), err => err.code === 'DATA_CORRUPT');
+  assert.throws(
+    () => users.getAll(),
+    err => err instanceof DataCorruptionError
+  );
+  await assert.rejects(
+    () => users.create({ name: 'C', email: 'c@exemplo.test', password: 'senha-de-teste-3' }),
+    err => err.code === 'DATA_CORRUPT'
+  );
+  assert.throws(
+    () => users.findByEmail('a@exemplo.test'),
+    err => err.code === 'DATA_CORRUPT'
+  );
   assert.equal(fs.readFileSync(file, 'utf-8'), broken, 'arquivo corrompido continua intacto');
-  assert.equal(fs.readdirSync(dir).some(f => f.startsWith('users.json.corrupt-')), true);
+  assert.equal(
+    fs.readdirSync(dir).some(f => f.startsWith('users.json.corrupt-')),
+    true
+  );
 });
 
 test('UserModel: grava de forma atômica (sem .tmp) e cria users.json vazio quando não existe', async () => {
@@ -180,7 +233,10 @@ test('UserModel: grava de forma atômica (sem .tmp) e cria users.json vazio quan
   const users = new UserModel(dir);
   assert.deepEqual(users.getAll(), []);
   await users.create({ name: 'A', email: 'a@exemplo.test', password: 'senha-de-teste-1' });
-  assert.equal(fs.readdirSync(dir).some(f => f.endsWith('.tmp')), false);
+  assert.equal(
+    fs.readdirSync(dir).some(f => f.endsWith('.tmp')),
+    false
+  );
   assert.equal(users.findByEmail('A@EXEMPLO.test').name, 'A');
 });
 
@@ -197,24 +253,38 @@ test('RateLimiter: bloqueia depois do máximo e libera depois da janela', () => 
 
 // --- Rotas da API ---------------------------------------------------------------------------------------------------------
 
-test('API: ingestão exige login, leitura é pública, entradas inválidas dão 400', async (t) => {
+test('API: ingestão exige login, leitura é pública, entradas inválidas dão 400', async t => {
   const app = require('../server/app');
   const mediaService = require('../server/services/mediaService');
   const { ingestLimiter } = require('../server/controllers/mediaController');
-  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  const server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}/api`;
 
   const fetchCalls = [];
-  mediaService.fetchJson = async (url) => {
+  mediaService.fetchJson = async url => {
     fetchCalls.push(url);
     const id = Number(/shows\/(\d+)/.exec(url)[1]);
-    return { id, name: `Série ${id}`, type: 'Scripted', summary: '<p>ok</p>', genres: ['Drama'], _embedded: { episodes: [{ season: 1, number: 1, name: 'E1', runtime: 30 }] } };
+    return {
+      id,
+      name: `Série ${id}`,
+      type: 'Scripted',
+      summary: '<p>ok</p>',
+      genres: ['Drama'],
+      _embedded: { episodes: [{ season: 1, number: 1, name: 'E1', runtime: 30 }] }
+    };
   };
   const token = issueToken({ id: 'usr_teste_api' });
   const auth = { Authorization: `Bearer ${token}` };
-  const json = async (res) => ({ status: res.status, body: await res.json() });
-  const post = (body, headers = {}) => fetch(`${base}/media/ingest`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
+  const json = async res => ({ status: res.status, body: await res.json() });
+  const post = (body, headers = {}) =>
+    fetch(`${base}/media/ingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify(body)
+    });
 
   // leitura pública de obra existente
   assert.equal((await fetch(`${base}/media/trending`)).status, 200);
@@ -274,10 +344,12 @@ test('API: ingestão exige login, leitura é pública, entradas inválidas dão 
   assert.equal((await post({ id: 1000401 }, auth)).status, 200, 'obra já existente não conta no limite');
 });
 
-test('API: arquivo de usuários corrompido responde 503 e não é sobrescrito', async (t) => {
+test('API: arquivo de usuários corrompido responde 503 e não é sobrescrito', async t => {
   const app = require('../server/app');
   const UserModelSingleton = require('../server/models/UserModel');
-  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  const server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}/api`;
 

@@ -10,10 +10,7 @@ const crypto = require('crypto');
 const SECRET_FILE_NAME = 'jwt.secret';
 const MIN_SECRET_LENGTH = 32;
 // Valores que já estiveram em repositório/exemplos públicos: jamais aceitos em produção.
-const KNOWN_PUBLIC_SECRETS = new Set([
-  'showvault_dev_only_secret_change_me',
-  'troque-por-um-segredo-longo-e-aleatorio'
-]);
+const KNOWN_PUBLIC_SECRETS = new Set(['showvault_dev_only_secret_change_me', 'troque-por-um-segredo-longo-e-aleatorio']);
 
 function generateSecret() {
   return crypto.randomBytes(48).toString('hex');
@@ -51,7 +48,9 @@ function loadOrCreateLocalSecret(dataDir) {
       return { secret, file, created: true, persisted: true };
     }
   } catch (err) {
-    console.warn(`[config] Não foi possível gravar ${file} (${err.message}). Usando segredo temporário: os logins serão perdidos ao reiniciar.`);
+    console.warn(
+      `[config] Não foi possível gravar ${file} (${err.message}). Usando segredo temporário: os logins serão perdidos ao reiniciar.`
+    );
     return { secret: generateSecret(), file, created: true, persisted: false };
   }
 }

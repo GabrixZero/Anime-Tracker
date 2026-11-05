@@ -15,7 +15,8 @@ delete process.env.JWT_SECRET;
 delete process.env.SEED_DEMO_USER;
 delete process.env.GOOGLE_CLIENT_ID;
 delete process.env.INVITE_CODES;
-for (const k of ['AUTH_LOGIN_MAX', 'AUTH_LOGIN_IP_MAX', 'AUTH_REGISTER_MAX', 'AUTH_GOOGLE_MAX', 'AUTH_SENSITIVE_MAX']) process.env[k] = '1000';
+for (const k of ['AUTH_LOGIN_MAX', 'AUTH_LOGIN_IP_MAX', 'AUTH_REGISTER_MAX', 'AUTH_GOOGLE_MAX', 'AUTH_SENSITIVE_MAX'])
+  process.env[k] = '1000';
 process.on('exit', () => fs.rmSync(DATA_DIR, { recursive: true, force: true }));
 
 const config = require('../server/config/config');
@@ -29,7 +30,9 @@ let server;
 let base;
 
 test.before(async () => {
-  server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   base = `http://127.0.0.1:${server.address().port}/api`;
 });
 test.after(() => server.close());
@@ -40,7 +43,11 @@ async function call(method, route, { body, token } = {}) {
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   const res = await fetch(`${base}${route}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
   let json = null;
-  try { json = await res.json(); } catch { /* sem corpo */ }
+  try {
+    json = await res.json();
+  } catch {
+    /* sem corpo */
+  }
   return { status: res.status, body: json };
 }
 
@@ -84,7 +91,11 @@ test('convite ligado: código válido cadastra UMA vez; inválido, ausente e reu
   const reused = await register('convidado2@exemplo.test', { inviteCode: a });
   assert.equal(reused.status, 403, 'cada código vale uma vez');
   assert.equal(reused.body.error, wrong.body.error);
-  assert.equal((await register('convidado2@exemplo.test', { inviteCode: `  ${b}  ` })).status, 201, 'outro código segue valendo (espaços nas pontas são ignorados)');
+  assert.equal(
+    (await register('convidado2@exemplo.test', { inviteCode: `  ${b}  ` })).status,
+    201,
+    'outro código segue valendo (espaços nas pontas são ignorados)'
+  );
 
   // O arquivo de códigos usados guarda só hashes, nunca o código em texto.
   const stored = fs.readFileSync(path.join(DATA_DIR, 'invites.json'), 'utf8');
@@ -109,7 +120,11 @@ test('convite: cadastro que falha por e-mail repetido não gasta o código', asy
   process.env.INVITE_CODES = code;
   assert.equal((await register('repetido@exemplo.test', { inviteCode: code })).status, 409);
   assert.equal((await register('novo-com-codigo@exemplo.test', { inviteCode: code })).status, 201, 'o código continuou valendo');
-  assert.equal((await register('invalido@exemplo.test', { inviteCode: code, password: 'curta' })).status, 400, 'validação vem antes e não gasta nada');
+  assert.equal(
+    (await register('invalido@exemplo.test', { inviteCode: code, password: 'curta' })).status,
+    400,
+    'validação vem antes e não gasta nada'
+  );
   delete process.env.INVITE_CODES;
 });
 
@@ -146,7 +161,10 @@ test('logout-all de uma conta não afeta as sessões de outra', async () => {
 test('trocar senha: o token novo vale, o antigo cai e a senha antiga deixa de entrar; também vale depois de logout-all', async () => {
   const { body: reg } = await register('troca-s14@exemplo.test');
   const oldToken = jwt.sign({ sub: reg.user.id, tv: 0, iat: Math.floor(Date.now() / 1000) - 100 }, config.JWT_SECRET, { expiresIn: '1h' });
-  const changed = await call('POST', '/auth/change-password', { token: reg.token, body: { currentPassword: PASS, newPassword: 'outra-senha-456' } });
+  const changed = await call('POST', '/auth/change-password', {
+    token: reg.token,
+    body: { currentPassword: PASS, newPassword: 'outra-senha-456' }
+  });
   assert.equal(changed.status, 200);
   assert.equal((await call('GET', '/auth/me', { token: oldToken })).status, 401);
   assert.equal((await call('GET', '/auth/me', { token: changed.body.token })).status, 200);
@@ -156,7 +174,10 @@ test('trocar senha: o token novo vale, o antigo cai e a senha antiga deixa de en
   const login = await call('POST', '/auth/login', { body: { email: 'troca-s14@exemplo.test', password: 'outra-senha-456' } });
   await call('POST', '/auth/logout-all', { token: login.body.token });
   const relogin = await call('POST', '/auth/login', { body: { email: 'troca-s14@exemplo.test', password: 'outra-senha-456' } });
-  const second = await call('POST', '/auth/change-password', { token: relogin.body.token, body: { currentPassword: 'outra-senha-456', newPassword: 'terceira-senha-789' } });
+  const second = await call('POST', '/auth/change-password', {
+    token: relogin.body.token,
+    body: { currentPassword: 'outra-senha-456', newPassword: 'terceira-senha-789' }
+  });
   assert.equal(second.status, 200);
   assert.equal((await call('GET', '/auth/me', { token: second.body.token })).status, 200);
 });
@@ -166,7 +187,11 @@ test('trocar senha: o token novo vale, o antigo cai e a senha antiga deixa de en
 test('excluir conta apaga também a biblioteca do usuário (e só a dele)', async () => {
   const { body: reg } = await register('exclui-s14@exemplo.test');
   const { body: other } = await register('permanece-s14@exemplo.test');
-  const lib = { trackedShows: [{ showId: 1396, status: 'watching', addedAt: '2026-10-20T00:00:00Z' }], watchedEpisodes: {}, episodeNotes: {} };
+  const lib = {
+    trackedShows: [{ showId: 1396, status: 'watching', addedAt: '2026-10-20T00:00:00Z' }],
+    watchedEpisodes: {},
+    episodeNotes: {}
+  };
   for (const t of [reg.token, other.token]) {
     assert.equal((await call('PUT', '/user/library', { token: t, body: { data: lib, stateVersion: STATE_VERSION } })).status, 200);
   }
@@ -179,7 +204,11 @@ test('excluir conta apaga também a biblioteca do usuário (e só a dele)', asyn
 
   assert.equal((await call('DELETE', '/auth/account', { token: reg.token, body: { password: PASS } })).status, 200);
   assert.equal(UserModel.findById(reg.user.id), null);
-  assert.equal(fs.readdirSync(libDir).some(f => f.startsWith(reg.user.id)), false, 'biblioteca e cópias apagadas');
+  assert.equal(
+    fs.readdirSync(libDir).some(f => f.startsWith(reg.user.id)),
+    false,
+    'biblioteca e cópias apagadas'
+  );
   assert.ok(fs.existsSync(path.join(libDir, `${other.user.id}.json`)), 'a biblioteca de outra conta continua');
   assert.equal((await call('GET', '/user/library', { token: reg.token })).status, 401);
 });

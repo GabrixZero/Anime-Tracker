@@ -28,29 +28,46 @@ const { toListItem } = require('../server/utils/mediaLight');
 let server;
 let origin;
 test.before(async () => {
-  server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   origin = `http://127.0.0.1:${server.address().port}`;
-  for (const client of [mediaService.anilist, mediaService.jikan]) { client.minIntervalMs = 0; client.retries = 0; }
+  for (const client of [mediaService.anilist, mediaService.jikan]) {
+    client.minIntervalMs = 0;
+    client.retries = 0;
+  }
   mediaService.sleep = async () => {};
 });
 test.after(() => server.close());
 test.beforeEach(() => {
   mediaController.searchLimiter.reset();
   mediaService.cache.clear();
-  for (const client of [mediaService.anilist, mediaService.jikan]) { client.cache.clear(); client.breaker.success(); }
+  for (const client of [mediaService.anilist, mediaService.jikan]) {
+    client.cache.clear();
+    client.breaker.success();
+  }
 });
 
-const api = (p, headers = {}) => new Promise((resolve, reject) => {
-  http.get(origin + p, { headers }, (res) => {
-    const chunks = [];
-    res.on('data', c => chunks.push(c));
-    res.on('end', () => {
-      const raw = Buffer.concat(chunks);
-      const body = res.headers['content-encoding'] === 'gzip' ? zlib.gunzipSync(raw) : raw;
-      resolve({ status: res.statusCode, headers: res.headers, raw, text: body.toString('utf8'), json: () => JSON.parse(body.toString('utf8')) });
-    });
-  }).on('error', reject);
-});
+const api = (p, headers = {}) =>
+  new Promise((resolve, reject) => {
+    http
+      .get(origin + p, { headers }, res => {
+        const chunks = [];
+        res.on('data', c => chunks.push(c));
+        res.on('end', () => {
+          const raw = Buffer.concat(chunks);
+          const body = res.headers['content-encoding'] === 'gzip' ? zlib.gunzipSync(raw) : raw;
+          resolve({
+            status: res.statusCode,
+            headers: res.headers,
+            raw,
+            text: body.toString('utf8'),
+            json: () => JSON.parse(body.toString('utf8'))
+          });
+        });
+      })
+      .on('error', reject);
+  });
 
 const totalEpisodes = m => m.seasons.reduce((n, s) => n + s.episodes.length, 0);
 
@@ -90,7 +107,10 @@ test('paginação: limit/offset/total/hasMore e validação (400)', async () => 
   assert.equal(first.total, all.total);
   assert.equal(first.hasMore, true);
   const second = (await api('/api/media/trending?limit=5&offset=5')).json();
-  assert.deepEqual(second.data.map(m => m.id), all.data.slice(5, 10).map(m => m.id));
+  assert.deepEqual(
+    second.data.map(m => m.id),
+    all.data.slice(5, 10).map(m => m.id)
+  );
   const last = (await api(`/api/media/trending?limit=5&offset=${all.total - 2}`)).json();
   assert.equal(last.count, 2);
   assert.equal(last.hasMore, false);
@@ -98,7 +118,10 @@ test('paginação: limit/offset/total/hasMore e validação (400)', async () => 
   for (const bad of ['limit=0', 'limit=201', 'limit=abc', 'limit=-1', 'offset=-1', 'limit=1&limit=2', 'offset=1.5']) {
     assert.equal((await api(`/api/media/trending?${bad}`)).status, 400, bad);
   }
-  assert.equal((await api('/api/media/trending?type=anime&limit=200')).json().data.every(m => m.type === 'anime'), true);
+  assert.equal(
+    (await api('/api/media/trending?type=anime&limit=200')).json().data.every(m => m.type === 'anime'),
+    true
+  );
   assert.equal((await api('/api/media/trending?type=banana')).status, 400);
 });
 
@@ -112,10 +135,12 @@ test('/trending guarda no navegador só com revalidação (ETag + no-cache) e re
 });
 
 test('busca: obra do catálogo vem leve; resultado externo segue como a fonte devolveu (precisa da sinopse até ser adicionado)', async () => {
-  mediaService.fetchJson = async (url) => {
+  mediaService.fetchJson = async url => {
     if (url.includes('anilist')) return { data: { Page: { media: [] } } };
     if (url.includes('jikan')) return { data: [] };
-    return [{ show: { id: 4242, name: 'Zzyzx Show', type: 'Scripted', genres: ['Drama'], status: 'Running', summary: '<p>Sinopse externa</p>' } }];
+    return [
+      { show: { id: 4242, name: 'Zzyzx Show', type: 'Scripted', genres: ['Drama'], status: 'Running', summary: '<p>Sinopse externa</p>' } }
+    ];
   };
   const localBody = (await api('/api/media/search?q=' + encodeURIComponent('Obra Sintética 3') + '&type=tv')).json();
   const local = localBody.data.find(m => m.name === 'Obra Sintética 3');
@@ -139,18 +164,27 @@ test('GET /:id continua devolvendo o detalhe completo (temporadas e episódios) 
 
 test('/batch: detalhe de várias obras de uma vez, sem ingerir; ids desconhecidos voltam em "missing"', async () => {
   let external = 0;
-  mediaService.fetchJson = async () => { external++; return {}; };
+  mediaService.fetchJson = async () => {
+    external++;
+    return {};
+  };
   const ids = [SYNTHETIC[0].id, SYNTHETIC[1].id, 1396];
   const res = await api(`/api/media/batch?ids=${ids.join(',')}&x=1`);
   const body = res.json();
   assert.equal(res.status, 200);
-  assert.deepEqual(body.data.map(m => m.id).sort((a, b) => a - b), ids.slice().sort((a, b) => a - b));
+  assert.deepEqual(
+    body.data.map(m => m.id).sort((a, b) => a - b),
+    ids.slice().sort((a, b) => a - b)
+  );
   assert.equal(body.data.find(m => m.id === SYNTHETIC[0].id).seasons.length, SYNTHETIC[0].seasons.length);
   assert.equal(res.headers['cache-control'], 'no-cache');
 
   const mixed = (await api(`/api/media/batch?ids=${SYNTHETIC[0].id},1001999,10000123,${SYNTHETIC[0].id}`)).json();
   assert.equal(mixed.count, 1, 'duplicado conta uma vez');
-  assert.deepEqual(mixed.missing.sort((a, b) => a - b), [1001999, 10000123]);
+  assert.deepEqual(
+    mixed.missing.sort((a, b) => a - b),
+    [1001999, 10000123]
+  );
   assert.equal(external, 0, 'o /batch nunca consulta fonte externa nem ingere');
 });
 
@@ -195,7 +229,10 @@ test('estáticos: gzip, ETag, index.html sempre conferido e CSS/JS com o cache c
 
   const js = await api('/js/models/state.js');
   assert.equal(js.headers['cache-control'], 'public, max-age=120');
-  assert.equal(js.headers['content-type'].startsWith('text/javascript') || js.headers['content-type'].startsWith('application/javascript'), true);
+  assert.equal(
+    js.headers['content-type'].startsWith('text/javascript') || js.headers['content-type'].startsWith('application/javascript'),
+    true
+  );
 });
 
 test('a API não é guardada em cache além da revalidação e erros continuam em JSON', async () => {
@@ -210,17 +247,38 @@ test('a API não é guardada em cache além da revalidação e erros continuam e
 test('TVMaze e Jikan: pôster do cartão em tamanho médio e imagem grande só no fundo', () => {
   const { MediaService } = require('../server/services/mediaService');
   const jikanMapper = require('../server/services/jikanMapper');
-  const tv = MediaService.mapTvmazeShow({ id: 1, name: 'X', type: 'Scripted', image: { medium: 'https://static.tvmaze.com/m.jpg', original: 'https://static.tvmaze.com/o.jpg' } });
+  const tv = MediaService.mapTvmazeShow({
+    id: 1,
+    name: 'X',
+    type: 'Scripted',
+    image: { medium: 'https://static.tvmaze.com/m.jpg', original: 'https://static.tvmaze.com/o.jpg' }
+  });
   assert.equal(tv.poster_path, 'https://static.tvmaze.com/m.jpg');
   assert.equal(tv.backdrop_path, 'https://static.tvmaze.com/o.jpg');
-  const onlyOriginal = MediaService.mapTvmazeShow({ id: 2, name: 'Y', type: 'Scripted', image: { original: 'https://static.tvmaze.com/o2.jpg' } });
+  const onlyOriginal = MediaService.mapTvmazeShow({
+    id: 2,
+    name: 'Y',
+    type: 'Scripted',
+    image: { original: 'https://static.tvmaze.com/o2.jpg' }
+  });
   assert.equal(onlyOriginal.poster_path, 'https://static.tvmaze.com/o2.jpg');
   const none = MediaService.mapTvmazeShow({ id: 3, name: 'Z', type: 'Scripted' });
   assert.deepEqual([none.poster_path, none.backdrop_path], [null, null]);
 
-  const anime = jikanMapper.mapAnimeBase({ mal_id: 7, title: 'A', images: { jpg: { image_url: 'https://cdn.myanimelist.net/s.jpg', large_image_url: 'https://cdn.myanimelist.net/l.jpg' } } });
+  const anime = jikanMapper.mapAnimeBase({
+    mal_id: 7,
+    title: 'A',
+    images: { jpg: { image_url: 'https://cdn.myanimelist.net/s.jpg', large_image_url: 'https://cdn.myanimelist.net/l.jpg' } }
+  });
   assert.equal(anime.poster_path, 'https://cdn.myanimelist.net/s.jpg');
   assert.equal(anime.backdrop_path, 'https://cdn.myanimelist.net/l.jpg');
-  const onlyLarge = jikanMapper.mapAnimeBase({ mal_id: 8, title: 'B', images: { jpg: { large_image_url: 'https://cdn.myanimelist.net/l2.jpg' } } });
-  assert.deepEqual([onlyLarge.poster_path, onlyLarge.backdrop_path], ['https://cdn.myanimelist.net/l2.jpg', 'https://cdn.myanimelist.net/l2.jpg']);
+  const onlyLarge = jikanMapper.mapAnimeBase({
+    mal_id: 8,
+    title: 'B',
+    images: { jpg: { large_image_url: 'https://cdn.myanimelist.net/l2.jpg' } }
+  });
+  assert.deepEqual(
+    [onlyLarge.poster_path, onlyLarge.backdrop_path],
+    ['https://cdn.myanimelist.net/l2.jpg', 'https://cdn.myanimelist.net/l2.jpg']
+  );
 });

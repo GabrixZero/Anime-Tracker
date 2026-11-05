@@ -21,8 +21,12 @@
 }
 
 @keyframes authFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .tvtime-auth-card {
@@ -33,20 +37,28 @@
   width: 100%;
   max-width: 460px;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), var(--shadow-gold);
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.85),
+    var(--shadow-gold);
   animation: authScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes authScale {
-  from { transform: scale(0.95) translateY(12px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from {
+    transform: scale(0.95) translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Fundo com Pôsteres Translúcidos (Assinatura TV Time) */
 .tvtime-auth-backdrop {
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     radial-gradient(ellipse at center, rgba(20, 22, 32, 0.88) 20%, rgba(14, 16, 24, 0.98) 100%),
     url('https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg');
   background-size: cover;
@@ -168,7 +180,8 @@
   font-weight: 700;
 }
 
-.tvtime-divider::before, .tvtime-divider::after {
+.tvtime-divider::before,
+.tvtime-divider::after {
   content: '';
   flex: 1;
   height: 1px;
@@ -281,11 +294,25 @@
 
 /* Celular (S05): o cartao de login rola dentro da tela quando o teclado ocupa espaco */
 @media (max-width: 768px) {
-  .tvtime-auth-overlay { padding: 0.75rem; align-items: flex-start; overflow-y: auto; }
-  .tvtime-auth-card { margin: auto; }
-  .tvtime-auth-content { padding: 2rem 1.25rem 1.5rem; }
-  .tvtime-auth-header h2 { font-size: 1.45rem; }
-  .tvtime-field input, .btn-tvtime-submit, .btn-google-tvtime { min-height: 46px; }
+  .tvtime-auth-overlay {
+    padding: 0.75rem;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+  .tvtime-auth-card {
+    margin: auto;
+  }
+  .tvtime-auth-content {
+    padding: 2rem 1.25rem 1.5rem;
+  }
+  .tvtime-auth-header h2 {
+    font-size: 1.45rem;
+  }
+  .tvtime-field input,
+  .btn-tvtime-submit,
+  .btn-google-tvtime {
+    min-height: 46px;
+  }
 }
 
 /* Elementos do formulário de login adicionados na S04 (antes eram estilos inline) */

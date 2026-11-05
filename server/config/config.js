@@ -11,10 +11,11 @@ const intFromEnv = (name, fallback) => {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 };
 
-const listFromEnv = (name) => (process.env[name] || '')
-  .split(',')
-  .map(s => s.trim().replace(/\/+$/, ''))
-  .filter(Boolean);
+const listFromEnv = name =>
+  (process.env[name] || '')
+    .split(',')
+    .map(s => s.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
 
 // HOST e TRUST_PROXY (S11): ver server/config/network.js. Em produção o servidor escuta só em 127.0.0.1 (modo PC com Tailscale Funnel).
 // TRUST_PROXY: número de proxies confiáveis (modo PC: 1). Vazio = não confiar em X-Forwarded-For.
@@ -63,8 +64,12 @@ module.exports = {
   AIRING_TTL_MS: Math.round(numFromEnv('MEDIA_AIRING_TTL_HOURS', 6) * 60 * 60 * 1000),
   REFRESH_INTERVAL_MIN: numFromEnv('MEDIA_REFRESH_INTERVAL_MIN', 30),
   DEFAULT_LANGUAGE: 'pt-BR',
-  get JWT_SECRET() { return getJwtSecret().secret; },
-  get JWT_SECRET_SOURCE() { return getJwtSecret().source; },
+  get JWT_SECRET() {
+    return getJwtSecret().secret;
+  },
+  get JWT_SECRET_SOURCE() {
+    return getJwtSecret().source;
+  },
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
 
   // Login com Google: o botão só aparece e a rota só funciona com o Client ID configurado (D-16).
@@ -72,7 +77,12 @@ module.exports = {
 
   // Cadastro por convite (S14): INVITE_CODES = lista separada por vírgula, cada código vale UMA vez. Vazio/ausente = convite desligado.
   // Lido a cada uso (não congelado ao carregar) para os testes poderem ligar e desligar o convite. Nunca é registrado em log.
-  get INVITE_CODES() { return (process.env.INVITE_CODES || '').split(',').map(s => s.trim()).filter(Boolean); },
+  get INVITE_CODES() {
+    return (process.env.INVITE_CODES || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+  },
 
   // Origens externas autorizadas a chamar a API (CORS). Vazio = só o próprio site (mesma origem).
   CORS_ORIGINS: listFromEnv('CORS_ORIGINS'),
@@ -82,7 +92,7 @@ module.exports = {
   // desenvolvedor ver a edição na hora). O index.html nunca é guardado sem conferir. Ajustável com STATIC_MAX_AGE_SEC. (S09)
   STATIC_MAX_AGE_SEC: (() => {
     const n = Number.parseInt(process.env.STATIC_MAX_AGE_SEC, 10);
-    return Number.isFinite(n) && n >= 0 ? n : (IS_PRODUCTION ? 3600 : 0);
+    return Number.isFinite(n) && n >= 0 ? n : IS_PRODUCTION ? 3600 : 0;
   })(),
 
   // Conta de demonstração: só nasce se SEED_DEMO_USER=1 e nunca em produção (D-22).

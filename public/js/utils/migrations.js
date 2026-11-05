@@ -49,7 +49,10 @@
     let tracked = data.trackedShows;
     if (Array.isArray(tracked)) {
       const allKeys = [...Object.keys(data.watchedEpisodes || {}), ...Object.keys(data.episodeNotes || {})];
-      const hasLegacySeries = allKeys.some(k => { const m = KEY_RE.exec(k); return m && Number(m[1]) === LEGACY_SERIES_ID && m[2] !== 'movie'; });
+      const hasLegacySeries = allKeys.some(k => {
+        const m = KEY_RE.exec(k);
+        return m && Number(m[1]) === LEGACY_SERIES_ID && m[2] !== 'movie';
+      });
       const hasBatman = allKeys.includes(`${LEGACY_SERIES_ID}_movie`);
       // O showId 155 só sai se há prova de que era a série antiga e nenhuma de que é o Batman (padrão conservador).
       tracked = tracked.filter(t => {

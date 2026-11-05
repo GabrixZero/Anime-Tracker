@@ -45,7 +45,11 @@ class AppState {
   // Só regrava o localStorage quando algo muda; a versão nova é registrada em seguida.
   migrateStored(data) {
     let version = 1;
-    try { version = Number(localStorage.getItem(this.VERSION_KEY)) || 1; } catch { /* sem localStorage */ }
+    try {
+      version = Number(localStorage.getItem(this.VERSION_KEY)) || 1;
+    } catch {
+      /* sem localStorage */
+    }
     const target = window.STATE_VERSION || version;
     if (version >= target || !window.migrateLibrary) return data;
 
@@ -81,14 +85,20 @@ class AppState {
 
   // ----- isolamento por conta (S03) -----
   getOwner() {
-    try { return localStorage.getItem(this.OWNER_KEY) || ''; } catch { return ''; }
+    try {
+      return localStorage.getItem(this.OWNER_KEY) || '';
+    } catch {
+      return '';
+    }
   }
 
   setOwner(userId) {
     try {
       if (userId) localStorage.setItem(this.OWNER_KEY, String(userId));
       else localStorage.removeItem(this.OWNER_KEY);
-    } catch { /* sem localStorage */ }
+    } catch {
+      /* sem localStorage */
+    }
   }
 
   // Troca todo o conteúdo (sem agendar envio: quem chama decide).
@@ -101,7 +111,11 @@ class AppState {
   // Guarda o estado atual como arquivo da conta (alterações ainda não enviadas); só se houver conteúdo.
   archiveFor(userId) {
     if (!userId || !window.LibraryMerge.hasContent(this.data)) return;
-    try { localStorage.setItem(this.ARCHIVE_PREFIX + userId, JSON.stringify(this.data)); } catch { /* sem espaço: segue */ }
+    try {
+      localStorage.setItem(this.ARCHIVE_PREFIX + userId, JSON.stringify(this.data));
+    } catch {
+      /* sem espaço: segue */
+    }
   }
 
   // Devolve (e apaga) o arquivo da conta, se existir e for legível.
@@ -111,7 +125,9 @@ class AppState {
       const raw = localStorage.getItem(this.ARCHIVE_PREFIX + userId);
       localStorage.removeItem(this.ARCHIVE_PREFIX + userId);
       return raw ? window.LibraryMerge.normalizeData(JSON.parse(raw)) : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
 
   // Logout/troca de conta: o navegador volta a ser "visitante" e vazio (sem dados da conta anterior, sem demo).
@@ -163,7 +179,7 @@ class AppState {
   // Itens vindos de uma LISTA (explorar/busca): leves (`light`) ou resultados externos. Nunca rebaixam um detalhe já carregado.
   cacheMediaList(items) {
     if (!Array.isArray(items)) return;
-    items.forEach((item) => {
+    items.forEach(item => {
       if (!item || !Number.isSafeInteger(item.id)) return;
       const current = this.mediaMap.get(item.id);
       if (current && !current.light && !current.isExternal && (item.light || item.isExternal)) return; // lista leve nunca apaga resumo/detalhe
@@ -272,7 +288,7 @@ class AppState {
   getStatus(tracked) {
     const media = this.getMedia(tracked.showId);
     // só itens antigos (sem updatedAt) precisam do progresso para decidir; os demais valem como estão
-    const progress = (!tracked.updatedAt && media) ? this.getProgress(tracked.showId) : null;
+    const progress = !tracked.updatedAt && media ? this.getProgress(tracked.showId) : null;
     return window.WatchStatus.effectiveStatus(tracked, media, (s, e) => this.isWatched(tracked.showId, s, e), progress);
   }
 
@@ -353,7 +369,7 @@ class AppState {
   // ----- episódios e notas -----
   isWatched(showId, seasonNum, epNum) {
     const show = this.getMedia(showId);
-    const key = (show && show.type === 'movie') ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+    const key = show && show.type === 'movie' ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
     return !!(this.data.watchedEpisodes[key] && this.data.watchedEpisodes[key].watched);
   }
 
@@ -371,7 +387,7 @@ class AppState {
         watched: true,
         watchedAt: at,
         updatedAt: at,
-        rewatchCount: (current && current.rewatchCount) ? current.rewatchCount : 1
+        rewatchCount: current && current.rewatchCount ? current.rewatchCount : 1
       };
       this.clearDeleted('watched', key);
     } else {
@@ -417,7 +433,7 @@ class AppState {
   // Chave da anotação: "<id>_movie" para filme, "<id>_s<T>_e<E>" para episódio.
   noteKey(showId, seasonNum, epNum) {
     const show = this.getMedia(showId);
-    return (show && show.type === 'movie') ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
+    return show && show.type === 'movie' ? `${showId}_movie` : `${showId}_s${seasonNum}_e${epNum}`;
   }
 
   // ----- anotações e histórico de versões (S08, D-19) -----
@@ -497,7 +513,10 @@ class AppState {
     let missing = 0;
     for (const id of AppState.EXAMPLE_SHOW_IDS) {
       if (this.getTracked(id)) continue;
-      if (!this.getMedia(id)) { missing++; continue; }
+      if (!this.getMedia(id)) {
+        missing++;
+        continue;
+      }
       if (this.addShow(id)) added.push(id);
     }
     return { added, missing };
@@ -511,7 +530,7 @@ class AppState {
     const tracked = this.getTracked(id);
     if (!tracked || tracked.status !== 'plan_to_watch') return false;
     const prefix = `${id}_`;
-    const used = (obj) => Object.keys(obj || {}).some(key => key.startsWith(prefix));
+    const used = obj => Object.keys(obj || {}).some(key => key.startsWith(prefix));
     return !used(this.data.watchedEpisodes) && !used(this.data.episodeNotes);
   }
 
@@ -532,7 +551,7 @@ class AppState {
 }
 
 AppState.NOTE_VERSION_GAP_MS = 10 * 60 * 1000; // anotação parada por 10 min = nova sessão de edição
-AppState.MAX_NOTE_VERSIONS = 5;                // igual ao limite do servidor e do backup (MAX_SNAPSHOTS)
+AppState.MAX_NOTE_VERSIONS = 5; // igual ao limite do servidor e do backup (MAX_SNAPSHOTS)
 AppState.EXAMPLE_SHOW_IDS = [157336, 872585, 1396, 1429]; // Interestelar, Oppenheimer, Breaking Bad, Attack on Titan (seed)
 
 window.appState = new AppState();

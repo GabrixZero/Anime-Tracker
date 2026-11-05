@@ -13,7 +13,13 @@
   const MAX = 10;
   const TOP_LIMIT = 5;
   // Faixas da distribuição: [início, fim). A última também inclui o 10.
-  const BANDS = [[0, 2], [2, 4], [4, 6], [6, 8], [8, 10]];
+  const BANDS = [
+    [0, 2],
+    [2, 4],
+    [4, 6],
+    [6, 8],
+    [8, 10]
+  ];
 
   // Sem nota informada (ausente, null ou texto vazio): é o jeito de pedir "remover a nota".
   const isEmptyRating = v => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
@@ -31,7 +37,7 @@
   }
 
   // "6.6" (sempre com uma casa)
-  const formatUserRating = v => normalizeRating(v) === null ? '' : normalizeRating(v).toFixed(1);
+  const formatUserRating = v => (normalizeRating(v) === null ? '' : normalizeRating(v).toFixed(1));
 
   // items: [{ showId, title, rating }] (só os com nota válida entram).
   // Devolve { count, average (1 casa ou null), distribution: [{ label, count }], top: [{ showId, title, rating }] (até 5) }.
@@ -48,9 +54,10 @@
       label: `${from}–${to}`,
       count: rated.filter(r => r.rating >= from && (r.rating < to || (i === BANDS.length - 1 && r.rating <= to))).length
     }));
-    const top = rated.slice().sort((a, b) =>
-      b.rating - a.rating || a.title.localeCompare(b.title, 'pt-BR') || (Number(a.showId) - Number(b.showId))
-    ).slice(0, TOP_LIMIT);
+    const top = rated
+      .slice()
+      .sort((a, b) => b.rating - a.rating || a.title.localeCompare(b.title, 'pt-BR') || Number(a.showId) - Number(b.showId))
+      .slice(0, TOP_LIMIT);
     return { count: rated.length, average, distribution, top };
   }
 
@@ -81,8 +88,17 @@
   }
 
   const api = {
-    MIN, MAX, TOP_LIMIT, BANDS, isEmptyRating, normalizeRating, formatUserRating, computeRatingStats,
-    ratingControlHtml, catalogRatingHtml, userRatingBadgeHtml
+    MIN,
+    MAX,
+    TOP_LIMIT,
+    BANDS,
+    isEmptyRating,
+    normalizeRating,
+    formatUserRating,
+    computeRatingStats,
+    ratingControlHtml,
+    catalogRatingHtml,
+    userRatingBadgeHtml
   };
   root.Rating = api;
   if (isNode) module.exports = api;
