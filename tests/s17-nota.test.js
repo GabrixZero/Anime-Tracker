@@ -250,17 +250,16 @@ test('HTML da nota: escapa título/valores, sem style/onclick, com rótulo acess
   const evil = '<img src=x onerror=alert(1)>"\'';
   const html = [
     Rating.ratingControlHtml({ showId: '7"><b>', name: evil, rating: 6.6, idPrefix: 'detail-rating' }),
-    Rating.catalogRatingHtml(evil),
     Rating.userRatingBadgeHtml(6.6)
   ].join('');
   assert.ok(!html.includes('<img') && !html.includes('<b>'), 'nada de tag solta');
   // (o texto malicioso escapado contém "onerror=" só como texto; a checagem de atributos usa um nome inofensivo)
-  const clean = Rating.ratingControlHtml({ showId: 7, name: 'X', rating: 6.6 }) + Rating.catalogRatingHtml('★ 8.5');
+  const clean = Rating.ratingControlHtml({ showId: 7, name: 'X', rating: 6.6 });
   assert.ok(!/\son[a-z]+\s*=|\sstyle\s*=/i.test(clean), 'sem onclick/style inline');
   assert.match(html, /Minha nota \(0 a 10\)/);
   assert.match(html, /type="number" class="rating-input"[^>]*min="0" max="10" step="0.1" inputmode="decimal"/);
   assert.match(html, /<button type="button"[^>]*data-action="clear-rating"[^>]*>Remover nota<\/button>/);
-  assert.match(html, /Nota do catálogo:/);
+  assert.ok(!html.includes('Nota do catálogo'), 'o texto "Nota do catálogo" foi removido (D-AV3-1)');
   assert.match(html, /★ 6\.6/);
 
   // sem nota: o botão Remover nasce desabilitado e o selo some

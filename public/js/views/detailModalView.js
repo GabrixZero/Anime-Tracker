@@ -171,8 +171,6 @@ class DetailModalView {
         <h2 class="modal-title" id="detail-modal-title">${escapeHtml(media.name)}</h2>
         <div class="modal-meta">${metaParts}</div>
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
-        <p class="rating-catalog-line">${window.Rating.catalogRatingHtml(MD.ratingBadge(media.vote_average))}</p>
-        
         <div class="modal-actions">
           ${
             tracked

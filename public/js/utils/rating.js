@@ -74,12 +74,6 @@
     </div>`;
   }
 
-  // Linha "Nota do catálogo: ★ 8.5" (a nota pública vem da fonte; sem nota = "Sem nota"). `badge` = MediaDisplay.ratingBadge(valor).
-  function catalogRatingHtml(badge) {
-    const { escapeHtml } = dom();
-    return `<span class="rating-catalog"><span class="rating-catalog-label">Nota do catálogo:</span> ${escapeHtml(badge)}</span>`;
-  }
-
   // Selo "★ 6.6" da sua nota no cartão ('' sem nota)
   function userRatingBadgeHtml(rating) {
     const { escapeHtml } = dom();
@@ -97,7 +91,6 @@
     formatUserRating,
     computeRatingStats,
     ratingControlHtml,
-    catalogRatingHtml,
     userRatingBadgeHtml
   };
   root.Rating = api;

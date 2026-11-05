@@ -639,12 +639,6 @@
   color: var(--tvtime-yellow);
 }
 
-.rating-catalog,
-.rating-catalog-label {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
 .rating-top-list {
   margin: 0;
   padding-left: 1.25rem;
