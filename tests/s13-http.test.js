@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S13 · rotas /api/media: atualização de obra em exibição (POST /:id/refresh), obra existente com outro id (alias público), amostra do
 // seed trocada ao adicionar (catalog_id na busca) e avisos de fonte com reserva. Fontes SIMULADAS (AniList = respostas reais gravadas).
 const test = require('node:test');

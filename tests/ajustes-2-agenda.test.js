@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Ajustes 2 · Grupo 1: obra em exibição guardada por um mapeamento antigo (sem episódios futuros) é atualizada na hora, e a Agenda
 // atualiza as obras em rodízio (as mais antigas primeiro). Nenhum teste usa a internet.
 const test = require('node:test');

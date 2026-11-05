@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S10 fase B: delegação de eventos (data-action), peças comuns das telas (ViewKit) e CSP sem 'unsafe-inline'.
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes S03 (integração): rotas da biblioteca, LibraryModel com marcas de exclusão e o frontend real (state.js + syncService.js
 // + views) rodando em "aparelhos" simulados (vm), ligados ao LibraryModel de verdade.
 const test = require('node:test');

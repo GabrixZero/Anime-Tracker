@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Rotas /api/media (S06): avisos de fontes, erro 429 da fonte externa com Retry-After, limite de buscas por IP,
 // ingestão exige login. Fontes externas SIMULADAS (nenhuma requisição real); tudo em diretório temporário.
 const test = require('node:test');

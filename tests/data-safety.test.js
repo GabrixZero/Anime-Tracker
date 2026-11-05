@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes S02: migração de bibliotecas (D-11), leitura corrompida em UserModel/LibraryModel e rotas da API (login na ingestão, validação).
 // Nada aqui escreve em server/data real.
 const test = require('node:test');

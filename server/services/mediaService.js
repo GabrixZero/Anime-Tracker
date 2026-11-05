@@ -42,7 +42,7 @@ const REFRESH_RETRY_AFTER_FAILURE_MS = 30 * 60 * 1000; // a conferência automá
 class MediaService {
   constructor(opts = {}) {
     const dataDir = opts.dataDir || config.DATA_DIR;
-    this.seedPath = opts.seedPath || SEED_PATH;
+    this.seedPath = opts.seedPath || config.SEED_PATH || SEED_PATH;
     this.catalogPath = path.join(dataDir, 'mediaCatalog.runtime.json');
     this.tvmazeBase = opts.tvmazeBase || config.TVMAZE_BASE_URL || TVMAZE_BASE;
     this.cache = new TtlCache({ ttlMs: opts.cacheTtlMs ?? 10 * 60 * 1000, max: 200 }); // buscas no TVMaze

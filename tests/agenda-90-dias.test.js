@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Agenda de 90 dias (parte servidor): data BR de filmes (TMDB release_dates), grade recente da AniList e validade de filmes não lançados.
 // Tudo com fetch falso: nenhum teste usa a internet.
 const test = require('node:test');

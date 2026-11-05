@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S13 · AniList como fonte principal de anime: cliente + mapper com respostas REAIS gravadas (tests/fixtures/anilist), busca e
 // ingestão no MediaService (AniList -> Jikan -> local/TVMaze, com avisos por fonte), episódios, franquia e deduplicação seed x fonte.
 // Nenhuma requisição real; tudo em pastas temporárias.

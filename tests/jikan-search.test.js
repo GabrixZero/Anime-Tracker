@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes da S06 (animes e busca): Jikan com respostas SIMULADAS (nenhuma requisição real), fila/throttle/429, deduplicação,
 // relevância, franquia (temporadas pelas relações Sequel/Prequel) e TMDB opcional. Nada escreve em server/data real.
 // Desde a S13 a AniList é a fonte principal de anime: aqui ela fica DESLIGADA (anilistEnabled: false) para exercitar a Jikan

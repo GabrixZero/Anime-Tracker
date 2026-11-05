@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Rotas HTTP gerais (S10): /health, 404 de API, arquivos estáticos e fallback, catálogo (sem rede) e
 // casos de borda da biblioteca (corpo quebrado, grande demais, conta que deixou de existir).
 // Roda em pasta temporária (SHOWVAULT_DATA_DIR); nenhuma chamada a fontes externas.

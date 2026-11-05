@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // S13 · qualidade do catálogo: migração idempotente (com backup) do catálogo de runtime ANTIGO (nota 8.0 / "Drama" / Unsplash) e
 // atualização das obras em exibição (validade por obra, refresh, conferência automática). Fontes simuladas; pastas temporárias.
 const test = require('node:test');

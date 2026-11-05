@@ -1,0 +1,419 @@
+[
+  {
+    "id": 1396,
+    "type": "tv",
+    "name": "Breaking Bad",
+    "overview": "Sinopse fictícia de teste para Breaking Bad.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 9.5,
+    "first_air_date": "2008-01-20",
+    "genres": ["Drama", "Crime"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Piloto",
+            "runtime": 58,
+            "air_date": "2008-01-20",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          },
+          {
+            "episode_number": 2,
+            "name": "Episódio 2 (teste)",
+            "runtime": 48,
+            "air_date": "2008-01-27",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          },
+          {
+            "episode_number": 3,
+            "name": "Episódio 3 (teste)",
+            "runtime": 48,
+            "air_date": "2008-02-10",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 136283,
+    "type": "tv",
+    "name": "The Bear (O Urso)",
+    "overview": "Sinopse fictícia de teste para The Bear (O Urso).",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.8,
+    "first_air_date": "2022-06-23",
+    "genres": ["Drama", "Comédia"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 28,
+            "air_date": "2022-06-23",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          },
+          {
+            "episode_number": 2,
+            "name": "Episódio 2 (teste)",
+            "runtime": 31,
+            "air_date": "2022-06-23",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 95396,
+    "type": "tv",
+    "name": "Ruptura (Severance)",
+    "overview": "Sinopse fictícia de teste para Ruptura (Severance).",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.7,
+    "first_air_date": "2022-02-18",
+    "genres": ["Ficção Científica", "Suspense", "Drama"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 57,
+            "air_date": "2022-02-18",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 66732,
+    "type": "tv",
+    "name": "Stranger Things",
+    "overview": "Sinopse fictícia de teste para Stranger Things.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.6,
+    "first_air_date": "2016-07-15",
+    "genres": ["Ficção Científica", "Terror", "Drama"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 48,
+            "air_date": "2016-07-15",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 94605,
+    "type": "tv",
+    "name": "Arcane",
+    "overview": "Sinopse fictícia de teste para Arcane.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 9,
+    "first_air_date": "2021-11-06",
+    "genres": ["Animação", "Ação", "Ficção Científica"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 43,
+            "air_date": "2021-11-06",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 100088,
+    "type": "tv",
+    "name": "The Last of Us",
+    "overview": "Sinopse fictícia de teste para The Last of Us.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.6,
+    "first_air_date": "2023-01-15",
+    "genres": ["Drama", "Ficção Científica", "Ação"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 81,
+            "air_date": "2023-01-15",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1429,
+    "type": "anime",
+    "name": "Attack on Titan (Shingeki no Kyojin)",
+    "overview": "Sinopse fictícia de teste para Attack on Titan (Shingeki no Kyojin).",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 9.1,
+    "first_air_date": "2013-04-07",
+    "genres": ["Anime", "Ação", "Fantasia"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 24,
+            "air_date": "2013-04-07",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          },
+          {
+            "episode_number": 2,
+            "name": "Episódio 2 (teste)",
+            "runtime": 24,
+            "air_date": "2013-04-14",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ],
+    "mal_id": 16498,
+    "alt_titles": ["Shingeki no Kyojin", "Attack on Titan", "進撃の巨人", "AoT"]
+  },
+  {
+    "id": 85937,
+    "type": "anime",
+    "name": "Demon Slayer (Kimetsu no Yaiba)",
+    "overview": "Sinopse fictícia de teste para Demon Slayer (Kimetsu no Yaiba).",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.7,
+    "first_air_date": "2019-04-06",
+    "genres": ["Anime", "Ação", "Sobrenatural"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "air_date": "2019-04-06",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ],
+    "mal_id": 38000,
+    "alt_titles": ["Kimetsu no Yaiba", "Demon Slayer: Kimetsu no Yaiba", "鬼滅の刃"]
+  },
+  {
+    "id": 95479,
+    "type": "anime",
+    "name": "Jujutsu Kaisen",
+    "overview": "Sinopse fictícia de teste para Jujutsu Kaisen.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.6,
+    "first_air_date": "2020-10-03",
+    "genres": ["Anime", "Ação", "Fantasia"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "air_date": "2020-10-03",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ],
+    "mal_id": 40748,
+    "alt_titles": ["Jujutsu Kaisen", "呪術廻戦"]
+  },
+  {
+    "id": 209867,
+    "type": "anime",
+    "name": "Frieren e a Jornada para o Além",
+    "overview": "Sinopse fictícia de teste para Frieren e a Jornada para o Além.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.9,
+    "first_air_date": "2023-09-29",
+    "genres": ["Anime", "Fantasia", "Aventura"],
+    "status": "Em Exibição",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "runtime": 25,
+            "air_date": "2023-09-29",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ],
+    "mal_id": 52991,
+    "alt_titles": ["Sousou no Frieren", "Frieren: Beyond Journey's End", "葬送のフリーレン"]
+  },
+  {
+    "id": 13916,
+    "type": "anime",
+    "name": "Death Note",
+    "overview": "Sinopse fictícia de teste para Death Note.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.6,
+    "first_air_date": "2006-10-04",
+    "genres": ["Anime", "Suspense", "Mistério"],
+    "status": "Finalizada",
+    "seasons": [
+      {
+        "season_number": 1,
+        "name": "Temporada 1",
+        "episodes": [
+          {
+            "episode_number": 1,
+            "name": "Episódio 1 (teste)",
+            "air_date": "2006-10-04",
+            "overview": "Resumo fictício.",
+            "still_path": null
+          }
+        ]
+      }
+    ],
+    "mal_id": 1535,
+    "alt_titles": ["Death Note", "デスノート"]
+  },
+  {
+    "id": 157336,
+    "type": "movie",
+    "name": "Interestelar (Interstellar)",
+    "runtime": 169,
+    "overview": "Sinopse fictícia de teste para Interestelar (Interstellar).",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.7,
+    "first_air_date": "2014-11-05",
+    "genres": ["Filme", "Ficção Científica", "Drama"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 872585,
+    "type": "movie",
+    "name": "Oppenheimer",
+    "runtime": 180,
+    "overview": "Sinopse fictícia de teste para Oppenheimer.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.1,
+    "first_air_date": "2023-07-19",
+    "genres": ["Filme", "Drama", "História"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 693134,
+    "type": "movie",
+    "name": "Duna: Parte 2",
+    "runtime": 166,
+    "overview": "Sinopse fictícia de teste para Duna: Parte 2.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.3,
+    "first_air_date": "2024-02-27",
+    "genres": ["Filme", "Ficção Científica", "Aventura"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 324857,
+    "type": "movie",
+    "name": "Homem-Aranha: No Aranhaverso",
+    "runtime": 117,
+    "overview": "Sinopse fictícia de teste para Homem-Aranha: No Aranhaverso.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.4,
+    "first_air_date": "2018-12-01",
+    "genres": ["Filme", "Animação", "Ação"],
+    "status": "Lançado",
+    "seasons": []
+  },
+  {
+    "id": 155,
+    "type": "movie",
+    "name": "Batman: O Cavaleiro das Trevas",
+    "runtime": 152,
+    "overview": "Sinopse fictícia de teste para Batman: O Cavaleiro das Trevas.",
+    "poster_path": null,
+    "backdrop_path": null,
+    "vote_average": 8.5,
+    "first_air_date": "2008-07-16",
+    "genres": ["Filme", "Ação", "Crime", "Drama"],
+    "status": "Lançado",
+    "seasons": []
+  }
+]

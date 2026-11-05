@@ -1,3 +1,4 @@
+process.env.SHOWVAULT_SEED_PATH = require('path').join(__dirname, 'fixtures', 'seed-teste.json'); // seed de teste (textos fictícios), não o catálogo real
 // Testes do MediaService (S02): ids por fonte, ingestão, erros da fonte externa, escrita atômica, leitura corrompida, concorrência.
 // Nada aqui escreve em server/data real: tudo usa diretórios temporários.
 const test = require('node:test');
