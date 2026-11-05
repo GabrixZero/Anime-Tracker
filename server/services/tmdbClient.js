@@ -128,7 +128,21 @@ class TmdbClient {
   async getMovie(tmdbId) {
     const m = await this.get(`/movie/${tmdbId}`, {}, { ttlMs: 60 * 60 * 1000 });
     if (!m || m.id !== tmdbId || !m.title) throw mediaErrors.notFound();
-    return { ...TmdbClient.mapMovie(m), ...(Number(m.runtime) > 0 ? { runtime: Number(m.runtime) } : { runtime: null }) };
+    const out = { ...TmdbClient.mapMovie(m), ...(Number(m.runtime) > 0 ? { runtime: Number(m.runtime) } : { runtime: null }) };
+    // Estreia no cinema do Brasil (release_dates, type 3): a menor data vence; sem ela (ou com erro) fica o release_date global.
+    try {
+      const rd = await this.get(`/movie/${tmdbId}/release_dates`, {}, { ttlMs: 60 * 60 * 1000 });
+      const br = (Array.isArray(rd && rd.results) ? rd.results : []).find(r => r && r.iso_3166_1 === 'BR');
+      const dates = (Array.isArray(br && br.release_dates) ? br.release_dates : [])
+        .filter(e => e && e.type === 3)
+        .map(e => dateOnly(e.release_date))
+        .filter(Boolean)
+        .sort();
+      if (dates.length) out.first_air_date = dates[0];
+    } catch {
+      /* sem a data do Brasil: segue com o release_date */
+    }
+    return out;
   }
 
   // Série + uma requisição por temporada (o TMDB só entrega os episódios por temporada). Temporada 0 (extras) fica de fora.

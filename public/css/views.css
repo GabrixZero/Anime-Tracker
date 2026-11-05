@@ -106,6 +106,61 @@
   color: var(--tvtime-yellow);
 }
 
+/* Passado / hoje / futuro (D-AG-4): três blocos separados, em ordem cronológica */
+.calendar-phase + .calendar-phase {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed var(--bg-card-border);
+}
+
+.calendar-phase--past .calendar-day {
+  opacity: 0.72;
+}
+
+.calendar-phase--past .calendar-day-title {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.calendar-phase--past .calendar-item {
+  background: transparent;
+  border-style: dashed;
+}
+
+.calendar-item-released {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: var(--text-secondary);
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--bg-card-border);
+  border-radius: 999px;
+}
+
+.calendar-phase--today .calendar-day {
+  scroll-margin-top: 5rem;
+  padding: 0.6rem 0.9rem 0.2rem;
+  background: var(--bg-surface);
+  border: 2px solid var(--tvtime-yellow);
+  border-radius: var(--radius-md);
+}
+
+.calendar-phase--today .calendar-day-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.calendar-today-mark {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tvtime-yellow);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25);
+}
+
 .calendar-list {
   list-style: none;
   margin: 0;

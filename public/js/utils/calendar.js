@@ -71,22 +71,36 @@
     return start ? { from: start, to: addDays(start, 6) } : null;
   }
 
-  // Intervalo (inclusive) de cada período do filtro.
+  // Janela da Agenda (D-AG-1): o que foi lançado nos últimos 90 dias aparece; do dia 91 para trás some.
+  // Fronteira INCLUSIVA: com hoje = 2026-11-05, o dia 2026-08-07 (hoje - 90) ainda aparece e 2026-08-06 já não.
+  const PAST_DAYS = 90;
+  const windowStart = todayKey => addDays(todayKey, -PAST_DAYS);
+
+  // Intervalo (inclusive) de cada período do filtro; `to: null` = sem limite para o futuro.
+  // 'all' = toda a janela (hoje - 90 dias até o fim dos tempos); os demais períodos nunca saem da janela.
   function rangeBounds(todayKey, range) {
     if (!parseDay(todayKey)) return null;
-    if (range === 'week') return weekRange(todayKey);
-    if (range === 'next30') return { from: todayKey, to: addDays(todayKey, 29) };
-    return { from: todayKey, to: addDays(todayKey, 6) }; // 'next7' (padrão)
+    const floor = windowStart(todayKey);
+    if (range === 'all') return { from: floor, to: null };
+    let bounds;
+    if (range === 'week') bounds = weekRange(todayKey);
+    else if (range === 'next30') bounds = { from: todayKey, to: addDays(todayKey, 29) };
+    else bounds = { from: todayKey, to: addDays(todayKey, 6) }; // 'next7' (padrão)
+    return bounds.from < floor ? { from: floor, to: bounds.to } : bounds;
   }
+
+  // Fase de um dia em relação a hoje: 'past' | 'today' | 'future'.
+  const phaseOf = daysFromToday => (daysFromToday < 0 ? 'past' : daysFromToday === 0 ? 'today' : 'future');
 
   // Lista de episódios (e estreias de filmes) das obras da lista dentro do período, ordenada por data, nome, temporada, episódio.
   //  - trackedList: itens da lista ({ showId }); getMedia(showId) -> obra; isWatched(showId, season, episode) (filme: sem season/episode);
   //  - includeTracked(tracked) -> bool (ex.: status que entra na fila); sem ele, todas entram;
-  //  - episódio sem data válida não entra (nunca se inventa data).
+  //  - episódio/filme sem data válida, ou fora da janela (mais de 90 dias atrás), não entra (nunca se inventa data);
+  //  - filme usa a data de estreia (first_air_date); o passado recente fica no histórico.
   function buildAgenda(trackedList, getMedia, isWatched, todayKey, { range = 'next7', includeTracked } = {}) {
     const bounds = rangeBounds(todayKey, range);
     if (!bounds || !Array.isArray(trackedList)) return [];
-    const inRange = key => key >= bounds.from && key <= bounds.to; // chaves YYYY-MM-DD comparam bem como texto
+    const inRange = key => key >= bounds.from && (bounds.to === null || key <= bounds.to); // chaves YYYY-MM-DD comparam bem como texto
     const items = [];
     const seen = new Set();
 
@@ -101,7 +115,7 @@
       if (media.type === 'movie') {
         const day = parseDay(String(media.first_air_date || '').slice(0, 10));
         const airDate = day ? keyOf(day.y, day.m, day.d) : null;
-        if (airDate && airDate >= todayKey && inRange(airDate)) {
+        if (airDate && inRange(airDate)) {
           items.push({
             ...base,
             seasonNumber: null,
@@ -145,34 +159,6 @@
     return items;
   }
 
-  // Obras da lista SEM nenhuma estreia/episódio com data conhecida de hoje em diante (independe do período do filtro):
-  // filme sem data futura; série/anime sem episódio datado >= hoje. Obra com data fora do período escolhido NÃO entra aqui.
-  // Obra sem detalhe carregado ou de tipo desconhecido é ignorada. Retorna [{ showId, showName, type }] ordenado por nome.
-  function buildUndated(trackedList, getMedia, todayKey, { includeTracked } = {}) {
-    if (!parseDay(todayKey) || !Array.isArray(trackedList)) return [];
-    const futureDay = value => {
-      const day = parseDay(String(value || '').slice(0, 10));
-      return !!day && keyOf(day.y, day.m, day.d) >= todayKey;
-    };
-    const out = [];
-    const seen = new Set();
-    for (const tracked of trackedList) {
-      if (!tracked || seen.has(tracked.showId)) continue;
-      seen.add(tracked.showId);
-      if (typeof includeTracked === 'function' && !includeTracked(tracked)) continue;
-      const media = getMedia(tracked.showId);
-      if (!media) continue;
-      let hasFuture;
-      if (media.type === 'movie') hasFuture = futureDay(media.first_air_date);
-      else if (media.type === 'tv' || media.type === 'anime') {
-        hasFuture = (media.seasons || []).some(season => (season.episodes || []).some(ep => futureDay(ep.air_date)));
-      } else continue;
-      if (!hasFuture) out.push({ showId: media.id, showName: media.name, type: media.type });
-    }
-    out.sort((a, b) => String(a.showName).localeCompare(String(b.showName), 'pt-BR'));
-    return out;
-  }
-
   // Agrupa itens já ordenados por dia: [{ key, y, m, d, weekday, daysFromToday, items }]. Os rótulos ("Hoje"...) ficam na view.
   function groupByDay(items) {
     const groups = [];
@@ -187,6 +173,7 @@
           d: day.d,
           weekday: weekday(item.airDate),
           daysFromToday: item.daysFromToday,
+          phase: phaseOf(item.daysFromToday),
           items: []
         };
         groups.push(group);
@@ -196,7 +183,21 @@
     return groups;
   }
 
-  const api = { parseDay, dayKey, addDays, diffDays, weekday, startOfWeek, weekRange, rangeBounds, buildAgenda, buildUndated, groupByDay };
+  const api = {
+    parseDay,
+    dayKey,
+    addDays,
+    diffDays,
+    weekday,
+    startOfWeek,
+    weekRange,
+    rangeBounds,
+    windowStart,
+    PAST_DAYS,
+    phaseOf,
+    buildAgenda,
+    groupByDay
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root) root.Calendar = api;
 })(typeof window !== 'undefined' ? window : null);

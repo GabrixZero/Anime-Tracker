@@ -3,6 +3,7 @@
 // sempre relativos a hoje. Nenhum teste usa a internet.
 'use strict';
 
+const { AxeBuilder } = require('@axe-core/playwright');
 const { test, expect } = require('./support/fixtures');
 const { EXPECTED } = require('./fake-sources/data');
 const {
@@ -18,7 +19,7 @@ const {
   tap
 } = require('./support/helpers');
 
-const { calendar } = EXPECTED;
+const { calendar, agenda90 } = EXPECTED;
 
 const item = (page, title) =>
   page.locator('#calendar-container .calendar-item').filter({ has: page.getByRole('button', { name: title, exact: true }) });
@@ -49,7 +50,7 @@ test.describe('Agenda', () => {
     await tap(page.locator('[data-range="next7"]'));
     await expect(page.locator('[data-range="next7"]')).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('[data-range="week"]')).toHaveAttribute('aria-pressed', 'false');
-    await expect(page.locator('#calendar-counter-pill')).toHaveText('3 episódios');
+    await expect(page.locator('#calendar-counter-pill')).toHaveText('3 itens');
     const headings = page.locator('#calendar-container .calendar-day-title');
     await expect(headings).toHaveCount(3);
     await expect(headings.nth(0)).toHaveText(/^Hoje · \d{2}\/\d{2}$/);
@@ -61,10 +62,10 @@ test.describe('Agenda', () => {
 
     // 30 dias: entra o episódio distante
     await tap(page.locator('[data-range="next30"]'));
-    await expect(page.locator('#calendar-counter-pill')).toHaveText('4 episódios');
+    await expect(page.locator('#calendar-counter-pill')).toHaveText('4 itens');
     await expect(item(page, calendar.in20days)).toBeVisible();
     await tap(page.locator('[data-range="next7"]'));
-    await expect(page.locator('#calendar-counter-pill')).toHaveText('3 episódios');
+    await expect(page.locator('#calendar-counter-pill')).toHaveText('3 itens');
 
     // marcar o episódio de hoje: fica marcado, com o botão de desfazer
     const today = item(page, calendar.today);
@@ -99,9 +100,9 @@ test.describe('Agenda', () => {
     await gotoTab(page, 'calendar');
     await expect(page.locator('#calendar-empty')).toBeVisible();
     await expect(page.locator('#calendar-empty')).toContainText('Sua lista está vazia');
-    await expect(page.locator('#calendar-counter-pill')).toHaveText('0 episódios');
+    await expect(page.locator('#calendar-counter-pill')).toHaveText('0 itens');
 
-    // com todas as obras em Desisti não sobra nada elegível: estado vazio com a regra nova
+    // com todas as obras em Desisti não sobra nada elegível: estado vazio
     await gotoTab(page, 'next-up');
     await seedLibrary(page);
     await page.evaluate(() => {
@@ -109,37 +110,8 @@ test.describe('Agenda', () => {
       window.appController.refreshAll();
     });
     await gotoTab(page, 'calendar');
-    await expect(page.locator('#calendar-empty')).toContainText('Nenhum episódio nesse período');
-    await expect(page.locator('#calendar-empty')).toContainText('exceto as que você desistiu');
+    await expect(page.locator('#calendar-empty')).toContainText('Nada nesse período');
     await expect(page.locator('#calendar-container .calendar-item')).toHaveCount(0);
-  });
-
-  test('obras sem data prevista aparecem no fim e obra em Desisti não aparece na Agenda', async ({ page }) => {
-    await openApp(page);
-    await gotoTab(page, 'next-up');
-    await seedLibrary(page); // 4 obras "Quero ver", sem episódio futuro
-
-    await gotoTab(page, 'watchlist');
-    const status = listCard(page, 'Breaking Bad').locator('select.status-select');
-    await status.selectOption({ label: 'Desisti' });
-    await expect(toast(page, 'Status: Desisti.')).toBeVisible();
-
-    await gotoTab(page, 'calendar');
-    const undated = page.locator('#calendar-container .calendar-undated');
-    await expect(undated.locator('.calendar-day-title')).toHaveText('Sem data prevista');
-    await expect(undated.locator('.calendar-item')).toHaveCount(3);
-    await expect(undated.locator('.calendar-item-show').filter({ hasText: 'Breaking Bad' })).toHaveCount(0);
-    await expect(undated.locator('.calendar-item-show').filter({ hasText: 'Attack on Titan' })).toHaveCount(1);
-    await expect(undated.locator('[data-action="quick-check"]')).toHaveCount(0); // sem botão de marcar episódio
-    await expect(page.locator('#calendar-counter-pill')).toHaveText('0 episódios · 3 sem data');
-    await expect(page.locator('#calendar-empty')).toBeHidden();
-
-    // a seção não depende do período
-    await tap(page.locator('[data-range="next30"]'));
-    await expect(undated.locator('.calendar-item')).toHaveCount(3);
-
-    await tap(undated.getByRole('button', { name: 'Ver detalhes: Attack on Titan' }));
-    await expect(page.locator('#modal-show-detail')).toBeVisible();
   });
 
   test('se a atualização das fontes falhar, mostra um aviso discreto e continua com os dados salvos', async ({ page, guard }, testInfo) => {
@@ -209,5 +181,208 @@ test.describe('Agenda', () => {
       .locator('#main-nav .nav-label')
       .evaluateAll(labels => labels.filter(l => l.scrollWidth > l.clientWidth).map(l => l.textContent));
     expect(clipped, 'rótulos cortados na barra inferior').toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Janela de 90 dias: o que já foi lançado (até 90 dias atrás), hoje e tudo que vem pela frente; filtro "Todos".
+// Obras na lista: Estreia Próxima (filme, +10), Lançamento Recente (filme, -30), Clássico Antigo (filme, -120: fora), Ronda Semanal (série),
+// Maré Viva (anime em exibição) e Cinza do Fim (anime encerrado, último episódio há 200 dias: nada aparece).
+// ---------------------------------------------------------------------------------------------------------------------------------
+const { upcomingMovie, recentMovie, oldMovie, weeklySeries, releasingAnime, endedAnime } = agenda90;
+const ALL_SHOWS = [upcomingMovie, recentMovie, oldMovie, weeklySeries, releasingAnime, endedAnime];
+// dias (em relação a hoje) que devem ter itens na Agenda: Maré Viva, Ronda Semanal e Lançamento Recente / depois, os próximos
+const PAST_OFFSETS = [-63, -56, -49, -42, -35, -30, -28, -21, -14, -7];
+const FUTURE_OFFSETS = [7, 10, 14, 21];
+const PAST_ITEMS = releasingAnime.pastEpisodes + weeklySeries.pastEpisodes + 1;
+const FUTURE_ITEMS = releasingAnime.futureEpisodes + weeklySeries.futureEpisodes + 1;
+
+const byShow = (page, name) =>
+  page.locator('#calendar-container .calendar-item').filter({ has: page.locator('.calendar-item-show', { hasText: name }) });
+
+// Põe as obras na lista sem passar pela busca (a busca tem limite de 60 por minuto por IP, dividido com os outros testes): o GET autenticado
+// da obra faz a ingestão (fonte falsa) e depois a lista é preenchida como em seedLibrary. O caminho pela busca fica no 1º teste do arquivo.
+async function setupAgenda90(page, testInfo) {
+  const token = await signInWithApi(page, newUser(testInfo, 'agenda90'));
+  const ids = ALL_SHOWS.map(show => show.id);
+  for (const id of ids) {
+    const res = await page.request.get(`/api/media/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(res.status(), `ingestão da obra ${id}`).toBe(200);
+  }
+  await page.evaluate(async list => {
+    await window.appController.ensureDetails(list);
+    list.forEach(id => window.appState.addShow(id));
+    window.appController.refreshAll();
+  }, ids);
+  await expect(page.locator('#badge-watchlist')).toHaveText(String(ids.length));
+  await gotoTab(page, 'calendar');
+  await tap(page.locator('[data-range="all"]'));
+  await expect(page.locator('[data-range="all"]')).toHaveAttribute('aria-pressed', 'true');
+}
+
+// "dd/mm" (com /aaaa se não for o ano de hoje), como a Agenda escreve, para hoje + n dias (usa o dia civil do próprio navegador).
+const expectedDate = (page, offset) =>
+  page.evaluate(n => {
+    const today = window.Calendar.dayKey(new Date());
+    const [y, m, d] = window.Calendar.addDays(today, n).split('-');
+    return `${d}/${m}${y === today.slice(0, 4) ? '' : '/' + y}`;
+  }, offset);
+
+const axeSerious = async page => {
+  const { violations } = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .options({ preload: false })
+    .include('#view-calendar')
+    .analyze();
+  return violations
+    .filter(v => v.impact === 'critical' || v.impact === 'serious')
+    .map(v => `${v.id}: ${v.nodes.slice(0, 3).map(n => n.target.join(' '))}`);
+};
+
+test.describe('Agenda · janela de 90 dias', () => {
+  test('Todos mostra já lançados, hoje com marcador e próximos, em ordem; Clássico Antigo e Cinza do Fim ficam de fora', async ({
+    page
+  }, testInfo) => {
+    await setupAgenda90(page, testInfo);
+
+    await expect(page.locator('#calendar-counter-pill')).toHaveText(`${PAST_ITEMS + FUTURE_ITEMS} itens`);
+
+    // três blocos, nesta ordem
+    const groups = page.locator('#calendar-container > .calendar-phase');
+    await expect(groups).toHaveCount(3);
+    await expect(groups.nth(0)).toHaveAttribute('role', 'group');
+    await expect(groups.nth(0)).toHaveAttribute('aria-label', 'Já lançados');
+    await expect(groups.nth(1)).toHaveAttribute('aria-label', 'Hoje');
+    await expect(groups.nth(2)).toHaveAttribute('aria-label', 'Próximos lançamentos');
+    await expect(groups.nth(0)).toHaveClass(/calendar-phase--past/);
+    await expect(groups.nth(1)).toHaveClass(/calendar-phase--today/);
+    await expect(groups.nth(2)).toHaveClass(/calendar-phase--future/);
+
+    // passado: selo "Lançado" em todos; hoje e futuro: nenhum
+    await expect(groups.nth(0).locator('.calendar-item')).toHaveCount(PAST_ITEMS);
+    await expect(groups.nth(0).locator('.calendar-item--past')).toHaveCount(PAST_ITEMS);
+    await expect(groups.nth(0).locator('.calendar-item-released')).toHaveCount(PAST_ITEMS);
+    await expect(groups.nth(0).locator('.calendar-item-released').first()).toHaveText('Lançado');
+    await expect(groups.nth(1).locator('.calendar-item')).toHaveCount(0);
+    await expect(groups.nth(2).locator('.calendar-item')).toHaveCount(FUTURE_ITEMS);
+    await expect(groups.nth(2).locator('.calendar-item-released')).toHaveCount(0);
+
+    // marcador de hoje (existe mesmo sem item hoje) e a tela abre rolada em Hoje
+    const todayDay = page.locator('#calendar-today');
+    await expect(todayDay).toHaveCount(1);
+    await expect(todayDay.locator('.calendar-today-mark')).toHaveCount(1);
+    await expect(todayDay.locator('.calendar-day-title')).toHaveText(`Hoje · ${await expectedDate(page, 0)}`);
+    await expect(todayDay).toBeInViewport();
+
+    // ordem cronológica dos dias: passado, hoje, futuro
+    const titles = await page.locator('#calendar-container .calendar-day-title').allTextContents();
+    const expected = [];
+    for (const off of [...PAST_OFFSETS, 0, ...FUTURE_OFFSETS]) expected.push(await expectedDate(page, off));
+    expect(titles.map(t => t.split(' · ')[1])).toEqual(expected);
+    expect(titles[PAST_OFFSETS.length]).toMatch(/^Hoje · /);
+
+    // quem aparece e quem não
+    await expect(byShow(page, upcomingMovie.name)).toHaveCount(1);
+    await expect(byShow(page, upcomingMovie.name).locator('.calendar-item-code')).toHaveText('FILME');
+    await expect(byShow(page, recentMovie.name)).toHaveCount(1);
+    await expect(byShow(page, recentMovie.name).locator('.calendar-item-released')).toHaveText('Lançado');
+    await expect(byShow(page, weeklySeries.name)).toHaveCount(weeklySeries.pastEpisodes + weeklySeries.futureEpisodes);
+    await expect(byShow(page, releasingAnime.name)).toHaveCount(releasingAnime.pastEpisodes + releasingAnime.futureEpisodes);
+    await expect(byShow(page, oldMovie.name)).toHaveCount(0);
+    await expect(byShow(page, endedAnime.name)).toHaveCount(0);
+
+    // sem "sem data prevista" e sem legenda/explicação
+    await expect(page.locator('#view-calendar')).not.toContainText(/sem data prevista/i);
+    await expect(page.locator('#calendar-container .calendar-undated')).toHaveCount(0);
+    await expect(page.locator('#calendar-empty')).toBeHidden();
+    await expect(page.locator('#view-calendar')).not.toContainText(/legenda|90 dias|janela|nos últimos/i);
+
+    // filtros curtos não passam do piso: nada de há 30 dias ou mais
+    await tap(page.locator('[data-range="week"]'));
+    await expect(byShow(page, recentMovie.name)).toHaveCount(0);
+    await expect(byShow(page, oldMovie.name)).toHaveCount(0);
+    await expect(byShow(page, endedAnime.name)).toHaveCount(0);
+    await tap(page.locator('[data-range="next30"]'));
+    await expect(page.locator('#calendar-container .calendar-item--past')).toHaveCount(0);
+    await expect(byShow(page, upcomingMovie.name)).toHaveCount(1);
+    await tap(page.locator('[data-range="all"]'));
+    await expect(page.locator('#calendar-counter-pill')).toHaveText(`${PAST_ITEMS + FUTURE_ITEMS} itens`);
+  });
+
+  test('marcar como assistido funciona num item já lançado e num futuro; Desisti sai da Agenda', async ({ page }, testInfo) => {
+    await setupAgenda90(page, testInfo);
+    const total = PAST_ITEMS + FUTURE_ITEMS;
+
+    // item já lançado: o episódio de há 7 dias da Ronda Semanal (T1:E8)
+    const pastEp = page
+      .locator('#calendar-container .calendar-item--past')
+      .filter({ has: page.locator('.calendar-item-show', { hasText: weeklySeries.name }) })
+      .last();
+    await expect(pastEp.locator('.calendar-item-code')).toHaveText('T1:E8');
+    await tap(pastEp.getByRole('button', { name: /^Marcar como assistido/ }));
+    await expect(toast(page, 'Marcado como assistido!')).toBeVisible();
+    await expect(pastEp).toHaveClass(/calendar-item--watched/);
+    await expect(pastEp).toHaveClass(/calendar-item--past/);
+    await expect(pastEp.locator('.calendar-item-released')).toHaveText('Lançado');
+    await expect(pastEp.getByRole('button', { name: /^Desmarcar como assistido/ })).toBeFocused();
+
+    // filme já lançado
+    const movie = byShow(page, recentMovie.name);
+    await tap(movie.getByRole('button', { name: /^Marcar como assistido/ }));
+    await expect(toast(page, 'Marcado como assistido!')).toBeVisible();
+    await expect(movie).toHaveClass(/calendar-item--watched/);
+
+    // desfazer o do passado
+    await tap(pastEp.getByRole('button', { name: /^Desmarcar como assistido/ }));
+    await expect(toast(page, 'Desmarcado.')).toBeVisible();
+    await expect(pastEp).not.toHaveClass(/calendar-item--watched/);
+
+    // item futuro (estreia do filme)
+    const future = byShow(page, upcomingMovie.name);
+    await tap(future.getByRole('button', { name: /^Marcar como assistido/ }));
+    await expect(future).toHaveClass(/calendar-item--watched/);
+    await expect(page.locator('#calendar-counter-pill')).toHaveText(`${total} itens`); // marcar não tira da Agenda
+
+    // Desisti: a obra some da Agenda (passado e futuro)
+    await gotoTab(page, 'watchlist');
+    await listCard(page, releasingAnime.name).locator('select.status-select').selectOption({ label: 'Desisti' });
+    await expect(toast(page, 'Status: Desisti.')).toBeVisible();
+    await gotoTab(page, 'calendar');
+    await expect(byShow(page, releasingAnime.name)).toHaveCount(0);
+    await expect(page.locator('#calendar-counter-pill')).toHaveText(
+      `${total - releasingAnime.pastEpisodes - releasingAnime.futureEpisodes} itens`
+    );
+    await expect(byShow(page, weeklySeries.name).first()).toBeVisible();
+  });
+
+  test('Desisti em todas as obras: Todos mostra o estado vazio, sem blocos', async ({ page }, testInfo) => {
+    await setupAgenda90(page, testInfo);
+    await page.evaluate(() => {
+      window.appState.data.trackedShows.forEach(t => window.appState.setShowStatus(t.showId, 'dropped'));
+      window.appController.refreshAll();
+    });
+    await expect(page.locator('#calendar-counter-pill')).toHaveText('0 itens');
+    await expect(page.locator('#calendar-container .calendar-phase')).toHaveCount(0);
+    await expect(page.locator('#calendar-empty')).toContainText('Nada nesse período');
+  });
+
+  test('acessibilidade: sem violação grave na aba Agenda nos filtros Semana e Todos', async ({ page }, testInfo) => {
+    await setupAgenda90(page, testInfo);
+    expect(await axeSerious(page), 'Todos').toEqual([]);
+    await tap(page.locator('[data-range="week"]'));
+    await expect(page.locator('[data-range="week"]')).toHaveAttribute('aria-pressed', 'true');
+    expect(await axeSerious(page), 'Semana').toEqual([]);
+  });
+
+  test('celular 375x812: Todos não cria rolagem horizontal', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'só faz sentido na largura de celular');
+    await setupAgenda90(page, testInfo);
+    await expect(page.locator('#calendar-container .calendar-item--past').first()).toBeVisible();
+    const o = await horizontalOverflow(page);
+    expect(o.innerWidth).toBe(375);
+    expect(o.scrollWidth, 'a página não pode passar da largura').toBeLessThanOrEqual(o.clientWidth);
+    await page.locator('#calendar-container .calendar-item-released').first().scrollIntoViewIfNeeded();
+    const o2 = await horizontalOverflow(page);
+    expect(o2.scrollWidth).toBeLessThanOrEqual(o2.clientWidth);
   });
 });

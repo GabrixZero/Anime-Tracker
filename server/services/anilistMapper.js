@@ -132,7 +132,8 @@ function episodesFor(a) {
 
   const dates = new Map();
   const nodes = a.airingSchedule && Array.isArray(a.airingSchedule.nodes) ? a.airingSchedule.nodes : [];
-  for (const node of nodes) {
+  const recent = a.recentSchedule && Array.isArray(a.recentSchedule.nodes) ? a.recentSchedule.nodes : []; // grade dos últimos 90 dias
+  for (const node of [...nodes, ...recent]) {
     if (node && isPositiveInt(node.episode) && node.episode <= MAX_EPISODES_PER_SEASON && !dates.has(node.episode)) {
       const d = dateFromUnix(node.airingAt);
       if (d) dates.set(node.episode, d);
@@ -151,6 +152,8 @@ function episodesFor(a) {
   if (isPositiveInt(a.episodes)) count = a.episodes;
   else if (next && next.episode > 1) count = next.episode - 1;
   else if (dates.size > 0) count = Math.max(...dates.keys());
+  // Sem total conhecido, os episódios futuros COM data confirmada (grade da AniList) também existem: a Agenda precisa deles.
+  if (!isPositiveInt(a.episodes) && dates.size > 0) count = Math.max(count, ...dates.keys());
   count = Math.min(count, MAX_EPISODES_PER_SEASON);
 
   const out = [];
