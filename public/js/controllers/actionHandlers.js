@@ -28,7 +28,9 @@
   A.on('clear-rating', el => window.appController.setRating(show(el), ''));
 
   // Detalhes e anotações
-  A.on('open-detail', el => window.detailModalView.open(show(el)));
+  // data-detail-mode="explore" (só a aba Explorar) abre o quadro enxuto; sem o atributo, o quadro completo
+  A.on('open-detail', el => window.detailModalView.open(show(el), el.getAttribute('data-detail-mode') || 'full'));
+  A.on('switch-season', el => window.detailModalView.switchSeason(season(el)));
   A.on('open-note', el => window.detailModalView.openNote(show(el), season(el), episode(el)));
 
   // Explorar

@@ -23,6 +23,8 @@ function makeApp(media) {
   const container = {
     innerHTML: '',
     listeners: [],
+    setAttribute() {},
+    removeAttribute() {},
     addEventListener(type, fn, capture) {
       this.listeners.push({ type, fn, capture });
     },
@@ -139,7 +141,7 @@ const SERIE = {
 
 test('lista todas as temporadas em <details>, a primeira aberta, com a quantidade de episódios', () => {
   const { view, container } = makeApp(SERIE);
-  view.open(SERIE.id);
+  view.open(SERIE.id, 'explore');
   const html = container.innerHTML;
   assert.equal(count(html, /<details class="season-block"/g), 3);
   assert.equal(count(html, /<details [^>]*\sopen>/g), 1);
@@ -150,7 +152,7 @@ test('lista todas as temporadas em <details>, a primeira aberta, com a quantidad
 
 test('linha do episódio: "E1 · título · data" dentro de <ol>/<li>, sem botão, caixa de assistido, miniatura ou duração', () => {
   const { view, container } = makeApp(SERIE);
-  view.open(SERIE.id);
+  view.open(SERIE.id, 'explore');
   const html = container.innerHTML;
   assert.match(html, /<ol class="episode-list" data-season-list="1">/);
   assert.match(
@@ -172,7 +174,7 @@ test('linha do episódio: "E1 · título · data" dentro de <ol>/<li>, sem botã
 
 test('todos os episódios ficam alcançáveis: as temporadas fechadas desenham ao abrir (toggle) e só uma vez', () => {
   const { view, container } = makeApp(SERIE);
-  view.open(SERIE.id);
+  view.open(SERIE.id, 'explore');
   assert.equal(count(container.innerHTML, /class="episode-line"/g), 12, 'só a temporada aberta tem linhas');
   const toggle = container.listeners.find(l => l.type === 'toggle');
   assert.ok(toggle && toggle.capture === true, 'toggle não borbulha: ouvinte na captura');
@@ -189,7 +191,7 @@ test('todos os episódios ficam alcançáveis: as temporadas fechadas desenham a
 test('temporada de 1200 episódios: só o primeiro bloco (60) no início; "Mostrar mais" traz o resto aos poucos', () => {
   const big = { ...SERIE, id: 502, seasons: [{ season_number: 1, name: 'Temporada 1', episodes: episodes(1, 1200) }] };
   const { view, container } = makeApp(big);
-  view.open(big.id);
+  view.open(big.id, 'explore');
   assert.equal(count(container.innerHTML, /class="episode-line"/g), CHUNK);
   assert.match(container.innerHTML, /<summary>Temporada 1 · 1200 episódios<\/summary>/);
   assert.match(container.innerHTML, /data-action="more-episodes" data-season="1">Mostrar mais episódios \(faltam 1140\)</);
@@ -215,7 +217,7 @@ test('o "Mostrar mais" sabe a temporada: cresce só a temporada pedida', () => {
     ]
   };
   const { view, container } = makeApp(two);
-  view.open(two.id);
+  view.open(two.id, 'explore');
   const toggle = container.listeners.find(l => l.type === 'toggle');
   toggle.fn({ target: { open: true, getAttribute: () => '2' } });
   assert.equal(count(container.innerHTML, /class="episode-line"/g), CHUNK * 2);
@@ -237,27 +239,35 @@ test('textos escapados e sem episódios: mensagens atuais continuam', () => {
     ]
   };
   const a = makeApp(evil);
-  a.view.open(evil.id);
+  a.view.open(evil.id, 'explore');
   assert.ok(!/<img|<script/.test(a.container.innerHTML));
   assert.match(a.container.innerHTML, /2020-05-06<\/span>/);
   assert.ok(!/T00:00/.test(a.container.innerHTML));
 
   const light = { ...SERIE, id: 505, seasons: undefined };
   const b = makeApp(light);
-  b.view.open(light.id);
+  b.view.open(light.id, 'explore');
   assert.match(b.container.innerHTML, /Carregando episódios/);
   const ext = { ...SERIE, id: 506, seasons: undefined, isExternal: true };
   const c = makeApp(ext);
-  c.view.open(ext.id);
+  c.view.open(ext.id, 'explore');
   assert.match(c.container.innerHTML, /depois que a obra é adicionada/);
   const empty = { ...SERIE, id: 507, seasons: [] };
   const d = makeApp(empty);
-  d.view.open(empty.id);
+  d.view.open(empty.id, 'explore');
   assert.match(d.container.innerHTML, /Nenhum episódio cadastrado/);
 });
 
-test('o HTML não tem mais abas de temporada, barra de progresso nem botões de temporada inteira', () => {
+test('o HTML tem abas, barra de resumo e botões de temporada uma só vez (ids únicos); o modo explore os esconde', () => {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf-8');
-  assert.ok(!/show-seasons-tabs|season-stats-summary|btn-batch-|Marcar Temporada Inteira|Desmarcar Temporada/.test(html));
-  assert.match(html, /id="show-episodes-container"/);
+  for (const id of [
+    'show-seasons-tabs',
+    'season-summary-bar',
+    'season-stats-summary',
+    'btn-batch-check-season',
+    'btn-batch-uncheck-season',
+    'show-episodes-container'
+  ]) {
+    assert.equal(count(html, new RegExp(`id="${id}"`, 'g')), 1, id);
+  }
 });

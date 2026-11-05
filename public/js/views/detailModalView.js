@@ -7,6 +7,9 @@ class DetailModalView {
     this.detailModal = document.getElementById('modal-show-detail');
     this.noteModal = document.getElementById('modal-episode-note');
     this.currentShowId = null;
+    this.currentSeasonNum = 1; // só no modo completo
+    // 'explore' = quadro enxuto (aba Explorar); 'full' = quadro completo (Minha Lista, A Seguir, Agenda...). Quem abre informa.
+    this.mode = 'full';
     this.currentNoteEp = { showId: null, seasonNum: null, epNum: null, isMovie: false };
     this.autoSaveTimer = null;
     this.detailToken = 0; // invalida o carregamento de detalhe de uma obra que já não é a aberta
@@ -95,7 +98,22 @@ class DetailModalView {
       window.appController.onEpisodeToggled(showId, seasonNum, epNum);
     });
 
-    // Lista só de leitura (Ajustes 3): cada temporada é um <details>; o conteúdo só é desenhado quando ela abre.
+    // Batch Actions do modo completo (S09: atualiza as linhas no lugar, sem reconstruir a lista de episódios)
+    document.getElementById('btn-batch-check-season').addEventListener('click', () => {
+      window.appState.batchSetSeason(this.currentShowId, this.currentSeasonNum, true);
+      this.syncEpisodeRows();
+      window.appController.refreshShow(this.currentShowId);
+      window.appController.showToast('Temporada inteira marcada como assistida!', 'success');
+    });
+
+    document.getElementById('btn-batch-uncheck-season').addEventListener('click', () => {
+      window.appState.batchSetSeason(this.currentShowId, this.currentSeasonNum, false);
+      this.syncEpisodeRows();
+      window.appController.refreshShow(this.currentShowId);
+      window.appController.showToast('Temporada desmarcada.');
+    });
+
+    // Modo enxuto (Ajustes 3): lista só de leitura, cada temporada é um <details>; o conteúdo só é desenhado quando ela abre.
     // `toggle` não borbulha, então o ouvinte fica na captura do contêiner (um só para todas as temporadas).
     document.getElementById('show-episodes-container').addEventListener(
       'toggle',
@@ -120,21 +138,65 @@ class DetailModalView {
     await window.appController.ensureDetails([showId]);
     if (token !== this.detailToken || !this.isOpenFor(showId)) return; // abriu outra obra / fechou enquanto carregava
     if (window.appState.hasDetail(showId)) {
+      const keepSeason = this.currentSeasonNum; // veio do resumo: reabre na mesma temporada (modo completo)
       this.open(showId);
+      const media = window.appState.getMedia(showId);
+      if (
+        this.mode === 'full' &&
+        keepSeason !== this.currentSeasonNum &&
+        Array.isArray(media.seasons) &&
+        media.seasons.some(s => s.season_number === keepSeason)
+      )
+        this.switchSeason(keepSeason);
     } else if (window.appState.hasEpisodes(showId)) {
       // o detalhe completo falhou, mas o resumo já mostra os episódios: segue com ele
     } else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
   }
 
-  // Sem episódios para mostrar (carregando, erro ou obra que ainda não foi adicionada): troca a lista antiga pela mensagem.
+  // Sem episódios para mostrar (carregando, erro ou obra que ainda não foi adicionada): limpa abas e lista antigas.
   renderNoEpisodes(message) {
     this.stopObservers();
+    document.getElementById('show-seasons-tabs').innerHTML = '';
+    document.getElementById('season-stats-summary').innerHTML = '';
     document.getElementById('show-episodes-container').innerHTML = `<p class="muted" role="status">${escapeHtml(message)}</p>`;
   }
 
-  open(showId) {
+  // Ajusta o HTML fixo do quadro ao modo (abas, resumo e botões de temporada só existem no completo) e, ao trocar de modo,
+  // limpa o que o outro modo desenhou para nada vazar (ids únicos: os mesmos elementos servem aos dois modos).
+  applyMode(mode) {
+    const changed = mode !== this.mode;
+    this.mode = mode;
+    const full = mode === 'full';
+    this.detailModal.setAttribute('data-detail-mode', mode);
+    document.getElementById('show-seasons-tabs').classList.toggle('hidden', !full);
+    document.getElementById('season-summary-bar').classList.toggle('hidden', !full);
+    const container = document.getElementById('show-episodes-container');
+    if (full) {
+      container.setAttribute('role', 'tabpanel');
+    } else {
+      container.removeAttribute('role');
+      container.removeAttribute('aria-labelledby');
+    }
+    if (changed) {
+      this.stopObservers();
+      this.renderedBySeason = {};
+      this.renderToken = (this.renderToken || 0) + 1;
+      document.getElementById('show-seasons-tabs').innerHTML = '';
+      document.getElementById('season-stats-summary').innerHTML = '';
+      container.innerHTML = '';
+      document.getElementById('movie-detail-body').innerHTML = '';
+    }
+  }
+
+  // `mode` ('explore' | 'full'): quem abre informa. Sem informar, a reabertura interna (adicionar/remover/carregar detalhe)
+  // mantém o modo do quadro aberto; com o quadro fechado volta ao completo.
+  open(showId, mode) {
     const media = window.appState.getMedia(showId);
     if (!media) return;
+
+    const isOpen = !this.detailModal.classList.contains('hidden');
+    this.applyMode(mode === 'explore' || mode === 'full' ? mode : isOpen ? this.mode : 'full');
+    const explore = this.mode === 'explore';
 
     this.currentShowId = Number(showId);
     const header = document.getElementById('show-modal-header');
@@ -153,7 +215,9 @@ class DetailModalView {
         : '<span>Sem nota</span>',
       MD.yearText(media.first_air_date) ? `<span>${escapeHtml(MD.yearText(media.first_air_date))}</span>` : '',
       `<span>${escapeHtml(MD.genresText(media.genres))}</span>`,
-      media.type !== 'movie' && MD.runtimeText(media.runtime) ? `<span>${escapeHtml(MD.runtimeText(media.runtime))}</span>` : ''
+      (!explore || media.type !== 'movie') && MD.runtimeText(media.runtime)
+        ? `<span>${escapeHtml(MD.runtimeText(media.runtime))}</span>`
+        : ''
     ]
       .filter(Boolean)
       .join('<span>•</span>');
@@ -166,7 +230,7 @@ class DetailModalView {
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
         <div class="modal-actions">
           ${
-            tracked && media.type === 'movie'
+            explore && tracked && media.type === 'movie'
               ? `
             <span class="in-list-chip" data-focus-key="detail:in-list">✓ Na sua lista</span>
             <button type="button" class="btn btn-sm btn-secondary" data-focus-key="detail:primary" data-action="remove-from-list" data-show="${toInt(media.id)}">Remover da Lista</button>
@@ -191,9 +255,15 @@ class DetailModalView {
     if (media.type === 'movie') {
       seriesBody.classList.add('hidden');
 
-      movieBody.innerHTML = ''; // D-AV3-3: o quadro do filme é só o cabeçalho (título, nota, ano, gênero, sinopse e botão)
-      movieBody.classList.add('hidden');
+      if (explore) {
+        movieBody.innerHTML = ''; // D-AV3-3: no Explorar o quadro do filme é só o cabeçalho (título, nota, ano, gênero, sinopse e botão)
+        movieBody.classList.add('hidden');
+      } else {
+        movieBody.classList.remove('hidden');
+        movieBody.innerHTML = this.movieBoxHtml(media);
+      }
     } else {
+      movieBody.innerHTML = '';
       movieBody.classList.add('hidden');
       seriesBody.classList.remove('hidden');
 
@@ -203,12 +273,46 @@ class DetailModalView {
           media.isExternal ? 'Os episódios aparecem depois que a obra é adicionada à lista.' : 'Carregando episódios...'
         );
       } else {
+        if (!explore) {
+          this.currentSeasonNum = media.seasons.length > 0 ? media.seasons[0].season_number : 1;
+          this.renderSeasonTabs();
+        }
         this.renderEpisodes();
       }
     }
 
     this.detailModal.classList.remove('hidden');
     if (!window.appState.hasDetail(media.id) && !media.isExternal) this.loadDetail(media.id);
+  }
+
+  // Modo completo: caixa do filme (assistido/pendente, duração, anotação e botões de marcar/anotar).
+  movieBoxHtml(media) {
+    const isWatched = window.appState.isWatched(media.id);
+    const note = window.appState.getNote(media.id);
+    const hasNote = note && note.text && note.text.trim();
+
+    return `
+        <div class="movie-actions-box">
+          <div>
+            <h3>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h3>
+            <p>${
+              window.MediaDisplay.knownRuntime(media.runtime)
+                ? `Duração: ${escapeHtml(window.MediaDisplay.knownRuntime(media.runtime))} minutos, contados nas estatísticas ao marcar.`
+                : 'Duração não informada pela fonte; as estatísticas usam 120 min como estimativa.'
+            }</p>
+            ${hasNote ? `<p class="movie-quote">"${escapeHtml(this.notePreview(note.text, 75))}"</p>` : ''}
+          </div>
+
+          <div class="movie-btn-group">
+            <button type="button" class="btn ${isWatched ? 'btn-secondary' : 'btn-primary'}" data-focus-key="detail:movie-check" data-action="quick-check" data-show="${toInt(media.id)}">
+              ${isWatched ? 'Desmarcar Filme' : '✓ Marcar como Assistido'}
+            </button>
+            <button type="button" class="btn btn-outline" data-focus-key="detail:movie-note" data-action="open-note" data-show="${toInt(media.id)}">
+              ${hasNote ? 'Editar Anotação' : 'Anotar no Diário'}
+            </button>
+          </div>
+        </div>
+      `;
   }
 
   // Mantém o campo de nota do modal igual ao estado (valor normalizado, "Remover nota" só com nota), sem redesenhar (o foco fica).
@@ -233,11 +337,13 @@ class DetailModalView {
 
   stopObservers() {
     Object.values(this.moreObservers || {}).forEach(o => o.disconnect());
+    if (this.moreObserver) this.moreObserver.disconnect();
+    this.moreObserver = null;
     this.moreObservers = {};
   }
 
-  // Lista só de leitura com TODAS as temporadas: um <details> por temporada (a primeira vem aberta e já desenhada).
-  renderEpisodes() {
+  // Modo enxuto: lista só de leitura com TODAS as temporadas, um <details> por temporada (a primeira vem aberta e já desenhada).
+  renderSeasonBlocks() {
     const media = window.appState.getMedia(this.currentShowId);
     if (!media || !media.seasons) return;
     const container = document.getElementById('show-episodes-container');
@@ -272,7 +378,7 @@ class DetailModalView {
   firstBlockHtml(num, episodes) {
     const slice = episodes.slice(0, DetailModalView.EP_CHUNK);
     this.renderedBySeason[num] = slice.length;
-    return `<ol class="episode-list" data-season-list="${num}">${this.episodeRowsHtml(slice)}</ol>${this.moreHtml(num, episodes.length - slice.length)}`;
+    return `<ol class="episode-list" data-season-list="${num}">${this.episodeLinesHtml(slice)}</ol>${this.moreHtml(num, episodes.length - slice.length)}`;
   }
 
   moreHtml(num, left) {
@@ -318,7 +424,7 @@ class DetailModalView {
   }
 
   // Desenha mais um bloco de linhas na temporada `num`; se ainda sobrar, o botão "Mostrar mais" é refeito (acessível por teclado).
-  showMoreEpisodes(num) {
+  showMoreSeasonEpisodes(num) {
     const key = toInt(num);
     const season = this.findSeason(key);
     if (!season) return;
@@ -334,14 +440,14 @@ class DetailModalView {
     const episodes = season.episodes || [];
     const from = this.renderedBySeason[key] || 0;
     const slice = episodes.slice(from, from + DetailModalView.EP_CHUNK);
-    list.insertAdjacentHTML('beforeend', this.episodeRowsHtml(slice));
+    list.insertAdjacentHTML('beforeend', this.episodeLinesHtml(slice));
     this.renderedBySeason[key] = from + slice.length;
     list.insertAdjacentHTML('afterend', this.moreHtml(key, episodes.length - this.renderedBySeason[key]));
     this.observeMore(key);
   }
 
   // Linha só de leitura: "E12 · título · AAAA-MM-DD" (a data só quando existe).
-  episodeRowsHtml(episodes) {
+  episodeLinesHtml(episodes) {
     return episodes
       .map(ep => {
         const date = ep.air_date ? String(ep.air_date).slice(0, 10) : '';
@@ -349,6 +455,201 @@ class DetailModalView {
       })
       .join('');
   }
+
+  // Quem decide a lista de episódios é o modo: enxuto = <details> só de leitura; completo = abas + linhas com caixa de assistido.
+  renderEpisodes() {
+    if (this.mode === 'explore') this.renderSeasonBlocks();
+    else this.renderEpisodesFull();
+  }
+
+  // Mostrar mais: no enxuto cada temporada tem o seu botão (`num`); no completo há uma lista só.
+  showMoreEpisodes(num) {
+    if (this.mode === 'explore') this.showMoreSeasonEpisodes(num);
+    else this.showMoreEpisodesFull();
+  }
+
+  // ===== Modo completo (quadro anterior à PR 36) =====
+  renderSeasonTabs() {
+    const media = window.appState.getMedia(this.currentShowId);
+    if (!media || !media.seasons) return;
+
+    const bar = document.getElementById('show-seasons-tabs');
+    bar.innerHTML = media.seasons
+      .map(s => {
+        return `
+        <button type="button" class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" id="season-tab-${toInt(s.season_number)}" data-focus-key="season:${toInt(s.season_number)}:tab" role="tab" aria-selected="${s.season_number === this.currentSeasonNum}" tabindex="${s.season_number === this.currentSeasonNum ? 0 : -1}" aria-controls="show-episodes-container"
+                data-action="switch-season" data-season="${toInt(s.season_number)}">
+          ${escapeHtml(this.seasonTabLabel(media, s))}
+        </button>
+      `;
+      })
+      .join('');
+  }
+
+  // "Temporada 1 (3/12)": nome da temporada e episódios assistidos.
+  seasonTabLabel(media, season) {
+    let watched = 0;
+    (season.episodes || []).forEach(ep => {
+      if (window.appState.isWatched(media.id, season.season_number, ep.episode_number)) watched++;
+    });
+    const total = season.episodes ? season.episodes.length : 0;
+    return `${season.name || `Temporada ${season.season_number}`} (${watched}/${total})`;
+  }
+
+  // Marcou/desmarcou UM episódio com o modal aberto (S09): muda só aquela linha, o rótulo da temporada e o resumo.
+  // Sem reconstruir a lista (com 1.000+ episódios, reconstruir congelava a tela).
+  updateEpisode(seasonNum, epNum) {
+    if (this.mode !== 'full') return;
+    const media = window.appState.getMedia(this.currentShowId);
+    if (!media || !Array.isArray(media.seasons)) return;
+    if (Number(seasonNum) === this.currentSeasonNum) {
+      const row = document.getElementById('show-episodes-container').querySelector(`[data-ep="${toInt(epNum)}"]`);
+      if (row) this.paintRow(row, window.appState.isWatched(media.id, seasonNum, epNum));
+    }
+    this.updateSeasonCounts(media);
+  }
+
+  // Marcou/desmarcou a temporada inteira: repinta as linhas existentes (também sem reconstruir).
+  syncEpisodeRows() {
+    if (this.mode !== 'full') return;
+    const media = window.appState.getMedia(this.currentShowId);
+    if (!media || !Array.isArray(media.seasons)) return;
+    const rows = document.getElementById('show-episodes-container').querySelectorAll('[data-ep]');
+    rows.forEach(row =>
+      this.paintRow(row, window.appState.isWatched(media.id, this.currentSeasonNum, Number(row.getAttribute('data-ep'))))
+    );
+    this.updateSeasonCounts(media);
+  }
+
+  paintRow(row, isWatched) {
+    row.classList.toggle('watched', isWatched);
+    const check = row.querySelector('.episode-check');
+    if (!check) return;
+    check.setAttribute('aria-checked', String(isWatched));
+    const mark = check.querySelector('span');
+    if (mark) mark.textContent = isWatched ? '✓' : '';
+  }
+
+  // Rótulo da aba da temporada atual e resumo "Progresso da Temporada" (texto igual ao de renderSeasonTabs/renderEpisodesFull).
+  updateSeasonCounts(media) {
+    const season = media.seasons.find(s => s.season_number === this.currentSeasonNum);
+    if (!season) return;
+    const tab = document.getElementById(`season-tab-${toInt(season.season_number)}`);
+    if (tab) tab.textContent = this.seasonTabLabel(media, season);
+    const episodes = season.episodes || [];
+    if (episodes.length > 0) {
+      const watched = episodes.filter(ep => window.appState.isWatched(media.id, season.season_number, ep.episode_number)).length;
+      document.getElementById('season-stats-summary').innerHTML =
+        `Progresso da Temporada: <strong>${watched}/${episodes.length} assistidos</strong>`;
+    }
+  }
+
+  switchSeason(num) {
+    this.currentSeasonNum = num;
+    this.renderSeasonTabs();
+    this.renderEpisodes();
+  }
+
+  renderEpisodesFull() {
+    const media = window.appState.getMedia(this.currentShowId);
+    if (!media || !media.seasons) return;
+
+    const season = media.seasons.find(s => s.season_number === this.currentSeasonNum);
+    const container = document.getElementById('show-episodes-container');
+    const summary = document.getElementById('season-stats-summary');
+    container.setAttribute('aria-labelledby', `season-tab-${toInt(this.currentSeasonNum)}`);
+    this.stopObservers();
+
+    if (!season || !season.episodes || season.episodes.length === 0) {
+      container.innerHTML = `<p class="muted">Nenhum episódio cadastrado.</p>`;
+      summary.innerHTML = '';
+      return;
+    }
+
+    let watched = 0;
+    season.episodes.forEach(ep => {
+      if (window.appState.isWatched(media.id, season.season_number, ep.episode_number)) watched++;
+    });
+
+    summary.innerHTML = `Progresso da Temporada: <strong>${watched}/${season.episodes.length} assistidos</strong>`;
+
+    // S18: com centenas de episódios só as primeiras linhas existem; o resto é desenhado aos poucos (rolagem ou botão).
+    this.renderedEpisodes = 0;
+    this.renderToken = (this.renderToken || 0) + 1;
+    container.innerHTML = '';
+    this.renderMoreEpisodes(media, season, DetailModalView.EP_CHUNK);
+  }
+
+  // Desenha mais `count` linhas depois das já existentes; se ainda sobrar, põe o botão "Mostrar mais" (acessível por teclado)
+  // e um observador que o aciona sozinho quando ele entra na tela.
+  renderMoreEpisodes(media, season, count) {
+    const container = document.getElementById('show-episodes-container');
+    const old = container.querySelector('.episodes-more');
+    if (old) old.remove();
+    if (this.moreObserver) {
+      this.moreObserver.disconnect();
+      this.moreObserver = null;
+    }
+    const from = this.renderedEpisodes;
+    const slice = season.episodes.slice(from, from + count);
+    container.insertAdjacentHTML('beforeend', this.episodeRowsHtml(media, season, slice));
+    this.renderedEpisodes = from + slice.length;
+    const left = season.episodes.length - this.renderedEpisodes;
+    if (left <= 0) return;
+    container.insertAdjacentHTML(
+      'beforeend',
+      `<div class="episodes-more"><button type="button" class="btn btn-outline" data-focus-key="ep:more" data-action="more-episodes">Mostrar mais episódios (faltam ${left})</button></div>`
+    );
+    const btn = container.querySelector('.episodes-more button');
+    if (btn && typeof IntersectionObserver !== 'undefined') {
+      const token = this.renderToken;
+      this.moreObserver = new IntersectionObserver(
+        entries => {
+          if (token === this.renderToken && entries.some(e => e.isIntersecting)) this.showMoreEpisodes();
+        },
+        { root: null, rootMargin: '400px' }
+      );
+      this.moreObserver.observe(btn);
+    }
+  }
+
+  showMoreEpisodesFull() {
+    const media = window.appState.getMedia(this.currentShowId);
+    const season = media && media.seasons && media.seasons.find(s => s.season_number === this.currentSeasonNum);
+    if (season) this.renderMoreEpisodes(media, season, DetailModalView.EP_CHUNK);
+  }
+
+  episodeRowsHtml(media, season, episodes) {
+    return episodes
+      .map(ep => {
+        const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
+        const note = window.appState.getNote(media.id, season.season_number, ep.episode_number);
+        const hasNote = note && note.text && note.text.trim();
+
+        return `
+        <div class="episode-row ${isWatched ? 'watched' : ''}" data-ep="${toInt(ep.episode_number)}">
+          <button type="button" class="episode-check" role="checkbox" aria-checked="${isWatched}" data-focus-key="ep:${toInt(ep.episode_number)}:check" aria-label="Assistido: episódio ${toInt(ep.episode_number)}, ${escapeHtml(ep.name)}" data-action="quick-check" data-show="${toInt(media.id)}" data-season="${toInt(season.season_number)}" data-episode="${toInt(ep.episode_number)}">
+            <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
+          </button>
+
+          <img ${window.ViewKit.imgAttrs(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path, 'still')} alt="" class="episode-thumb" loading="lazy" decoding="async">
+
+          <div class="episode-info">
+            <span class="episode-code">E${escapeHtml(ep.episode_number)}${ep.air_date ? ` · ${escapeHtml(String(ep.air_date).slice(0, 10))}` : ''}</span>
+            <div class="episode-name">${escapeHtml(ep.name)}</div>
+            ${window.MediaDisplay.runtimeText(ep.runtime) ? `<span class="episode-runtime">${escapeHtml(window.MediaDisplay.runtimeText(ep.runtime))}</span>` : ''}
+            ${hasNote ? `<span class="episode-note-tag">Anotação salva</span>` : ''}
+          </div>
+
+          <button type="button" class="btn btn-sm btn-outline" data-focus-key="ep:${toInt(ep.episode_number)}:note" aria-label="${hasNote ? 'Ver ou editar' : 'Anotar'} episódio ${toInt(ep.episode_number)}: ${escapeHtml(ep.name)}" data-action="open-note" data-show="${toInt(media.id)}" data-season="${toInt(season.season_number)}" data-episode="${toInt(ep.episode_number)}">
+            ${hasNote ? 'Ver/Editar' : 'Anotar'}
+          </button>
+        </div>
+      `;
+      })
+      .join('');
+  }
+  // ===== fim do modo completo =====
 
   openNote(showId, seasonNum = null, epNum = null) {
     const media = window.appState.getMedia(showId);
