@@ -183,24 +183,24 @@ test.describe('anotações', () => {
     await expect(toast(page, 'Diário exportado em Markdown!')).toBeVisible();
   });
 
-  test('anotação de filme: abre pelo modal da obra e entra no Diário como "Filme"', async ({ page }) => {
+  test('anotação de filme: sem botão no quadro (D-AV3-3); a anotação do filme continua no Diário pela lógica', async ({ page }) => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Oppenheimer', exact: true }));
-    await tap(page.getByRole('button', { name: 'Anotar no Diário' }));
+    await expect(page.locator('#modal-show-detail')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Anotar no Diário|Editar Anotação/ })).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await page.evaluate(() => {
+      const t = window.appState.data.trackedShows.find(x => window.appState.getMedia(x.showId).name === 'Oppenheimer');
+      window.detailModalView.openNote(t.showId);
+    });
     await expect(noteModal(page)).toBeVisible();
     await expect(page.locator('#note-ep-code')).toHaveText('FILME');
     await expect(page.locator('#note-ep-title')).toHaveText('Oppenheimer');
     await expect(page.locator('#note-show-title')).toHaveText('Duração: 180 min');
     await textarea(page).fill('Uma obra-prima. >!Spoiler do final!<');
     await expectSaved(page);
-
-    // Esc fecha só a anotação (a de cima) e o foco volta ao botão que a abriu; o modal da obra segue aberto por baixo
     await page.keyboard.press('Escape');
     await expect(noteModal(page)).toBeHidden();
-    await expect(page.locator('#modal-show-detail')).toBeVisible();
-    await expect(page.locator('[data-focus-key="detail:movie-note"]')).toBeFocused();
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#modal-show-detail')).toBeHidden();
 
     await gotoTab(page, 'diary');
     await expect(page.locator('#diary-container .diary-code')).toHaveText('Oppenheimer · Filme');

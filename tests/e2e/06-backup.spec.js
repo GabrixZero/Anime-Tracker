@@ -28,7 +28,7 @@ test.describe('backup', () => {
     // uma anotação para ir junto no backup
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Breaking Bad', exact: true }));
-    await tap(page.locator('#show-episodes-container .episode-row[data-ep="1"]').getByRole('button', { name: /^Ver ou editar|^Anotar/ }));
+    await page.evaluate(() => window.detailModalView.openNote(1396, 1, 1)); // o quadro da obra não tem mais "Anotar": abre o diário pela lógica
     await page.locator('#note-textarea').fill('nota que vai no backup');
     await expect(page.locator('#note-save-status .save-text')).toHaveText(/^Salvo neste aparelho às /);
     await tap(page.locator('#btn-save-note-modal'));

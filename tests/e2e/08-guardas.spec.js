@@ -89,7 +89,7 @@ test.describe('largura em 375 px', () => {
         return [...document.querySelectorAll('body *')]
           .filter(el => {
             const r = el.getBoundingClientRect();
-            return r.width > 0 && r.right > limit + 1 && !el.closest('.type-filter-row--scroll, .season-tabs, [aria-hidden="true"]');
+            return r.width > 0 && r.right > limit + 1 && !el.closest('.type-filter-row--scroll, [aria-hidden="true"]');
           })
           .slice(0, 5)
           .map(el => `${el.tagName.toLowerCase()}#${el.id}.${String(el.className).replace(/\s+/g, '.')}`);
@@ -125,7 +125,7 @@ test.describe('largura em 375 px', () => {
     await tap(page.getByRole('button', { name: 'Breaking Bad', exact: true }));
     await expect(page.locator('#modal-show-detail')).toBeVisible();
     await fits('Janela da obra');
-    await tap(page.locator('#show-episodes-container .episode-row[data-ep="1"]').getByRole('button', { name: /^Anotar/ }));
+    await page.evaluate(() => window.detailModalView.openNote(1396, 1, 1)); // o quadro da obra não tem mais "Anotar": abre o diário pela lógica
     await expect(page.locator('#modal-episode-note')).toBeVisible();
     await fits('Janela da anotação');
     await page.keyboard.press('Escape');

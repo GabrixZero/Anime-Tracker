@@ -711,45 +711,17 @@ test('regressão de custo: marcar 1 episódio com 2.800+ rastreados varre só os
 
 // ---------------------------------------------------------------- modal de detalhes
 
-test('modal: marcar um episódio atualiza só a linha, o rótulo da temporada e o resumo (sem reconstruir a lista)', async () => {
+test('modal: marcar um episódio com o quadro aberto não quebra (a lista do quadro é só leitura)', async () => {
   const catalog = buildCatalog('grande'); // a 1ª obra tem 1.100 episódios numa só temporada
   const m = catalog[0];
   const app = makeApp({ catalog, library: buildLibrary(catalog) });
   const w = app.window;
   await loadAll(app);
-  const dv = w.detailModalView;
-  dv.currentShowId = m.id;
-  dv.currentSeasonNum = 1;
-
-  const rowAttrs = new Map([['aria-checked', 'false']]);
-  const mark = { textContent: '' };
-  const classes = FakeCards.classList();
-  const check = { setAttribute: (k, v) => rowAttrs.set(k, v), querySelector: () => mark };
-  const row = { classList: classes, querySelector: sel => (sel === '.episode-check' ? check : null), getAttribute: () => '700' };
-  const container = makeEl('show-episodes-container');
-  container.querySelector = sel => (sel === '[data-ep="700"]' ? row : null);
-  container.querySelectorAll = sel => (sel === '[data-ep]' ? [row] : []);
-  app.els.set('show-episodes-container', container);
-  const tab = makeEl('season-tab-1');
-  app.els.set('season-tab-1', tab);
-  const summary = makeEl('season-stats-summary');
-  app.els.set('season-stats-summary', summary);
-
-  const before = app.state.getProgress(m.id).watched;
+  w.detailModalView.currentShowId = m.id;
   w.appController.quickCheck(m.id, 1, 700); // 700 ainda não assistido (a obra grande tem 300); marcar o 700 marca também os anteriores
-  const afterMark = app.state.getProgress(m.id).watched;
-  assert.equal(afterMark, 700, 'episódios 1 a 700 assistidos (Ajustes 2)');
-  assert.equal(classes.contains('watched'), true);
-  assert.equal(rowAttrs.get('aria-checked'), 'true');
-  assert.equal(mark.textContent, '✓');
-  assert.equal(tab.textContent, `Temporada 1 (${afterMark}/${totalEps(m)})`);
-  assert.match(summary.innerHTML, new RegExp(`${afterMark}/${totalEps(m)} assistidos`));
+  assert.equal(app.state.getProgress(m.id).watched, 700, 'episódios 1 a 700 assistidos (Ajustes 2)');
   w.appController.quickCheck(m.id, 1, 700); // desmarca
-  assert.equal(classes.contains('watched'), false);
-  assert.equal(rowAttrs.get('aria-checked'), 'false');
-  assert.equal(mark.textContent, '');
-  assert.equal(tab.textContent, `Temporada 1 (${afterMark - 1}/${totalEps(m)})`); // desmarcar mexe só no 700
-  assert.equal(before, 300);
+  assert.equal(app.state.getProgress(m.id).watched, 699);
 });
 
 test('modal: obra da lista leve mostra "Carregando", busca o detalhe e redesenha; se falhar, avisa', async () => {
@@ -773,7 +745,7 @@ test('modal: obra da lista leve mostra "Carregando", busca o detalhe e redesenha
   await flush();
   assert.equal(app.state.hasDetail(m.id), true);
   assert.equal(opens, 2, 'redesenhou uma vez com o detalhe');
-  assert.match(app.els.get('show-episodes-container').innerHTML || '', /episode-row|^$/);
+  assert.match(app.els.get('show-episodes-container').innerHTML || '', /season-block|^$/);
 
   // falha de rede
   const app2 = makeApp({ catalog, apiFails: true });

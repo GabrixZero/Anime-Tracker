@@ -6,7 +6,16 @@ const { test, expect } = require('./support/fixtures');
 const { openApp, gotoTab, toast, seedLibrary, queueCard, listCard, tap } = require('./support/helpers');
 
 const modal = page => page.locator('#modal-show-detail');
-const episodeCheck = (page, n) => page.locator(`#show-episodes-container .episode-row[data-ep="${n}"] .episode-check`);
+const episodeLines = page => page.locator('#show-episodes-container .episode-line');
+// O quadro da obra é só leitura (Ajustes 3): marcar acontece pela lógica do app (A Seguir usa a mesma função).
+const markViaApp = (page, name, season, ep) =>
+  page.evaluate(
+    ([n, s, e]) => {
+      const t = window.appState.data.trackedShows.find(x => window.appState.getMedia(x.showId).name === n);
+      window.appController.quickCheck(t.showId, s, e);
+    },
+    [name, season, ep]
+  );
 
 test.describe('progresso', () => {
   test.beforeEach(async ({ page }) => {
@@ -46,44 +55,31 @@ test.describe('progresso', () => {
     await expect(listCard(page, 'Breaking Bad').locator('select.status-select')).toHaveValue('completed');
   });
 
-  test('modal da obra: marcar um episódio, temporada inteira e desmarcar, com o status acompanhando', async ({ page }) => {
+  test('modal da obra: lista só de leitura; o status acompanha o progresso marcado por fora', async ({ page }) => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Breaking Bad', exact: true }));
     await expect(modal(page)).toBeVisible();
     await expect(modal(page).locator('.modal-title')).toHaveText('Breaking Bad');
-    await expect(page.locator('#show-seasons-tabs .season-tab-btn')).toHaveText('Temporada 1 (0/3)');
-    await expect(page.locator('#show-episodes-container .episode-row')).toHaveCount(3);
+    await expect(page.locator('#show-episodes-container details')).toHaveCount(1);
+    await expect(page.locator('#show-episodes-container summary')).toHaveText('Temporada 1 · 3 episódios');
+    await expect(page.locator('#show-episodes-container details')).toHaveAttribute('open', '');
+    await expect(episodeLines(page)).toHaveCount(3);
+    await expect(episodeLines(page).first()).toContainText('E1');
+    await expect(page.locator('#show-episodes-container button, #show-episodes-container [role="checkbox"]')).toHaveCount(0);
+    await expect(modal(page).getByRole('button', { name: /Marcar Temporada|Desmarcar Temporada|Anotar|Ver\/Editar/ })).toHaveCount(0);
     await expect(page.locator('#detail-status-select')).toHaveValue('plan_to_watch');
 
-    // marcar o episódio 2 pelo modal marca também o 1 (Ajustes 2): a linha, a aba, o resumo e o status mudam na hora
-    await tap(episodeCheck(page, 2));
+    // marcar o episódio 2 (pela lógica, que também marca o 1: Ajustes 2): o aviso com "Desfazer" aparece e o status muda na hora
+    await markViaApp(page, 'Breaking Bad', 1, 2);
     await expect(toast(page, '2 episódios marcados.')).toBeVisible();
     await expect(toast(page, '2 episódios marcados.').getByRole('button', { name: 'Desfazer' })).toBeVisible();
-    await expect(episodeCheck(page, 2)).toHaveAttribute('aria-checked', 'true');
-    await expect(episodeCheck(page, 1)).toHaveAttribute('aria-checked', 'true');
-    await expect(episodeCheck(page, 3)).toHaveAttribute('aria-checked', 'false');
-    await expect(page.locator('#show-episodes-container .episode-row[data-ep="2"]')).toHaveClass(/watched/);
-    await expect(page.locator('#show-episodes-container .episode-row[data-ep="1"]')).toHaveClass(/watched/);
-    await expect(page.locator('#show-seasons-tabs .season-tab-btn')).toHaveText('Temporada 1 (2/3)');
-    await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 2/3 assistidos');
     await expect(page.locator('#detail-status-select')).toHaveValue('watching');
+    await expect(episodeLines(page)).toHaveCount(3); // a lista não muda: continua só de leitura
 
-    // desmarcar o episódio 2 mexe só nele: o 1 continua assistido
-    await tap(episodeCheck(page, 2));
+    // desmarcar o episódio 2 mexe só nele
+    await markViaApp(page, 'Breaking Bad', 1, 2);
     await expect(toast(page, 'Desmarcado.')).toBeVisible();
-    await expect(episodeCheck(page, 2)).toHaveAttribute('aria-checked', 'false');
-    await expect(episodeCheck(page, 1)).toHaveAttribute('aria-checked', 'true');
-    await expect(page.locator('#show-seasons-tabs .season-tab-btn')).toHaveText('Temporada 1 (1/3)');
-    await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 1/3 assistidos');
-
-    await tap(page.locator('#btn-batch-check-season'));
-    await expect(toast(page, 'Temporada inteira marcada como assistida!')).toBeVisible();
-    await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 3/3 assistidos');
-    await expect(page.locator('#detail-status-select')).toHaveValue('completed');
-
-    await tap(page.locator('#btn-batch-uncheck-season'));
-    await expect(page.locator('#season-stats-summary')).toHaveText('Progresso da Temporada: 0/3 assistidos');
-    await expect(page.locator('#detail-status-select')).toHaveValue('plan_to_watch');
+    await expect(page.locator('#detail-status-select')).toHaveValue('watching');
 
     // Esc fecha e o foco volta para o botão que abriu o modal
     await page.keyboard.press('Escape');
@@ -131,17 +127,20 @@ test.describe('progresso', () => {
     await expect(listCard(page, 'Breaking Bad').locator('select.status-select')).toHaveValue('completed');
   });
 
-  test('filme: marcar como assistido finaliza e entra nas estatísticas com a duração', async ({ page }) => {
+  test('filme: quadro enxuto; marcar como assistido (pela lógica) finaliza e entra nas estatísticas com a duração', async ({ page }) => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Interestelar (Interstellar)', exact: true }));
     await expect(modal(page)).toBeVisible();
-    await expect(page.locator('#movie-detail-body h3')).toHaveText('Filme Pendente para Assistir');
-
-    await tap(page.getByRole('button', { name: '✓ Marcar como Assistido' }));
-    await expect(page.locator('#movie-detail-body h3')).toHaveText('✓ Filme Assistido no Seu Diário');
-    await expect(page.getByRole('button', { name: 'Desmarcar Filme' })).toBeVisible();
-    await expect(page.locator('#detail-status-select')).toHaveValue('completed');
+    // D-AV3-3: o quadro do filme é só o essencial (sem botões de assistido/diário); a lógica de marcar continua no estado
+    await expect(modal(page).getByText('Na sua lista')).toBeVisible();
+    await expect(modal(page).getByRole('button', { name: /Marcar como Assistido|Desmarcar Filme|Anotar no Diário/ })).toHaveCount(0);
+    await expect(modal(page).getByText('Duração não informada')).toHaveCount(0);
+    await expect(modal(page).getByText('Nota do catálogo')).toHaveCount(0);
     await page.keyboard.press('Escape');
+    await page.evaluate(() => {
+      const t = window.appState.data.trackedShows.find(x => window.appState.getMedia(x.showId).name.startsWith('Interestelar'));
+      window.appController.quickCheck(t.showId);
+    });
 
     await expect(listCard(page, 'Interestelar (Interstellar)').locator('.show-progress-info')).toContainText('Filme Assistido (100%)');
     await gotoTab(page, 'next-up'); // as abas ocultas se atualizam ao abrir (S09)

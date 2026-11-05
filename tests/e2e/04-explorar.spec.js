@@ -83,14 +83,14 @@ test.describe('Explorar', () => {
     await expect(inList.locator('.show-progress-info')).toContainText(`0/${tvShow.episodes} eps (0%)`);
     await expect(inList.locator('select.status-select')).toHaveValue('plan_to_watch');
 
-    // Detalhe: abas de temporada com os episódios de cada uma
+    // Detalhe: uma temporada por <details> (a primeira aberta), com os episódios de cada uma
     await tap(page.getByRole('button', { name: tvShow.name, exact: true }));
-    const tabs = page.locator('#show-seasons-tabs .season-tab-btn');
-    await expect(tabs).toHaveText(['Temporada 1 (0/3)', 'Temporada 2 (0/2)']);
-    await expect(page.locator('#show-episodes-container .episode-name')).toHaveText(['A Chegada', 'O Mapa', 'A Travessia']);
-    await tap(tabs.nth(1));
-    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('#show-episodes-container .episode-name')).toHaveText(['Do Outro Lado', 'O Retorno']);
+    const seasons = page.locator('#show-episodes-container details');
+    await expect(seasons.locator('summary')).toHaveText(['Temporada 1 · 3 episódios', 'Temporada 2 · 2 episódios']);
+    await expect(seasons.nth(0).locator('.episode-name')).toHaveText(['A Chegada', 'O Mapa', 'A Travessia']);
+    await tap(seasons.nth(1).locator('summary'));
+    await expect(seasons.nth(1).locator('.episode-name')).toHaveText(['Do Outro Lado', 'O Retorno']);
+    await expect(page.locator('#show-episodes-container button')).toHaveCount(0);
     await page.keyboard.press('Escape');
 
     // A Seguir: o primeiro episódio da série
@@ -131,15 +131,11 @@ test.describe('Explorar', () => {
     await expect(inList.locator('.show-progress-info')).toContainText(`0/${anime.episodes} eps (0%)`);
 
     await tap(page.getByRole('button', { name: anime.name, exact: true }));
-    const tabs = page.locator('#show-seasons-tabs .season-tab-btn');
-    await expect(tabs).toHaveText([`${anime.seasonNames[0]} (0/3)`, `${anime.seasonNames[1]} (0/2)`]);
-    await expect(page.locator('#show-episodes-container .episode-name')).toHaveText([
-      anime.firstEpisode,
-      'Constelações',
-      'A Estrela Cadente'
-    ]);
-    await tap(tabs.nth(1));
-    await expect(page.locator('#show-episodes-container .episode-name')).toHaveText(['Um Novo Céu', 'Memória Final']);
+    const seasons = page.locator('#show-episodes-container details');
+    await expect(seasons.locator('summary')).toHaveText([`${anime.seasonNames[0]} · 3 episódios`, `${anime.seasonNames[1]} · 2 episódios`]);
+    await expect(seasons.nth(0).locator('.episode-name')).toHaveText([anime.firstEpisode, 'Constelações', 'A Estrela Cadente']);
+    await tap(seasons.nth(1).locator('summary'));
+    await expect(seasons.nth(1).locator('.episode-name')).toHaveText(['Um Novo Céu', 'Memória Final']);
     await page.keyboard.press('Escape');
 
     await gotoTab(page, 'next-up');

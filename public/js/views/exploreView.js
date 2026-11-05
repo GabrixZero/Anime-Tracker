@@ -201,8 +201,13 @@ class ExploreView {
 
           const typeBadge = window.ViewKit.typeBadge(item.type);
 
+          // Obra "Em breve": selo ao lado do tipo e data completa (dd/mm/aaaa) quando a data é válida.
+          const isSoon = MD.statusText(item.status) === 'Em breve';
+          const soonBadge = isSoon ? '<span class="badge-type-tag badge-type-soon">Em breve</span>' : '';
+          const fullDate = isSoon ? /^(\d{4})-(\d{2})-(\d{2})/.exec(String(item.first_air_date || '')) : null;
+
           // Temporada/cour de exibição ("Outono 2023") quando a fonte informa; senão o ano.
-          const when = item.season_label || MD.yearText(item.first_air_date);
+          const when = item.season_label || (fullDate ? `${fullDate[3]}/${fullDate[2]}/${fullDate[1]}` : MD.yearText(item.first_air_date));
           const fullTitle = item.original_name ? `${item.name} (${item.original_name})` : item.name;
 
           return `
@@ -217,7 +222,7 @@ class ExploreView {
 
           <div class="show-info">
             <div class="show-info-top">
-              ${typeBadge}
+              ${typeBadge}${soonBadge}
               <span class="show-year">${escapeHtml(when)}</span>
             </div>
 
