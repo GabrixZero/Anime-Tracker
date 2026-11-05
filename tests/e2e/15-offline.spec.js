@@ -13,7 +13,9 @@ test.describe('modo offline', () => {
     await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
     await loadExample(page);
     // espera o service worker assumir o controle da página
-    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
     await page.reload();
     await page.waitForFunction(() => !!navigator.serviceWorker.controller);
     await expect(page.locator('#badge-watchlist')).toHaveText('4');
