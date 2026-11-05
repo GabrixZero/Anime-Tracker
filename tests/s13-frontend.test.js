@@ -35,20 +35,50 @@ test('botão "Remover exemplo": type=button, nome acessível, descrito pelo text
 // ---------------------------------------------------------------- um "aparelho" com os scripts reais
 
 class FakeClassList {
-  constructor(initial = []) { this.set = new Set(initial); }
-  add(c) { this.set.add(c); }
-  remove(c) { this.set.delete(c); }
-  toggle(c, on) { if (on === undefined ? !this.set.has(c) : on) this.set.add(c); else this.set.delete(c); }
-  contains(c) { return this.set.has(c); }
+  constructor(initial = []) {
+    this.set = new Set(initial);
+  }
+  add(c) {
+    this.set.add(c);
+  }
+  remove(c) {
+    this.set.delete(c);
+  }
+  toggle(c, on) {
+    if (on === undefined ? !this.set.has(c) : on) this.set.add(c);
+    else this.set.delete(c);
+  }
+  contains(c) {
+    return this.set.has(c);
+  }
 }
 
 function makeEl(id, classes = []) {
   const attrs = new Map();
   const el = {
-    id, textContent: '', innerHTML: '', value: '', checked: false, dataset: {}, style: {}, classList: new FakeClassList(classes), focused: 0,
-    addEventListener() {}, setAttribute: (k, v) => attrs.set(k, String(v)), getAttribute: (k) => (attrs.has(k) ? attrs.get(k) : null), removeAttribute: (k) => attrs.delete(k),
-    querySelector: () => null, querySelectorAll: () => [], click() {}, append() {}, remove() {}, contains: () => false,
-    focus() { el.focused++; doc.activeElement = el; }
+    id,
+    textContent: '',
+    innerHTML: '',
+    value: '',
+    checked: false,
+    dataset: {},
+    style: {},
+    classList: new FakeClassList(classes),
+    focused: 0,
+    addEventListener() {},
+    setAttribute: (k, v) => attrs.set(k, String(v)),
+    getAttribute: k => (attrs.has(k) ? attrs.get(k) : null),
+    removeAttribute: k => attrs.delete(k),
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    click() {},
+    append() {},
+    remove() {},
+    contains: () => false,
+    focus() {
+      el.focused++;
+      doc.activeElement = el;
+    }
   };
   return el;
 }
@@ -58,18 +88,62 @@ function makeApp({ catalog = [] } = {}) {
   const store = new Map();
   const els = new Map();
   const heading = makeEl('h2');
-  const el = (id) => {
+  const el = id => {
     if (!els.has(id)) els.set(id, makeEl(id, id === 'watchlist-example-bar' ? ['hidden'] : []));
     return els.get(id);
   };
   const app = { els, toasts: [], apiCalls: [], byId: new Map(catalog.map(m => [m.id, m])), heading };
-  doc = { getElementById: el, querySelector: (sel) => (sel === '#view-watchlist h2' ? heading : null), querySelectorAll: () => [], addEventListener() {}, createElement: () => makeEl('x'), body: makeEl('body'), activeElement: null };
+  doc = {
+    getElementById: el,
+    querySelector: sel => (sel === '#view-watchlist h2' ? heading : null),
+    querySelectorAll: () => [],
+    addEventListener() {},
+    createElement: () => makeEl('x'),
+    body: makeEl('body'),
+    activeElement: null
+  };
   const ctx = {
-    console, JSON, Promise, Math, Object, Array, Number, String, Map, Set, WeakMap, Error, TypeError, SyntaxError, Date, Intl, isNaN, parseInt, Symbol, Boolean,
-    setTimeout: () => 0, clearTimeout: () => {},
-    localStorage: { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => { store.set(k, String(v)); }, removeItem: (k) => { store.delete(k); } },
-    CustomEvent: class { constructor(type) { this.type = type; } },
-    document: doc, addEventListener() {}, dispatchEvent() {}, confirm: () => true, prompt: () => 'APAGAR'
+    console,
+    JSON,
+    Promise,
+    Math,
+    Object,
+    Array,
+    Number,
+    String,
+    Map,
+    Set,
+    WeakMap,
+    Error,
+    TypeError,
+    SyntaxError,
+    Date,
+    Intl,
+    isNaN,
+    parseInt,
+    Symbol,
+    Boolean,
+    setTimeout: () => 0,
+    clearTimeout: () => {},
+    localStorage: {
+      getItem: k => (store.has(k) ? store.get(k) : null),
+      setItem: (k, v) => {
+        store.set(k, String(v));
+      },
+      removeItem: k => {
+        store.delete(k);
+      }
+    },
+    CustomEvent: class {
+      constructor(type) {
+        this.type = type;
+      }
+    },
+    document: doc,
+    addEventListener() {},
+    dispatchEvent() {},
+    confirm: () => true,
+    prompt: () => 'APAGAR'
   };
   ctx.window = ctx;
   vm.createContext(ctx);
@@ -85,14 +159,37 @@ function makeApp({ catalog = [] } = {}) {
       return { count: 0, data: ids.map(id => app.byId.get(id)).filter(Boolean), missing: [] };
     }
   };
-  store.set('showvault_state_mvc_v1', JSON.stringify({ trackedShows: [], watchedEpisodes: {}, episodeNotes: {}, tombstones: { shows: {}, watched: {}, notes: {} }, resetAt: '' }));
+  store.set(
+    'showvault_state_mvc_v1',
+    JSON.stringify({
+      trackedShows: [],
+      watchedEpisodes: {},
+      episodeNotes: {},
+      tombstones: { shows: {}, watched: {}, notes: {} },
+      resetAt: ''
+    })
+  );
   store.set('showvault_state_version', '2');
   const run = (...f) => vm.runInContext(fs.readFileSync(path.join(ROOT, 'js', ...f), 'utf-8'), ctx, { filename: f.join('/') });
-  ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/viewKit.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js', 'models/state.js']
-    .forEach(f => run(...f.split('/')));
+  [
+    'utils/dom.js',
+    'utils/emotions.js',
+    'utils/markdown.js',
+    'utils/mediaDisplay.js',
+    'utils/viewKit.js',
+    'utils/libraryMerge.js',
+    'utils/rating.js',
+    'utils/watchStatus.js',
+    'utils/backupValidator.js',
+    'utils/migrations.js',
+    'models/state.js'
+  ].forEach(f => run(...f.split('/')));
   ['nextUpView', 'watchlistView', 'diaryView', 'statsView', 'exploreView', 'detailModalView'].forEach(v => run('views', `${v}.js`));
   run('controllers', 'appController.js');
-  vm.runInContext('window.appController = Object.create(AppController.prototype); window.appController.activeTab = "watchlist"; window.appController.dirty = new Set(); window.appController.renderedRev = {}; window.appController.detailChain = Promise.resolve();', ctx);
+  vm.runInContext(
+    'window.appController = Object.create(AppController.prototype); window.appController.activeTab = "watchlist"; window.appController.dirty = new Set(); window.appController.renderedRev = {}; window.appController.detailChain = Promise.resolve();',
+    ctx
+  );
   ctx.appController.showToast = (msg, type) => app.toasts.push([type, msg]);
   app.window = ctx;
   app.state = ctx.appState;
@@ -106,10 +203,37 @@ function makeApp({ catalog = [] } = {}) {
 const EXAMPLE = [
   { id: 157336, type: 'movie', name: 'Interestelar', genres: [], runtime: 169 },
   { id: 872585, type: 'movie', name: 'Oppenheimer', genres: [], runtime: 180 },
-  { id: 1396, type: 'tv', name: 'Breaking Bad', genres: [], seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'Piloto' }, { episode_number: 2, name: 'Dois' }] }] },
-  { id: 1429, type: 'anime', name: 'Attack on Titan', genres: [], seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'E1' }] }] }
+  {
+    id: 1396,
+    type: 'tv',
+    name: 'Breaking Bad',
+    genres: [],
+    seasons: [
+      {
+        season_number: 1,
+        name: 'T1',
+        episodes: [
+          { episode_number: 1, name: 'Piloto' },
+          { episode_number: 2, name: 'Dois' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 1429,
+    type: 'anime',
+    name: 'Attack on Titan',
+    genres: [],
+    seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'E1' }] }]
+  }
 ];
-const OTHER = { id: 777, type: 'tv', name: 'Outra série', genres: [], seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'E1' }] }] };
+const OTHER = {
+  id: 777,
+  type: 'tv',
+  name: 'Outra série',
+  genres: [],
+  seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'E1' }] }]
+};
 const withExample = () => {
   const app = makeApp({ catalog: [...EXAMPLE, OTHER] });
   app.state.cacheMediaDetail(JSON.parse(JSON.stringify(EXAMPLE[2])));
@@ -125,10 +249,13 @@ const ids = app => app.state.data.trackedShows.map(t => t.showId).sort((a, b) =>
 
 test('"Remover exemplo": tira as 4 obras do exemplo intocadas de uma vez, grava uma vez só e deixa a marca de exclusão de cada uma', () => {
   const app = withExample();
-  app.state.addShow(777);   // obra do usuário (não é do exemplo): nunca sai
+  app.state.addShow(777); // obra do usuário (não é do exemplo): nunca sai
   const saves = [];
   const realSave = app.state.save.bind(app.state);
-  app.state.save = () => { saves.push(1); realSave(); };
+  app.state.save = () => {
+    saves.push(1);
+    realSave();
+  };
 
   assert.deepEqual(plain(app.state.exampleStatus().removable), [157336, 872585, 1396, 1429]);
   const out = app.state.removeExample();
@@ -145,9 +272,9 @@ test('"Remover exemplo": tira as 4 obras do exemplo intocadas de uma vez, grava 
 
 test('"Remover exemplo": o que o usuário já usou fica (status mudado, episódio marcado, filme assistido, anotação); ids parecidos não enganam', () => {
   const app = withExample();
-  app.state.setShowStatus(157336, 'watching');        // Interestelar: mudou o status
-  app.state.toggleWatched(1396, 1, 1);                // Breaking Bad: marcou um episódio (também vira "Assistindo")
-  app.state.toggleWatched(872585);                    // Oppenheimer: marcou como assistido
+  app.state.setShowStatus(157336, 'watching'); // Interestelar: mudou o status
+  app.state.toggleWatched(1396, 1, 1); // Breaking Bad: marcou um episódio (também vira "Assistindo")
+  app.state.toggleWatched(872585); // Oppenheimer: marcou como assistido
   assert.deepEqual(plain(app.state.exampleStatus().removable), [1429], 'só Attack on Titan continua intocada');
 
   app.state.saveNote(1429, 1, 1, { text: 'minha anotação', emotion: null, character: '' });
@@ -157,7 +284,12 @@ test('"Remover exemplo": o que o usuário já usou fica (status mudado, episódi
 
   // "13960_s1_e1" é de outra obra (id 13960): não pode contar como uso da 1396; e "1429_" também não casa com 14290
   const app2 = withExample();
-  app2.state.data.watchedEpisodes['13960_s1_e1'] = { watched: true, watchedAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z', rewatchCount: 1 };
+  app2.state.data.watchedEpisodes['13960_s1_e1'] = {
+    watched: true,
+    watchedAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    rewatchCount: 1
+  };
   app2.state.data.episodeNotes['14290_s1_e1'] = { text: 'x', updatedAt: '2026-01-01T00:00:00.000Z', snapshots: [] };
   assert.deepEqual(plain(app2.state.exampleStatus().removable), [157336, 872585, 1396, 1429]);
 });
@@ -211,7 +343,10 @@ test('appController.removeExample: avisa quantos saíram, redesenha a lista e le
   app.button.focus();
   app.controller.removeExample();
   assert.deepEqual(ids(app), [872585]);
-  assert.ok(app.toasts.some(([type, msg]) => type === 'success' && /Exemplo removido: 3 títulos\./.test(msg) && /ficou na lista/.test(msg)), JSON.stringify(app.toasts));
+  assert.ok(
+    app.toasts.some(([type, msg]) => type === 'success' && /Exemplo removido: 3 títulos\./.test(msg) && /ficou na lista/.test(msg)),
+    JSON.stringify(app.toasts)
+  );
   assert.equal(app.bar.classList.contains('hidden'), true);
   assert.equal(app.heading.focused, 1, 'o foco foi para o título "Minha Lista"');
   assert.equal(app.heading.getAttribute('tabindex'), '-1');
@@ -232,7 +367,22 @@ test('appController.removeExample: avisa quantos saíram, redesenha a lista e le
 // ---------------------------------------------------------------- adicionar: id canônico
 
 test('adicionar um resultado externo que o servidor devolve com OUTRO id (amostra do seed trocada pela obra real): entra a obra real, sem duplicar', async () => {
-  const real = { id: 1429, type: 'anime', name: 'Attack on Titan', genres: [], seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, name: 'E1' }, { episode_number: 2, name: 'E2' }] }] };
+  const real = {
+    id: 1429,
+    type: 'anime',
+    name: 'Attack on Titan',
+    genres: [],
+    seasons: [
+      {
+        season_number: 1,
+        name: 'T1',
+        episodes: [
+          { episode_number: 1, name: 'E1' },
+          { episode_number: 2, name: 'E2' }
+        ]
+      }
+    ]
+  };
   const app = makeApp({ catalog: [] });
   app.resolveId = id => (id === 10016498 ? real : null);
   app.state.cacheMediaList([{ id: 10016498, type: 'anime', name: 'Attack on Titan', isExternal: true, catalog_id: 1429, genres: [] }]);
@@ -282,7 +432,17 @@ test('Explorar: resultado externo cuja obra (catalog_id) já está na lista most
   const view = app.window.exploreView;
   view.container = makeEl('explore-container');
   view.hasMore = false;
-  const item = { id: 10016498, type: 'anime', name: 'Attack on Titan', original_name: 'Shingeki no Kyojin', isExternal: true, catalog_id: 1429, genres: [], first_air_date: '2013-04-07', season_label: 'Primavera 2013' };
+  const item = {
+    id: 10016498,
+    type: 'anime',
+    name: 'Attack on Titan',
+    original_name: 'Shingeki no Kyojin',
+    isExternal: true,
+    catalog_id: 1429,
+    genres: [],
+    first_air_date: '2013-04-07',
+    season_label: 'Primavera 2013'
+  };
   view.render([item]);
   assert.match(view.container.innerHTML, /data-action="open-detail" data-show="1429"[^>]*>\s*Ver no Cofre/);
   assert.ok(!/data-action="add-to-list"/.test(view.container.innerHTML));
@@ -301,7 +461,22 @@ test('Explorar: aviso cuja fonte reserva respondeu (fallback) não aparece; avis
   const view = makeApp().window.exploreView;
   const covered = { source: 'anilist', code: 'UPSTREAM', message: 'x', fallback: 'jikan' };
   assert.equal(view.renderWarnings([covered]), '', 'a Jikan cobriu a AniList: resultados completos, nada a avisar');
-  assert.match(view.renderWarnings([covered, { source: 'tvmaze', code: 'UPSTREAM', message: 'y' }]), /Uma fonte do catálogo está indisponível/);
-  assert.match(view.renderWarnings([{ source: 'anilist', code: 'UPSTREAM', message: 'x' }, { source: 'jikan', code: 'UPSTREAM', message: 'x' }]), /indisponível/);
-  assert.match(view.renderWarnings([{ source: 'anilist', code: 'RATE_LIMITED', retryAfterSec: 30, message: 'x', fallback: 'jikan' }, { source: 'tmdb', code: 'RATE_LIMITED', retryAfterSec: 30, message: 'x' }]), /~30 s/);
+  assert.match(
+    view.renderWarnings([covered, { source: 'tvmaze', code: 'UPSTREAM', message: 'y' }]),
+    /Uma fonte do catálogo está indisponível/
+  );
+  assert.match(
+    view.renderWarnings([
+      { source: 'anilist', code: 'UPSTREAM', message: 'x' },
+      { source: 'jikan', code: 'UPSTREAM', message: 'x' }
+    ]),
+    /indisponível/
+  );
+  assert.match(
+    view.renderWarnings([
+      { source: 'anilist', code: 'RATE_LIMITED', retryAfterSec: 30, message: 'x', fallback: 'jikan' },
+      { source: 'tmdb', code: 'RATE_LIMITED', retryAfterSec: 30, message: 'x' }
+    ]),
+    /~30 s/
+  );
 });

@@ -15,7 +15,8 @@ delete process.env.SEED_DEMO_USER;
 process.env.GOOGLE_CLIENT_ID = 'cliente-de-teste.apps.googleusercontent.com';
 process.env.CORS_ORIGINS = 'https://app.exemplo.test';
 // Limites folgados aqui (o teste de limite fica em auth-ratelimit.test.js, com valores baixos).
-for (const k of ['AUTH_LOGIN_MAX', 'AUTH_LOGIN_IP_MAX', 'AUTH_REGISTER_MAX', 'AUTH_GOOGLE_MAX', 'AUTH_SENSITIVE_MAX']) process.env[k] = '1000';
+for (const k of ['AUTH_LOGIN_MAX', 'AUTH_LOGIN_IP_MAX', 'AUTH_REGISTER_MAX', 'AUTH_GOOGLE_MAX', 'AUTH_SENSITIVE_MAX'])
+  process.env[k] = '1000';
 process.on('exit', () => fs.rmSync(DATA_DIR, { recursive: true, force: true }));
 
 const config = require('../server/config/config');
@@ -31,7 +32,9 @@ let server;
 let base;
 
 test.before(async () => {
-  server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   base = `http://127.0.0.1:${server.address().port}/api`;
 });
 test.after(() => server.close());
@@ -49,7 +52,11 @@ async function call(method, route, { body, token, raw, headers = {} } = {}) {
   }
   const res = await fetch(`${base}${route}`, { method, headers: h, body: payload });
   let json = null;
-  try { json = await res.json(); } catch { /* sem corpo */ }
+  try {
+    json = await res.json();
+  } catch {
+    /* sem corpo */
+  }
   return { status: res.status, body: json, headers: res.headers };
 }
 
@@ -169,9 +176,14 @@ test('login: sucesso, e mesma resposta para senha errada e e-mail inexistente (s
 
 test('login: entradas inválidas dão 400 (nunca 500)', async () => {
   const bad = [
-    {}, { email: 123, password: PASS }, { email: 'login@exemplo.test' }, { email: 'login@exemplo.test', password: 123 },
-    { email: 'login@exemplo.test', password: ['a'] }, { email: { $gt: '' }, password: { $gt: '' } },
-    { email: 'sem-arroba', password: PASS }, { email: 'login@exemplo.test', password: 'x'.repeat(129) }
+    {},
+    { email: 123, password: PASS },
+    { email: 'login@exemplo.test' },
+    { email: 'login@exemplo.test', password: 123 },
+    { email: 'login@exemplo.test', password: ['a'] },
+    { email: { $gt: '' }, password: { $gt: '' } },
+    { email: 'sem-arroba', password: PASS },
+    { email: 'login@exemplo.test', password: 'x'.repeat(129) }
   ];
   for (const body of bad) {
     const res = await call('POST', '/auth/login', { body });
@@ -181,10 +193,18 @@ test('login: entradas inválidas dão 400 (nunca 500)', async () => {
 });
 
 test('login: senha legada em texto puro entra e é convertida para hash (sem aceitar senha curta em cadastros novos)', async () => {
-  UserModel.saveAll([...UserModel.getAll(), {
-    id: 'usr_legado_01', createdAt: '2026-01-01T00:00:00.000Z', name: 'Legado', email: 'legado@exemplo.test',
-    password: 'curta', avatar: 'https://exemplo.test/a.png', provider: 'email'
-  }]);
+  UserModel.saveAll([
+    ...UserModel.getAll(),
+    {
+      id: 'usr_legado_01',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      name: 'Legado',
+      email: 'legado@exemplo.test',
+      password: 'curta',
+      avatar: 'https://exemplo.test/a.png',
+      provider: 'email'
+    }
+  ]);
   const res = await login('legado@exemplo.test', 'curta');
   assert.equal(res.status, 200);
   assert.match(UserModel.findByEmail('legado@exemplo.test').password, /^[0-9a-f]{32}:/);
@@ -192,10 +212,18 @@ test('login: senha legada em texto puro entra e é convertida para hash (sem ace
 });
 
 test('conta Google (sem senha) não entra por senha e recebe a mesma resposta neutra', async () => {
-  UserModel.saveAll([...UserModel.getAll(), {
-    id: 'usr_semsenha_01', createdAt: '2026-01-01T00:00:00.000Z', name: 'G', email: 'semsenha@exemplo.test',
-    avatar: 'https://exemplo.test/a.png', provider: 'google', googleId: 'g-semsenha'
-  }]);
+  UserModel.saveAll([
+    ...UserModel.getAll(),
+    {
+      id: 'usr_semsenha_01',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      name: 'G',
+      email: 'semsenha@exemplo.test',
+      avatar: 'https://exemplo.test/a.png',
+      provider: 'google',
+      googleId: 'g-semsenha'
+    }
+  ]);
   const res = await login('semsenha@exemplo.test', PASS);
   assert.equal(res.status, 401);
   assert.deepEqual(res.body, (await login('nao.existe@exemplo.test', PASS)).body);
@@ -215,7 +243,10 @@ test('/me: token válido devolve o usuário; sem token, forjado, expirado, alg n
   assert.equal((await call('GET', '/auth/me', { token: 'lixo' })).status, 401);
   assert.equal((await call('GET', '/auth/me', { token: `token_${reg.user.id}` })).status, 401);
   assert.equal((await call('GET', '/auth/me', { token: jwt.sign({ sub: reg.user.id }, 'outro-segredo-qualquer') })).status, 401);
-  assert.equal((await call('GET', '/auth/me', { token: jwt.sign({ sub: reg.user.id }, config.JWT_SECRET, { expiresIn: -10 }) })).status, 401);
+  assert.equal(
+    (await call('GET', '/auth/me', { token: jwt.sign({ sub: reg.user.id }, config.JWT_SECRET, { expiresIn: -10 }) })).status,
+    401
+  );
   assert.equal((await call('GET', '/auth/me', { token: jwt.sign({ sub: reg.user.id }, '', { algorithm: 'none' }) })).status, 401);
   assert.equal((await call('GET', '/auth/me', { token: jwt.sign({ nome: 'sem sub' }, config.JWT_SECRET) })).status, 401);
   // assinatura certa, mas conta que não existe (mais): sessão inválida
@@ -228,7 +259,10 @@ test('trocar senha: valida, exige a senha atual, e derruba tokens antigos', asyn
   const { body: reg } = await register({ email: 'troca@exemplo.test' });
   const post = (body, token = reg.token) => call('POST', '/auth/change-password', { body, token });
 
-  assert.equal((await call('POST', '/auth/change-password', { body: { currentPassword: PASS, newPassword: 'nova-senha-123' } })).status, 401);
+  assert.equal(
+    (await call('POST', '/auth/change-password', { body: { currentPassword: PASS, newPassword: 'nova-senha-123' } })).status,
+    401
+  );
   assert.equal((await post({})).status, 400);
   assert.equal((await post({ currentPassword: PASS, newPassword: 'curta' })).status, 400);
   assert.equal((await post({ currentPassword: PASS, newPassword: 12345678 })).status, 400);
@@ -256,7 +290,11 @@ test('trocar senha: valida, exige a senha atual, e derruba tokens antigos', asyn
 test('excluir conta: exige a senha, apaga usuário e biblioteca e invalida o token', async () => {
   const { body: reg } = await register({ email: 'apagar@exemplo.test' });
   const { body: outro } = await register({ email: 'fica@exemplo.test' });
-  const lib = { trackedShows: [{ showId: 1396, status: 'watching', addedAt: '2026-10-20T00:00:00Z' }], watchedEpisodes: {}, episodeNotes: {} };
+  const lib = {
+    trackedShows: [{ showId: 1396, status: 'watching', addedAt: '2026-10-20T00:00:00Z' }],
+    watchedEpisodes: {},
+    episodeNotes: {}
+  };
   assert.equal((await call('PUT', '/user/library', { token: reg.token, body: { data: lib, stateVersion: STATE_VERSION } })).status, 200);
   assert.equal((await call('PUT', '/user/library', { token: outro.token, body: { data: lib, stateVersion: STATE_VERSION } })).status, 200);
   const libDir = path.join(DATA_DIR, 'libraries');
@@ -271,7 +309,11 @@ test('excluir conta: exige a senha, apaga usuário e biblioteca e invalida o tok
 
   assert.equal((await del({ password: PASS })).status, 200);
   assert.equal(UserModel.findById(reg.user.id), null);
-  assert.equal(fs.readdirSync(libDir).some(f => f.startsWith(reg.user.id)), false, 'biblioteca (e cópias) apagadas');
+  assert.equal(
+    fs.readdirSync(libDir).some(f => f.startsWith(reg.user.id)),
+    false,
+    'biblioteca (e cópias) apagadas'
+  );
 
   // sessão antiga não ressuscita a conta nem recria a biblioteca
   assert.equal((await call('GET', '/auth/me', { token: reg.token })).status, 401);
@@ -309,12 +351,18 @@ test('Google: ID token é validado no servidor; cria conta, reconhece o mesmo us
   assert.equal(cfg.body.googleClientId, process.env.GOOGLE_CLIENT_ID);
 
   const profiles = {
-    'tok-ok': { sub: 'g-111', email: 'Pessoa@Gmail.test', email_verified: true, name: 'Pessoa Google', picture: 'https://fotos.exemplo.test/p.jpg' },
+    'tok-ok': {
+      sub: 'g-111',
+      email: 'Pessoa@Gmail.test',
+      email_verified: true,
+      name: 'Pessoa Google',
+      picture: 'https://fotos.exemplo.test/p.jpg'
+    },
     'tok-naoverificado': { sub: 'g-222', email: 'nv@gmail.test', email_verified: false, name: 'NV' },
     'tok-conflito': { sub: 'g-333', email: 'eu@exemplo.test', email_verified: true, name: 'Outro' },
     'tok-foto-ruim': { sub: 'g-444', email: 'foto@gmail.test', email_verified: true, name: '<b>Nome</b>', picture: 'javascript:alert(1)' }
   };
-  googleAuth.__setVerifierForTests(async (credential) => {
+  googleAuth.__setVerifierForTests(async credential => {
     if (!profiles[credential]) throw new Error('token inválido');
     return profiles[credential];
   });
@@ -324,7 +372,10 @@ test('Google: ID token é validado no servidor; cria conta, reconhece o mesmo us
     assert.equal((await call('POST', '/auth/google', { body: { credential: 'forjado' } })).status, 401);
     assert.equal((await call('POST', '/auth/google', { body: { credential: 'tok-naoverificado' } })).status, 403);
     // enviar e-mail/nome no corpo não adianta: só vale o que o Google assinou
-    assert.equal((await call('POST', '/auth/google', { body: { email: 'eu@exemplo.test', name: 'x', credential: 'forjado' } })).status, 401);
+    assert.equal(
+      (await call('POST', '/auth/google', { body: { email: 'eu@exemplo.test', name: 'x', credential: 'forjado' } })).status,
+      401
+    );
 
     const first = await call('POST', '/auth/google', { body: { credential: 'tok-ok' } });
     assert.equal(first.status, 200);
@@ -350,10 +401,22 @@ test('Google: ID token é validado no servidor; cria conta, reconhece o mesmo us
     assert.doesNotMatch(sanitized.body.user.name, /[<>]/);
 
     // conta Google: não tem senha para trocar; excluir exige nova credencial do mesmo Google
-    assert.equal((await call('POST', '/auth/change-password', { token: first.body.token, body: { currentPassword: PASS, newPassword: 'nova-senha-123' } })).status, 409);
+    assert.equal(
+      (
+        await call('POST', '/auth/change-password', {
+          token: first.body.token,
+          body: { currentPassword: PASS, newPassword: 'nova-senha-123' }
+        })
+      ).status,
+      409
+    );
     assert.equal((await call('DELETE', '/auth/account', { token: first.body.token, body: { password: PASS } })).status, 400);
     assert.equal((await call('DELETE', '/auth/account', { token: first.body.token, body: { credential: 'forjado' } })).status, 403);
-    assert.equal((await call('DELETE', '/auth/account', { token: first.body.token, body: { credential: 'tok-foto-ruim' } })).status, 403, 'credencial de outra pessoa');
+    assert.equal(
+      (await call('DELETE', '/auth/account', { token: first.body.token, body: { credential: 'tok-foto-ruim' } })).status,
+      403,
+      'credencial de outra pessoa'
+    );
     assert.ok(UserModel.findById(first.body.user.id));
     assert.equal((await call('DELETE', '/auth/account', { token: first.body.token, body: { credential: 'tok-ok' } })).status, 200);
     assert.equal(UserModel.findById(first.body.user.id), null);

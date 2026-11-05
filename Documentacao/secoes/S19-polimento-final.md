@@ -7,9 +7,9 @@ Fechar a dívida técnica que sobrou: auditorias de acessibilidade/performance n
 
 ## Tarefas
 - [ ] Lighthouse e axe reais (via Playwright da S12) em todas as abas e modais; corrigir o que aparecer; checklist manual com leitor de tela (NVDA) e celular real, registrado no diário.
-- [ ] Prettier no repositório inteiro (um commit só, sem mudança de lógica) e `format:check` cobrindo tudo no CI.
+- [x] Prettier no repositório inteiro (um commit só, sem mudança de lógica) e `format:check` cobrindo tudo no CI.
 - [ ] Migrar o frontend para módulos ES (`type="module"`), removendo a dependência de ordem dos `<script>` e os globais `window.*` onde possível; manter a CSP estrita.
-- [ ] Unificar a montagem da chave `id_sN_eM` (hoje repetida em `state.js`) no util compartilhado.
+- [x] Unificar a montagem da chave `id_sN_eM` (hoje repetida em `state.js`) no util compartilhado.
 - [ ] Revisão final de segurança (checklist de `01-visao-geral`) e atualização do README/arquitetura.
 
 ## Critério de pronto
@@ -21,3 +21,6 @@ Reescrever em framework.
 ## Achados de outras seções (para esta)
 - **Foco (S12):** "Carregar exemplo" acionado pelo teclado no estado vazio de A Seguir deixa o foco no `body` — teste marcado `test.fixme` em `tests/e2e/09-teclado.spec.js`; corrigir e remover o `fixme`.
 - **Toast no celular (S12):** cobre o conteúdo e recebe o toque por 4,5 s; e o axe aponta `heading-order` (detalhes em `diario/2026-10-27-S12.md`).
+
+## Resultado (2026-11-04)
+Feito: Prettier total, chave unificada, axe com conta (sem violações), foco e toast corrigidos. **Ficou pendente:** módulos ES (D-S19-5), Lighthouse e leitor de tela reais, excluir conta Google (D-S19-4). Detalhes em `diario/2026-11-04-S19.md`.

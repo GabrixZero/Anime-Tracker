@@ -6,8 +6,8 @@ class AppController {
   constructor() {
     this.activeTab = 'next-up';
     // S09 · render incremental: só a aba visível é redesenhada; as outras guardam "ficou desatualizada" e redesenham ao abrir.
-    this.dirty = new Set();          // abas marcadas à mão (ex.: o detalhe de uma obra chegou)
-    this.renderedRev = {};           // revisão do estado (appState.rev) com que cada aba foi desenhada pela última vez
+    this.dirty = new Set(); // abas marcadas à mão (ex.: o detalhe de uma obra chegou)
+    this.renderedRev = {}; // revisão do estado (appState.rev) com que cada aba foi desenhada pela última vez
     this.detailChain = Promise.resolve(); // carregamentos de detalhe em fila (um lote por vez)
     this.init();
   }
@@ -38,9 +38,9 @@ class AppController {
   // Carrega o detalhe das obras da lista que ainda não o têm. Devolve true se buscou algo (a tela deve ser redesenhada).
   async ensureTrackedDetails() {
     const state = window.appState;
-    const need = this.trackedIds().filter(id => !state.hasDetail(id));
+    const need = this.trackedIds().filter(id => !state.hasEpisodes(id));
     if (need.length === 0) return false;
-    await this.ensureDetails(need);
+    await this.ensureDetails(need, { summary: true }); // S18: só o resumo; o detalhe completo vem ao abrir a obra
     return true;
   }
 
@@ -50,22 +50,24 @@ class AppController {
 
   // Carrega em lote (até 50 por requisição) o detalhe completo dessas obras. Nunca lança: em falha deixa
   // `appState.detailsStatus = 'error'` e as telas mostram o aviso. Chamadas simultâneas entram numa fila (um lote por vez).
-  ensureDetails(ids) {
-    const run = this.detailChain.then(() => this.loadDetails(ids));
+  ensureDetails(ids, opts = {}) {
+    const run = this.detailChain.then(() => this.loadDetails(ids, opts));
     this.detailChain = run.catch(() => {});
     return run;
   }
 
-  async loadDetails(ids) {
+  async loadDetails(ids, { summary = false } = {}) {
     const state = window.appState;
-    const need = [...new Set(ids.map(Number))].filter(id => Number.isSafeInteger(id) && id > 0 && !state.hasDetail(id));
+    const need = [...new Set(ids.map(Number))].filter(
+      id => Number.isSafeInteger(id) && id > 0 && !(summary ? state.hasEpisodes(id) : state.hasDetail(id))
+    );
     if (need.length === 0) return;
     state.detailsStatus = 'loading';
     let failed = false;
     for (let i = 0; i < need.length; i += AppController.DETAIL_BATCH) {
       try {
-        const res = await window.apiClient.getBatch(need.slice(i, i + AppController.DETAIL_BATCH));
-        ((res && res.data) || []).forEach(item => state.cacheMediaDetail(item));
+        const res = await window.apiClient.getBatch(need.slice(i, i + AppController.DETAIL_BATCH), { summary });
+        ((res && res.data) || []).forEach(item => (summary ? state.cacheMediaSummary(item) : state.cacheMediaDetail(item)));
       } catch (err) {
         failed = true;
         console.warn('Não foi possível carregar o detalhe das obras:', err.message);
@@ -95,11 +97,22 @@ class AppController {
 
     if (tabId === 'explore') window.exploreView.loadMedia();
     else this.renderTab(tabId);
+
+    // S15: ao abrir a Agenda, atualiza em segundo plano as obras em exibição (a tela já foi desenhada com os dados salvos)
+    if (tabId === 'calendar' && window.calendarView) window.calendarView.onOpen();
   }
 
-  // As views das 4 abas que dependem da lista do usuário (a aba Explorar tem o próprio ciclo de carga).
+  // As views das 5 abas que dependem da lista do usuário (a aba Explorar tem o próprio ciclo de carga).
   viewFor(tabId) {
-    return { 'next-up': window.nextUpView, watchlist: window.watchlistView, diary: window.diaryView, stats: window.statsView }[tabId] || null;
+    return (
+      {
+        'next-up': window.nextUpView,
+        watchlist: window.watchlistView,
+        diary: window.diaryView,
+        stats: window.statsView,
+        calendar: window.calendarView
+      }[tabId] || null
+    );
   }
 
   // Redesenha a aba se ela ficou para trás (estado mudou ou foi marcada); senão não faz nada.
@@ -115,7 +128,7 @@ class AppController {
 
   // Números das abas (A Seguir, Lista, Diário) sempre em dia, mesmo com a aba oculta e sem redesenhar nada.
   updateBadges(except = null) {
-    ['next-up', 'watchlist', 'diary'].forEach((tab) => {
+    ['next-up', 'watchlist', 'diary'].forEach(tab => {
       const view = this.viewFor(tab);
       if (tab !== except && view && view.refreshBadge) view.refreshBadge();
     });
@@ -153,7 +166,12 @@ class AppController {
     // Obra já completa no cache (filme ou com temporadas): não precisa buscar de novo. Senão pede o detalhe ao servidor:
     // obra que já está no catálogo é pública; obra nova é ingerida e isso exige login (S02).
     // (resultado de busca externa — isExternal — e item leve da lista — light — nunca contam como completos: sem episódios no cache)
-    const complete = known && !known.isExternal && !known.light && (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
+    const complete =
+      known &&
+      !known.isExternal &&
+      !known.light &&
+      !known.summary &&
+      (known.type === 'movie' || (Array.isArray(known.seasons) && known.seasons.length > 0));
     if (!complete) {
       try {
         this.showToast('Buscando os episódios da obra...', 'info');
@@ -187,17 +205,30 @@ class AppController {
 
   // S08 (D-22): "Carregar exemplo" no estado vazio. Só põe obras do catálogo na lista (Quero ver), sem progresso nem notas.
   async loadExample() {
+    const emptyBtn = document.querySelector('#next-up-empty [data-action="load-example"]');
+    const hadFocus = !!emptyBtn && document.activeElement === emptyBtn;
     // as obras de exemplo precisam do catálogo em memória: busca o detalhe delas em lote (a lista não traz mais o catálogo inteiro)
     await this.ensureDetails(window.appState.constructor.EXAMPLE_SHOW_IDS || []);
     const { added, missing } = window.appState.loadExample();
     if (added.length > 0) {
-      this.showToast(`Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Para tirar tudo de uma vez, use "Remover exemplo" na Minha Lista.`, 'success');
+      this.showToast(
+        `Exemplo carregado: ${added.length} título${added.length === 1 ? '' : 's'} na sua lista (sem progresso nem anotações). Para tirar tudo de uma vez, use "Remover exemplo" na Minha Lista.`,
+        'success'
+      );
     } else if (missing > 0) {
       this.showToast('O catálogo ainda não carregou. Tente de novo em instantes.', 'error');
     } else {
       this.showToast('Os títulos de exemplo já estão na sua lista.', 'info');
     }
     this.refreshAll();
+    // S19: o botão "Carregar exemplo" some junto com o estado vazio; o foco vai para a fila (ou o título da tela), nunca para o <body>
+    if (hadFocus) {
+      const target = document.querySelector('#next-up-container button') || document.querySelector('#view-next-up h2');
+      if (target) {
+        if (target.tagName !== 'BUTTON') target.setAttribute('tabindex', '-1');
+        target.focus();
+      }
+    }
   }
 
   // S13: "Remover exemplo" em 1 clique — tira só as obras do exemplo que continuam intocadas (as que você já usou ficam).
@@ -207,7 +238,10 @@ class AppController {
     const { removed, kept } = window.appState.removeExample();
     if (removed.length > 0) {
       const plural = removed.length === 1 ? 'título' : 'títulos';
-      this.showToast(`Exemplo removido: ${removed.length} ${plural}.${kept.length ? ' O que você já usou ficou na lista.' : ''}`, 'success');
+      this.showToast(
+        `Exemplo removido: ${removed.length} ${plural}.${kept.length ? ' O que você já usou ficou na lista.' : ''}`,
+        'success'
+      );
     } else if (kept.length > 0) {
       this.showToast('Os títulos de exemplo que estão na lista já têm progresso ou anotações, então ficaram.', 'info');
     } else {
@@ -244,10 +278,27 @@ class AppController {
     this.refreshShow(showId);
   }
 
-  // Tudo pode ter mudado (login, sync, importar/resetar, adicionar/remover obra): marca as 4 telas como desatualizadas e
+  // Nota pessoal (S17): valor do campo (texto) ou vazio para remover. Inválido não grava e o campo volta ao valor salvo.
+  setRating(showId, raw) {
+    const ok = window.appState.setRating(showId, raw);
+    if (!ok) {
+      this.showToast('Nota inválida: use um número de 0 a 10 com no máximo uma casa decimal (ex.: 7.5).', 'error');
+    } else {
+      this.showToast(
+        window.appState.getRating(showId) === null
+          ? 'Nota removida.'
+          : `Nota salva: ${window.Rating.formatUserRating(window.appState.getRating(showId))}.`,
+        'success'
+      );
+    }
+    this.refreshShow(showId);
+    window.detailModalView.refreshRating();
+  }
+
+  // Tudo pode ter mudado (login, sync, importar/resetar, adicionar/remover obra): marca as 5 telas como desatualizadas e
   // redesenha só a que está visível; as outras redesenham quando forem abertas (S09). Os números das abas ficam em dia.
   refreshAll() {
-    ['next-up', 'watchlist', 'diary', 'stats'].forEach(tab => this.dirty.add(tab));
+    ['next-up', 'watchlist', 'diary', 'stats', 'calendar'].forEach(tab => this.dirty.add(tab));
     this.renderTab(this.activeTab);
     this.updateBadges(this.activeTab);
     window.detailModalView.refreshStatusPicker();
@@ -301,10 +352,10 @@ class AppController {
       this.showToast('Backup JSON exportado!', 'success');
     });
 
-    document.getElementById('input-import-backup').addEventListener('change', (e) => {
+    document.getElementById('input-import-backup').addEventListener('change', e => {
       if (e.target.files && e.target.files[0]) {
         const reader = new FileReader();
-        reader.onload = (ev) => {
+        reader.onload = ev => {
           try {
             const parsed = JSON.parse(ev.target.result);
             // Backups antigos podem conter obras aposentadas (D-11): migra antes de aplicar. Sem versão = versão 1.
@@ -316,7 +367,7 @@ class AppController {
             this.showToast('Backup restaurado com sucesso!', 'success');
           } catch (err) {
             const isFormat = err instanceof SyntaxError;
-            this.showToast(isFormat ? 'Arquivo de backup inválido.' : (err.message || 'Arquivo de backup inválido.'), 'error');
+            this.showToast(isFormat ? 'Arquivo de backup inválido.' : err.message || 'Arquivo de backup inválido.', 'error');
           }
         };
         reader.readAsText(e.target.files[0]);
@@ -336,7 +387,8 @@ class AppController {
     const state = window.appState;
     const sync = window.syncService;
 
-    if (!confirm('Apagar todos os dados DESTE aparelho (séries, episódios e notas)? Se quiser guardá-los, exporte um backup antes.')) return;
+    if (!confirm('Apagar todos os dados DESTE aparelho (séries, episódios e notas)? Se quiser guardá-los, exporte um backup antes.'))
+      return;
 
     if (!sync.isLoggedIn()) {
       localStorage.removeItem(state.STORAGE_KEY); // visitante: volta ao estado inicial do app (lista vazia)
@@ -348,8 +400,8 @@ class AppController {
 
     const alsoCloud = confirm(
       'Você está conectado. Apagar TAMBÉM a cópia guardada na nuvem desta conta?\n\n' +
-      'OK = apagar aqui e na nuvem (seus outros aparelhos também ficam zerados).\n' +
-      'Cancelar = apagar só neste aparelho (a cópia da nuvem volta no próximo login).'
+        'OK = apagar aqui e na nuvem (seus outros aparelhos também ficam zerados).\n' +
+        'Cancelar = apagar só neste aparelho (a cópia da nuvem volta no próximo login).'
     );
 
     if (alsoCloud) {
@@ -384,13 +436,18 @@ class AppController {
     const text = document.createElement('span');
     text.textContent = String(message);
     toast.append(icon, text);
+    toast.addEventListener('click', () => toast.remove()); // S19: um toque fecha o aviso
     container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(10px)';
-      toast.style.transition = 'all 0.25s ease';
-      setTimeout(() => toast.remove(), 250);
-    }, type === 'error' ? 7000 : 4500); // um pouco mais de tempo para ler (acessibilidade)
+    const narrow = !!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+    setTimeout(
+      () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      },
+      type === 'error' ? (narrow ? 5000 : 7000) : narrow ? 2800 : 4500
+    ); // um pouco mais de tempo para ler (acessibilidade)
   }
 }
 

@@ -19,9 +19,12 @@ function requestJson(url, { headers = {}, timeoutMs = DEFAULT_TIMEOUT_MS, maxByt
     }
     // `timeout` nas opções vale já durante a CONEXÃO (req.setTimeout sozinho só passa a contar depois de conectado: um servidor que
     // nem atende deixava a espera em ~5 s, ignorando o tempo pedido).
-    const req = client.request(url, { method, headers: reqHeaders, timeout: timeoutMs }, (res) => {
+    const req = client.request(url, { method, headers: reqHeaders, timeout: timeoutMs }, res => {
       const status = res.statusCode || 0;
-      if (status === 404) { res.resume(); return reject(mediaErrors.notFound()); }
+      if (status === 404) {
+        res.resume();
+        return reject(mediaErrors.notFound());
+      }
       if (status === 429) {
         res.resume();
         const retryAfter = Number(res.headers['retry-after']);
@@ -38,7 +41,7 @@ function requestJson(url, { headers = {}, timeoutMs = DEFAULT_TIMEOUT_MS, maxByt
 
       let size = 0;
       const chunks = [];
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         size += chunk.length;
         if (size > maxBytes) {
           req.destroy();

@@ -53,7 +53,12 @@
   function effectiveStatus(tracked, media, isWatched, progress) {
     const status = normalizeStatus(tracked && tracked.status);
     const legacy = !(tracked && tracked.updatedAt);
-    if (legacy && media && (status === 'watching' || status === 'plan_to_watch') && (progress || computeProgress(media, isWatched)).complete) {
+    if (
+      legacy &&
+      media &&
+      (status === 'watching' || status === 'plan_to_watch') &&
+      (progress || computeProgress(media, isWatched)).complete
+    ) {
       return 'completed';
     }
     return status;
@@ -72,7 +77,7 @@
     const status = normalizeStatus(current);
     if (progress.complete) return 'completed';
     if (media && media.type === 'movie') {
-      return marked ? 'completed' : (status === 'completed' ? 'plan_to_watch' : status);
+      return marked ? 'completed' : status === 'completed' ? 'plan_to_watch' : status;
     }
     if (marked) return status === 'watching' ? status : 'watching';
     if (status === 'completed') return progress.watched > 0 ? 'watching' : 'plan_to_watch';
@@ -88,15 +93,21 @@
   // <option>s do seletor (valores e rótulos fixos, sem dados externos).
   function statusOptionsHtml(selected) {
     const current = normalizeStatus(selected);
-    return STATUS_LIST
-      .map(s => `<option value="${s.value}"${s.value === current ? ' selected' : ''}>${s.label}</option>`)
-      .join('');
+    return STATUS_LIST.map(s => `<option value="${s.value}"${s.value === current ? ' selected' : ''}>${s.label}</option>`).join('');
   }
 
   const api = {
-    STATUS_LIST, STATUS_VALUES, STATUS_LABELS,
-    normalizeStatus, statusLabel, computeProgress, effectiveStatus, initialStatus,
-    statusAfterProgress, isQueueStatus, statusOptionsHtml
+    STATUS_LIST,
+    STATUS_VALUES,
+    STATUS_LABELS,
+    normalizeStatus,
+    statusLabel,
+    computeProgress,
+    effectiveStatus,
+    initialStatus,
+    statusAfterProgress,
+    isQueueStatus,
+    statusOptionsHtml
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root) root.WatchStatus = api;

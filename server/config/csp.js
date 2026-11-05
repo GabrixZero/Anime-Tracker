@@ -24,6 +24,8 @@ function buildCspDirectives({ isProduction, googleEnabled = false }) {
     imgSrc: ["'self'", 'data:', 'https:', 'http:'],
     connectSrc: ["'self'", 'https://accounts.google.com/gsi/'],
     frameSrc: ["'self'", 'https://accounts.google.com/gsi/'],
+    workerSrc: ["'self'"], // service worker do modo offline (S18)
+    manifestSrc: ["'self'"],
     objectSrc: ["'none'"],
     baseUri: ["'self'"],
     formAction: ["'self'"],

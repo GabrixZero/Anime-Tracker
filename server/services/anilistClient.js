@@ -7,14 +7,14 @@ const { mediaErrors } = require('../utils/errors');
 
 const DEFAULTS = {
   baseUrl: 'https://graphql.anilist.co',
-  minIntervalMs: 350,        // uma franquia de 9 entradas sai em ~3 s; o teto por minuto (abaixo) é que respeita o limite oficial de 90/min
+  minIntervalMs: 350, // uma franquia de 9 entradas sai em ~3 s; o teto por minuto (abaixo) é que respeita o limite oficial de 90/min
   perMinute: 80,
   maxQueue: 40,
   maxWaitMs: 25000,
   retries: 2,
   backoffMs: 1000,
-  timeoutMs: 6000,           // a AniList responde em ~0,2-1,5 s; sem resposta em 6 s a busca já cai para a reserva
-  breakerCooldownMs: 30000,  // AniList fora do ar: 30 s de falha imediata (a busca cai para a Jikan) antes de tentar de novo
+  timeoutMs: 6000, // a AniList responde em ~0,2-1,5 s; sem resposta em 6 s a busca já cai para a reserva
+  breakerCooldownMs: 30000, // AniList fora do ar: 30 s de falha imediata (a busca cai para a Jikan) antes de tentar de novo
   pauseOnRateLimit: true,
   searchTtlMs: 10 * 60 * 1000,
   detailTtlMs: 60 * 60 * 1000,
@@ -55,7 +55,7 @@ const isMedia = m => !!m && Number.isSafeInteger(m.id) && m.id > 0 && !!m.title 
 
 // ids (da AniList) das entradas ligadas por SEQUEL/PREQUEL (anime, não adulto, não clipe musical)
 function franchiseNeighbours(media) {
-  const edges = (media.relations && Array.isArray(media.relations.edges)) ? media.relations.edges : [];
+  const edges = media.relations && Array.isArray(media.relations.edges) ? media.relations.edges : [];
   const ids = [];
   for (const edge of edges) {
     const node = edge && edge.node;
@@ -75,18 +75,33 @@ class AniListClient extends SourceClient {
   // POST GraphQL com fila, nova tentativa, disjuntor e cache. Devolve o objeto `data` ou lança um erro tipado.
   async query(query, variables, { ttlMs = this.searchTtlMs, fresh = false } = {}) {
     const body = JSON.stringify({ query, variables });
-    const json = await this.cached(body, ttlMs, async () => {
-      // retries429: 0 => a espera/retentativa é decidida pela fila (o fetchJson não repete por conta própria)
-      const res = await this.fetchJson(this.baseUrl, { method: 'POST', body, headers: { 'Content-Type': 'application/json' }, retries429: 0, timeoutMs: this.timeoutMs });
-      return AniListClient.unwrap(res);
-    }, { fresh });
+    const json = await this.cached(
+      body,
+      ttlMs,
+      async () => {
+        // retries429: 0 => a espera/retentativa é decidida pela fila (o fetchJson não repete por conta própria)
+        const res = await this.fetchJson(this.baseUrl, {
+          method: 'POST',
+          body,
+          headers: { 'Content-Type': 'application/json' },
+          retries429: 0,
+          timeoutMs: this.timeoutMs
+        });
+        return AniListClient.unwrap(res);
+      },
+      { fresh }
+    );
     return json;
   }
 
   // GraphQL devolve {data} ou {errors:[{message,status}]}. Erro sem dados = erro tipado (nunca "vazio").
   static unwrap(res) {
     if (!res || typeof res !== 'object') throw mediaErrors.upstream('Resposta inesperada da AniList.');
-    if (Array.isArray(res.errors) && res.errors.length > 0 && (res.data === null || res.data === undefined || !Object.values(res.data).some(Boolean))) {
+    if (
+      Array.isArray(res.errors) &&
+      res.errors.length > 0 &&
+      (res.data === null || res.data === undefined || !Object.values(res.data).some(Boolean))
+    ) {
       const status = Number(res.errors[0] && res.errors[0].status);
       if (status === 404) throw mediaErrors.notFound();
       if (status === 429) throw mediaErrors.rateLimited();
@@ -131,7 +146,10 @@ class AniListClient extends SourceClient {
 
     while (frontier.length > 0) {
       const room = maxNodes - nodes.size;
-      if (room <= 0) { truncated = true; break; }
+      if (room <= 0) {
+        truncated = true;
+        break;
+      }
       if (frontier.length > room) truncated = true;
       const batch = frontier.slice(0, room);
       const settled = await Promise.allSettled(batch.map(id => this.getMedia({ id }, { fresh })));
@@ -143,7 +161,10 @@ class AniListClient extends SourceClient {
         }
         nodes.set(res.value.id, res.value);
         for (const id of franchiseNeighbours(res.value)) {
-          if (!seen.has(id)) { seen.add(id); next.push(id); }
+          if (!seen.has(id)) {
+            seen.add(id);
+            next.push(id);
+          }
         }
       });
       frontier = next;

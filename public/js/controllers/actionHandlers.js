@@ -22,8 +22,12 @@
   A.on('add-to-list', el => window.appController.addToList(show(el)));
   A.on('remove-from-list', el => window.appController.removeFromList(show(el)));
   A.on('quick-check', el => window.appController.quickCheck(show(el), season(el), episode(el)));
+  A.on('more-episodes', () => window.detailModalView.showMoreEpisodes());
   A.on('retry-details', () => window.appController.retryDetails());
   A.onChange('set-status', el => window.appController.setStatus(show(el), el.value));
+  // Nota pessoal (S17): confirma ao mudar o valor (Enter ou sair do campo); "Remover nota" apaga
+  A.onChange('set-rating', el => window.appController.setRating(show(el), el.value));
+  A.on('clear-rating', el => window.appController.setRating(show(el), ''));
 
   // Detalhes e anotações
   A.on('open-detail', el => window.detailModalView.open(show(el)));
@@ -42,4 +46,16 @@
 
   // Login
   A.on('auth-mode', el => window.authView.switchMode(el.getAttribute('data-mode')));
+  // "Perdi a senha": por enquanto só um aviso (a recuperação por e-mail ainda não existe)
+  A.on('forgot-password', () => document.getElementById('tvtime-forgot-note').classList.remove('hidden'));
+
+  // Importar histórico (S16)
+  A.on('import-apply', () => window.importView.apply());
+  A.on('import-cancel', () => window.importView.cancel());
+  A.on('import-close', () => window.importView.cancel());
+  A.onChange('import-choice', el => window.importView.setChoice(A.int(el, 'index'), el.value));
+
+  // Minha conta (S14)
+  A.on('open-account', () => window.accountView.open());
+  A.on('logout-all', () => window.accountView.handleLogoutAll());
 })();

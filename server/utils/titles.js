@@ -6,7 +6,9 @@ const CJK = /[぀-ヿ㐀-鿿가-힯]/;
 // minúsculas, sem acentos, sem pontuação; japonês/coreano/chinês e números são preservados.
 function normalizeTitle(value) {
   return String(value ?? '')
-    .normalize('NFKD').replace(/[̀-ͯ]/g, '').normalize('NFC')
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .normalize('NFC')
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim();

@@ -10,17 +10,17 @@ const EPISODE_TYPES = new Set(['TV', 'ONA', 'OVA', 'Special', 'TV Special']);
 
 const DEFAULTS = {
   baseUrl: 'https://api.jikan.moe/v4',
-  minIntervalMs: 400,        // ~2,5 req/s (a Jikan aceita 3)
-  perMinute: 50,             // teto por minuto (a Jikan aceita 60)
-  maxQueue: 40,              // pedidos esperando na fila; acima disso responde "tente de novo" em vez de acumular
-  maxWaitMs: 25000,          // quanto um pedido aceita esperar na fila antes de desistir (RATE_LIMITED)
-  retries: 2,                // novas tentativas em 429/5xx (além da primeira); timeout/conexão não repete (disjuntor)
-  backoffMs: 1000,           // espera inicial entre tentativas (dobra a cada uma, respeitando Retry-After)
-  breakerCooldownMs: 60000,  // Jikan fora do ar (timeout/conexão): 60 s de falha imediata antes de tentar de novo
+  minIntervalMs: 400, // ~2,5 req/s (a Jikan aceita 3)
+  perMinute: 50, // teto por minuto (a Jikan aceita 60)
+  maxQueue: 40, // pedidos esperando na fila; acima disso responde "tente de novo" em vez de acumular
+  maxWaitMs: 25000, // quanto um pedido aceita esperar na fila antes de desistir (RATE_LIMITED)
+  retries: 2, // novas tentativas em 429/5xx (além da primeira); timeout/conexão não repete (disjuntor)
+  backoffMs: 1000, // espera inicial entre tentativas (dobra a cada uma, respeitando Retry-After)
+  breakerCooldownMs: 60000, // Jikan fora do ar (timeout/conexão): 60 s de falha imediata antes de tentar de novo
   searchTtlMs: 10 * 60 * 1000,
   detailTtlMs: 6 * 60 * 60 * 1000,
   episodesTtlMs: 60 * 60 * 1000,
-  maxEpisodePages: 30        // 30 x 100 episódios
+  maxEpisodePages: 30 // 30 x 100 episódios
 };
 
 class JikanClient extends SourceClient {
@@ -33,7 +33,12 @@ class JikanClient extends SourceClient {
   // timeoutMs (opcional) encurta a espera por esta resposta: usado quando a Jikan é só um complemento (títulos de episódio, S13).
   get(path, { ttlMs = this.searchTtlMs, fresh = false, timeoutMs } = {}) {
     // retries429: 0 => a espera/retentativa é decidida pela fila (o fetchJson não repete por conta própria)
-    return this.cached(path, ttlMs, () => this.fetchJson(`${this.baseUrl}${path}`, { retries429: 0, ...(timeoutMs ? { timeoutMs } : {}) }), { fresh });
+    return this.cached(
+      path,
+      ttlMs,
+      () => this.fetchJson(`${this.baseUrl}${path}`, { retries429: 0, ...(timeoutMs ? { timeoutMs } : {}) }),
+      { fresh }
+    );
   }
 
   // --- Endpoints ------------------------------------------------------------------------------
@@ -79,7 +84,10 @@ class JikanClient extends SourceClient {
     let truncated = false;
 
     while (queue.length) {
-      if (nodes.size >= maxNodes) { truncated = true; break; }
+      if (nodes.size >= maxNodes) {
+        truncated = true;
+        break;
+      }
       const id = queue.shift();
       let full;
       try {

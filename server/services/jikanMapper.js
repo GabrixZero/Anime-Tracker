@@ -42,7 +42,9 @@ function seasonLabel(a) {
 
 function altTitles(a, exclude = []) {
   const raw = [
-    a.title, a.title_english, a.title_japanese,
+    a.title,
+    a.title_english,
+    a.title_japanese,
     ...(Array.isArray(a.titles) ? a.titles.map(t => t && t.title) : []),
     ...(Array.isArray(a.title_synonyms) ? a.title_synonyms : [])
   ];
@@ -88,8 +90,8 @@ function mapAnimeSearchEntry(a) {
   return {
     ...mapAnimeBase(a),
     isExternal: true,
-    anime_kind: KIND_PT[a.type] || '',           // '' = série de TV normal
-    season_label: seasonLabel(a),                // "Outono 2023" (temporada/cour de exibição)
+    anime_kind: KIND_PT[a.type] || '', // '' = série de TV normal
+    season_label: seasonLabel(a), // "Outono 2023" (temporada/cour de exibição)
     episode_count: Number.isInteger(a.episodes) && a.episodes > 0 ? a.episodes : null
   };
 }
@@ -97,14 +99,16 @@ function mapAnimeSearchEntry(a) {
 function episodesFor(full, list) {
   const defaultRuntime = parseDurationMin(full.duration);
   if (full.type === 'Movie') {
-    return [{
-      episode_number: 1,
-      name: stripHtml(full.title_english || full.title, 300) || 'Filme',
-      runtime: defaultRuntime,
-      air_date: isoDate(full.aired && full.aired.from),
-      overview: '',
-      still_path: null
-    }];
+    return [
+      {
+        episode_number: 1,
+        name: stripHtml(full.title_english || full.title, 300) || 'Filme',
+        runtime: defaultRuntime,
+        air_date: isoDate(full.aired && full.aired.from),
+        overview: '',
+        still_path: null
+      }
+    ];
   }
   const byNumber = new Map();
   for (const ep of Array.isArray(list) ? list : []) {
@@ -174,7 +178,7 @@ function buildAnimeWork(numId, requestedMalId, franchise) {
     mal_id: requestedMalId,
     mal_ids: [...new Set(franchise.visited)],
     alt_titles: alt.length ? alt : base.alt_titles,
-    status: airing ? 'Em Exibição' : (kept.length && kept.every(f => f.status === 'Finished Airing') ? 'Finalizada' : base.status),
+    status: airing ? 'Em Exibição' : kept.length && kept.every(f => f.status === 'Finished Airing') ? 'Finalizada' : base.status,
     seasons,
     franchise: { entries, truncated: Boolean(franchise.truncated) }
   };

@@ -20,14 +20,14 @@
   const IDS = Object.freeze(LIST.map(e => e.id));
   const BY_ID = new Map(LIST.map(e => [e.id, e]));
 
-  const isEmotion = (id) => typeof id === 'string' && BY_ID.has(id);
-  const get = (id) => (isEmotion(id) ? BY_ID.get(id) : null);
+  const isEmotion = id => typeof id === 'string' && BY_ID.has(id);
+  const get = id => (isEmotion(id) ? BY_ID.get(id) : null);
 
   // "Adorei" (id desconhecido, ex.: dado vindo de um backup antigo, devolve o próprio texto).
-  const label = (id) => (isEmotion(id) ? BY_ID.get(id).label : (id == null ? '' : String(id)));
+  const label = id => (isEmotion(id) ? BY_ID.get(id).label : id == null ? '' : String(id));
 
   // "😍 Adorei"
-  const withIcon = (id) => (isEmotion(id) ? `${BY_ID.get(id).icon} ${BY_ID.get(id).label}` : label(id));
+  const withIcon = id => (isEmotion(id) ? `${BY_ID.get(id).icon} ${BY_ID.get(id).label}` : label(id));
 
   // { awesome: 0, fun: 0, ... } para contagens (estatísticas)
   const emptyCounts = () => Object.fromEntries(IDS.map(id => [id, 0]));

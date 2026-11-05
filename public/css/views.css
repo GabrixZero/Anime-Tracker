@@ -6,9 +6,15 @@
    ================================================================ */
 
 /* ---------- Estados vazios e mensagens de grade ---------- */
-.empty-icon { margin-bottom: 1rem; }
-.empty-icon--success { color: var(--accent-emerald); }
-.empty-icon--muted { color: var(--text-muted); }
+.empty-icon {
+  margin-bottom: 1rem;
+}
+.empty-icon--success {
+  color: var(--accent-emerald);
+}
+.empty-icon--muted {
+  color: var(--text-muted);
+}
 
 .empty-title {
   font-family: var(--font-display);
@@ -28,7 +34,9 @@
   margin-right: auto;
 }
 
-.empty-state .empty-text:last-child { margin-bottom: 0; }
+.empty-state .empty-text:last-child {
+  margin-bottom: 0;
+}
 
 .grid-message {
   grid-column: 1 / -1;
@@ -37,10 +45,17 @@
   color: var(--text-muted);
 }
 
-.grid-message--error { color: var(--accent-rose); }
-.grid-message--info { color: var(--text-secondary); }
+.grid-message--error {
+  color: var(--accent-rose);
+}
+.grid-message--info {
+  color: var(--text-secondary);
+}
 
-.muted { color: var(--text-muted); font-size: 0.9rem; }
+.muted {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
 
 /* ---------- Campos de texto reutilizáveis ---------- */
 .input-field {
@@ -54,7 +69,128 @@
   transition: border-color var(--transition-fast);
 }
 
-.input-field:focus { border-color: var(--tvtime-yellow); }
+.input-field:focus {
+  border-color: var(--tvtime-yellow);
+}
+
+/* ---------- Agenda (S15) ---------- */
+.calendar-notice {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+}
+
+.calendar-notice.hidden {
+  display: none;
+}
+
+.calendar-day {
+  margin-bottom: 1.5rem;
+}
+
+.calendar-day-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--bg-card-border);
+}
+
+.calendar-day-title--today {
+  color: var(--tvtime-yellow);
+}
+
+.calendar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.calendar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-md);
+}
+
+.calendar-item--watched {
+  opacity: 0.8;
+}
+
+.calendar-item-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.calendar-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.calendar-item-show {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tvtime-yellow);
+}
+
+.calendar-item-code {
+  font-size: var(--fs-meta);
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.calendar-item-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.calendar-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0b0c10;
+  background: linear-gradient(135deg, var(--tvtime-yellow), #f59e0b);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.calendar-check:hover {
+  filter: brightness(1.1);
+}
+
+.calendar-check--done {
+  color: var(--accent-emerald);
+  background: transparent;
+  border: 1px solid var(--accent-emerald);
+}
 
 /* ---------- Minha Lista: filtros de status ---------- */
 .filter-pills {
@@ -75,7 +211,10 @@
   border-radius: var(--radius-sm);
 }
 
-.pill-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+.pill-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
 
 /* ---------- Cartões de obra: linha de tipo + ano ---------- */
 .show-info-top {
@@ -86,10 +225,18 @@
   margin-bottom: 0.35rem;
 }
 
-.show-year { font-size: var(--fs-meta); color: var(--text-muted); }
+.show-year {
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
 
-.show-card-actions { margin-top: auto; padding-top: 0.5rem; }
-.show-card-actions .btn { width: 100%; }
+.show-card-actions {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+.show-card-actions .btn {
+  width: 100%;
+}
 
 .next-up-info-top {
   display: flex;
@@ -106,7 +253,10 @@
   align-items: center;
 }
 
-.header-controls .input-field { min-width: 260px; width: auto; }
+.header-controls .input-field {
+  min-width: 260px;
+  width: auto;
+}
 
 .diary-entry-card {
   background: var(--bg-card);
@@ -242,12 +392,22 @@
   color: var(--tvtime-yellow);
 }
 
-.stat-hero-body { min-width: 0; }
+.stat-hero-body {
+  min-width: 0;
+}
 
-.stat-icon { margin-bottom: 0.5rem; }
-.stat-icon--yellow { color: var(--tvtime-yellow); }
-.stat-icon--green { color: var(--accent-emerald); }
-.stat-icon--cyan { color: var(--accent-cyan); }
+.stat-icon {
+  margin-bottom: 0.5rem;
+}
+.stat-icon--yellow {
+  color: var(--tvtime-yellow);
+}
+.stat-icon--green {
+  color: var(--accent-emerald);
+}
+.stat-icon--cyan {
+  color: var(--accent-cyan);
+}
 
 .stat-kicker {
   display: block;
@@ -266,9 +426,15 @@
   color: var(--text-secondary);
 }
 
-.stat-time strong { font-size: 2rem; color: #ffffff; }
+.stat-time strong {
+  font-size: 2rem;
+  color: #ffffff;
+}
 
-.stat-subtext { font-size: 0.85rem; color: var(--text-muted); }
+.stat-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
 
 .stat-number {
   font-family: var(--font-display);
@@ -277,7 +443,11 @@
   color: #ffffff;
 }
 
-.stat-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
 
 .stats-panels {
   display: grid;
@@ -300,7 +470,11 @@
   margin-bottom: 0.2rem;
 }
 
-.stat-panel p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.stat-panel p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
 
 .stat-bar-row {
   display: flex;
@@ -309,7 +483,11 @@
   margin-bottom: 0.85rem;
 }
 
-.stat-bar-icon { font-size: 1.2rem; width: 28px; flex-shrink: 0; }
+.stat-bar-icon {
+  font-size: 1.2rem;
+  width: 28px;
+  flex-shrink: 0;
+}
 
 .stat-bar-label {
   font-size: 0.85rem;
@@ -322,7 +500,9 @@
   white-space: nowrap;
 }
 
-.stat-bar-label--wide { width: 120px; }
+.stat-bar-label--wide {
+  width: 120px;
+}
 
 .stat-bar-track {
   flex: 1;
@@ -333,8 +513,14 @@
   overflow: hidden;
 }
 
-.stat-bar-fill { height: 100%; border-radius: 99px; background: var(--tvtime-yellow); }
-.stat-bar-fill--cyan { background: var(--accent-cyan); }
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--tvtime-yellow);
+}
+.stat-bar-fill--cyan {
+  background: var(--accent-cyan);
+}
 
 .stat-bar-count {
   font-size: var(--fs-meta);
@@ -360,7 +546,10 @@
   margin-bottom: 0.5rem;
 }
 
-.explore-sub { color: var(--text-secondary); margin-bottom: 1.75rem; }
+.explore-sub {
+  color: var(--text-secondary);
+  margin-bottom: 1.75rem;
+}
 
 .search-bar {
   display: flex;
@@ -381,7 +570,9 @@
   color: #ffffff;
 }
 
-.section-title-wrap { margin-bottom: 1.5rem; }
+.section-title-wrap {
+  margin-bottom: 1.5rem;
+}
 
 .section-title {
   font-family: var(--font-display);
@@ -404,9 +595,16 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.modal-container--detail { max-width: 900px; }
-.modal-container--note { max-width: 680px; }
-.modal-container--backup { max-width: 520px; padding: 2rem; }
+.modal-container--detail {
+  max-width: 900px;
+}
+.modal-container--note {
+  max-width: 680px;
+}
+.modal-container--backup {
+  max-width: 520px;
+  padding: 2rem;
+}
 
 /* ---------- Modal de detalhes da obra ---------- */
 .show-modal-header {
@@ -441,8 +639,13 @@
   flex-shrink: 0;
 }
 
-.modal-header-info { flex: 1; min-width: 0; }
-.modal-type-row { margin-bottom: 0.4rem; }
+.modal-header-info {
+  flex: 1;
+  min-width: 0;
+}
+.modal-type-row {
+  margin-bottom: 0.4rem;
+}
 
 .modal-title {
   font-family: var(--font-display);
@@ -471,9 +674,15 @@
   margin-bottom: 1.25rem;
 }
 
-.modal-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
 
-.modal-body { padding: 1.75rem 2.5rem; }
+.modal-body {
+  padding: 1.75rem 2.5rem;
+}
 
 .season-tabs {
   display: flex;
@@ -508,8 +717,15 @@
   border-radius: var(--radius-sm);
 }
 
-.season-summary { font-size: 0.85rem; color: var(--text-secondary); }
-.season-batch-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.season-summary {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.season-batch-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
 
 .episode-row {
   display: flex;
@@ -525,7 +741,9 @@
   contain-intrinsic-size: auto 5.5rem;
 }
 
-.episode-row.watched { border-left: 3px solid var(--tvtime-yellow); }
+.episode-row.watched {
+  border-left: 3px solid var(--tvtime-yellow);
+}
 
 .episode-check {
   width: 28px;
@@ -555,7 +773,10 @@
   flex-shrink: 0;
 }
 
-.episode-info { flex: 1; min-width: 0; }
+.episode-info {
+  flex: 1;
+  min-width: 0;
+}
 
 .episode-code {
   font-size: var(--fs-meta);
@@ -571,7 +792,10 @@
   overflow-wrap: anywhere;
 }
 
-.episode-runtime { font-size: var(--fs-meta); color: var(--text-muted); }
+.episode-runtime {
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
 
 .episode-note-tag {
   display: inline-block;
@@ -595,10 +819,25 @@
   border-radius: var(--radius-sm);
 }
 
-.movie-actions-box h4 { color: #ffffff; font-size: 1.05rem; margin-bottom: 0.25rem; }
-.movie-actions-box p { font-size: 0.88rem; color: var(--text-secondary); }
-.movie-actions-box .movie-quote { color: var(--tvtime-yellow); margin-top: 0.4rem; font-weight: 600; }
-.movie-btn-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.movie-actions-box h3 {
+  color: #ffffff;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+.movie-actions-box p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.movie-actions-box .movie-quote {
+  color: var(--tvtime-yellow);
+  margin-top: 0.4rem;
+  font-weight: 600;
+}
+.movie-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
 
 /* ---------- Modal de anotação ---------- */
 .note-header {
@@ -611,7 +850,9 @@
   gap: 0.75rem 1rem;
 }
 
-.note-header > div:first-child { min-width: 0; }
+.note-header > div:first-child {
+  min-width: 0;
+}
 
 .note-badge {
   display: inline-block;
@@ -631,7 +872,10 @@
   overflow-wrap: anywhere;
 }
 
-.note-show-title { font-size: 0.85rem; color: var(--text-muted); }
+.note-show-title {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
 
 .note-save-status {
   display: flex;
@@ -646,7 +890,13 @@
   font-weight: 600;
 }
 
-.save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-emerald); flex-shrink: 0; }
+.save-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  flex-shrink: 0;
+}
 
 .note-body {
   padding: 1.75rem 2rem;
@@ -674,7 +924,11 @@
   font-size: 0.9rem;
 }
 
-.note-watched-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--tvtime-yellow); }
+.note-watched-row input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--tvtime-yellow);
+}
 
 .note-label {
   display: block;
@@ -705,7 +959,9 @@
   transition: all var(--transition-fast);
 }
 
-.emotion-btn:hover { border-color: rgba(255, 255, 255, 0.25); }
+.emotion-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
 
 .emotion-btn.active {
   border-color: var(--tvtime-yellow);
@@ -713,8 +969,14 @@
   color: var(--tvtime-yellow);
 }
 
-.emotion-emoji { font-size: 1.5rem; line-height: 1.2; }
-.emotion-label { font-size: var(--fs-meta); margin-top: 0.25rem; }
+.emotion-emoji {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.emotion-label {
+  font-size: var(--fs-meta);
+  margin-top: 0.25rem;
+}
 
 .note-editor {
   background: var(--bg-surface);
@@ -734,8 +996,15 @@
   border-bottom: 1px solid var(--bg-card-border);
 }
 
-.note-toolbar-title { font-size: var(--fs-meta); font-weight: 700; color: var(--text-secondary); }
-.note-toolbar-tools { display: flex; gap: 0.35rem; }
+.note-toolbar-title {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.note-toolbar-tools {
+  display: flex;
+  gap: 0.35rem;
+}
 
 .tool-btn {
   background: transparent;
@@ -749,7 +1018,10 @@
   font-size: 0.85rem;
 }
 
-.tool-btn:hover { color: var(--tvtime-yellow); border-color: rgba(255, 208, 0, 0.4); }
+.tool-btn:hover {
+  color: var(--tvtime-yellow);
+  border-color: rgba(255, 208, 0, 0.4);
+}
 
 .note-textarea {
   display: block;
@@ -793,9 +1065,17 @@
   padding-right: 2.5rem;
 }
 
-.backup-sub { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.75rem; }
+.backup-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.75rem;
+}
 
-.backup-list { display: flex; flex-direction: column; gap: 1.25rem; }
+.backup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
 
 .backup-row {
   background: var(--bg-surface);
@@ -809,11 +1089,27 @@
   gap: 0.75rem 1rem;
 }
 
-.backup-row h4 { color: #ffffff; font-size: 0.95rem; }
-.backup-row p { font-size: var(--fs-meta); color: var(--text-muted); }
-.backup-row label.btn { cursor: pointer; position: relative; }
+.backup-row h4 {
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+.backup-row p {
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
+.backup-row label.btn {
+  cursor: pointer;
+  position: relative;
+}
 /* escondido so visualmente: com display:none o teclado nao alcancaria o seletor de arquivo (S07) */
-.backup-row input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0, 0, 0, 0); }
+.backup-row input[type='file'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
 
 .backup-reset {
   margin-top: 1rem;
@@ -821,7 +1117,11 @@
   border-top: 1px solid rgba(244, 63, 94, 0.2);
 }
 
-.backup-reset h4 { color: var(--accent-rose); font-size: 0.88rem; margin-bottom: 0.5rem; }
+.backup-reset h4 {
+  color: var(--accent-rose);
+  font-size: 0.88rem;
+  margin-bottom: 0.5rem;
+}
 
 /* ================================================================
    S08 · Markdown das anotações, spoiler, histórico de versões e estado vazio
@@ -857,8 +1157,13 @@
 }
 
 /* Texto renderizado (utils/markdown.js): só estas tags/classes existem */
-.diary-text strong { color: #ffffff; font-weight: 800; }
-.diary-text em { font-style: italic; }
+.diary-text strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+.diary-text em {
+  font-style: italic;
+}
 
 .md-quote {
   margin: 0.35rem 0;
@@ -878,12 +1183,18 @@
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
-.md-spoiler * { color: transparent; }
+.md-spoiler * {
+  color: transparent;
+}
 
-.md-spoiler:hover { background: #38405a; }
+.md-spoiler:hover {
+  background: #38405a;
+}
 
 .md-spoiler:focus-visible {
   outline: 2px solid var(--tvtime-yellow);
@@ -897,12 +1208,19 @@
   -webkit-user-select: text;
 }
 
-.md-spoiler.revealed * { color: inherit; }
+.md-spoiler.revealed * {
+  color: inherit;
+}
 
-.md-spoiler.revealed strong { color: #ffffff; }
+.md-spoiler.revealed strong {
+  color: #ffffff;
+}
 
 /* Histórico de versões da anotação */
-.tool-btn--history { color: var(--tvtime-yellow); border-color: rgba(255, 208, 0, 0.3); }
+.tool-btn--history {
+  color: var(--tvtime-yellow);
+  border-color: rgba(255, 208, 0, 0.3);
+}
 
 .note-history {
   border-top: 1px solid var(--bg-card-border);
@@ -921,7 +1239,10 @@
   font-size: 0.88rem;
 }
 
-.note-history-head span { font-size: var(--fs-meta); color: var(--text-muted); }
+.note-history-head span {
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
 
 .note-history-list {
   list-style: none;
@@ -943,111 +1264,395 @@
   border-radius: var(--radius-sm);
 }
 
-.note-history-info { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
-.note-history-when { font-size: var(--fs-meta); font-weight: 700; color: var(--text-secondary); }
-.note-history-text { font-size: 0.88rem; color: var(--text-main); overflow-wrap: anywhere; }
-.note-history-item .btn { flex-shrink: 0; }
+.note-history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.note-history-when {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.note-history-text {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  overflow-wrap: anywhere;
+}
+.note-history-item .btn {
+  flex-shrink: 0;
+}
 
 /* S10 · Larguras das barras de progresso (0-100%). Existem como classes porque `style="width: N%"` é bloqueado pela CSP (sem unsafe-inline). */
 /* Usadas por ViewKit.pctClass() em .show-progress-fill e .stat-bar-fill */
-.pct-0 { width: 0%; }
-.pct-1 { width: 1%; }
-.pct-2 { width: 2%; }
-.pct-3 { width: 3%; }
-.pct-4 { width: 4%; }
-.pct-5 { width: 5%; }
-.pct-6 { width: 6%; }
-.pct-7 { width: 7%; }
-.pct-8 { width: 8%; }
-.pct-9 { width: 9%; }
-.pct-10 { width: 10%; }
-.pct-11 { width: 11%; }
-.pct-12 { width: 12%; }
-.pct-13 { width: 13%; }
-.pct-14 { width: 14%; }
-.pct-15 { width: 15%; }
-.pct-16 { width: 16%; }
-.pct-17 { width: 17%; }
-.pct-18 { width: 18%; }
-.pct-19 { width: 19%; }
-.pct-20 { width: 20%; }
-.pct-21 { width: 21%; }
-.pct-22 { width: 22%; }
-.pct-23 { width: 23%; }
-.pct-24 { width: 24%; }
-.pct-25 { width: 25%; }
-.pct-26 { width: 26%; }
-.pct-27 { width: 27%; }
-.pct-28 { width: 28%; }
-.pct-29 { width: 29%; }
-.pct-30 { width: 30%; }
-.pct-31 { width: 31%; }
-.pct-32 { width: 32%; }
-.pct-33 { width: 33%; }
-.pct-34 { width: 34%; }
-.pct-35 { width: 35%; }
-.pct-36 { width: 36%; }
-.pct-37 { width: 37%; }
-.pct-38 { width: 38%; }
-.pct-39 { width: 39%; }
-.pct-40 { width: 40%; }
-.pct-41 { width: 41%; }
-.pct-42 { width: 42%; }
-.pct-43 { width: 43%; }
-.pct-44 { width: 44%; }
-.pct-45 { width: 45%; }
-.pct-46 { width: 46%; }
-.pct-47 { width: 47%; }
-.pct-48 { width: 48%; }
-.pct-49 { width: 49%; }
-.pct-50 { width: 50%; }
-.pct-51 { width: 51%; }
-.pct-52 { width: 52%; }
-.pct-53 { width: 53%; }
-.pct-54 { width: 54%; }
-.pct-55 { width: 55%; }
-.pct-56 { width: 56%; }
-.pct-57 { width: 57%; }
-.pct-58 { width: 58%; }
-.pct-59 { width: 59%; }
-.pct-60 { width: 60%; }
-.pct-61 { width: 61%; }
-.pct-62 { width: 62%; }
-.pct-63 { width: 63%; }
-.pct-64 { width: 64%; }
-.pct-65 { width: 65%; }
-.pct-66 { width: 66%; }
-.pct-67 { width: 67%; }
-.pct-68 { width: 68%; }
-.pct-69 { width: 69%; }
-.pct-70 { width: 70%; }
-.pct-71 { width: 71%; }
-.pct-72 { width: 72%; }
-.pct-73 { width: 73%; }
-.pct-74 { width: 74%; }
-.pct-75 { width: 75%; }
-.pct-76 { width: 76%; }
-.pct-77 { width: 77%; }
-.pct-78 { width: 78%; }
-.pct-79 { width: 79%; }
-.pct-80 { width: 80%; }
-.pct-81 { width: 81%; }
-.pct-82 { width: 82%; }
-.pct-83 { width: 83%; }
-.pct-84 { width: 84%; }
-.pct-85 { width: 85%; }
-.pct-86 { width: 86%; }
-.pct-87 { width: 87%; }
-.pct-88 { width: 88%; }
-.pct-89 { width: 89%; }
-.pct-90 { width: 90%; }
-.pct-91 { width: 91%; }
-.pct-92 { width: 92%; }
-.pct-93 { width: 93%; }
-.pct-94 { width: 94%; }
-.pct-95 { width: 95%; }
-.pct-96 { width: 96%; }
-.pct-97 { width: 97%; }
-.pct-98 { width: 98%; }
-.pct-99 { width: 99%; }
-.pct-100 { width: 100%; }
+.pct-0 {
+  width: 0%;
+}
+.pct-1 {
+  width: 1%;
+}
+.pct-2 {
+  width: 2%;
+}
+.pct-3 {
+  width: 3%;
+}
+.pct-4 {
+  width: 4%;
+}
+.pct-5 {
+  width: 5%;
+}
+.pct-6 {
+  width: 6%;
+}
+.pct-7 {
+  width: 7%;
+}
+.pct-8 {
+  width: 8%;
+}
+.pct-9 {
+  width: 9%;
+}
+.pct-10 {
+  width: 10%;
+}
+.pct-11 {
+  width: 11%;
+}
+.pct-12 {
+  width: 12%;
+}
+.pct-13 {
+  width: 13%;
+}
+.pct-14 {
+  width: 14%;
+}
+.pct-15 {
+  width: 15%;
+}
+.pct-16 {
+  width: 16%;
+}
+.pct-17 {
+  width: 17%;
+}
+.pct-18 {
+  width: 18%;
+}
+.pct-19 {
+  width: 19%;
+}
+.pct-20 {
+  width: 20%;
+}
+.pct-21 {
+  width: 21%;
+}
+.pct-22 {
+  width: 22%;
+}
+.pct-23 {
+  width: 23%;
+}
+.pct-24 {
+  width: 24%;
+}
+.pct-25 {
+  width: 25%;
+}
+.pct-26 {
+  width: 26%;
+}
+.pct-27 {
+  width: 27%;
+}
+.pct-28 {
+  width: 28%;
+}
+.pct-29 {
+  width: 29%;
+}
+.pct-30 {
+  width: 30%;
+}
+.pct-31 {
+  width: 31%;
+}
+.pct-32 {
+  width: 32%;
+}
+.pct-33 {
+  width: 33%;
+}
+.pct-34 {
+  width: 34%;
+}
+.pct-35 {
+  width: 35%;
+}
+.pct-36 {
+  width: 36%;
+}
+.pct-37 {
+  width: 37%;
+}
+.pct-38 {
+  width: 38%;
+}
+.pct-39 {
+  width: 39%;
+}
+.pct-40 {
+  width: 40%;
+}
+.pct-41 {
+  width: 41%;
+}
+.pct-42 {
+  width: 42%;
+}
+.pct-43 {
+  width: 43%;
+}
+.pct-44 {
+  width: 44%;
+}
+.pct-45 {
+  width: 45%;
+}
+.pct-46 {
+  width: 46%;
+}
+.pct-47 {
+  width: 47%;
+}
+.pct-48 {
+  width: 48%;
+}
+.pct-49 {
+  width: 49%;
+}
+.pct-50 {
+  width: 50%;
+}
+.pct-51 {
+  width: 51%;
+}
+.pct-52 {
+  width: 52%;
+}
+.pct-53 {
+  width: 53%;
+}
+.pct-54 {
+  width: 54%;
+}
+.pct-55 {
+  width: 55%;
+}
+.pct-56 {
+  width: 56%;
+}
+.pct-57 {
+  width: 57%;
+}
+.pct-58 {
+  width: 58%;
+}
+.pct-59 {
+  width: 59%;
+}
+.pct-60 {
+  width: 60%;
+}
+.pct-61 {
+  width: 61%;
+}
+.pct-62 {
+  width: 62%;
+}
+.pct-63 {
+  width: 63%;
+}
+.pct-64 {
+  width: 64%;
+}
+.pct-65 {
+  width: 65%;
+}
+.pct-66 {
+  width: 66%;
+}
+.pct-67 {
+  width: 67%;
+}
+.pct-68 {
+  width: 68%;
+}
+.pct-69 {
+  width: 69%;
+}
+.pct-70 {
+  width: 70%;
+}
+.pct-71 {
+  width: 71%;
+}
+.pct-72 {
+  width: 72%;
+}
+.pct-73 {
+  width: 73%;
+}
+.pct-74 {
+  width: 74%;
+}
+.pct-75 {
+  width: 75%;
+}
+.pct-76 {
+  width: 76%;
+}
+.pct-77 {
+  width: 77%;
+}
+.pct-78 {
+  width: 78%;
+}
+.pct-79 {
+  width: 79%;
+}
+.pct-80 {
+  width: 80%;
+}
+.pct-81 {
+  width: 81%;
+}
+.pct-82 {
+  width: 82%;
+}
+.pct-83 {
+  width: 83%;
+}
+.pct-84 {
+  width: 84%;
+}
+.pct-85 {
+  width: 85%;
+}
+.pct-86 {
+  width: 86%;
+}
+.pct-87 {
+  width: 87%;
+}
+.pct-88 {
+  width: 88%;
+}
+.pct-89 {
+  width: 89%;
+}
+.pct-90 {
+  width: 90%;
+}
+.pct-91 {
+  width: 91%;
+}
+.pct-92 {
+  width: 92%;
+}
+.pct-93 {
+  width: 93%;
+}
+.pct-94 {
+  width: 94%;
+}
+.pct-95 {
+  width: 95%;
+}
+.pct-96 {
+  width: 96%;
+}
+.pct-97 {
+  width: 97%;
+}
+.pct-98 {
+  width: 98%;
+}
+.pct-99 {
+  width: 99%;
+}
+.pct-100 {
+  width: 100%;
+}
+
+/* ---------- Importar histórico (S16) ---------- */
+.import-note,
+.import-hint,
+.import-summary {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+.import-hint {
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
+.import-progress {
+  width: 100%;
+  height: 0.75rem;
+  margin-bottom: 0.75rem;
+  accent-color: var(--accent-rose);
+}
+.import-h {
+  color: #ffffff;
+  font-size: 0.95rem;
+  margin: 1rem 0 0.5rem;
+}
+.import-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.import-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.import-select {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--bg-surface);
+  color: #ffffff;
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+.import-details {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.import-details summary {
+  cursor: pointer;
+}
+.import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.episodes-more {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 0;
+}

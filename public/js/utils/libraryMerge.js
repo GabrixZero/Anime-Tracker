@@ -14,7 +14,7 @@
 
 (function (root) {
   const TOMBSTONE_TTL_MS = 180 * 24 * 60 * 60 * 1000; // marcas mais velhas que isso são descartadas (aparelho offline por mais tempo pode ressuscitar itens)
-  const MAX_SKEW_MS = 5 * 60 * 1000;                  // relógio de aparelho adiantado não "vence para sempre": datas futuras são limitadas a agora + 5 min
+  const MAX_SKEW_MS = 5 * 60 * 1000; // relógio de aparelho adiantado não "vence para sempre": datas futuras são limitadas a agora + 5 min
 
   const isPlainObject = v => v !== null && typeof v === 'object' && !Array.isArray(v);
   const toMs = iso => {
@@ -121,7 +121,7 @@
       const l = lMap.get(key);
       const r = rMap.get(key);
       // item vivo mais novo (empate: o primeiro argumento, local, fica); o horário é medido ANTES de combinar os campos
-      const raw = l && r ? (ctx.t(stamp(r)) > ctx.t(stamp(l)) ? r : l) : (l || r || null);
+      const raw = l && r ? (ctx.t(stamp(r)) > ctx.t(stamp(l)) ? r : l) : l || r || null;
       let winner = raw ? combine(raw, (raw === l ? r : l) || raw) : null;
 
       // Relógio adiantado: um horário depois de "agora + 5 min" é regravado como esse limite (fica fixo no dado salvo),
@@ -164,8 +164,24 @@
       return m;
     };
 
-    const shows = mergeSection(ctx, showsMap(L.trackedShows), showsMap(R.trackedShows), L.tombstones.shows, R.tombstones.shows, showStamp, combineShow);
-    const watched = mergeSection(ctx, L.watchedEpisodes, R.watchedEpisodes, L.tombstones.watched, R.tombstones.watched, watchedStamp, combineWatched);
+    const shows = mergeSection(
+      ctx,
+      showsMap(L.trackedShows),
+      showsMap(R.trackedShows),
+      L.tombstones.shows,
+      R.tombstones.shows,
+      showStamp,
+      combineShow
+    );
+    const watched = mergeSection(
+      ctx,
+      L.watchedEpisodes,
+      R.watchedEpisodes,
+      L.tombstones.watched,
+      R.tombstones.watched,
+      watchedStamp,
+      combineWatched
+    );
     const notes = mergeSection(ctx, L.episodeNotes, R.episodeNotes, L.tombstones.notes, R.tombstones.notes, noteStamp, combineNote);
 
     return {
@@ -194,7 +210,12 @@
     const deleteMark = (liveItem, stampFn) => new Date(Math.max(now, toMs(stampFn(liveItem)) + 1)).toISOString();
     const tombstones = emptyTombstones();
     const sections = [
-      ['shows', Object.fromEntries(C.trackedShows.map(s => [String(s.showId), s])), Object.fromEntries(trackedShows.map(s => [String(s.showId), s])), showStamp],
+      [
+        'shows',
+        Object.fromEntries(C.trackedShows.map(s => [String(s.showId), s])),
+        Object.fromEntries(trackedShows.map(s => [String(s.showId), s])),
+        showStamp
+      ],
       ['watched', C.watchedEpisodes, watchedEpisodes, watchedStamp],
       ['notes', C.episodeNotes, episodeNotes, noteStamp]
     ];
@@ -224,8 +245,17 @@
   }
 
   const api = {
-    TOMBSTONE_TTL_MS, MAX_SKEW_MS, emptyData, emptyTombstones, normalizeData, hasContent,
-    cleanStamp, cleanTombstones, merge, replaceWith, decideLogin
+    TOMBSTONE_TTL_MS,
+    MAX_SKEW_MS,
+    emptyData,
+    emptyTombstones,
+    normalizeData,
+    hasContent,
+    cleanStamp,
+    cleanTombstones,
+    merge,
+    replaceWith,
+    decideLogin
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root) root.LibraryMerge = api;

@@ -18,12 +18,14 @@ function token(css, name) {
   return m[1];
 }
 function luminance(hex) {
-  const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+  const c = [1, 3, 5]
+    .map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
     .map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
   return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 }
 function ratio(a, b) {
-  const x = luminance(a), y = luminance(b);
+  const x = luminance(a),
+    y = luminance(b);
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 
@@ -79,12 +81,19 @@ test('os 4 modais têm role=dialog, aria-modal e aria-labelledby apontando para 
     // o rótulo pode ser criado por script (título da obra no modal de detalhes)
     if (modal !== 'modal-show-detail') assert.ok(ids.has(m[1]), `${modal}: aria-labelledby="${m[1]}" não existe`);
   }
-  assert.ok(/id="detail-modal-title"/.test(read('js', 'views', 'detailModalView.js')), 'o título do modal de detalhes precisa do id detail-modal-title');
+  assert.ok(
+    /id="detail-modal-title"/.test(read('js', 'views', 'detailModalView.js')),
+    'o título do modal de detalhes precisa do id detail-modal-title'
+  );
 });
 
 test('todo botão só de ícone/símbolo tem aria-label e todo <img> estático tem alt', () => {
   for (const m of html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) {
-    const text = m[2].replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<span[^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/span>/g, '').replace(/<[^>]+>/g, '').trim();
+    const text = m[2]
+      .replace(/<svg[\s\S]*?<\/svg>/g, '')
+      .replace(/<span[^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/span>/g, '')
+      .replace(/<[^>]+>/g, '')
+      .trim();
     assert.ok(text || /aria-label="[^"]+"/.test(m[1]), `botão sem nome acessível: <button${m[1]}>`);
   }
   for (const m of html.matchAll(/<img\b[^>]*>/g)) assert.ok(/\salt="/.test(m[0]), `img sem alt: ${m[0]}`);
@@ -93,7 +102,7 @@ test('todo botão só de ícone/símbolo tem aria-label e todo <img> estático t
 test('navegação principal usa o padrão de abas (tablist/tab/tabpanel) e cada aba aponta para um painel', () => {
   assert.ok(/<nav[^>]*role="tablist"/.test(html));
   const tabs = [...html.matchAll(/<button[^>]*data-tab="([a-z-]+)"[^>]*>/g)];
-  assert.equal(tabs.length, 5);
+  assert.equal(tabs.length, 6);
   for (const [tag, name] of tabs) {
     assert.ok(/role="tab"/.test(tag) && /aria-selected="(true|false)"/.test(tag), `aba ${name} sem role/aria-selected`);
     assert.ok(new RegExp(`id="view-${name}"[^>]*role="tabpanel"`).test(html), `painel view-${name} sem role="tabpanel"`);
@@ -157,19 +166,42 @@ class FakeEl {
     this.attrs = new Map();
     this.classes = new Set(cls);
     this.classList = {
-      add: c => this.classes.add(c), remove: c => this.classes.delete(c),
+      add: c => this.classes.add(c),
+      remove: c => this.classes.delete(c),
       contains: c => this.classes.has(c)
     };
   }
-  append(...kids) { kids.forEach(k => { k.parentElement = this; this.children.push(k); }); return this; }
-  setAttribute(k, v) { this.attrs.set(k, String(v)); }
-  getAttribute(k) { return this.attrs.has(k) ? this.attrs.get(k) : null; }
-  hasAttribute(k) { return this.attrs.has(k); }
-  removeAttribute(k) { this.attrs.delete(k); }
-  descendants() { return this.children.flatMap(c => [c, ...c.descendants()]); }
-  contains(el) { return el === this || this.descendants().includes(el); }
-  get isConnected() { return this.doc.root.contains(this); }
-  querySelectorAll(sel) { return sel === FOCUSABLE ? this.descendants().filter(e => e.focusable && !e.hiddenByClass()) : []; }
+  append(...kids) {
+    kids.forEach(k => {
+      k.parentElement = this;
+      this.children.push(k);
+    });
+    return this;
+  }
+  setAttribute(k, v) {
+    this.attrs.set(k, String(v));
+  }
+  getAttribute(k) {
+    return this.attrs.has(k) ? this.attrs.get(k) : null;
+  }
+  hasAttribute(k) {
+    return this.attrs.has(k);
+  }
+  removeAttribute(k) {
+    this.attrs.delete(k);
+  }
+  descendants() {
+    return this.children.flatMap(c => [c, ...c.descendants()]);
+  }
+  contains(el) {
+    return el === this || this.descendants().includes(el);
+  }
+  get isConnected() {
+    return this.doc.root.contains(this);
+  }
+  querySelectorAll(sel) {
+    return sel === FOCUSABLE ? this.descendants().filter(e => e.focusable && !e.hiddenByClass()) : [];
+  }
   querySelector(sel) {
     const all = this.descendants();
     if (sel.startsWith('#')) return all.find(e => e.id === sel.slice(1)) || null;
@@ -177,8 +209,13 @@ class FakeEl {
     if (sel.startsWith('[data-focus-key="')) return all.find(e => e.getAttribute('data-focus-key') === sel.slice(17, -2)) || null;
     return null;
   }
-  hiddenByClass() { for (let e = this; e; e = e.parentElement) if (e.classes.has('hidden')) return true; return false; }
-  getClientRects() { return this.hiddenByClass() ? [] : [1]; }
+  hiddenByClass() {
+    for (let e = this; e; e = e.parentElement) if (e.classes.has('hidden')) return true;
+    return false;
+  }
+  getClientRects() {
+    return this.hiddenByClass() ? [] : [1];
+  }
   focus() {
     if (this.hiddenByClass() || this.hasAttribute('inert')) return;
     this.doc.activeElement = this;
@@ -188,8 +225,12 @@ class FakeEl {
 
 function buildPage() {
   const doc = { listeners: {}, activeElement: null };
-  doc.addEventListener = (t, fn) => { (doc.listeners[t] = doc.listeners[t] || []).push(fn); };
-  doc.dispatch = (t, ev) => { (doc.listeners[t] || []).forEach(fn => fn(ev)); };
+  doc.addEventListener = (t, fn) => {
+    (doc.listeners[t] = doc.listeners[t] || []).push(fn);
+  };
+  doc.dispatch = (t, ev) => {
+    (doc.listeners[t] || []).forEach(fn => fn(ev));
+  };
   doc.contains = el => doc.root.contains(el);
   doc.querySelector = sel => doc.root.querySelector(sel);
   const mk = (tag, o) => new FakeEl(doc, tag, o);
@@ -218,7 +259,15 @@ function buildPage() {
   overlay2.append(box2);
   app.append(header, toasts, overlay, overlay2);
   const key = (k, extra = {}) => {
-    const ev = { key: k, shiftKey: false, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, ...extra };
+    const ev = {
+      key: k,
+      shiftKey: false,
+      defaultPrevented: false,
+      preventDefault() {
+        this.defaultPrevented = true;
+      },
+      ...extra
+    };
     doc.dispatch('keydown', ev);
     return ev;
   };

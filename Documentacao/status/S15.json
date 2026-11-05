@@ -2,9 +2,9 @@
   "secao": "S15",
   "titulo": "Calendário de lançamentos",
   "arquivo": "Documentacao/secoes/S15-calendario.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s15-calendario",
+  "concluidaEm": "2026-11-04",
   "commit": "",
-  "notas": ""
+  "notas": "Aba Agenda no cliente (semana/7/30 dias), atualizacao ao abrir, testes unitarios e e2e."
 }

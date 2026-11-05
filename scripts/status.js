@@ -19,7 +19,13 @@ const noFetch = args.includes('--no-fetch');
 const target = (args.find(a => /^S\d{2}$/i.test(a)) || '').toUpperCase();
 
 const git = (...a) => execFileSync('git', a, { cwd: root, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'pipe'] });
-const tryGit = (...a) => { try { return git(...a); } catch { return null; } };
+const tryGit = (...a) => {
+  try {
+    return git(...a);
+  } catch {
+    return null;
+  }
+};
 
 if (!noFetch) {
   if (tryGit('fetch', '--prune', 'origin') === null) {
@@ -39,7 +45,9 @@ function lerStatus(id) {
 }
 
 const branches = (tryGit('branch', '-r', '--list', 'origin/feature/s*') || '')
-  .split('\n').map(s => s.trim()).filter(Boolean);
+  .split('\n')
+  .map(s => s.trim())
+  .filter(Boolean);
 const emAndamento = {};
 for (const b of branches) {
   const m = /^origin\/feature\/s(\d{2})-/i.exec(b);
@@ -97,17 +105,24 @@ if (i.estado === 'concluida') {
   process.exit(3);
 }
 if (i.estado === 'em andamento') {
-  console.log(`${target} já está EM ANDAMENTO na branch ${i.branchAtiva}. Outra sessão a pegou; confirme com o Gabriel antes de continuar.`);
+  console.log(
+    `${target} já está EM ANDAMENTO na branch ${i.branchAtiva}. Outra sessão a pegou; confirme com o Gabriel antes de continuar.`
+  );
   process.exit(3);
 }
 if (faltam.length) {
   console.log(`${target} está BLOQUEADA: aguardando ${faltam.join(', ')} chegar(em) ao main.`);
-  for (const d of faltam) console.log(`  - ${d} (${info[d].titulo}): ${info[d].estado}${info[d].branchAtiva ? ` · ${info[d].branchAtiva}` : ''}`);
+  for (const d of faltam)
+    console.log(`  - ${d} (${info[d].titulo}): ${info[d].estado}${info[d].branchAtiva ? ` · ${info[d].branchAtiva}` : ''}`);
   console.log('Avise o Gabriel e PARE. Quando as dependências estiverem concluídas ele te chama de novo.');
   process.exit(2);
 }
 console.log(`${target} PODE INICIAR (${i.titulo}).`);
-if (avisos.length) console.log(`Atenção: é recomendado que ${avisos.join(', ')} esteja(m) concluída(s) antes; verifique conflitos de arquivo.`);
+if (avisos.length)
+  console.log(`Atenção: é recomendado que ${avisos.join(', ')} esteja(m) concluída(s) antes; verifique conflitos de arquivo.`);
 const paralelas = ids.filter(id => id !== target && info[id].estado === 'em andamento');
-if (paralelas.length) console.log(`Em paralelo agora: ${paralelas.map(id => `${id} (${info[id].branchAtiva})`).join(', ')} — evite os mesmos arquivos e faça merge de origin/develop antes do push.`);
+if (paralelas.length)
+  console.log(
+    `Em paralelo agora: ${paralelas.map(id => `${id} (${info[id].branchAtiva})`).join(', ')} — evite os mesmos arquivos e faça merge de origin/develop antes do push.`
+  );
 process.exit(0);

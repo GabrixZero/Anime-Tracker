@@ -10,14 +10,14 @@ const SourceBreaker = require('../utils/sourceBreaker');
 const { mediaErrors, MediaError } = require('../utils/errors');
 
 const BASE_DEFAULTS = {
-  minIntervalMs: 400,        // espaço mínimo entre dois pedidos
-  perMinute: 50,             // teto por minuto
-  maxQueue: 40,              // pedidos esperando na fila; acima disso responde "tente de novo" em vez de acumular
-  maxWaitMs: 25000,          // quanto um pedido aceita esperar na fila antes de desistir (RATE_LIMITED)
-  retries: 2,                // novas tentativas em 429/5xx (além da primeira)
-  backoffMs: 1000,           // espera inicial entre tentativas (dobra a cada uma, respeitando Retry-After)
-  breakerCooldownMs: 60000,  // fonte fora do ar: quanto tempo os pedidos falham na hora (0 desliga o disjuntor)
-  breakerThreshold: 3,       // falhas seguidas (que não sejam "inalcançável") para abrir o disjuntor
+  minIntervalMs: 400, // espaço mínimo entre dois pedidos
+  perMinute: 50, // teto por minuto
+  maxQueue: 40, // pedidos esperando na fila; acima disso responde "tente de novo" em vez de acumular
+  maxWaitMs: 25000, // quanto um pedido aceita esperar na fila antes de desistir (RATE_LIMITED)
+  retries: 2, // novas tentativas em 429/5xx (além da primeira)
+  backoffMs: 1000, // espera inicial entre tentativas (dobra a cada uma, respeitando Retry-After)
+  breakerCooldownMs: 60000, // fonte fora do ar: quanto tempo os pedidos falham na hora (0 desliga o disjuntor)
+  breakerThreshold: 3, // falhas seguidas (que não sejam "inalcançável") para abrir o disjuntor
   pauseOnRateLimit: false
 };
 
@@ -30,13 +30,13 @@ class SourceClient {
     this.now = now || Date.now;
     this.sleep = sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
     this.cache = new TtlCache({ max: cacheMax, now: this.now });
-    this.inflight = new Map();   // mesma chave pedida ao mesmo tempo = uma única requisição
+    this.inflight = new Map(); // mesma chave pedida ao mesmo tempo = uma única requisição
     this.tail = Promise.resolve();
     this.pending = 0;
     this.lastAt = 0;
     this.stamps = [];
     this.pauseUntil = 0;
-    this.requestCount = 0;       // quantas requisições reais foram feitas (diagnóstico e testes)
+    this.requestCount = 0; // quantas requisições reais foram feitas (diagnóstico e testes)
     this.breaker = new SourceBreaker({ name, label, cooldownMs: this.breakerCooldownMs, threshold: this.breakerThreshold, now: this.now });
   }
 
@@ -75,12 +75,14 @@ class SourceClient {
     }
     this.breaker.check();
 
-    const promise = this._withRetry(perform).then((data) => {
-      this.cache.set(key, data);
-      return data;
-    }).finally(() => {
-      if (this.inflight.get(key) === promise) this.inflight.delete(key);
-    });
+    const promise = this._withRetry(perform)
+      .then(data => {
+        this.cache.set(key, data);
+        return data;
+      })
+      .finally(() => {
+        if (this.inflight.get(key) === promise) this.inflight.delete(key);
+      });
     this.inflight.set(key, promise);
     return promise;
   }

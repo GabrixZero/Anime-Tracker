@@ -1,0 +1,6 @@
+series_name,season_number,episode_number,created_at,movie_name
+Serie Ficticia,1,1,2024-02-01 20:00:00,
+Serie Ficticia,1,2,2024-02-02 20:00:00,
+"Serie, com virgula",2,3,2024-03-01,
+,,,2024-04-01,Filme Ficticio
+Serie Ficticia,x,y,2024-02-01,

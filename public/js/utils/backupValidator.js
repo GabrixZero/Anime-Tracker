@@ -16,6 +16,9 @@
   // libraryMerge.js (carregado antes de qualquer uso): navegador = window.LibraryMerge; Node = require.
   const merge = () => (typeof module !== 'undefined' && module.exports ? require('./libraryMerge') : root.LibraryMerge);
 
+  // rating.js (carregado antes de qualquer uso): mesma regra da nota do servidor.
+  const rating = () => (typeof module !== 'undefined' && module.exports ? require('./rating') : root.Rating);
+
   // Retorna uma cópia saneada {trackedShows, watchedEpisodes, episodeNotes, tombstones, resetAt} ou lança Error com mensagem em português.
   function validateBackup(payload) {
     if (!isPlainObject(payload)) throw new Error('Backup inválido.');
@@ -24,9 +27,7 @@
     if (!Array.isArray(trackedShows) || !isPlainObject(watchedEpisodes) || !isPlainObject(episodeNotes)) {
       throw new Error('Backup inválido: faltam trackedShows, watchedEpisodes ou episodeNotes.');
     }
-    if (trackedShows.length > MAX_SHOWS
-      || Object.keys(watchedEpisodes).length > MAX_KEYS
-      || Object.keys(episodeNotes).length > MAX_KEYS) {
+    if (trackedShows.length > MAX_SHOWS || Object.keys(watchedEpisodes).length > MAX_KEYS || Object.keys(episodeNotes).length > MAX_KEYS) {
       throw new Error('Backup grande demais.');
     }
 
@@ -40,6 +41,12 @@
       const show = { showId: t.showId, status: str(t.status, 30), addedAt: str(t.addedAt, 40) };
       const updatedAt = merge().cleanStamp(t.updatedAt);
       if (updatedAt) show.updatedAt = updatedAt;
+      // Nota pessoal (S17): mesma regra do servidor (0 a 10, uma casa decimal; ausente/null = sem nota; inválida = rejeita)
+      if (!rating().isEmptyRating(t.rating)) {
+        const value = rating().normalizeRating(t.rating);
+        if (value === null) throw new Error('Backup inválido: nota incorreta em trackedShows (use 0 a 10 com no máximo uma casa decimal).');
+        show.rating = value;
+      }
       cleanShows.push(show);
     }
 
@@ -64,13 +71,13 @@
         emotion: typeof n.emotion === 'string' ? n.emotion.slice(0, 40) : null,
         character: str(n.character, 200),
         updatedAt: str(n.updatedAt, 40),
-        snapshots: snapshots
-          .filter(isPlainObject)
-          .map(s => ({ text: str(s.text, MAX_TEXT), updatedAt: str(s.updatedAt, 40) }))
+        snapshots: snapshots.filter(isPlainObject).map(s => ({ text: str(s.text, MAX_TEXT), updatedAt: str(s.updatedAt, 40) }))
       };
     }
 
-    const fail = () => { throw new Error('Backup inválido: item incorreto em tombstones.'); };
+    const fail = () => {
+      throw new Error('Backup inválido: item incorreto em tombstones.');
+    };
     const tombstones = merge().cleanTombstones(payload.tombstones, fail);
     const resetAt = merge().cleanStamp(payload.resetAt);
 

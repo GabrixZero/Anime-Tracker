@@ -74,7 +74,7 @@ class DetailModalView {
     if (historyBtn) historyBtn.addEventListener('click', () => this.toggleHistory());
     const historyList = document.getElementById('note-history-list');
     if (historyList) {
-      historyList.addEventListener('click', (e) => {
+      historyList.addEventListener('click', e => {
         const btn = e.target.closest ? e.target.closest('[data-restore]') : null;
         if (btn) this.restoreVersion(Number(btn.getAttribute('data-restore')));
       });
@@ -115,8 +115,14 @@ class DetailModalView {
     const token = ++this.detailToken;
     await window.appController.ensureDetails([showId]);
     if (token !== this.detailToken || !this.isOpenFor(showId)) return; // abriu outra obra / fechou enquanto carregava
-    if (window.appState.hasDetail(showId)) this.open(showId);
-    else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
+    if (window.appState.hasDetail(showId)) {
+      const keepSeason = this.currentSeasonNum; // veio do resumo: reabre na mesma temporada
+      this.open(showId);
+      const media = window.appState.getMedia(showId);
+      if (keepSeason !== this.currentSeasonNum && media.seasons.some(s => s.season_number === keepSeason)) this.switchSeason(keepSeason);
+    } else if (window.appState.hasEpisodes(showId)) {
+      // o detalhe completo falhou, mas o resumo já mostra os episódios: segue com ele
+    } else this.renderNoEpisodes('Não foi possível carregar os episódios desta obra agora. Feche e abra de novo para tentar outra vez.');
   }
 
   // Sem episódios para mostrar (carregando, erro ou obra que ainda não foi adicionada): limpa abas e lista antigas.
@@ -142,11 +148,15 @@ class DetailModalView {
     header.style.backgroundImage = cssUrl(safeUrl(media.backdrop_path) || media.poster_path);
     // S08: nada de nota/gênero/ano inventados; o que a fonte não informa aparece como "Sem nota"/"Sem gênero" ou some
     const metaParts = [
-      MD.hasRating(media.vote_average) ? `<span>★ <strong>${escapeHtml(Number(media.vote_average).toFixed(1))}</strong></span>` : '<span>Sem nota</span>',
+      MD.hasRating(media.vote_average)
+        ? `<span>★ <strong>${escapeHtml(Number(media.vote_average).toFixed(1))}</strong></span>`
+        : '<span>Sem nota</span>',
       MD.yearText(media.first_air_date) ? `<span>${escapeHtml(MD.yearText(media.first_air_date))}</span>` : '',
       `<span>${escapeHtml(MD.genresText(media.genres))}</span>`,
       MD.runtimeText(media.runtime) ? `<span>${escapeHtml(MD.runtimeText(media.runtime))}</span>` : ''
-    ].filter(Boolean).join('<span>•</span>');
+    ]
+      .filter(Boolean)
+      .join('<span>•</span>');
     header.innerHTML = `
       <img class="modal-poster" ${window.ViewKit.imgAttrs(media.poster_path, 'poster')} alt="Pôster de ${escapeHtml(media.name)}">
       <div class="modal-header-info">
@@ -154,17 +164,23 @@ class DetailModalView {
         <h2 class="modal-title" id="detail-modal-title">${escapeHtml(media.name)}</h2>
         <div class="modal-meta">${metaParts}</div>
         <p class="modal-synopsis">${escapeHtml(media.overview || 'Sem sinopse.')}</p>
+        <p class="rating-catalog-line">${window.Rating.catalogRatingHtml(MD.ratingBadge(media.vote_average))}</p>
         
         <div class="modal-actions">
-          ${tracked ? `
+          ${
+            tracked
+              ? `
             <button type="button" class="btn btn-sm btn-secondary" data-focus-key="detail:primary" data-action="remove-from-list" data-show="${toInt(media.id)}">Remover da Lista</button>
             <label class="status-picker">
               <span class="status-picker-label">Status</span>
               <select class="status-select" id="detail-status-select" aria-label="Status da obra" data-change-action="set-status" data-show="${toInt(media.id)}">${window.WatchStatus.statusOptionsHtml(window.appState.getStatus(tracked))}</select>
             </label>
-          ` : `
+            ${window.Rating.ratingControlHtml({ showId: media.id, name: media.name, rating: tracked.rating, idPrefix: 'detail-rating' })}
+          `
+              : `
             <button type="button" class="btn btn-sm btn-primary" data-focus-key="detail:primary" data-action="add-to-list" data-show="${toInt(media.id)}">+ Adicionar à Lista</button>
-          `}
+          `
+          }
         </div>
       </div>
     `;
@@ -180,10 +196,12 @@ class DetailModalView {
       movieBody.innerHTML = `
         <div class="movie-actions-box">
           <div>
-            <h4>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h4>
-            <p>${window.MediaDisplay.knownRuntime(media.runtime)
-              ? `Duração: ${escapeHtml(window.MediaDisplay.knownRuntime(media.runtime))} minutos, contados nas estatísticas ao marcar.`
-              : 'Duração não informada pela fonte; as estatísticas usam 120 min como estimativa.'}</p>
+            <h3>${isWatched ? '✓ Filme Assistido no Seu Diário' : 'Filme Pendente para Assistir'}</h3>
+            <p>${
+              window.MediaDisplay.knownRuntime(media.runtime)
+                ? `Duração: ${escapeHtml(window.MediaDisplay.knownRuntime(media.runtime))} minutos, contados nas estatísticas ao marcar.`
+                : 'Duração não informada pela fonte; as estatísticas usam 120 min como estimativa.'
+            }</p>
             ${hasNote ? `<p class="movie-quote">"${escapeHtml(this.notePreview(note.text, 75))}"</p>` : ''}
           </div>
 
@@ -203,7 +221,9 @@ class DetailModalView {
 
       if (!Array.isArray(media.seasons)) {
         // lista leve (episódios a caminho) ou resultado de busca externo (sem episódios até a obra ser adicionada)
-        this.renderNoEpisodes(media.isExternal ? 'Os episódios aparecem depois que a obra é adicionada à lista.' : 'Carregando episódios...');
+        this.renderNoEpisodes(
+          media.isExternal ? 'Os episódios aparecem depois que a obra é adicionada à lista.' : 'Carregando episódios...'
+        );
       } else {
         const seasons = media.seasons;
         this.currentSeasonNum = seasons.length > 0 ? seasons[0].season_number : 1;
@@ -214,6 +234,16 @@ class DetailModalView {
 
     this.detailModal.classList.remove('hidden');
     if (!window.appState.hasDetail(media.id) && !media.isExternal) this.loadDetail(media.id);
+  }
+
+  // Mantém o campo de nota do modal igual ao estado (valor normalizado, "Remover nota" só com nota), sem redesenhar (o foco fica).
+  refreshRating() {
+    const input = document.getElementById(`detail-rating-${this.currentShowId}`);
+    if (!input || this.currentShowId === null) return;
+    const rating = window.appState.getRating(this.currentShowId);
+    input.value = window.Rating.formatUserRating(rating);
+    const clear = input.parentNode ? input.parentNode.querySelector('[data-action="clear-rating"]') : null;
+    if (clear) clear.disabled = rating === null;
   }
 
   // Mantém o seletor de status do modal igual ao estado (ex.: virou "Finalizado" ao marcar o último episódio).
@@ -231,20 +261,22 @@ class DetailModalView {
     if (!media || !media.seasons) return;
 
     const bar = document.getElementById('show-seasons-tabs');
-    bar.innerHTML = media.seasons.map(s => {
-      return `
+    bar.innerHTML = media.seasons
+      .map(s => {
+        return `
         <button type="button" class="season-tab-btn ${s.season_number === this.currentSeasonNum ? 'active' : ''}" id="season-tab-${toInt(s.season_number)}" data-focus-key="season:${toInt(s.season_number)}:tab" role="tab" aria-selected="${s.season_number === this.currentSeasonNum}" tabindex="${s.season_number === this.currentSeasonNum ? 0 : -1}" aria-controls="show-episodes-container"
                 data-action="switch-season" data-season="${toInt(s.season_number)}">
           ${escapeHtml(this.seasonTabLabel(media, s))}
         </button>
       `;
-    }).join('');
+      })
+      .join('');
   }
 
   // "Temporada 1 (3/12)": nome da temporada e episódios assistidos.
   seasonTabLabel(media, season) {
     let watched = 0;
-    (season.episodes || []).forEach((ep) => {
+    (season.episodes || []).forEach(ep => {
       if (window.appState.isWatched(media.id, season.season_number, ep.episode_number)) watched++;
     });
     const total = season.episodes ? season.episodes.length : 0;
@@ -268,7 +300,9 @@ class DetailModalView {
     const media = window.appState.getMedia(this.currentShowId);
     if (!media || !Array.isArray(media.seasons)) return;
     const rows = document.getElementById('show-episodes-container').querySelectorAll('[data-ep]');
-    rows.forEach(row => this.paintRow(row, window.appState.isWatched(media.id, this.currentSeasonNum, Number(row.getAttribute('data-ep')))));
+    rows.forEach(row =>
+      this.paintRow(row, window.appState.isWatched(media.id, this.currentSeasonNum, Number(row.getAttribute('data-ep'))))
+    );
     this.updateSeasonCounts(media);
   }
 
@@ -290,7 +324,8 @@ class DetailModalView {
     const episodes = season.episodes || [];
     if (episodes.length > 0) {
       const watched = episodes.filter(ep => window.appState.isWatched(media.id, season.season_number, ep.episode_number)).length;
-      document.getElementById('season-stats-summary').innerHTML = `Progresso da Temporada: <strong>${watched}/${episodes.length} assistidos</strong>`;
+      document.getElementById('season-stats-summary').innerHTML =
+        `Progresso da Temporada: <strong>${watched}/${episodes.length} assistidos</strong>`;
     }
   }
 
@@ -322,13 +357,60 @@ class DetailModalView {
 
     summary.innerHTML = `Progresso da Temporada: <strong>${watched}/${season.episodes.length} assistidos</strong>`;
 
+    // S18: com centenas de episódios só as primeiras linhas existem; o resto é desenhado aos poucos (rolagem ou botão).
+    this.renderedEpisodes = 0;
+    this.renderToken = (this.renderToken || 0) + 1;
+    container.innerHTML = '';
+    this.renderMoreEpisodes(media, season, DetailModalView.EP_CHUNK);
+  }
 
-    container.innerHTML = season.episodes.map(ep => {
-      const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
-      const note = window.appState.getNote(media.id, season.season_number, ep.episode_number);
-      const hasNote = note && note.text && note.text.trim();
+  // Desenha mais `count` linhas depois das já existentes; se ainda sobrar, põe o botão "Mostrar mais" (acessível por teclado)
+  // e um observador que o aciona sozinho quando ele entra na tela.
+  renderMoreEpisodes(media, season, count) {
+    const container = document.getElementById('show-episodes-container');
+    const old = container.querySelector('.episodes-more');
+    if (old) old.remove();
+    if (this.moreObserver) {
+      this.moreObserver.disconnect();
+      this.moreObserver = null;
+    }
+    const from = this.renderedEpisodes;
+    const slice = season.episodes.slice(from, from + count);
+    container.insertAdjacentHTML('beforeend', this.episodeRowsHtml(media, season, slice));
+    this.renderedEpisodes = from + slice.length;
+    const left = season.episodes.length - this.renderedEpisodes;
+    if (left <= 0) return;
+    container.insertAdjacentHTML(
+      'beforeend',
+      `<div class="episodes-more"><button type="button" class="btn btn-outline" data-focus-key="ep:more" data-action="more-episodes">Mostrar mais episódios (faltam ${left})</button></div>`
+    );
+    const btn = container.querySelector('.episodes-more button');
+    if (btn && typeof IntersectionObserver !== 'undefined') {
+      const token = this.renderToken;
+      this.moreObserver = new IntersectionObserver(
+        entries => {
+          if (token === this.renderToken && entries.some(e => e.isIntersecting)) this.showMoreEpisodes();
+        },
+        { root: null, rootMargin: '400px' }
+      );
+      this.moreObserver.observe(btn);
+    }
+  }
 
-      return `
+  showMoreEpisodes() {
+    const media = window.appState.getMedia(this.currentShowId);
+    const season = media && media.seasons && media.seasons.find(s => s.season_number === this.currentSeasonNum);
+    if (season) this.renderMoreEpisodes(media, season, DetailModalView.EP_CHUNK);
+  }
+
+  episodeRowsHtml(media, season, episodes) {
+    return episodes
+      .map(ep => {
+        const isWatched = window.appState.isWatched(media.id, season.season_number, ep.episode_number);
+        const note = window.appState.getNote(media.id, season.season_number, ep.episode_number);
+        const hasNote = note && note.text && note.text.trim();
+
+        return `
         <div class="episode-row ${isWatched ? 'watched' : ''}" data-ep="${toInt(ep.episode_number)}">
           <button type="button" class="episode-check" role="checkbox" aria-checked="${isWatched}" data-focus-key="ep:${toInt(ep.episode_number)}:check" aria-label="Assistido: episódio ${toInt(ep.episode_number)}, ${escapeHtml(ep.name)}" data-action="quick-check" data-show="${toInt(media.id)}" data-season="${toInt(season.season_number)}" data-episode="${toInt(ep.episode_number)}">
             <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
@@ -348,7 +430,8 @@ class DetailModalView {
           </button>
         </div>
       `;
-    }).join('');
+      })
+      .join('');
   }
 
   openNote(showId, seasonNum = null, epNum = null) {
@@ -365,7 +448,9 @@ class DetailModalView {
     if (isMovie) {
       epCode.textContent = 'FILME';
       epTitle.textContent = media.name;
-      showTitle.textContent = window.MediaDisplay.runtimeText(media.runtime) ? `Duração: ${window.MediaDisplay.runtimeText(media.runtime)}` : 'Filme';
+      showTitle.textContent = window.MediaDisplay.runtimeText(media.runtime)
+        ? `Duração: ${window.MediaDisplay.runtimeText(media.runtime)}`
+        : 'Filme';
     } else {
       const ep = window.appState.getEpisode(showId, seasonNum, epNum);
       epCode.textContent = `S${String(seasonNum).padStart(2, '0')}E${String(epNum).padStart(2, '0')}`;
@@ -442,7 +527,9 @@ class DetailModalView {
   // ===== S08: histórico de versões da anotação (D-19) =====
   // Prévia curta em texto puro (sem marcas de Markdown e sem vazar spoiler).
   notePreview(text, max) {
-    const plain = window.NoteMarkdown.toPlainText(String(text || '')).replace(/\s+/g, ' ').trim();
+    const plain = window.NoteMarkdown.toPlainText(String(text || ''))
+      .replace(/\s+/g, ' ')
+      .trim();
     return plain.length > max ? `${plain.slice(0, max)}…` : plain;
   }
 
@@ -461,13 +548,23 @@ class DetailModalView {
     const show = versions.length > 0 && (open === null ? !panel.classList.contains('hidden') : open);
     panel.classList.toggle('hidden', !show);
     btn.setAttribute('aria-expanded', show ? 'true' : 'false');
-    if (!versions.length) { list.innerHTML = ''; return; }
+    if (!versions.length) {
+      list.innerHTML = '';
+      return;
+    }
 
-    list.innerHTML = versions.map((v, i) => {
-      const when = Date.parse(v.updatedAt)
-        ? new Date(v.updatedAt).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-        : 'Data desconhecida';
-      return `
+    list.innerHTML = versions
+      .map((v, i) => {
+        const when = Date.parse(v.updatedAt)
+          ? new Date(v.updatedAt).toLocaleString('pt-BR', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : 'Data desconhecida';
+        return `
         <li class="note-history-item">
           <div class="note-history-info">
             <span class="note-history-when">${escapeHtml(when)}</span>
@@ -476,7 +573,8 @@ class DetailModalView {
           <button type="button" class="btn btn-sm btn-outline" data-restore="${toInt(i)}" data-focus-key="history:${toInt(i)}:restore" aria-label="Restaurar a versão de ${escapeHtml(when)}">Restaurar</button>
         </li>
       `;
-    }).join('');
+      })
+      .join('');
   }
 
   toggleHistory() {
@@ -505,7 +603,8 @@ class DetailModalView {
     window.appController.showToast('Versão restaurada. O texto anterior ficou no histórico.', 'success');
   }
   // ===== fim S08 =====
-
 }
+
+DetailModalView.EP_CHUNK = 60; // linhas de episódio desenhadas por vez (S18)
 
 window.detailModalView = new DetailModalView();

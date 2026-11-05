@@ -41,9 +41,34 @@ function toListItem(item) {
   return light;
 }
 
+// Resumo por obra (S18): o que o app precisa para a lista, o "A Seguir", as estatísticas e a Agenda sem baixar o detalhe completo.
+// Vem o item leve + temporadas com episódios ENXUTOS (número, nome, data, duração, miniatura). Ficam de fora a sinopse da obra,
+// as sinopses dos episódios, os títulos alternativos e a franquia (o modal pede o detalhe completo quando a obra é aberta).
+// `summary: true` avisa o app de que ainda não é o detalhe completo.
+function toSummaryItem(item) {
+  const out = toListItem(item);
+  delete out.light;
+  out.summary = true;
+  if (item.backdrop_path) out.backdrop_path = item.backdrop_path;
+  if (Array.isArray(item.seasons)) {
+    out.seasons = item.seasons.map(season => ({
+      season_number: season.season_number,
+      name: season.name,
+      episodes: (Array.isArray(season.episodes) ? season.episodes : []).map(ep => ({
+        episode_number: ep.episode_number,
+        name: ep.name,
+        air_date: ep.air_date,
+        runtime: ep.runtime,
+        still_path: ep.still_path
+      }))
+    }));
+  }
+  return out;
+}
+
 // Resultado de busca: obra do catálogo vira item leve; resultado externo (ainda sem episódios) segue como veio.
 function toSearchItem(item) {
   return item && item.isExternal ? item : toListItem(item);
 }
 
-module.exports = { toListItem, toSearchItem };
+module.exports = { toListItem, toSearchItem, toSummaryItem };

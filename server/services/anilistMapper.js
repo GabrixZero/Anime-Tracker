@@ -51,7 +51,7 @@ function titleOf(a) {
 }
 
 function seasonLabel(a) {
-  const year = isPositiveInt(a.seasonYear) ? a.seasonYear : (a.startDate && isPositiveInt(a.startDate.year) ? a.startDate.year : null);
+  const year = isPositiveInt(a.seasonYear) ? a.seasonYear : a.startDate && isPositiveInt(a.startDate.year) ? a.startDate.year : null;
   const season = SEASON_PT[a.season];
   if (season && year) return `${season} ${year}`;
   return year ? String(year) : '';
@@ -83,13 +83,13 @@ function mapAnimeBase(a) {
   // S09: pôster do cartão = imagem média (`large`, ~230 px); a grande (`extraLarge`) e o banner ficam para o fundo do modal.
   const poster = safeHttpUrl(cover.large || cover.extraLarge, null);
   const backdrop = safeHttpUrl(a.bannerImage || cover.extraLarge || cover.large, null);
-  const score = Number(a.averageScore) || Number(a.meanScore);   // 0 a 100
+  const score = Number(a.averageScore) || Number(a.meanScore); // 0 a 100
   const base = {
     id: internalIdOf(a),
     type: 'anime',
     anilist_id: a.id,
     name,
-    original_name: romaji && romaji.toLowerCase() !== name.toLowerCase() ? romaji : '',   // "NARUTO" x "Naruto" é o mesmo título
+    original_name: romaji && romaji.toLowerCase() !== name.toLowerCase() ? romaji : '', // "NARUTO" x "Naruto" é o mesmo título
     alt_titles: altTitles(a, [name]),
     overview: cleanSynopsis(a.description),
     poster_path: poster,
@@ -108,8 +108,8 @@ function mapAnimeSearchEntry(a) {
   return {
     ...mapAnimeBase(a),
     isExternal: true,
-    anime_kind: KIND_PT[a.format] || '',           // '' = série de TV normal
-    season_label: seasonLabel(a),                  // "Outono 2023" (temporada/cour de exibição)
+    anime_kind: KIND_PT[a.format] || '', // '' = série de TV normal
+    season_label: seasonLabel(a), // "Outono 2023" (temporada/cour de exibição)
     episode_count: isPositiveInt(a.episodes) ? a.episodes : null
   };
 }
@@ -118,14 +118,16 @@ function mapAnimeSearchEntry(a) {
 function episodesFor(a) {
   const duration = isPositiveInt(a.duration) ? a.duration : null;
   if (a.format === 'MOVIE') {
-    return [{
-      episode_number: 1,
-      name: titleOf(a) || 'Filme',
-      runtime: duration,
-      air_date: fullDate(a.startDate),
-      overview: '',
-      still_path: null
-    }];
+    return [
+      {
+        episode_number: 1,
+        name: titleOf(a) || 'Filme',
+        runtime: duration,
+        air_date: fullDate(a.startDate),
+        overview: '',
+        still_path: null
+      }
+    ];
   }
 
   const dates = new Map();
@@ -164,7 +166,7 @@ function enrichEpisodes(episodes, list) {
   if (!Array.isArray(list) || list.length === 0) return episodes;
   const byNumber = new Map();
   for (const ep of list) if (ep && isPositiveInt(ep.mal_id)) byNumber.set(ep.mal_id, ep);
-  return episodes.map((ep) => {
+  return episodes.map(ep => {
     const extra = byNumber.get(ep.episode_number);
     if (!extra) return ep;
     const title = stripHtml(extra.title, 300);
@@ -182,7 +184,7 @@ function enrichEpisodes(episodes, list) {
 // Atualização de uma obra: a AniList só tem "Episódio N". Se a obra já tinha títulos (e datas) vindos da Jikan e a Jikan não respondeu
 // agora, mantém o que havia (por entrada da franquia: id da MAL, senão da AniList; nunca pela posição da temporada).
 function carryOverEpisodeData(previous, work) {
-  const keyOf = e => (e && e.mal_id ? `m${e.mal_id}` : (e && e.anilist_id ? `a${e.anilist_id}` : ''));
+  const keyOf = e => (e && e.mal_id ? `m${e.mal_id}` : e && e.anilist_id ? `a${e.anilist_id}` : '');
   const oldEntries = previous && previous.franchise && Array.isArray(previous.franchise.entries) ? previous.franchise.entries : [];
   const newEntries = work && work.franchise && Array.isArray(work.franchise.entries) ? work.franchise.entries : [];
   if (!oldEntries.length || !newEntries.length || !Array.isArray(previous.seasons)) return work;
@@ -191,20 +193,23 @@ function carryOverEpisodeData(previous, work) {
   for (const e of oldEntries) {
     const season = previous.seasons.find(x => x && x.season_number === e.season_number);
     const key = keyOf(e);
-    if (season && key && Array.isArray(season.episodes)) oldEpisodes.set(key, new Map(season.episodes.filter(Boolean).map(ep => [ep.episode_number, ep])));
+    if (season && key && Array.isArray(season.episodes))
+      oldEpisodes.set(key, new Map(season.episodes.filter(Boolean).map(ep => [ep.episode_number, ep])));
   }
-  const seasons = work.seasons.map((season) => {
+  const seasons = work.seasons.map(season => {
     const entry = newEntries.find(e => e.season_number === season.season_number);
     const old = entry && oldEpisodes.get(keyOf(entry));
     if (!old) return season;
     return {
       ...season,
-      episodes: season.episodes.map((ep) => {
+      episodes: season.episodes.map(ep => {
         const before = old.get(ep.episode_number);
         if (!before) return ep;
         const lostName = ep.name === `Episódio ${ep.episode_number}` && before.name && before.name !== ep.name;
         const lostDate = !ep.air_date && before.air_date;
-        return lostName || lostDate ? { ...ep, name: lostName ? before.name : ep.name, air_date: lostDate ? before.air_date : ep.air_date } : ep;
+        return lostName || lostDate
+          ? { ...ep, name: lostName ? before.name : ep.name, air_date: lostDate ? before.air_date : ep.air_date }
+          : ep;
       })
     };
   });
@@ -251,7 +256,9 @@ function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
     kept.push(a);
   }
 
-  const wanted = franchise.nodes.find(a => (requested.anilistId && a.id === requested.anilistId) || (requested.malId && a.idMal === requested.malId));
+  const wanted = franchise.nodes.find(
+    a => (requested.anilistId && a.id === requested.anilistId) || (requested.malId && a.idMal === requested.malId)
+  );
   const root = kept.find(isTvLike) || kept[0] || wanted || franchise.nodes[0];
   const base = mapAnimeBase(root);
   const airing = kept.some(a => a.status === 'RELEASING');
@@ -264,7 +271,7 @@ function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
     mal_ids: [...new Set(franchise.nodes.map(a => a.idMal).filter(isPositiveInt))],
     anilist_ids: [...new Set(franchise.visited)],
     alt_titles: alt.length ? alt : base.alt_titles,
-    status: airing ? 'Em Exibição' : (kept.length && kept.every(a => a.status === 'FINISHED') ? 'Finalizada' : base.status),
+    status: airing ? 'Em Exibição' : kept.length && kept.every(a => a.status === 'FINISHED') ? 'Finalizada' : base.status,
     seasons,
     franchise: { entries, truncated: Boolean(franchise.truncated) }
   };
@@ -277,6 +284,16 @@ function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
 }
 
 module.exports = {
-  mapAnimeBase, mapAnimeSearchEntry, buildAnimeWork, episodesFor, enrichEpisodes, carryOverEpisodeData, internalIdOf,
-  fuzzyDate, dateFromUnix, seasonLabel, KEPT_FORMATS, STATUS_PT
+  mapAnimeBase,
+  mapAnimeSearchEntry,
+  buildAnimeWork,
+  episodesFor,
+  enrichEpisodes,
+  carryOverEpisodeData,
+  internalIdOf,
+  fuzzyDate,
+  dateFromUnix,
+  seasonLabel,
+  KEPT_FORMATS,
+  STATUS_PT
 };

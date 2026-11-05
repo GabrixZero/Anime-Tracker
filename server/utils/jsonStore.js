@@ -13,7 +13,7 @@ let tmpCounter = 0;
 const preservedCorrupt = new Set();
 
 function stripBom(text) {
-  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
 }
 
 function parseFile(file) {
@@ -88,11 +88,17 @@ function writeJsonAtomic(file, data, { pretty = true } = {}) {
       try {
         parseFile(file);
         fs.copyFileSync(file, `${file}.bak`);
-      } catch { /* arquivo atual ilegível: mantém o .bak anterior */ }
+      } catch {
+        /* arquivo atual ilegível: mantém o .bak anterior */
+      }
     }
     renameWithRetry(tmp, file);
   } catch (err) {
-    try { fs.unlinkSync(tmp); } catch { /* já não existe */ }
+    try {
+      fs.unlinkSync(tmp);
+    } catch {
+      /* já não existe */
+    }
     throw err;
   }
 }

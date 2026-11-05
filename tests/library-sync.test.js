@@ -14,7 +14,7 @@ process.on('exit', () => fs.rmSync(process.env.SHOWVAULT_DATA_DIR, { recursive: 
 const { LibraryModel } = require('../server/models/LibraryModel');
 const { issueToken } = require('../server/middleware/auth');
 const LM = require('../public/js/utils/libraryMerge');
-const ago = (hours) => new Date(Date.now() - hours * 3600000).toISOString();
+const ago = hours => new Date(Date.now() - hours * 3600000).toISOString();
 
 const ROOT = path.join(__dirname, '..', 'public', 'js');
 const tmpModel = () => new LibraryModel(fs.mkdtempSync(path.join(os.tmpdir(), 'showvault-s03-lib-')));
@@ -27,18 +27,40 @@ test('LibraryModel: PUT de cliente da S03 MESCLA com o servidor (aparelho desatu
   const t0 = ago(3);
   const t1 = ago(2);
   // aparelho A: tem as obras 1 e 2
-  lib.save('usr_m1', { ...empty(), trackedShows: [{ showId: 1, status: 'watching', addedAt: t0, updatedAt: t0 }, { showId: 2, status: 'watching', addedAt: t0, updatedAt: t0 }] });
+  lib.save('usr_m1', {
+    ...empty(),
+    trackedShows: [
+      { showId: 1, status: 'watching', addedAt: t0, updatedAt: t0 },
+      { showId: 2, status: 'watching', addedAt: t0, updatedAt: t0 }
+    ]
+  });
   // aparelho B (desatualizado) só conhece a 1 e adiciona a 3
-  const fromB = lib.save('usr_m1', { ...empty(), trackedShows: [{ showId: 1, status: 'watching', addedAt: t0, updatedAt: t0 }, { showId: 3, status: 'plan_to_watch', addedAt: t1, updatedAt: t1 }] });
+  const fromB = lib.save('usr_m1', {
+    ...empty(),
+    trackedShows: [
+      { showId: 1, status: 'watching', addedAt: t0, updatedAt: t0 },
+      { showId: 3, status: 'plan_to_watch', addedAt: t1, updatedAt: t1 }
+    ]
+  });
   assert.deepEqual(fromB.trackedShows.map(s => s.showId).sort(), [1, 2, 3]);
-  assert.deepEqual(lib.get('usr_m1').trackedShows.map(s => s.showId).sort(), [1, 2, 3]);
+  assert.deepEqual(
+    lib
+      .get('usr_m1')
+      .trackedShows.map(s => s.showId)
+      .sort(),
+    [1, 2, 3]
+  );
 });
 
 test('LibraryModel: marca de exclusão propaga a remoção; o servidor guarda a marca', () => {
   const lib = tmpModel();
   const t0 = ago(3);
   const t1 = ago(2);
-  lib.save('usr_m2', { ...empty(), trackedShows: [{ showId: 1, status: 'watching', addedAt: t0, updatedAt: t0 }], watchedEpisodes: { '1_s1_e1': { watched: true, watchedAt: t0, updatedAt: t0, rewatchCount: 1 } } });
+  lib.save('usr_m2', {
+    ...empty(),
+    trackedShows: [{ showId: 1, status: 'watching', addedAt: t0, updatedAt: t0 }],
+    watchedEpisodes: { '1_s1_e1': { watched: true, watchedAt: t0, updatedAt: t0, rewatchCount: 1 } }
+  });
   const afterRemoval = lib.save('usr_m2', { ...empty(), tombstones: { shows: { 1: t1 }, watched: { '1_s1_e1': t1 }, notes: {} } });
   assert.deepEqual(afterRemoval.trackedShows, []);
   assert.deepEqual(afterRemoval.watchedEpisodes, {});
@@ -53,17 +75,30 @@ test('LibraryModel: marca de exclusão propaga a remoção; o servidor guarda a 
 test('LibraryModel: cliente antigo (sem tombstones) continua com snapshot completo (last-write-wins)', () => {
   const lib = tmpModel();
   lib.save('usr_m3', { trackedShows: [{ showId: 1, status: 'watching', addedAt: 'x' }], watchedEpisodes: {}, episodeNotes: {} });
-  const second = lib.save('usr_m3', { trackedShows: [{ showId: 2, status: 'watching', addedAt: 'y' }], watchedEpisodes: {}, episodeNotes: {} });
-  assert.deepEqual(second.trackedShows.map(s => s.showId), [2]);
+  const second = lib.save('usr_m3', {
+    trackedShows: [{ showId: 2, status: 'watching', addedAt: 'y' }],
+    watchedEpisodes: {},
+    episodeNotes: {}
+  });
+  assert.deepEqual(
+    second.trackedShows.map(s => s.showId),
+    [2]
+  );
 });
 
 test('LibraryModel: biblioteca gravada antes da S03 volta com tombstones/resetAt vazios; clear() zera com resetAt', () => {
   const lib = tmpModel();
   fs.mkdirSync(lib.dir, { recursive: true });
-  fs.writeFileSync(path.join(lib.dir, 'usr_old.json'), JSON.stringify({
-    schemaVersion: 2, updatedAt: '2026-10-26T00:00:00.000Z',
-    trackedShows: [{ showId: 9, status: 'watching', addedAt: 'x' }], watchedEpisodes: {}, episodeNotes: {}
-  }));
+  fs.writeFileSync(
+    path.join(lib.dir, 'usr_old.json'),
+    JSON.stringify({
+      schemaVersion: 2,
+      updatedAt: '2026-10-26T00:00:00.000Z',
+      trackedShows: [{ showId: 9, status: 'watching', addedAt: 'x' }],
+      watchedEpisodes: {},
+      episodeNotes: {}
+    })
+  );
   const got = lib.get('usr_old');
   assert.deepEqual(got.tombstones, LM.emptyTombstones());
   assert.equal(got.resetAt, '');
@@ -74,7 +109,10 @@ test('LibraryModel: biblioteca gravada antes da S03 volta com tombstones/resetAt
   assert.ok(Date.parse(cleared.resetAt) > 0);
   assert.equal(lib.get('usr_old').resetAt, cleared.resetAt);
   // depois do reset, um aparelho antigo com dados anteriores não traz nada de volta
-  const back = lib.save('usr_old', { ...empty(), trackedShows: [{ showId: 9, status: 'watching', addedAt: '2026-10-01T00:00:00.000Z', updatedAt: '2026-10-01T00:00:00.000Z' }] });
+  const back = lib.save('usr_old', {
+    ...empty(),
+    trackedShows: [{ showId: 9, status: 'watching', addedAt: '2026-10-01T00:00:00.000Z', updatedAt: '2026-10-01T00:00:00.000Z' }]
+  });
   assert.deepEqual(back.trackedShows, []);
 });
 
@@ -86,16 +124,22 @@ test('LibraryModel: marcas inválidas são recusadas', () => {
 
 // ---------------------------------------------------------------- Rotas
 
-test('API: PUT mescla e devolve a biblioteca mesclada; DELETE zera; sem login = 401', async (t) => {
+test('API: PUT mescla e devolve a biblioteca mesclada; DELETE zera; sem login = 401', async t => {
   const app = require('../server/app');
-  const server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  const server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}/api/user/library`;
   // S04: as rotas exigem conta existente (requireActiveUser): cadastra um usuário de teste no diretório temporário
-  const user = await require('../server/models/UserModel').create({ name: 'Teste S03', email: 's03@exemplo.test', password: 'senha-de-teste-s03' });
+  const user = await require('../server/models/UserModel').create({
+    name: 'Teste S03',
+    email: 's03@exemplo.test',
+    password: 'senha-de-teste-s03'
+  });
   const auth = { Authorization: `Bearer ${issueToken(user)}`, 'Content-Type': 'application/json' };
   const t0 = ago(3);
-  const put = (data) => fetch(base, { method: 'PUT', headers: auth, body: JSON.stringify({ data, stateVersion: 2 }) });
+  const put = data => fetch(base, { method: 'PUT', headers: auth, body: JSON.stringify({ data, stateVersion: 2 }) });
 
   assert.equal((await fetch(base)).status, 401);
   assert.equal((await fetch(base, { method: 'DELETE' })).status, 401);
@@ -129,11 +173,24 @@ test('API: PUT mescla e devolve a biblioteca mesclada; DELETE zera; sem login = 
 // Os horários são do relógio real (o servidor usa o dele); `tick` garante que ações em sequência não caiam no mesmo milissegundo.
 const tick = () => new Promise(resolve => setTimeout(resolve, 4));
 // Os objetos do aparelho (vm) vêm de outro "realm": normaliza para comparar com deepEqual.
-const plain = (value) => JSON.parse(JSON.stringify(value));
+const plain = value => JSON.parse(JSON.stringify(value));
 
 const SERIES = {
-  id: 100, type: 'tv', name: 'Série A', genres: ['Drama'], status: 'Ended',
-  seasons: [{ season_number: 1, name: 'T1', episodes: [{ episode_number: 1, runtime: 40 }, { episode_number: 2, runtime: 40 }] }]
+  id: 100,
+  type: 'tv',
+  name: 'Série A',
+  genres: ['Drama'],
+  status: 'Ended',
+  seasons: [
+    {
+      season_number: 1,
+      name: 'T1',
+      episodes: [
+        { episode_number: 1, runtime: 40 },
+        { episode_number: 2, runtime: 40 }
+      ]
+    }
+  ]
 };
 const MOVIE = { id: 200, type: 'movie', name: 'Filme B', genres: ['Ação'], runtime: 100 };
 const OTHER = { id: 300, type: 'tv', name: 'Série C', genres: [], seasons: [{ season_number: 1, episodes: [{ episode_number: 1 }] }] };
@@ -142,34 +199,79 @@ const OTHER = { id: 300, type: 'tv', name: 'Série C', genres: [], seasons: [{ s
 function makeDevice(model, { withViews = false, firstVisit = false } = {}) {
   const store = new Map();
   const elements = new Map();
-  const el = (id) => {
-    if (!elements.has(id)) elements.set(id, { id, textContent: '', innerHTML: '', classList: { add() {}, remove() {}, toggle() {} }, dataset: {}, style: {}, addEventListener() {} });
+  const el = id => {
+    if (!elements.has(id))
+      elements.set(id, {
+        id,
+        textContent: '',
+        innerHTML: '',
+        classList: { add() {}, remove() {}, toggle() {} },
+        dataset: {},
+        style: {},
+        addEventListener() {}
+      });
     return elements.get(id);
   };
   const device = { elements, online: true, events: [], pushes: 0 };
   const ctx = {
-    console, JSON, Promise, Math, Object, Array, Number, String, Map, Set, Error, TypeError, SyntaxError, Date,
-    setTimeout: () => 0, clearTimeout: () => {}, // sem debounce: os testes chamam push()/pullAndMerge() à mão
+    console,
+    JSON,
+    Promise,
+    Math,
+    Object,
+    Array,
+    Number,
+    String,
+    Map,
+    Set,
+    Error,
+    TypeError,
+    SyntaxError,
+    Date,
+    setTimeout: () => 0,
+    clearTimeout: () => {}, // sem debounce: os testes chamam push()/pullAndMerge() à mão
     localStorage: {
-      getItem: (k) => (store.has(k) ? store.get(k) : null),
-      setItem: (k, v) => { store.set(k, String(v)); },
-      removeItem: (k) => { store.delete(k); }
+      getItem: k => (store.has(k) ? store.get(k) : null),
+      setItem: (k, v) => {
+        store.set(k, String(v));
+      },
+      removeItem: k => {
+        store.delete(k);
+      }
     },
-    CustomEvent: class { constructor(type) { this.type = type; } },
+    CustomEvent: class {
+      constructor(type) {
+        this.type = type;
+      }
+    },
     document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [] },
     addEventListener() {},
-    dispatchEvent(e) { device.events.push(e.type); }
+    dispatchEvent(e) {
+      device.events.push(e.type);
+    }
   };
   ctx.window = ctx;
   vm.createContext(ctx);
-  const files = ['utils/dom.js', 'utils/emotions.js', 'utils/markdown.js', 'utils/mediaDisplay.js', 'utils/viewKit.js', 'utils/libraryMerge.js', 'utils/watchStatus.js', 'utils/backupValidator.js', 'utils/migrations.js'];
+  const files = [
+    'utils/dom.js',
+    'utils/emotions.js',
+    'utils/markdown.js',
+    'utils/mediaDisplay.js',
+    'utils/viewKit.js',
+    'utils/libraryMerge.js',
+    'utils/rating.js',
+    'utils/watchStatus.js',
+    'utils/backupValidator.js',
+    'utils/migrations.js'
+  ];
 
   const userFromToken = () => {
     const tok = store.get('showvault_auth_token');
     return tok ? tok.replace(/^tok_/, '') : null;
   };
   const strip = ({ schemaVersion, updatedAt, ...data }) => data;
-  const fail = (message, status) => Object.assign(message === 'net' ? new TypeError('fetch failed') : new Error(message), status ? { status } : {});
+  const fail = (message, status) =>
+    Object.assign(message === 'net' ? new TypeError('fetch failed') : new Error(message), status ? { status } : {});
   ctx.apiClient = {
     async getLibrary() {
       if (!device.online) throw fail('net');
@@ -249,8 +351,15 @@ test('isolamento: duas contas no mesmo navegador não veem dados uma da outra (l
   await dev.login('usr_alice');
   assert.deepEqual(dev.ids(), [100], 'Alice volta só com a dela');
   assert.equal(dev.state.isWatched(100, 1, 1), true);
-  assert.deepEqual(model.get('usr_bruno').trackedShows.map(s => s.showId), [200], 'a nuvem do Bruno só tem a dele');
-  assert.deepEqual(model.get('usr_alice').trackedShows.map(s => s.showId), [100]);
+  assert.deepEqual(
+    model.get('usr_bruno').trackedShows.map(s => s.showId),
+    [200],
+    'a nuvem do Bruno só tem a dele'
+  );
+  assert.deepEqual(
+    model.get('usr_alice').trackedShows.map(s => s.showId),
+    [100]
+  );
 });
 
 test('isolamento: trocar de conta SEM sair (sessão expirada) arquiva a anterior e não mescla', async () => {
@@ -261,7 +370,7 @@ test('isolamento: trocar de conta SEM sair (sessão expirada) arquiva a anterior
   await tick();
   await dev.sync.push();
   dev.state.addShow(200); // alteração ainda não enviada
-  dev.sync.stop();        // token expirou: a sessão encerra, o estado local continua sendo da Carla
+  dev.sync.stop(); // token expirou: a sessão encerra, o estado local continua sendo da Carla
 
   await dev.login('usr_davi'); // outra pessoa entra sem logout
   assert.deepEqual(dev.ids(), [], 'Davi não vê nada da Carla');
@@ -272,7 +381,13 @@ test('isolamento: trocar de conta SEM sair (sessão expirada) arquiva a anterior
   await dev.login('usr_carla'); // a alteração não enviada volta
   assert.deepEqual(dev.ids(), [100, 200]);
   assert.equal(dev.store.get('showvault_archive_usr_carla'), undefined, 'arquivo consumido');
-  assert.deepEqual(model.get('usr_carla').trackedShows.map(s => s.showId).sort(), [100, 200]);
+  assert.deepEqual(
+    model
+      .get('usr_carla')
+      .trackedShows.map(s => s.showId)
+      .sort(),
+    [100, 200]
+  );
 });
 
 test('logout sem rede guarda uma cópia e a conta recupera no próximo login', async () => {
@@ -292,17 +407,26 @@ test('logout sem rede guarda uma cópia e a conta recupera no próximo login', a
   dev.online = true;
   await dev.login('usr_eva');
   assert.deepEqual(dev.ids(), [100, 300]);
-  assert.deepEqual(model.get('usr_eva').trackedShows.map(s => s.showId).sort(), [100, 300]);
+  assert.deepEqual(
+    model
+      .get('usr_eva')
+      .trackedShows.map(s => s.showId)
+      .sort(),
+    [100, 300]
+  );
 });
 
 test('visitante que entra numa conta leva o que fez antes de entrar; sessão retomada assume o estado antigo', async () => {
   const model = tmpModel();
   const dev = makeDevice(model);
-  dev.state.addShow(100);                       // visitante (sem token)
+  dev.state.addShow(100); // visitante (sem token)
   dev.state.toggleWatched(100, 1, 1);
   assert.equal(dev.state.getOwner(), '');
   await dev.login('usr_fabio');
-  assert.deepEqual(model.get('usr_fabio').trackedShows.map(s => s.showId), [100]);
+  assert.deepEqual(
+    model.get('usr_fabio').trackedShows.map(s => s.showId),
+    [100]
+  );
   assert.equal(dev.state.getOwner(), 'usr_fabio');
 
   // estado de antes da S03 (sem dono) + sessão retomada ao abrir a página: pertence ao usuário do token
@@ -311,7 +435,10 @@ test('visitante que entra numa conta leva o que fez antes de entrar; sessão ret
   legacy.store.set('showvault_auth_token', 'tok_usr_gina');
   await legacy.sync.pullAndMerge({ id: 'usr_gina' }, { resumed: true });
   assert.equal(legacy.state.getOwner(), 'usr_gina');
-  assert.deepEqual(model.get('usr_gina').trackedShows.map(s => s.showId), [300]);
+  assert.deepEqual(
+    model.get('usr_gina').trackedShows.map(s => s.showId),
+    [300]
+  );
 });
 
 test('dois aparelhos: remover obra e desmarcar episódio num reflete no outro; aparelho desatualizado não ressuscita', async () => {
@@ -328,15 +455,18 @@ test('dois aparelhos: remover obra e desmarcar episódio num reflete no outro; a
   await A.sync.push();
 
   await tick();
-  await B.login('usr_hugo');                 // aparelho novo: recebe tudo
+  await B.login('usr_hugo'); // aparelho novo: recebe tudo
   assert.deepEqual(B.ids(), [100, 200]);
   assert.equal(B.state.isWatched(100, 1, 2), true);
 
   await tick();
-  A.state.removeShow(200);                   // A remove o filme e desmarca o ep. 2
+  A.state.removeShow(200); // A remove o filme e desmarca o ep. 2
   A.state.toggleWatched(100, 1, 2);
   await A.sync.push();
-  assert.deepEqual(model.get('usr_hugo').trackedShows.map(s => s.showId), [100]);
+  assert.deepEqual(
+    model.get('usr_hugo').trackedShows.map(s => s.showId),
+    [100]
+  );
   assert.ok(model.get('usr_hugo').tombstones.shows['200']);
 
   // B, ainda desatualizado, edita outra coisa e ENVIA antes de sincronizar: não pode desfazer o trabalho de A
@@ -346,7 +476,13 @@ test('dois aparelhos: remover obra e desmarcar episódio num reflete no outro; a
   assert.deepEqual(B.ids(), [100, 300], 'a resposta do servidor já removeu a obra 200 no B');
   assert.equal(B.state.isWatched(100, 1, 2), false, 'e desmarcou o episódio');
   assert.equal(B.state.isWatched(100, 1, 1), true);
-  assert.deepEqual(model.get('usr_hugo').trackedShows.map(s => s.showId).sort(), [100, 300]);
+  assert.deepEqual(
+    model
+      .get('usr_hugo')
+      .trackedShows.map(s => s.showId)
+      .sort(),
+    [100, 300]
+  );
 
   // A traz a obra 300 do B
   await A.sync.pullAndMerge();
@@ -377,7 +513,7 @@ test('dois aparelhos: status e notas seguem a alteração mais recente', async (
   await B.sync.push();
   await tick();
   A.state.setShowStatus(100, 'dropped');
-  await A.sync.push();            // status do A é o mais novo; a nota do B é a mais nova
+  await A.sync.push(); // status do A é o mais novo; a nota do B é a mais nova
 
   assert.equal(A.state.getTracked(100).status, 'dropped');
   assert.equal(A.state.getNote(100, 1, 1).text, 'nota editada no B');
@@ -401,7 +537,10 @@ test('Resetar com nuvem zera a conta em todos os aparelhos; só local não mexe 
   await tick();
   B.state.resetLocal();
   assert.deepEqual(B.ids(), []);
-  assert.deepEqual(model.get('usr_jana').trackedShows.map(s => s.showId), [100]);
+  assert.deepEqual(
+    model.get('usr_jana').trackedShows.map(s => s.showId),
+    [100]
+  );
   await B.sync.pullAndMerge();
   assert.deepEqual(B.ids(), [100]);
 
@@ -411,7 +550,7 @@ test('Resetar com nuvem zera a conta em todos os aparelhos; só local não mexe 
   assert.deepEqual(A.ids(), []);
   assert.deepEqual(model.get('usr_jana').trackedShows, []);
   await tick();
-  await B.sync.pullAndMerge();      // B ainda tinha a obra 100: ao sincronizar, zera também
+  await B.sync.pullAndMerge(); // B ainda tinha a obra 100: ao sincronizar, zera também
   assert.deepEqual(B.ids(), [], 'o outro aparelho também foi zerado');
   assert.deepEqual(plain(B.state.data.watchedEpisodes), {});
 
@@ -441,14 +580,21 @@ test('falhas de sincronização ficam visíveis: offline, erro do servidor e ses
   assert.equal(await dev.sync.retry(), true);
   assert.equal(dev.sync.status, 'idle');
   assert.equal(dev.sync.dirty, false);
-  assert.deepEqual(model.get('usr_kau').trackedShows.map(s => s.showId), [100]);
+  assert.deepEqual(
+    model.get('usr_kau').trackedShows.map(s => s.showId),
+    [100]
+  );
 
   const realPut = dev.window.apiClient.putLibrary;
-  dev.window.apiClient.putLibrary = async () => { throw Object.assign(new Error('Erro interno'), { status: 500 }); };
+  dev.window.apiClient.putLibrary = async () => {
+    throw Object.assign(new Error('Erro interno'), { status: 500 });
+  };
   dev.state.addShow(300);
   assert.equal(await dev.sync.push(), false);
   assert.equal(dev.sync.status, 'error');
-  dev.window.apiClient.putLibrary = async () => { throw Object.assign(new Error('Token inválido'), { status: 401 }); };
+  dev.window.apiClient.putLibrary = async () => {
+    throw Object.assign(new Error('Token inválido'), { status: 401 });
+  };
   assert.equal(await dev.sync.push(), false);
   assert.equal(dev.sync.status, 'auth');
   dev.window.apiClient.putLibrary = realPut;
@@ -465,7 +611,14 @@ test('falhas de sincronização ficam visíveis: offline, erro do servidor e ses
   fresh.online = true;
   await fresh.sync.retry();
   assert.equal(fresh.sync.ready, true);
-  assert.deepEqual(model.get('usr_kau').trackedShows.map(s => s.showId).sort(), [100, 200], 'o que ficou sem enviar (300) não foi para a nuvem; o 200 foi depois do retry');
+  assert.deepEqual(
+    model
+      .get('usr_kau')
+      .trackedShows.map(s => s.showId)
+      .sort(),
+    [100, 200],
+    'o que ficou sem enviar (300) não foi para a nuvem; o 200 foi depois do retry'
+  );
 });
 
 test('resposta de uma sessão antiga é ignorada (logout durante o pull não grava dados da conta anterior)', async () => {
@@ -474,13 +627,19 @@ test('resposta de uma sessão antiga é ignorada (logout durante o pull não gra
   model.save('usr_lia', { ...empty(), trackedShows: [{ showId: 100, status: 'watching', addedAt: ago(3), updatedAt: ago(3) }] });
 
   let release;
-  const gate = new Promise(resolve => { release = resolve; });
+  const gate = new Promise(resolve => {
+    release = resolve;
+  });
   const realGet = dev.window.apiClient.getLibrary;
-  dev.window.apiClient.getLibrary = async () => { const r = await realGet(); await gate; return r; };
+  dev.window.apiClient.getLibrary = async () => {
+    const r = await realGet();
+    await gate;
+    return r;
+  };
 
   dev.store.set('showvault_auth_token', 'tok_usr_lia');
   const pending = dev.sync.pullAndMerge({ id: 'usr_lia' });
-  dev.sync.stop();                       // saiu (ou trocou de conta) enquanto a resposta não chegava
+  dev.sync.stop(); // saiu (ou trocou de conta) enquanto a resposta não chegava
   dev.store.delete('showvault_auth_token');
   dev.state.clearForLogout();
   release();
@@ -496,12 +655,20 @@ test('status por obra: regras automáticas e as telas (lista, estatísticas, A S
   const dev = makeDevice(model, { withViews: true });
   const w = dev.window;
   const state = dev.state;
-  const txt = (id) => String(dev.elements.get(id).textContent);
-  const renderAll = () => { w.watchlistView.render(); w.statsView.render(); };
+  const txt = id => String(dev.elements.get(id).textContent);
+  const renderAll = () => {
+    w.watchlistView.render();
+    w.statsView.render();
+  };
 
   // séries/animes e filmes entram como "Quero ver"
-  state.addShow(100); state.addShow(200); state.addShow(300);
-  assert.deepEqual(state.data.trackedShows.map(s => s.status), ['plan_to_watch', 'plan_to_watch', 'plan_to_watch']);
+  state.addShow(100);
+  state.addShow(200);
+  state.addShow(300);
+  assert.deepEqual(
+    state.data.trackedShows.map(s => s.status),
+    ['plan_to_watch', 'plan_to_watch', 'plan_to_watch']
+  );
 
   // marcar o 1º episódio -> Assistindo; último -> Finalizado; desmarcar -> volta a Assistindo
   state.toggleWatched(100, 1, 1);
@@ -567,7 +734,11 @@ test('importar backup propaga a substituição aos outros aparelhos', async () =
   await B.login('usr_mel');
 
   await tick();
-  const imported = A.window.validateBackup({ trackedShows: [{ showId: 300, status: 'completed', addedAt: '2026-01-01T00:00:00.000Z' }], watchedEpisodes: {}, episodeNotes: {} });
+  const imported = A.window.validateBackup({
+    trackedShows: [{ showId: 300, status: 'completed', addedAt: '2026-01-01T00:00:00.000Z' }],
+    watchedEpisodes: {},
+    episodeNotes: {}
+  });
   A.state.importData(imported);
   assert.deepEqual(A.ids(), [300]);
   await A.sync.push();
@@ -653,7 +824,9 @@ test('histórico de versões: nova sessão de edição guarda a versão anterior
   const dev = makeDevice(tmpModel());
   const state = dev.state;
   const key = '100_s1_e1';
-  const older = (minutes) => { state.data.episodeNotes[key].updatedAt = new Date(Date.now() - minutes * 60000).toISOString(); };
+  const older = minutes => {
+    state.data.episodeNotes[key].updatedAt = new Date(Date.now() - minutes * 60000).toISOString();
+  };
 
   state.saveNote(100, 1, 1, { text: 'v1 texto', emotion: 'fun', character: 'Ana' });
   assert.deepEqual(plain(state.getNoteVersions(100, 1, 1)), [], 'primeira gravação não tem versão anterior');
@@ -680,7 +853,10 @@ test('histórico de versões: nova sessão de edição guarda a versão anterior
   assert.equal(state.getNoteVersions(100, 1, 1).length, 2);
 
   // limite de 5 (as mais novas ficam)
-  for (let i = 4; i <= 9; i++) { older(60); state.saveNote(100, 1, 1, { text: `v${i} texto`, emotion: null, character: '' }); }
+  for (let i = 4; i <= 9; i++) {
+    older(60);
+    state.saveNote(100, 1, 1, { text: `v${i} texto`, emotion: null, character: '' });
+  }
   const texts = state.getNoteVersions(100, 1, 1).map(v => v.text);
   assert.equal(texts.length, 5);
   assert.equal(texts[0], 'v8 texto');
@@ -692,22 +868,29 @@ test('histórico de versões: restaurar em 1 clique troca o texto, guarda o atua
   const dev = makeDevice(model);
   const state = dev.state;
   const key = '100_s1_e1';
-  const older = () => { state.data.episodeNotes[key].updatedAt = new Date(Date.now() - 3600000).toISOString(); };
+  const older = () => {
+    state.data.episodeNotes[key].updatedAt = new Date(Date.now() - 3600000).toISOString();
+  };
   state.saveNote(100, 1, 1, { text: 'primeira versão da anotação', emotion: 'fun', character: 'Ana' });
   for (const t of ['segunda versão da anotação', 'terceira versão da anotação', 'quarta versão da anotação']) {
     older();
     state.saveNote(100, 1, 1, { text: t, emotion: 'sad', character: 'Ana' });
   }
-  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)),
-    ['terceira versão da anotação', 'segunda versão da anotação', 'primeira versão da anotação']);
+  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)), [
+    'terceira versão da anotação',
+    'segunda versão da anotação',
+    'primeira versão da anotação'
+  ]);
 
   const restored = state.restoreNoteVersion(100, 1, 1, 2); // a mais antiga
   assert.equal(restored, 'primeira versão da anotação');
   assert.equal(state.getNote(100, 1, 1).text, 'primeira versão da anotação');
   assert.equal(state.getNote(100, 1, 1).emotion, 'sad', 'emoção e personagem não mudam');
-  assert.deepEqual(plain(state.getNoteVersions(100, 1, 1).map(v => v.text)),
+  assert.deepEqual(
+    plain(state.getNoteVersions(100, 1, 1).map(v => v.text)),
     ['quarta versão da anotação', 'terceira versão da anotação', 'segunda versão da anotação'],
-    'o texto que valia virou a versão mais nova; as outras continuam');
+    'o texto que valia virou a versão mais nova; as outras continuam'
+  );
 
   // restaurar de novo traz de volta o que estava valendo (desfazer)
   state.restoreNoteVersion(100, 1, 1, 0);
@@ -722,7 +905,10 @@ test('histórico de versões: restaurar em 1 clique troca o texto, guarda o atua
   assert.equal(JSON.stringify(state.getNote(100, 1, 1)), before);
 
   // com o limite cheio (5), restaurar mantém 5 (a restaurada sai, a atual entra)
-  for (let i = 0; i < 4; i++) { older(); state.saveNote(100, 1, 1, { text: `rascunho número ${i}`, emotion: null, character: '' }); }
+  for (let i = 0; i < 4; i++) {
+    older();
+    state.saveNote(100, 1, 1, { text: `rascunho número ${i}`, emotion: null, character: '' });
+  }
   assert.equal(state.getNoteVersions(100, 1, 1).length, 5);
   state.restoreNoteVersion(100, 1, 1, 4);
   assert.equal(state.getNoteVersions(100, 1, 1).length, 5);

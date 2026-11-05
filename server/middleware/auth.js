@@ -4,7 +4,8 @@ const UserModel = require('../models/UserModel');
 const { sendError } = require('../utils/httpErrors');
 
 function issueToken(user) {
-  return jwt.sign({ sub: user.id }, config.JWT_SECRET, {
+  // tv = versão da sessão da conta (sobe em "sair de todos os aparelhos"); token sem tv vale como versão 0.
+  return jwt.sign({ sub: user.id, tv: Number.isInteger(user.tokenVersion) ? user.tokenVersion : 0 }, config.JWT_SECRET, {
     algorithm: 'HS256',
     expiresIn: config.JWT_EXPIRES_IN
   });
@@ -32,16 +33,21 @@ function requireAuth(req, res, next) {
   }
   req.userId = payload.sub;
   req.tokenIssuedAt = payload.iat;
+  req.tokenVersion = Number.isInteger(payload.tv) ? payload.tv : 0;
   return next();
 }
 
-// Como requireAuth, mas também exige que a conta ainda exista e que o token seja posterior à última troca de senha.
-// Assim "excluir conta" e "trocar senha" encerram as sessões antigas de verdade.
+// Como requireAuth, mas também exige que a conta ainda exista, que o token seja posterior à última troca de senha e que a versão
+// da sessão (tv) seja a atual. Assim "excluir conta", "trocar senha" e "sair de todos os aparelhos" encerram as sessões antigas de verdade.
 function requireActiveUser(req, res, next) {
   requireAuth(req, res, () => {
     try {
       const info = UserModel.authInfo(req.userId);
-      if (!info || (info.passwordChangedAtSec && (req.tokenIssuedAt || 0) < info.passwordChangedAtSec)) {
+      if (
+        !info ||
+        (info.passwordChangedAtSec && (req.tokenIssuedAt || 0) < info.passwordChangedAtSec) ||
+        req.tokenVersion !== info.tokenVersion
+      ) {
         return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
       }
       return next();

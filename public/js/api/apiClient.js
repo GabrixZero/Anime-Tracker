@@ -11,7 +11,7 @@ class ApiClient {
     const token = localStorage.getItem('showvault_auth_token');
     return {
       'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
     };
   }
 
@@ -46,8 +46,9 @@ class ApiClient {
   }
 
   // Detalhe completo (temporadas/episódios) de várias obras do catálogo de uma vez: { count, data, missing }. Máx. 50 ids.
-  async getBatch(ids) {
-    return this.request(`/media/batch?ids=${ids.map(id => encodeURIComponent(Number(id))).join(',')}`);
+  // `summary: true` (S18) pede só o resumo por obra (sem sinopses), bem menor.
+  async getBatch(ids, { summary = false } = {}) {
+    return this.request(`/media/batch?ids=${ids.map(id => encodeURIComponent(Number(id))).join(',')}${summary ? '&summary=1' : ''}`);
   }
 
   async search(query = '', type = 'all') {
@@ -65,12 +66,38 @@ class ApiClient {
     });
   }
 
+  // Atualiza uma obra em exibição (S13/S15): o servidor respeita a validade e o limite (sem force). Devolve { refreshed, data }.
+  async refreshMedia(id) {
+    return this.request(`/media/${encodeURIComponent(Number(id))}/refresh`, { method: 'POST', body: '{}' });
+  }
+
   // --- AUTENTICAÇÃO ---
-  async register(name, email, password) {
+  async register(name, email, password, inviteCode) {
     return this.request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, email, password, ...(inviteCode ? { inviteCode } : {}) })
     });
+  }
+
+  // Troca a senha; devolve um token novo para este aparelho (os outros caem).
+  async changePassword(currentPassword, newPassword) {
+    return this.request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+  }
+
+  // Exclui a conta e a biblioteca no servidor. Conta com senha: { password }. Conta Google: { credential }.
+  async deleteAccount(confirmation) {
+    return this.request('/auth/account', {
+      method: 'DELETE',
+      body: JSON.stringify(confirmation)
+    });
+  }
+
+  // "Sair de todos os aparelhos": invalida todos os tokens da conta, inclusive o deste aparelho.
+  async logoutAll() {
+    return this.request('/auth/logout-all', { method: 'POST', body: '{}' });
   }
 
   async login(email, password) {

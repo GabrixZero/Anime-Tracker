@@ -6,17 +6,17 @@ const { mediaErrors } = require('./errors');
 
 const SOURCES = {
   // Catálogo inicial (seed) curado: usa o id nativo do TMDB, sem deslocamento.
-  seed:       { min: 1,        max: 999999,   offset: 0,        ingestable: false },
+  seed: { min: 1, max: 999999, offset: 0, ingestable: false },
   // Ingestão sob demanda do TVMaze (séries): id interno = 1_000_000 + id do TVMaze.
-  tvmaze:     { min: 1000000,  max: 1999999,  offset: 1000000,  ingestable: true },
+  tvmaze: { min: 1000000, max: 1999999, offset: 1000000, ingestable: true },
   // Animes com id do MyAnimeList (S06; AniList e Jikan descrevem a mesma obra com o mesmo id): id interno = 10_000_000 + mal_id.
   // A obra gravada com esse id reúne a franquia inteira (temporadas). Desde a S13 a AniList é a fonte principal e a Jikan a reserva (D-26).
-  jikan:      { min: 10000000, max: 19999999, offset: 10000000, ingestable: true },
+  jikan: { min: 10000000, max: 19999999, offset: 10000000, ingestable: true },
   // TMDB externo (D-17, S06; exige TMDB_API_KEY). Séries e filmes têm faixas separadas porque no TMDB os dois tipos reutilizam os mesmos números.
-  tmdb_tv:    { min: 20000000, max: 29999999, offset: 20000000, ingestable: true },
+  tmdb_tv: { min: 20000000, max: 29999999, offset: 20000000, ingestable: true },
   tmdb_movie: { min: 30000000, max: 39999999, offset: 30000000, ingestable: true },
   // Animes da AniList SEM idMal (S13, D-26): id interno = 40_000_000 + id da AniList. Só a AniList conhece essas obras.
-  anilist:    { min: 40000000, max: 49999999, offset: 40000000, ingestable: true }
+  anilist: { min: 40000000, max: 49999999, offset: 40000000, ingestable: true }
 };
 
 // Aceita número ou string de dígitos; devolve inteiro positivo seguro ou lança MediaError(400).

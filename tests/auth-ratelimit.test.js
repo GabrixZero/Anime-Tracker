@@ -22,7 +22,9 @@ const PASS = 'senha-de-teste-1';
 let server;
 let base;
 test.before(async () => {
-  server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
+  server = await new Promise(resolve => {
+    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+  });
   base = `http://127.0.0.1:${server.address().port}/api`;
 });
 test.after(() => server.close());
@@ -34,7 +36,11 @@ async function post(route, body, token, method = 'POST') {
     body: JSON.stringify(body)
   });
   let json = null;
-  try { json = await res.json(); } catch { /* sem corpo */ }
+  try {
+    json = await res.json();
+  } catch {
+    /* sem corpo */
+  }
   return { status: res.status, body: json, headers: res.headers };
 }
 
@@ -85,7 +91,10 @@ test('trocar senha / excluir conta: tentativas erradas são limitadas por usuár
   const token = issueToken(user);
 
   for (let i = 0; i < 3; i++) {
-    assert.equal((await post('/auth/change-password', { currentPassword: 'senha-errada-99', newPassword: 'nova-senha-123' }, token)).status, 403);
+    assert.equal(
+      (await post('/auth/change-password', { currentPassword: 'senha-errada-99', newPassword: 'nova-senha-123' }, token)).status,
+      403
+    );
   }
   const blocked = await post('/auth/change-password', { currentPassword: 'senha-errada-99', newPassword: 'nova-senha-123' }, token);
   assert.equal(blocked.status, 429);

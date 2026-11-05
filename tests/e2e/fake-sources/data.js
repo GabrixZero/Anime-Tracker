@@ -13,6 +13,14 @@ const ep = (season, number, name, airdate) => ({
   image: null
 });
 
+// Dia civil (AAAA-MM-DD) de hoje + n dias no MESMO fuso do navegador dos testes (playwright.config.js: America/Sao_Paulo),
+// gerado na hora para os episódios da Agenda (S15) nunca envelhecerem nem divergirem do "hoje" da página perto da meia-noite UTC.
+const dayFromToday = n => {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const [y, m, d] = fmt.format(new Date()).split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+};
+
 // ---------------------------------------------------------------------------------------------------------------------------------
 // TVMaze: GET /search/shows?q=  e  GET /shows/:id?embed=episodes   (séries)
 // ---------------------------------------------------------------------------------------------------------------------------------
@@ -57,6 +65,28 @@ const TVMAZE_SHOWS = [
     image: null,
     summary: '<p>Outra série fictícia, para a busca ter mais de um resultado.</p>',
     episodes: [ep(1, 1, 'Piloto', '2024-09-01'), ep(1, 2, 'Órbita', '2024-09-08')]
+  },
+  {
+    // Série em exibição para a Agenda (S15): episódios hoje, amanhã, daqui a 3 dias e daqui a 20 dias (datas relativas a hoje).
+    id: 9003,
+    name: 'Estreias da Semana',
+    type: 'Scripted',
+    language: 'Portuguese',
+    genres: ['Comedy'],
+    status: 'Running',
+    premiered: dayFromToday(-30),
+    averageRuntime: 30,
+    rating: { average: null },
+    network: { name: 'Canal Fictício', country: { code: 'BR' } },
+    webChannel: null,
+    image: null,
+    summary: '<p>Série fictícia com episódios futuros, usada só na Agenda dos testes.</p>',
+    episodes: [
+      ep(1, 1, 'Estreia de Hoje', dayFromToday(0)),
+      ep(1, 2, 'Segundo Capítulo', dayFromToday(1)),
+      ep(1, 3, 'Terceira Parte', dayFromToday(3)),
+      ep(1, 4, 'Muito Mais Tarde', dayFromToday(20))
+    ]
   }
 ];
 
@@ -238,6 +268,15 @@ const EXPECTED = {
     episodes: 5,
     firstEpisode: 'O Começo da Jornada',
     seasonNames: ['Temporada 1 · Outono 2023', 'Temporada 2 · Primavera 2024']
+  },
+  calendar: {
+    name: 'Estreias da Semana',
+    query: 'Estreias da Semana',
+    id: 1_000_000 + 9003,
+    today: 'Estreia de Hoje',
+    tomorrow: 'Segundo Capítulo',
+    in3days: 'Terceira Parte',
+    in20days: 'Muito Mais Tarde'
   },
   movie: { name: 'Cidade Fantasma', query: 'Cidade Fantasma', id: 30_000_000 + 8801, runtime: 95 }
 };

@@ -12,7 +12,11 @@ function assertOnlySafeTags(html, label = '') {
   for (const t of tagsIn(html)) assert.ok(ALLOWED_TAGS.has(t), `${label} gerou <${t}>: ${html}`);
   // atributos só nos spans de spoiler, sempre os mesmos
   for (const m of html.matchAll(/<span\b([^>]*)>/g)) {
-    assert.match(m[1], /^ class="md-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="[^"<>]*"$/, `${label} span com atributo estranho: ${m[0]}`);
+    assert.match(
+      m[1],
+      /^ class="md-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="[^"<>]*"$/,
+      `${label} span com atributo estranho: ${m[0]}`
+    );
   }
   for (const m of html.matchAll(/<(strong|em|blockquote)\b([^>]*)>/g)) {
     assert.ok(m[2] === '' || m[2] === ' class="md-quote"', `${label} <${m[1]}> com atributo: ${m[2]}`);
@@ -35,17 +39,17 @@ test('asteriscos soltos ou colados em espaço continuam texto', () => {
 
 test('citação: linhas com "> " viram blockquote, agrupadas', () => {
   assert.equal(render('> frase marcante'), '<blockquote class="md-quote">frase marcante</blockquote>');
-  assert.equal(
-    render('antes\n> linha 1\n> linha 2\ndepois'),
-    'antes<blockquote class="md-quote">linha 1\nlinha 2</blockquote>depois'
-  );
+  assert.equal(render('antes\n> linha 1\n> linha 2\ndepois'), 'antes<blockquote class="md-quote">linha 1\nlinha 2</blockquote>depois');
   // ">" no meio da linha não é citação
   assert.equal(render('1 > 0'), '1 &gt; 0');
 });
 
 test('spoiler: escondido até clicar, com acessibilidade básica', () => {
   const html = render('o vilão é >!o mordomo!<');
-  assert.match(html, /^o vilão é <span class="md-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="[^"]+">o mordomo<\/span>$/);
+  assert.match(
+    html,
+    /^o vilão é <span class="md-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="[^"]+">o mordomo<\/span>$/
+  );
   assert.equal(render('>!só isto!<').startsWith('<span class="md-spoiler"'), true, '">!" no começo da linha é spoiler, não citação');
   assert.equal(render('>!x!<').includes('blockquote'), false);
   // sem fechamento ou vazio: texto comum
@@ -57,7 +61,10 @@ test('aninhamento: negrito/itálico dentro de citação e de spoiler, spoiler de
   assert.equal(render('**negrito com *itálico* dentro**'), '<strong>negrito com <em>itálico</em> dentro</strong>');
   assert.match(render('>!segredo **forte** e *suave*!<'), />segredo <strong>forte<\/strong> e <em>suave<\/em><\/span>$/);
   const quote = render('> fala **dele** e >!spoiler!<');
-  assert.match(quote, /^<blockquote class="md-quote">fala <strong>dele<\/strong> e <span class="md-spoiler"[^>]*>spoiler<\/span><\/blockquote>$/);
+  assert.match(
+    quote,
+    /^<blockquote class="md-quote">fala <strong>dele<\/strong> e <span class="md-spoiler"[^>]*>spoiler<\/span><\/blockquote>$/
+  );
   // marcas que cruzam a fronteira do spoiler não geram HTML mal aninhado: viram texto
   const crossed = render('**a >!b**c!<');
   assert.ok(!crossed.includes('<strong>'), crossed);
@@ -111,7 +118,15 @@ test('entrada estranha não quebra: null, número, texto gigante e marcas em exc
   assert.equal(render(undefined), '');
   assert.equal(render(123), '');
   assert.equal(render(''), '');
-  for (const nasty of ['*'.repeat(30000), '**'.repeat(15000), '> '.repeat(15000), '>!'.repeat(15000), '!<'.repeat(15000), '*a '.repeat(10000), '** a '.repeat(8000)]) {
+  for (const nasty of [
+    '*'.repeat(30000),
+    '**'.repeat(15000),
+    '> '.repeat(15000),
+    '>!'.repeat(15000),
+    '!<'.repeat(15000),
+    '*a '.repeat(10000),
+    '** a '.repeat(8000)
+  ]) {
     const t0 = Date.now();
     const html = render(nasty);
     assert.ok(Date.now() - t0 < 1500, 'demorou demais (backtracking?)');
@@ -129,12 +144,21 @@ test('toPlainText: tira as marcas e não vaza spoiler na prévia', () => {
 });
 
 test('toggleSpoiler revela e esconde, ajustando aria', () => {
-  const attrs = new Map([['aria-expanded', 'false'], ['aria-label', 'Spoiler escondido']]);
+  const attrs = new Map([
+    ['aria-expanded', 'false'],
+    ['aria-label', 'Spoiler escondido']
+  ]);
   const classes = new Set();
   const el = {
-    classList: { contains: (c) => classes.has(c), toggle: (c, on) => { if (on) classes.add(c); else classes.delete(c); } },
+    classList: {
+      contains: c => classes.has(c),
+      toggle: (c, on) => {
+        if (on) classes.add(c);
+        else classes.delete(c);
+      }
+    },
     setAttribute: (k, v) => attrs.set(k, v),
-    removeAttribute: (k) => attrs.delete(k)
+    removeAttribute: k => attrs.delete(k)
   };
   assert.equal(toggleSpoiler(el), true);
   assert.equal(classes.has('revealed'), true);

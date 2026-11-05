@@ -97,6 +97,17 @@ class UserModel {
     return true;
   }
 
+  // "Sair de todos os aparelhos" (S14): sobe o contador de versão da sessão; todo token emitido antes (claim "tv") passa a dar 401.
+  // Contador em vez de data: o token só guarda segundos, e um contador não confunde um token emitido no mesmo segundo.
+  revokeSessions(id) {
+    const users = this.getAll();
+    const user = users.find(u => u.id === id);
+    if (!user) return false;
+    user.tokenVersion = (Number.isInteger(user.tokenVersion) ? user.tokenVersion : 0) + 1;
+    this.saveAll(users);
+    return true;
+  }
+
   // --- arquivo ---
 
   // Lança DataCorruptionError se users.json existir mas estiver ilegível (e sem .bak válido): nunca devolve [] nesse caso,
@@ -132,7 +143,7 @@ class UserModel {
     return this.getAll().find(u => u.googleId === googleId) || null;
   }
 
-  // Dados mínimos para validar um token a cada requisição: { id, passwordChangedAtSec } ou null se a conta não existe mais.
+  // Dados mínimos para validar um token a cada requisição: { id, passwordChangedAtSec, tokenVersion } ou null se a conta não existe mais.
   // Fica em cache enquanto users.json não muda (comparando tamanho e data de modificação).
   authInfo(id) {
     if (typeof id !== 'string' || !id) return null;
@@ -142,7 +153,11 @@ class UserModel {
       const map = new Map();
       for (const u of this.getAll()) {
         const changed = u.passwordChangedAt ? Math.floor(Date.parse(u.passwordChangedAt) / 1000) : 0;
-        map.set(u.id, { id: u.id, passwordChangedAtSec: Number.isFinite(changed) ? changed : 0 });
+        map.set(u.id, {
+          id: u.id,
+          passwordChangedAtSec: Number.isFinite(changed) ? changed : 0,
+          tokenVersion: Number.isInteger(u.tokenVersion) ? u.tokenVersion : 0
+        });
       }
       this._authIndex = { stamp, map };
     }

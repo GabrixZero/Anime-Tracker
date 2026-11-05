@@ -3,7 +3,7 @@ const RateLimiter = require('../utils/rateLimiter');
 const { parseId } = require('../utils/ids');
 const { mediaErrors } = require('../utils/errors');
 const { sendError } = require('../utils/httpErrors');
-const { toListItem, toSearchItem } = require('../utils/mediaLight');
+const { toListItem, toSearchItem, toSummaryItem } = require('../utils/mediaLight');
 
 const VALID_TYPES = ['all', 'tv', 'anime', 'movie'];
 const MAX_QUERY_LENGTH = 100;
@@ -19,7 +19,8 @@ const revalidate = res => res.set('Cache-Control', 'no-cache');
 function readInt(req, name, fallback, min, max) {
   const raw = req.query[name];
   if (raw === undefined) return fallback;
-  if (typeof raw !== 'string' || !/^\d{1,9}$/.test(raw)) throw mediaErrors.invalidQuery(`Parâmetro "${name}" inválido: use um número inteiro.`);
+  if (typeof raw !== 'string' || !/^\d{1,9}$/.test(raw))
+    throw mediaErrors.invalidQuery(`Parâmetro "${name}" inválido: use um número inteiro.`);
   const n = Number(raw);
   if (n < min || n > max) throw mediaErrors.invalidQuery(`Parâmetro "${name}" fora da faixa permitida (${min} a ${max}).`);
   return n;
@@ -106,7 +107,9 @@ class MediaController {
       const ids = [...new Set(parts.map(part => parseId(part.trim())))];
       const { data, missing } = mediaService.getMany(ids);
       revalidate(res);
-      return res.json({ count: data.length, data, missing });
+      // ?summary=1 (S18): resumo por obra (temporadas com episódios enxutos, sem sinopses), bem menor que o detalhe completo
+      const summary = req.query.summary === '1';
+      return res.json({ count: data.length, data: summary ? data.map(toSummaryItem) : data, missing });
     } catch (err) {
       return sendError(res, err, 'Erro ao buscar detalhes das obras.', 'media/batch');
     }
@@ -135,7 +138,13 @@ class MediaController {
         if (!limit.ok) throw mediaErrors.tooManyRequests(limit.retryAfterSec);
       }
       const result = await mediaService.refresh(id, { force });
-      return res.json({ success: true, refreshed: result.refreshed, ...(result.reason ? { reason: result.reason } : {}), newEpisodes: result.newEpisodes, data: result.item });
+      return res.json({
+        success: true,
+        refreshed: result.refreshed,
+        ...(result.reason ? { reason: result.reason } : {}),
+        newEpisodes: result.newEpisodes,
+        data: result.item
+      });
     } catch (err) {
       return sendError(res, err, 'Falha ao atualizar a obra.', 'media/refresh');
     }

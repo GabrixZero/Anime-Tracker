@@ -25,10 +25,9 @@ amigo (celular/PC)  --https-->  link fixo  https://<máquina>.<rede>.ts.net   (o
 - [ ] Node.js 26+ e Git instalados (você já usa). Teste: `node --version` mostra `v26...`.
 - [ ] A sessão principal avisou que a **S11 chegou ao `main`**.
 - [ ] Você tem a conta do Gabriel no ShowVault hoje em `server\data` (modo antigo, arquivos JSON). Vamos copiar tudo para o banco novo **sem apagar nada do antigo**.
-- [ ] A pasta do projeto está **sempre disponível neste PC**: no Explorador de Arquivos, clique com o botão direito em `Antigravity Projeto` → *Manter sempre neste dispositivo*
-      (senão o OneDrive pode deixar os arquivos "só na nuvem" e o app não conseguir ligar sem internet).
+- [ ] A pasta do projeto fica **fora do OneDrive**, em `C:\Users\Gabri\Documents\Projetos\ShowVault`, então não há risco de arquivos "só na nuvem".
 - [ ] Uns 30 minutos. Os comandos abaixo rodam no **PowerShell, dentro da pasta do projeto**: no Explorador de Arquivos abra
-      `...\OneDrive\Documentos\Antigravity Projeto`, clique na barra de endereços, digite `powershell` e aperte Enter.
+      `C:\Users\Gabri\Documents\Projetos\ShowVault`, clique na barra de endereços, digite `powershell` e aperte Enter.
 
 ---
 
@@ -69,7 +68,7 @@ e nunca vai para o Git) e cria as pastas de dados e de backup. Você deve ver li
 
 Se aparecer **"Atenção"** com algo em `!`, leia: ele avisa de coisas como "dados dentro do OneDrive" ou "HOST aberto para a rede". Para só espiar sem gravar: `npm run setup:pc -- --dry-run`.
 
-> O `.env` fica na pasta do projeto (que está no OneDrive) e guarda o segredo dos logins. É a sua conta pessoal do OneDrive, mas **não compartilhe essa pasta com ninguém**.
+> O `.env` fica na pasta do projeto (fora do OneDrive) e guarda o segredo dos logins e os códigos de convite. **Não compartilhe essa pasta com ninguém** e nunca commite o `.env`.
 
 ### 1.4 Copie seus dados antigos para o banco novo
 
