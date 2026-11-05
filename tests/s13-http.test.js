@@ -25,6 +25,7 @@ const airing = (id, hoursAgo) => ({
   genres: ['Comédia'],
   status: 'Em Exibição',
   ingestedAt: new Date(Date.now() - 100 * HOUR).toISOString(),
+  scheduleVersion: 2,
   refreshedAt: new Date(Date.now() - hoursAgo * HOUR).toISOString(),
   seasons: [
     {

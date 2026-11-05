@@ -84,6 +84,13 @@ class DetailModalView {
     // Toggle de Assistido dentro do Diário
     document.getElementById('note-watched-toggle').addEventListener('change', () => {
       const { showId, seasonNum, epNum } = this.currentNoteEp;
+      // mesmo caminho do botão de episódio: marcar também marca os anteriores (D-AV2-3), com um aviso "Desfazer"
+      const media = window.appState.getMedia(showId);
+      if (media && media.type !== 'movie') {
+        window.appController.quickCheck(showId, seasonNum, epNum);
+        document.getElementById('note-watched-toggle').checked = window.appState.isWatched(showId, seasonNum, epNum);
+        return;
+      }
       const isWatched = window.appState.toggleWatched(showId, seasonNum, epNum);
       document.getElementById('note-watched-toggle').checked = isWatched;
       window.appController.onEpisodeToggled(showId, seasonNum, epNum);

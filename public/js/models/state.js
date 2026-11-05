@@ -401,6 +401,67 @@ class AppState {
     return isNowWatched;
   }
 
+  // Marca o episódio como assistido E todos os anteriores já lançados (Ajustes 2, D-AV2-3), numa única gravação/sincronização.
+  // Devolve { count, snapshot }: `count` = episódios que passaram a ficar assistidos (inclui o clicado); `snapshot` serve ao desfazer.
+  // Episódio já assistido não muda (nem a data em que foi visto). Filmes e episódio já assistido: use toggleWatched.
+  markWatchedUpTo(showId, seasonNum, epNum) {
+    const show = this.getMedia(showId);
+    const W = window.WatchStatus;
+    const todayKey = window.Calendar ? window.Calendar.dayKey(new Date()) : null;
+    const extra = W.episodesToCascade(show, seasonNum, epNum, (s, e) => this.isWatched(showId, s, e), todayKey);
+    const targets = [...extra, { season: Number(seasonNum), episode: Number(epNum) }];
+    const snapshot = [];
+    const tracked = this.getTracked(showId);
+    snapshot.statusBefore = tracked ? tracked.status : null;
+    for (const t of targets) {
+      const key = window.ViewKit.makeKey(showId, t.season, t.episode);
+      const current = this.data.watchedEpisodes[key];
+      if (current && current.watched) continue;
+      snapshot.push({
+        key,
+        before: current ? { ...current } : null,
+        tombstone: this.data.tombstones.watched[key] || null
+      });
+      const at = this.stampFor('watched', key, current && current.updatedAt);
+      this.data.watchedEpisodes[key] = {
+        watched: true,
+        watchedAt: at,
+        updatedAt: at,
+        rewatchCount: current && current.rewatchCount ? current.rewatchCount : 1
+      };
+      this.clearDeleted('watched', key);
+    }
+    if (snapshot.length === 0) return { count: 0, snapshot };
+    this.invalidateProgress(showId);
+    this.applyProgressRules(showId, true);
+    this.save();
+    return { count: snapshot.length, snapshot };
+  }
+
+  // Desfaz um markWatchedUpTo: volta cada episódio ao que era (marcas novas, para a sincronização entre aparelhos entender a mudança).
+  undoMarkWatched(showId, snapshot) {
+    if (!Array.isArray(snapshot) || snapshot.length === 0) return 0;
+    for (const item of snapshot) {
+      const current = this.data.watchedEpisodes[item.key];
+      if (item.before && item.before.watched) continue; // já estava assistido antes: nada a desfazer
+      if (item.before) {
+        const at = this.stampFor('watched', item.key, current && current.updatedAt);
+        this.data.watchedEpisodes[item.key] = { ...item.before, updatedAt: at };
+      } else if (current) {
+        delete this.data.watchedEpisodes[item.key];
+        this.markDeleted('watched', item.key, current.updatedAt || current.watchedAt);
+      }
+    }
+    this.invalidateProgress(showId);
+    const tracked = this.getTracked(showId);
+    if (tracked && snapshot.statusBefore && tracked.status !== snapshot.statusBefore) {
+      tracked.status = snapshot.statusBefore; // volta ao status de antes da marcação em lote
+      tracked.updatedAt = this.stamp(tracked.updatedAt, tracked.addedAt);
+    } else this.applyProgressRules(showId, false);
+    this.save();
+    return snapshot.length;
+  }
+
   batchSetSeason(showId, seasonNum, shouldWatch) {
     const show = this.getMedia(showId);
     if (!show || !show.seasons) return;

@@ -135,9 +135,38 @@ class AppController {
   }
 
   quickCheck(showId, seasonNum = null, epNum = null) {
+    const state = window.appState;
+    const media = state.getMedia(showId);
+    const isSeries = media && media.type !== 'movie' && seasonNum !== null && epNum !== null;
+    // Marcar o episódio N marca também todos os anteriores já lançados (D-AV2-3): uma gravação só e um aviso com "Desfazer".
+    // Desmarcar mexe só no próprio episódio.
+    if (isSeries && !state.isWatched(showId, seasonNum, epNum)) {
+      const { count, snapshot } = state.markWatchedUpTo(showId, seasonNum, epNum);
+      if (count > 1) {
+        this.showToast(count + ' episódios marcados.', 'success', {
+          label: 'Desfazer',
+          onClick: () => {
+            state.undoMarkWatched(showId, snapshot);
+            this.refreshBatch(showId);
+            this.showToast('Desfeito.');
+          }
+        });
+      } else {
+        this.showToast('Marcado como assistido!', 'success');
+      }
+      this.refreshBatch(showId);
+      return;
+    }
     const isWatched = window.appState.toggleWatched(showId, seasonNum, epNum);
     this.showToast(isWatched ? 'Marcado como assistido!' : 'Desmarcado.', 'success');
     this.onEpisodeToggled(showId, seasonNum, epNum);
+  }
+
+  // Depois de marcar/desfazer VÁRIOS episódios de uma vez: as listas atualizam a obra uma vez; o modal repinta as linhas da temporada aberta.
+  refreshBatch(showId) {
+    this.refreshShow(showId);
+    const modal = window.detailModalView;
+    if (modal.isOpenFor(showId)) modal.syncEpisodeRows();
   }
 
   // Depois de marcar/desmarcar um episódio ou filme (S09): atualiza só o que mudou, não a tela inteira.
@@ -370,7 +399,8 @@ class AppController {
     }
   }
 
-  showToast(message, type = 'info') {
+  // `action` (opcional) = { label, onClick }: botão dentro do aviso (ex.: "Desfazer"); fica mais tempo na tela.
+  showToast(message, type = 'info', action = null) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : ''}`;
@@ -382,6 +412,18 @@ class AppController {
     text.textContent = String(message);
     toast.append(icon, text);
     toast.addEventListener('click', () => toast.remove()); // S19: um toque fecha o aviso
+    if (action && typeof action.onClick === 'function') {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toast-action';
+      btn.textContent = String(action.label || 'Desfazer');
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        toast.remove();
+        action.onClick();
+      });
+      toast.appendChild(btn);
+    }
     container.appendChild(toast);
     const narrow = !!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
     setTimeout(
@@ -391,7 +433,7 @@ class AppController {
         toast.style.transition = 'all 0.25s ease';
         setTimeout(() => toast.remove(), 250);
       },
-      type === 'error' ? (narrow ? 5000 : 7000) : narrow ? 2800 : 4500
+      action ? 8000 : type === 'error' ? (narrow ? 5000 : 7000) : narrow ? 2800 : 4500
     ); // um pouco mais de tempo para ler (acessibilidade)
   }
 }

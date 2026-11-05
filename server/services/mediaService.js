@@ -28,6 +28,9 @@ const TVMAZE_STATUS_PT = {
 const JIKAN_EPISODE_FORMATS = new Set(['TV', 'TV_SHORT', 'ONA', 'OVA', 'SPECIAL']);
 const AIRING_STATUS = 'Em Exibição';
 const UPCOMING_STATUS = 'Em breve';
+// Versão do mapeamento dos episódios (2 = episódios futuros com data confirmada, Agenda de 90 dias). Obras em exibição guardadas com versão
+// menor são atualizadas na próxima abertura da Agenda, sem esperar a validade de 6 h.
+const SCHEDULE_VERSION = 2;
 const FORCE_REFRESH_MIN_MS = 10 * 60 * 1000; // atualização forçada da mesma obra: no máximo 1 vez a cada 10 min
 const REFRESH_RETRY_AFTER_FAILURE_MS = 30 * 60 * 1000; // a conferência automática não insiste numa obra que acabou de falhar
 
@@ -660,7 +663,7 @@ class MediaService {
   // Marcas de tempo de uma ingestão: `ingestedAt` = primeira vez (não muda nas atualizações); `refreshedAt` = última vez que os dados vieram da fonte.
   static stamps(previous) {
     const now = new Date().toISOString();
-    return { ingestedAt: (previous && previous.ingestedAt) || now, refreshedAt: now };
+    return { ingestedAt: (previous && previous.ingestedAt) || now, refreshedAt: now, scheduleVersion: SCHEDULE_VERSION };
   }
 
   async ingestTvmaze(numId, tvmazeId, { previous = null } = {}) {
@@ -798,6 +801,8 @@ class MediaService {
       return released ? null : this.upcomingTtlMs;
     }
     if (item.needsRefresh) return 0;
+    // Obra em exibição/em breve guardada por uma versão antiga do mapeamento (sem os episódios futuros datados): atualiza na hora, uma vez.
+    if ((item.status === AIRING_STATUS || item.status === UPCOMING_STATUS) && (item.scheduleVersion || 0) < SCHEDULE_VERSION) return 0;
     if (item.status === AIRING_STATUS) return this.airingTtlMs;
     if (item.status === UPCOMING_STATUS) return this.upcomingTtlMs;
     return null;

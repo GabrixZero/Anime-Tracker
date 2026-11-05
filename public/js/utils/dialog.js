@@ -51,6 +51,12 @@
       return Array.from(container.querySelectorAll(FOCUSABLE)).filter(isVisible);
     }
 
+    // Botões de ação dos avisos (ex.: "Desfazer"): ficam fora do diálogo, mas o teclado precisa alcançá-los (Ajustes 2).
+    function toastActions() {
+      if (typeof doc.querySelectorAll !== 'function') return [];
+      return Array.from(doc.querySelectorAll('.toast-action')).filter(isVisible);
+    }
+
     function isConnected(el) {
       return !!el && (el.isConnected !== undefined ? el.isConnected : doc.contains(el));
     }
@@ -176,9 +182,9 @@
         return;
       }
       if (e.key !== 'Tab') return;
-      const list = focusables(t.dialog);
+      const list = focusables(t.dialog).concat(toastActions());
       const active = doc.activeElement;
-      const inside = !!active && t.dialog.contains(active);
+      const inside = !!active && (t.dialog.contains(active) || list.includes(active));
       const next = nextFocusIndex(list.length, list.indexOf(active), e.shiftKey, inside);
       if (next === -2) {
         e.preventDefault();
@@ -193,6 +199,7 @@
     function onFocusin(e) {
       const t = top();
       if (!t || t.dialog.contains(e.target)) return;
+      if (e.target && e.target.classList && e.target.classList.contains('toast-action')) return; // botão do aviso (ex.: Desfazer)
       const list = focusables(t.dialog);
       (list[0] || t.dialog).focus();
     }

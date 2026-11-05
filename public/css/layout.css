@@ -397,6 +397,36 @@
   }
 }
 
+/* Com conta o cabecalho ganha o perfil (avatar, nome, nuvem, 2 botoes) e passava da largura da janela.
+   Nome e selo ficam mais curtos (com reticencias) e, se ainda assim nao couber, a area da direita desce para uma segunda linha
+   (sem esconder nada). */
+@media (min-width: 1025px) and (max-width: 1560px) {
+  .app-header {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+  .header-left {
+    min-width: 0;
+  }
+  .header-right {
+    min-width: 0;
+    margin-left: auto;
+  }
+  .user-logged-profile {
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
+  }
+  .user-display-name {
+    max-width: 80px;
+  }
+  .user-cloud-badge {
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 /* Notebook estreito: so os rotulos nas abas */
 @media (min-width: 1025px) and (max-width: 1140px) {
   .nav-tab svg {

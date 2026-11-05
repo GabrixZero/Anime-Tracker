@@ -35,6 +35,7 @@ const legacy = (id, o = {}) => ({
   genres: ['Drama'],
   status: 'Em Exibição',
   ingestedAt: '2026-10-25T10:00:00.000Z',
+  scheduleVersion: 2,
   seasons: [
     {
       season_number: 1,
@@ -225,7 +226,7 @@ test('obra migrada é atualizada pela fonte: dados reais entram, o selo some, in
 
 test('validade por obra: em exibição 6 h, em breve 24 h; finalizada, filme e obra do seed nunca vencem', () => {
   const svc = new MediaService({ dataDir: T.newDir(), jikanEnabled: false, anilistEnabled: false, tmdbKey: '' });
-  const base = { id: 1000001, type: 'tv', name: 'X', ingestedAt: '2026-10-27T00:00:00.000Z' };
+  const base = { id: 1000001, type: 'tv', name: 'X', ingestedAt: '2026-10-27T00:00:00.000Z', scheduleVersion: 2 };
   const t0 = Date.parse(base.ingestedAt);
   assert.equal(svc.refreshTtlMs({ ...base, status: 'Em Exibição' }), 6 * HOUR);
   assert.equal(svc.refreshTtlMs({ ...base, status: 'Em breve' }), 24 * HOUR);
