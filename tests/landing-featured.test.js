@@ -30,7 +30,8 @@ function fakeTmdb({ enabled = true, posters = {}, fail = false } = {}) {
     }
   };
 }
-const make = (tmdb, clock, dir) => new LandingFeatured({ tmdb, dataDir: dir || fs.mkdtempSync(path.join(DATA_DIR, 'c-')), now: () => clock.t });
+const make = (tmdb, clock, dir) =>
+  new LandingFeatured({ tmdb, dataDir: dir || fs.mkdtempSync(path.join(DATA_DIR, 'c-')), now: () => clock.t });
 
 test('a lista fixa tem 3 títulos reais (série, anime e filme) com ids do TMDB', () => {
   assert.deepEqual(

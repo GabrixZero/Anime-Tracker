@@ -13,7 +13,6 @@ html[data-view='landing'] .lp {
 }
 html[data-view='landing'] .app-header,
 html[data-view='landing'] .app-main,
-html[data-view='landing'] .app-credits,
 html[data-view='landing'] body > .skip-link:not(.lp-skip) {
   display: none;
 }
@@ -158,9 +157,30 @@ html[data-view='landing'] body > .skip-link:not(.lp-skip) {
 }
 .lp-mock-poster {
   flex: none;
-  width: 44px;
-  height: 64px;
+  position: relative;
+  width: 48px;
+  height: 72px;
   border-radius: 6px;
+  overflow: hidden;
+}
+.lp-mock-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.lp-mock-wrap {
+  min-width: 0;
+}
+.lp-mock-credit {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.lp-mock-credit a {
+  color: var(--text-secondary);
 }
 .lp-tone-a {
   background: linear-gradient(160deg, #38bdf8, #6366f1);
@@ -218,6 +238,9 @@ html[data-view='landing'] body > .skip-link:not(.lp-skip) {
   color: var(--tvtime-yellow);
   font-family: var(--font-display);
   font-weight: 800;
+}
+.lp-mock-score::after {
+  content: '\2605';
 }
 
 /* Seções */
@@ -297,24 +320,6 @@ html[data-view='landing'] body > .skip-link:not(.lp-skip) {
 .lp-final-in p {
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
-}
-
-/* Rodapé */
-.lp-footer {
-  border-top: 1px solid var(--bg-card-border);
-  padding: 2rem 0 2.5rem;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-.lp .lp-footer-title {
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
-}
-.lp-footer p + p {
-  margin-top: 0.4rem;
-}
-.lp-footer a {
-  color: var(--tvtime-yellow);
 }
 
 #lp-main:focus {

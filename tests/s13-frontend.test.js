@@ -396,18 +396,28 @@ test('detalhe: amostra pendente, anônimo = aviso escrito e sem nova busca; loga
   assert.ok(real.els.get('show-modal-header').innerHTML.includes('Obra Real'));
 });
 
-test('rodapé "Créditos dos dados": textos de TMDB, TVMaze e AniList, links seguros, sem imagem e sem style/onclick', () => {
+test('créditos: o rodapé saiu do app e da landing; a página creditos.html tem os textos, links seguros e nenhum script/style/imagem', () => {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf-8');
-  const footer = /<footer class="app-credits"[\s\S]*?<\/footer>/.exec(html);
-  assert.ok(footer, 'rodapé existe');
-  const f = footer[0];
-  assert.match(f, /Créditos dos dados/);
-  assert.match(f, /Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB\./);
-  assert.match(f, /Dados de séries também do TVMaze \(CC BY-SA 4\.0\)/);
-  assert.match(f, /Dados de animes da AniList; ShowVault é não oficial/);
-  for (const host of ['themoviedb.org', 'tvmaze.com', 'anilist.co']) {
-    const link = new RegExp('<a href="https://[^"]*' + host.replace('.', '[.]') + '/"[^>]*rel="noopener noreferrer"');
-    assert.match(f, link, host);
+  assert.ok(!/<footer/i.test(html), 'sem <footer> no index.html');
+  assert.ok(!/app-credits|lp-footer/.test(html));
+  const page = fs.readFileSync(path.join(ROOT, 'creditos.html'), 'utf-8');
+  assert.equal((page.match(/<h1[ >]/g) || []).length, 1);
+  assert.match(page, /This product uses the TMDB API but is not endorsed or certified by TMDB./);
+  assert.match(page, /Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB./);
+  assert.match(page, /TVMaze/);
+  assert.match(page, /CC BY-SA 4.0/);
+  assert.match(page, /ODbL\s+1\.0/);
+  for (const host of [
+    'themoviedb.org/',
+    'tvmaze.com/',
+    'anilist.co/',
+    'jikan.moe/',
+    'github.com/Fribb/anime-lists',
+    'github.com/manami-project/anime-offline-database',
+    'github.com/Anime-Lists/anime-lists'
+  ]) {
+    assert.match(page, new RegExp('<a href="https://[^"]*' + host.replace(/[.]/g, '[.]') + '"[^>]*rel="noopener noreferrer"'), host);
   }
-  assert.ok(!/<img|style=|onclick=/i.test(f));
+  assert.ok(!/<img|<script|style=|onclick=|logo/i.test(page), 'só texto e links (sem logo do TMDB)');
+  assert.equal((html.match(/href="creditos.html"/g) || []).length, 3, 'links: Entrar/Cadastrar, Minha conta e o mockup da landing');
 });

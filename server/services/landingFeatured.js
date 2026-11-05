@@ -34,7 +34,8 @@ class LandingFeatured {
     try {
       const raw = JSON.parse(fs.readFileSync(this.file, 'utf-8'));
       for (const [id, v] of Object.entries(raw || {})) {
-        if (v && Number.isFinite(v.at) && (v.path === null || POSTER_PATH.test(String(v.path)))) this.memory[id] = { path: v.path, at: v.at };
+        if (v && Number.isFinite(v.at) && (v.path === null || POSTER_PATH.test(String(v.path))))
+          this.memory[id] = { path: v.path, at: v.at };
       }
     } catch {
       /* sem arquivo (ou ilegível): começa vazio */
