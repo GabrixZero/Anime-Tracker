@@ -24,6 +24,14 @@ class AccountView {
       e.preventDefault();
       this.handleDelete();
     });
+    // Mostra o que falta na nova senha enquanto digita (mesma regra do servidor: passwordRules.js)
+    document.getElementById('account-new-password').addEventListener('input', e => {
+      const value = e.target.value;
+      const live = value === '' ? '' : window.checkPasswordRules(value, 'A nova senha').error || '';
+      this.showMessage('account-new-password-error', live);
+      if (live) e.target.setAttribute('aria-invalid', 'true');
+      else e.target.removeAttribute('aria-invalid');
+    });
     // Some o aviso assim que a pessoa volta a digitar
     [
       ['account-current-password', 'account-password-msg'],
@@ -105,10 +113,10 @@ class AccountView {
     const next = document.getElementById('account-new-password').value;
     const again = document.getElementById('account-confirm-password').value;
 
+    const rules = window.checkPasswordRules(next, 'A nova senha');
     let problem = '';
     if (!current) problem = 'Informe a senha atual.';
-    else if (next.length < 8) problem = 'A nova senha precisa ter pelo menos 8 caracteres.';
-    else if (next.length > 128) problem = 'A nova senha pode ter no máximo 128 caracteres.';
+    else if (!rules.ok) problem = rules.error;
     else if (next !== again) problem = 'A confirmação não é igual à nova senha.';
     else if (next === current) problem = 'A nova senha precisa ser diferente da atual.';
     if (problem) {

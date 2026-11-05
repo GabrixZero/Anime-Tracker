@@ -80,6 +80,7 @@
   position: absolute;
   top: 18px;
   right: 18px;
+  z-index: 20; /* acima do .tvtime-auth-content (z-index 2), senão o conteúdo cobre o X e o clique não chega */
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -279,19 +280,6 @@
   box-shadow: 0 6px 20px rgba(255, 208, 0, 0.45);
 }
 
-.tvtime-auth-footer {
-  text-align: center;
-  margin-top: 1.25rem;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-.tvtime-auth-footer a {
-  color: var(--tvtime-yellow);
-  text-decoration: none;
-  font-weight: 700;
-}
-
 /* Celular (S05): o cartao de login rola dentro da tela quando o teclado ocupa espaco */
 @media (max-width: 768px) {
   .tvtime-auth-overlay {
@@ -327,6 +315,17 @@
   margin-top: 0.35rem;
   font-size: var(--fs-meta, 0.8rem);
   color: var(--text-muted);
+}
+
+.auth-field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: var(--fs-meta, 0.8rem);
+  color: #fda4af;
+}
+
+input[aria-invalid='true'] {
+  border-color: rgba(244, 63, 94, 0.7);
 }
 
 .auth-form-error {

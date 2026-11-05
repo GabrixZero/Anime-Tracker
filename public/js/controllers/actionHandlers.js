@@ -43,7 +43,6 @@
   });
 
   // Login
-  A.on('auth-mode', el => window.authView.switchMode(el.getAttribute('data-mode')));
   // "Perdi a senha": por enquanto só um aviso (a recuperação por e-mail ainda não existe)
   A.on('forgot-password', () => document.getElementById('tvtime-forgot-note').classList.remove('hidden'));
 

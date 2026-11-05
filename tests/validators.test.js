@@ -37,21 +37,21 @@ test('e-mail: normaliza e rejeita formatos inválidos sem lançar', () => {
 });
 
 test('cadastro: aceita o caso feliz e limpa os campos', () => {
-  const r = v.validateRegister({ email: 'ana@exemplo.com', password: '12345678', name: '  Ana  ', avatar: ' https://x.test/a.png ' });
+  const r = v.validateRegister({ email: 'ana@exemplo.com', password: 'senha1234', name: '  Ana  ', avatar: ' https://x.test/a.png ' });
   assert.equal(r.ok, true);
-  assert.deepEqual(r.value, { email: 'ana@exemplo.com', password: '12345678', name: 'Ana', avatar: 'https://x.test/a.png' });
-  const minimal = v.validateRegister({ email: 'ana@exemplo.com', password: '12345678' });
+  assert.deepEqual(r.value, { email: 'ana@exemplo.com', password: 'senha1234', name: 'Ana', avatar: 'https://x.test/a.png' });
+  const minimal = v.validateRegister({ email: 'ana@exemplo.com', password: 'senha1234' });
   assert.deepEqual([minimal.ok, minimal.value.name, minimal.value.avatar], [true, null, null]);
 });
 
 test('cadastro: limites de senha (8 a 128) e nome (até 60)', () => {
   const base = { email: 'ana@exemplo.com' };
-  assert.equal(v.validateRegister({ ...base, password: 'x'.repeat(7) }).ok, false);
-  assert.equal(v.validateRegister({ ...base, password: 'x'.repeat(8) }).ok, true);
-  assert.equal(v.validateRegister({ ...base, password: 'x'.repeat(128) }).ok, true);
-  assert.equal(v.validateRegister({ ...base, password: 'x'.repeat(129) }).ok, false);
-  assert.equal(v.validateRegister({ ...base, password: '12345678', name: 'n'.repeat(60) }).ok, true);
-  assert.equal(v.validateRegister({ ...base, password: '12345678', name: 'n'.repeat(61) }).ok, false);
+  assert.equal(v.validateRegister({ ...base, password: 'x1'.repeat(3) + 'a' }).ok, false);
+  assert.equal(v.validateRegister({ ...base, password: 'x1'.repeat(4) }).ok, true);
+  assert.equal(v.validateRegister({ ...base, password: 'x1'.repeat(64) }).ok, true);
+  assert.equal(v.validateRegister({ ...base, password: 'x1'.repeat(64) + 'a' }).ok, false);
+  assert.equal(v.validateRegister({ ...base, password: 'senha1234', name: 'n'.repeat(60) }).ok, true);
+  assert.equal(v.validateRegister({ ...base, password: 'senha1234', name: 'n'.repeat(61) }).ok, false);
 });
 
 test('qualquer corpo que não seja objeto é inválido (sem exceção)', () => {

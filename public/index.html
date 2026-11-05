@@ -678,7 +678,16 @@
 
               <div class="tvtime-field">
                 <label for="input-tvtime-email">E-mail</label>
-                <input type="email" id="input-tvtime-email" placeholder="seu@email.com" maxlength="254" autocomplete="email" required />
+                <input
+                  type="email"
+                  id="input-tvtime-email"
+                  placeholder="seu@email.com"
+                  maxlength="254"
+                  autocomplete="email"
+                  aria-describedby="tvtime-email-error"
+                  required
+                />
+                <small id="tvtime-email-error" class="hidden auth-field-error" role="alert"></small>
               </div>
 
               <div class="tvtime-field">
@@ -689,9 +698,13 @@
                   placeholder="••••••••"
                   maxlength="128"
                   autocomplete="current-password"
+                  aria-describedby="tvtime-password-hint tvtime-password-error"
                   required
                 />
-                <small id="tvtime-password-hint" class="hidden auth-field-hint">Use de 8 a 128 caracteres.</small>
+                <small id="tvtime-password-hint" class="hidden auth-field-hint"
+                  >Use de 8 a 128 caracteres, com pelo menos uma letra e um número.</small
+                >
+                <small id="tvtime-password-error" class="hidden auth-field-error" aria-live="polite"></small>
                 <button
                   type="button"
                   class="auth-switch-link auth-forgot-link"
@@ -725,15 +738,6 @@
 
               <button type="submit" class="btn-tvtime-submit" id="btn-tvtime-auth-submit">Entrar na Conta</button>
             </form>
-
-            <div class="tvtime-auth-footer">
-              <span id="tvtime-switch-link"
-                >Não tem conta?
-                <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">
-                  Cadastre-se grátis
-                </button></span
-              >
-            </div>
           </div>
         </div>
       </div>
@@ -782,10 +786,13 @@
                     id="account-new-password"
                     maxlength="128"
                     autocomplete="new-password"
-                    aria-describedby="account-new-password-hint"
+                    aria-describedby="account-new-password-hint account-new-password-error"
                     required
                   />
-                  <small id="account-new-password-hint" class="auth-field-hint">Use de 8 a 128 caracteres.</small>
+                  <small id="account-new-password-hint" class="auth-field-hint"
+                    >Use de 8 a 128 caracteres, com pelo menos uma letra e um número.</small
+                  >
+                  <small id="account-new-password-error" class="hidden auth-field-error" aria-live="polite"></small>
                 </div>
                 <div class="tvtime-field">
                   <label for="account-confirm-password">Repita a nova senha</label>
@@ -1087,6 +1094,7 @@
     <script src="js/utils/watchStatus.js"></script>
     <script src="js/utils/calendar.js"></script>
     <script src="js/utils/backupValidator.js"></script>
+    <script src="js/utils/passwordRules.js"></script>
     <script src="js/utils/migrations.js"></script>
     <script src="js/api/apiClient.js"></script>
     <script src="js/models/state.js"></script>

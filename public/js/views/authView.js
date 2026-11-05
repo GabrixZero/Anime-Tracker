@@ -36,6 +36,13 @@ class AuthView {
     ['input-tvtime-name', 'input-tvtime-email', 'input-tvtime-password', 'input-tvtime-invite'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => this.showError(''));
     });
+    document.getElementById('input-tvtime-email').addEventListener('input', () => this.showFieldError('email', ''));
+    // Cadastro: mostra o que falta na senha enquanto digita (a regra é a mesma do servidor: passwordRules.js)
+    document.getElementById('input-tvtime-password').addEventListener('input', e => {
+      const value = e.target.value;
+      const live = this.mode === 'register' && value !== '' ? window.checkPasswordRules(value).error : '';
+      this.showFieldError('password', live || '');
+    });
 
     // Logout
     document.getElementById('btn-logout').addEventListener('click', () => this.handleLogout());
@@ -109,6 +116,16 @@ class AuthView {
     box.classList.toggle('hidden', !message);
   }
 
+  // Mensagem junto de um campo ('email' ou 'password'; '' limpa) com aria-invalid no input.
+  showFieldError(field, message) {
+    const box = document.getElementById(`tvtime-${field}-error`);
+    const input = document.getElementById(`input-tvtime-${field}`);
+    box.textContent = message || '';
+    box.classList.toggle('hidden', !message);
+    if (message) input.setAttribute('aria-invalid', 'true');
+    else input.removeAttribute('aria-invalid');
+  }
+
   setBusy(busy) {
     this.busy = busy;
     const btn = document.getElementById('btn-tvtime-auth-submit');
@@ -119,12 +136,13 @@ class AuthView {
   switchMode(mode) {
     this.mode = mode;
     this.showError('');
+    this.showFieldError('email', '');
+    this.showFieldError('password', '');
     const title = document.getElementById('tvtime-auth-title');
     const submitBtn = document.getElementById('btn-tvtime-auth-submit');
     const nameField = document.getElementById('tvtime-name-field');
     const tabLogin = document.getElementById('tvtime-tab-login');
     const tabRegister = document.getElementById('tvtime-tab-register');
-    const footerLink = document.getElementById('tvtime-switch-link');
     const passwordInput = document.getElementById('input-tvtime-password');
     const passwordHint = document.getElementById('tvtime-password-hint');
     const forgotNote = document.getElementById('tvtime-forgot-note');
@@ -140,7 +158,6 @@ class AuthView {
       passwordInput.setAttribute('autocomplete', 'new-password');
       tabRegister.classList.add('active');
       tabLogin.classList.remove('active');
-      footerLink.innerHTML = `Já tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="login">Entrar agora</button>`;
     } else {
       title.innerHTML = 'Bem-vindo ao <span>ShowVault</span>';
       submitBtn.textContent = 'Entrar na Conta';
@@ -149,7 +166,6 @@ class AuthView {
       passwordInput.setAttribute('autocomplete', 'current-password');
       tabLogin.classList.add('active');
       tabRegister.classList.remove('active');
-      footerLink.innerHTML = `Não tem conta? <button type="button" class="auth-switch-link" data-action="auth-mode" data-mode="register">Cadastre-se grátis</button>`;
     }
   }
 
@@ -214,18 +230,21 @@ class AuthView {
   // ---------------- E-mail e senha ----------------
 
   // Validação no navegador (mesmas regras do servidor, só para responder rápido; o servidor sempre revalida).
+  // Devolve { email, password, general } com a mensagem de cada campo ('' = ok).
   validateForm({ name, email, password, inviteCode = '' }) {
-    if (!email) return 'Informe o e-mail.';
-    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'E-mail inválido. Use o formato nome@exemplo.com.';
-    if (!password) return 'Informe a senha.';
-    if (password.length > 128) return 'A senha pode ter no máximo 128 caracteres.';
+    const out = { email: '', password: '', general: '' };
+    if (!email) out.email = 'Informe o e-mail.';
+    else if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      out.email = 'E-mail inválido. Use o formato nome@exemplo.com.';
+    if (!password) out.password = 'Informe a senha.';
+    else if (this.mode === 'register') out.password = window.checkPasswordRules(password).error || '';
+    else if (password.length > 128) out.password = 'A senha pode ter no máximo 128 caracteres.';
     if (this.mode === 'register') {
-      if (password.length < 8) return 'A senha precisa ter pelo menos 8 caracteres.';
-      if ([...name].length > 60) return 'O nome pode ter no máximo 60 caracteres.';
-      if (/[<>]/.test(name)) return 'O nome não pode conter os caracteres < ou >.';
-      if (this.inviteRequired && !inviteCode) return 'Informe o código de convite.';
+      if ([...name].length > 60) out.general = 'O nome pode ter no máximo 60 caracteres.';
+      else if (/[<>]/.test(name)) out.general = 'O nome não pode conter os caracteres < ou >.';
+      else if (this.inviteRequired && !inviteCode) out.general = 'Informe o código de convite.';
     }
-    return '';
+    return out;
   }
 
   friendlyError(err) {
@@ -254,12 +273,16 @@ class AuthView {
     const inviteCode = document.getElementById('input-tvtime-invite').value.trim();
 
     const problem = this.validateForm({ name, email, password, inviteCode });
-    if (problem) {
-      this.showError(problem);
+    this.showFieldError('email', problem.email);
+    this.showFieldError('password', problem.password);
+    this.showError(problem.general);
+    if (problem.email || problem.password || problem.general) {
+      // foco no primeiro campo com erro, sem enviar nada ao servidor
+      const first = problem.email ? 'input-tvtime-email' : problem.password ? 'input-tvtime-password' : null;
+      if (first) document.getElementById(first).focus();
       return;
     }
 
-    this.showError('');
     this.setBusy(true);
     try {
       const res =
