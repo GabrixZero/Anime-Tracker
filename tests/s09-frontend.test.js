@@ -229,6 +229,7 @@ function makeApp({ catalog = catalogFor(), library = null, withController = true
     'utils/viewKit.js',
     'utils/libraryMerge.js',
     'utils/rating.js',
+    'utils/genreStats.js',
     'utils/watchStatus.js',
     'utils/backupValidator.js',
     'utils/migrations.js'

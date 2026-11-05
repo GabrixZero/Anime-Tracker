@@ -260,6 +260,7 @@ function makeDevice(model, { withViews = false, firstVisit = false } = {}) {
     'utils/viewKit.js',
     'utils/libraryMerge.js',
     'utils/rating.js',
+    'utils/genreStats.js',
     'utils/watchStatus.js',
     'utils/backupValidator.js',
     'utils/migrations.js'

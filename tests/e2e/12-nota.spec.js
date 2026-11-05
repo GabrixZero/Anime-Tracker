@@ -53,6 +53,7 @@ test.describe('nota pessoal', () => {
     await expect(toast(page, 'Nota removida.').first()).toBeVisible();
     await expect(listCard(page, 'Breaking Bad').locator('.rating-user-badge')).toHaveCount(0);
     await gotoTab(page, 'stats');
-    await expect(page.locator('#stats-rating-chart')).toContainText('ainda não deu nenhuma nota');
+    await expect(page.locator('#stats-rating-summary')).toContainText('Média das notas');
+    await expect(page.locator('#stats-rating-top')).toContainText('Nenhuma obra avaliada ainda');
   });
 });
