@@ -16,7 +16,7 @@ test.describe('nota pessoal', () => {
     await gotoTab(page, 'watchlist');
     await tap(page.getByRole('button', { name: 'Breaking Bad', exact: true }));
     await expect(modal(page)).toBeVisible();
-    await expect(modal(page).getByText('Nota do catálogo:')).toBeVisible();
+    await expect(modal(page).getByText('Nota do catálogo')).toHaveCount(0);
 
     const input = modal(page).getByLabel('Minha nota (0 a 10)', { exact: false }).first();
     const clear = modal(page).getByRole('button', { name: 'Remover nota' });

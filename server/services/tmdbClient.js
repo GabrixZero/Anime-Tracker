@@ -120,7 +120,7 @@ class TmdbClient {
     if (!json || !Array.isArray(json.results)) throw mediaErrors.upstream('Resposta inesperada do TMDB.');
     return json.results
       .filter(r => r && Number.isSafeInteger(r.id) && r.id > 0 && typeof r.title === 'string' && r.title && !isTmdbAnime(r))
-      .map(TmdbClient.mapMovie);
+      .map(r => TmdbClient.mapMovie(r)); // sem passar o índice do map como `today`
   }
 
   // --- Detalhes (ingestão) ---------------------------------------------------------------------
@@ -189,7 +189,13 @@ class TmdbClient {
     };
   }
 
-  static mapMovie(r) {
+  // `today` (AAAA-MM-DD) é opcional, só para teste. Resultado de busca vem sem `status`: data futura válida vira "Em breve".
+  static mapMovie(r, today = new Date().toISOString().slice(0, 10)) {
+    const firstAirDate = dateOnly(r.release_date);
+    let status = MOVIE_STATUS_PT[r.status] || '';
+    const parsed = firstAirDate ? new Date(`${firstAirDate}T00:00:00Z`) : null;
+    const validDate = !!parsed && !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === firstAirDate;
+    if (!r.status && validDate && firstAirDate > today) status = 'Em breve';
     const out = {
       id: toInternalId('tmdb_movie', r.id),
       type: 'movie',
@@ -199,9 +205,9 @@ class TmdbClient {
       poster_path: safeHttpUrl(img(r.poster_path, 'w500'), null),
       backdrop_path: safeHttpUrl(img(r.backdrop_path, 'w1280'), null),
       vote_average: rating(r.vote_average, r.vote_count),
-      first_air_date: dateOnly(r.release_date),
+      first_air_date: firstAirDate,
       genres: genreNames(r.genres || r.genre_ids),
-      status: MOVIE_STATUS_PT[r.status] || ''
+      status
     };
     if (Number(r.runtime) > 0) out.runtime = Number(r.runtime);
     return out;

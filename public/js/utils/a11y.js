@@ -148,7 +148,6 @@
 
     enableTablist(doc.getElementById('main-nav'), { auto: false });
     enableTablist(doc.getElementById('tvtime-auth-tabs'), { auto: true });
-    enableTablist(doc.getElementById('show-seasons-tabs'), { auto: true });
 
     wrapRender(window.nextUpView, 'render', '#next-up-container', '#view-next-up');
     wrapRender(window.watchlistView, 'render', '#watchlist-container', '#view-watchlist');
@@ -159,7 +158,6 @@
     wrapRender(window.watchlistView, 'updateShow', '#watchlist-container', '#view-watchlist');
     const dv = window.detailModalView;
     wrapRender(dv, 'renderEpisodes', '#show-episodes-container');
-    wrapRender(dv, 'renderSeasonTabs', '#show-seasons-tabs');
     wrapRender(dv, 'open', '#modal-show-detail');
   }
 
