@@ -2,9 +2,9 @@
   "secao": "S18",
   "titulo": "Performance 2 e modo offline",
   "arquivo": "Documentacao/secoes/S18-performance-e-offline.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s18-performance-e-offline",
+  "concluidaEm": "2026-11-04",
   "commit": "",
-  "notas": ""
+  "notas": "Resumo por obra (/batch?summary=1), episodios do modal desenhados aos poucos, PWA (manifesto, icones, service worker), migracao de imagens; Lighthouse e medicao no celular ficaram pendentes."
 }

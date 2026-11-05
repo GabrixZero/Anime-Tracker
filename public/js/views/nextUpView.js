@@ -108,7 +108,7 @@ class NextUpView {
     const trackedCount = (state && state.data && state.data.trackedShows) ? state.data.trackedShows.length : 0;
 
     // Obras da lista ainda sem episódios (o detalhe chega em lote do servidor, S09): mostra o carregamento em vez de uma fila errada.
-    if (state && trackedCount > 0 && state.detailsStatus !== 'idle' && state.data.trackedShows.some(t => !state.hasDetail(t.showId))) {
+    if (state && trackedCount > 0 && state.detailsStatus !== 'idle' && state.data.trackedShows.some(t => !state.hasEpisodes(t.showId))) {
       const failed = state.detailsStatus === 'error';
       if (this.counterPill) this.counterPill.textContent = failed ? 'Não carregou' : 'Carregando fila...';
       if (this.badge) this.badge.textContent = '0';

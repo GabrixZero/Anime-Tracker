@@ -46,8 +46,9 @@ class ApiClient {
   }
 
   // Detalhe completo (temporadas/episódios) de várias obras do catálogo de uma vez: { count, data, missing }. Máx. 50 ids.
-  async getBatch(ids) {
-    return this.request(`/media/batch?ids=${ids.map(id => encodeURIComponent(Number(id))).join(',')}`);
+  // `summary: true` (S18) pede só o resumo por obra (sem sinopses), bem menor.
+  async getBatch(ids, { summary = false } = {}) {
+    return this.request(`/media/batch?ids=${ids.map(id => encodeURIComponent(Number(id))).join(',')}${summary ? '&summary=1' : ''}`);
   }
 
   async search(query = '', type = 'all') {

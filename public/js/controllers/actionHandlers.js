@@ -22,6 +22,7 @@
   A.on('add-to-list', el => window.appController.addToList(show(el)));
   A.on('remove-from-list', el => window.appController.removeFromList(show(el)));
   A.on('quick-check', el => window.appController.quickCheck(show(el), season(el), episode(el)));
+  A.on('more-episodes', () => window.detailModalView.showMoreEpisodes());
   A.on('retry-details', () => window.appController.retryDetails());
   A.onChange('set-status', el => window.appController.setStatus(show(el), el.value));
   // Nota pessoal (S17): confirma ao mudar o valor (Enter ou sair do campo); "Remover nota" apaga

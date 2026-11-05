@@ -51,6 +51,13 @@ module.exports = [
     languageOptions: { globals: { ...globals.node, ...globals.browser } }
   },
 
+  // Service worker (S18)
+  {
+    files: ['public/sw.js'],
+    languageOptions: { ecmaVersion: 2023, sourceType: 'script', globals: { ...globals.serviceworker } },
+    rules: { ...commonRules }
+  },
+
   // Frontend: scripts clássicos no navegador. Os arquivos conversam por `window.*` e por variáveis globais declaradas
   // em outros <script>, então `no-undef` não consegue julgar aqui (o teste de a11y/xss cobre o contrato entre eles).
   {

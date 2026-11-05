@@ -3,7 +3,7 @@ const RateLimiter = require('../utils/rateLimiter');
 const { parseId } = require('../utils/ids');
 const { mediaErrors } = require('../utils/errors');
 const { sendError } = require('../utils/httpErrors');
-const { toListItem, toSearchItem } = require('../utils/mediaLight');
+const { toListItem, toSearchItem, toSummaryItem } =require('../utils/mediaLight');
 
 const VALID_TYPES = ['all', 'tv', 'anime', 'movie'];
 const MAX_QUERY_LENGTH = 100;
@@ -106,7 +106,9 @@ class MediaController {
       const ids = [...new Set(parts.map(part => parseId(part.trim())))];
       const { data, missing } = mediaService.getMany(ids);
       revalidate(res);
-      return res.json({ count: data.length, data, missing });
+      // ?summary=1 (S18): resumo por obra (temporadas com episódios enxutos, sem sinopses), bem menor que o detalhe completo
+      const summary = req.query.summary === '1';
+      return res.json({ count: data.length, data: summary ? data.map(toSummaryItem) : data, missing });
     } catch (err) {
       return sendError(res, err, 'Erro ao buscar detalhes das obras.', 'media/batch');
     }
