@@ -1,6 +1,6 @@
 // ================================================================
 // SHOWVAULT · VIEW "AGENDA" (S15) (MVC)
-// Episódios das obras da lista por dia (semana, próximos 7 ou 30 dias). 100% no cliente: usa o detalhe que o app já tem e,
+// Episódios e estreias das obras da lista por dia (semana, 7 dias, 30 dias ou Todos = últimos 90 dias + tudo que vem pela frente). 100% no cliente: usa o detalhe que o app já tem e,
 // ao abrir a aba, pede ao servidor (POST /media/:id/refresh) a atualização das obras em exibição. Cálculo em utils/calendar.js.
 // ================================================================
 
@@ -11,6 +11,7 @@ class CalendarView {
     this.counterPill = document.getElementById('calendar-counter-pill');
     this.notice = document.getElementById('calendar-notice');
     this.range = 'week';
+    this.scrollToToday = false; // 'Todos' abre posicionado em Hoje (só ao abrir a aba ou trocar o filtro)
     this.refreshing = false;
     this.lastRefreshAt = 0; // início da última rodada de atualização das fontes (uma a cada 30 min por sessão)
     this.refreshFailures = 0; // obras que não atualizaram na última rodada
@@ -22,7 +23,9 @@ class CalendarView {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#view-calendar .type-pill-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        document.querySelectorAll('#view-calendar .type-pill-btn').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
         this.range = btn.getAttribute('data-range');
+        this.scrollToToday = true;
         this.render();
       });
     });
@@ -35,15 +38,6 @@ class CalendarView {
   // Todas as obras da lista, menos as que o usuário desistiu (status "Desisti").
   includeTracked(tracked) {
     return window.appState.getStatus(tracked) !== 'dropped';
-  }
-
-  // Obras sem nenhuma data futura conhecida (seção "Sem data prevista"), independente do período.
-  buildUndated() {
-    const state = window.appState;
-    if (!state || !state.data || !state.data.trackedShows) return [];
-    return window.Calendar.buildUndated(state.data.trackedShows, id => state.getMedia(id), this.today(), {
-      includeTracked: t => this.includeTracked(t)
-    });
   }
 
   buildItems() {
@@ -61,6 +55,7 @@ class CalendarView {
   // ---------- atualização das fontes ao abrir a aba ----------
   // Chamado pelo AppController.switchTab('calendar'). Só com login, no máximo 1 rodada a cada 30 min, até 8 obras, uma por vez.
   async onOpen() {
+    this.scrollToToday = true;
     const sync = window.syncService;
     if (this.refreshing || !sync || !sync.isLoggedIn()) return;
     if (this.lastRefreshAt && Date.now() - this.lastRefreshAt < CalendarView.REFRESH_EVERY_MS) return;
@@ -68,7 +63,7 @@ class CalendarView {
     const ids = (state.data.trackedShows || [])
       .filter(t => this.includeTracked(t))
       .map(t => ({ id: t.showId, media: state.getMedia(t.showId) }))
-      .filter(x => x.media && CalendarView.AIRING_STATUSES.includes(x.media.status))
+      .filter(x => x.media && this.needsRefresh(x.media))
       .slice(0, CalendarView.REFRESH_LIMIT)
       .map(x => x.id);
     this.lastRefreshAt = Date.now();
@@ -90,6 +85,15 @@ class CalendarView {
     const app = window.appController;
     app.dirty.add('calendar');
     if (app.activeTab === 'calendar') app.renderTab('calendar');
+  }
+
+  // Série/anime em exibição ou "Em breve"; filme ainda sem estreia ou com estreia de hoje em diante.
+  needsRefresh(media) {
+    if (media.type === 'movie') {
+      const day = String(media.first_air_date || '').slice(0, 10);
+      return !day || day >= this.today();
+    }
+    return CalendarView.AIRING_STATUSES.includes(media.status);
   }
 
   renderNotice() {
@@ -122,24 +126,18 @@ class CalendarView {
     }
 
     const items = this.buildItems();
-    const undated = this.buildUndated();
     if (this.counterPill) {
-      const eps = `${items.length} episódio${items.length === 1 ? '' : 's'}`;
-      this.counterPill.textContent = undated.length > 0 ? `${eps} · ${undated.length} sem data` : eps;
+      this.counterPill.textContent = `${items.length} ${items.length === 1 ? 'item' : 'itens'}`;
     }
 
-    if (items.length > 0 || undated.length > 0) {
+    if (items.length > 0) {
       this.emptyState.classList.add('hidden');
-      const noEpisodes =
-        items.length === 0
-          ? '<div class="grid-message grid-message--info" role="status">Nenhum episódio com data nesse período. Tente outro período.</div>'
-          : '';
-      this.container.innerHTML =
-        noEpisodes +
-        window.Calendar.groupByDay(items)
-          .map(g => this.renderDay(g))
-          .join('') +
-        this.renderUndated(undated);
+      this.container.innerHTML = this.renderPhases(window.Calendar.groupByDay(items));
+      if (this.scrollToToday) {
+        this.scrollToToday = false;
+        const today = this.range === 'all' ? this.container.querySelector('#calendar-today') : null;
+        if (today && typeof today.scrollIntoView === 'function') today.scrollIntoView({ block: 'start' });
+      }
       return;
     }
 
@@ -152,7 +150,7 @@ class CalendarView {
       this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
         iconSvg: calendarIcon,
         title: 'Sua lista está vazia',
-        text: 'Adicione séries e animes em exibição para ver aqui os dias em que saem os próximos episódios.',
+        text: 'Adicione séries, animes e filmes para ver aqui as datas de lançamento.',
         narrow: true,
         actionsHtml:
           '<button type="button" class="btn btn-primary" data-focus-key="cal:empty:explore" data-action="goto-tab" data-goto="explore">Explorar</button>'
@@ -162,8 +160,8 @@ class CalendarView {
 
     this.emptyState.innerHTML = window.ViewKit.emptyStateHtml({
       iconSvg: calendarIcon,
-      title: 'Nenhum episódio nesse período',
-      text: 'Tente outro período. A agenda só mostra episódios com data de exibição conhecida, de todas as obras exceto as que você desistiu.',
+      title: 'Nada nesse período',
+      text: 'Tente outro período.',
       narrow: true
     });
   }
@@ -172,44 +170,38 @@ class CalendarView {
   dayHeading(group) {
     const names = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     const rel = { '-1': 'Ontem', 0: 'Hoje', 1: 'Amanhã' }[String(group.daysFromToday)];
-    const date = `${String(group.d).padStart(2, '0')}/${String(group.m).padStart(2, '0')}`;
+    const year = Number(this.today().slice(0, 4));
+    const date = `${String(group.d).padStart(2, '0')}/${String(group.m).padStart(2, '0')}${group.y === year ? '' : '/' + group.y}`;
     return `${rel || names[group.weekday]} · ${date}`;
   }
 
-  renderDay(group) {
-    return `
-      <div class="calendar-day">
-        <h3 class="calendar-day-title${group.daysFromToday === 0 ? ' calendar-day-title--today' : ''}">${escapeHtml(this.dayHeading(group))}</h3>
-        <ul class="calendar-list">
-          ${group.items.map(item => this.renderItem(item)).join('')}
-        </ul>
-      </div>
-    `;
+  // Três blocos em ordem cronológica: já lançados (passado), hoje e próximos. Hoje sempre aparece como marco (mesmo sem itens).
+  renderPhases(groups) {
+    const past = groups.filter(g => g.phase === 'past');
+    const today = groups.find(g => g.phase === 'today') || { phase: 'today', daysFromToday: 0, items: [], ...this.todayParts() };
+    const future = groups.filter(g => g.phase === 'future');
+    const block = (cls, label, inner) =>
+      inner ? `<div class="calendar-phase calendar-phase--${cls}" role="group" aria-label="${label}">${inner}</div>` : '';
+    return (
+      block('past', 'Já lançados', past.map(g => this.renderDay(g)).join('')) +
+      block('today', 'Hoje', this.renderDay(today)) +
+      block('future', 'Próximos lançamentos', future.map(g => this.renderDay(g)).join(''))
+    );
   }
 
-  // Seção no fim: obras sem data prevista (sem botão de marcar episódio, só abre o detalhe).
-  renderUndated(list) {
-    if (list.length === 0) return '';
+  todayParts() {
+    const day = window.Calendar.parseDay(this.today());
+    return { key: this.today(), y: day.y, m: day.m, d: day.d, weekday: window.Calendar.weekday(this.today()) };
+  }
+
+  renderDay(group) {
+    const isToday = group.phase === 'today';
+    const mark = isToday ? '<span class="calendar-today-mark" aria-hidden="true"></span>' : '';
+    const idAttr = isToday ? ' id="calendar-today"' : '';
     return `
-      <div class="calendar-day calendar-undated">
-        <h3 class="calendar-day-title">Sem data prevista</h3>
-        <ul class="calendar-list">
-          ${list
-            .map(o => {
-              const id = toInt(o.showId);
-              return `
-          <li class="calendar-item" data-show-id="${id}">
-            <div class="calendar-item-info">
-              <div class="calendar-item-top">
-                <span class="calendar-item-show">${escapeHtml(o.showName)}</span>
-                ${window.ViewKit.typeBadge(o.type)}
-              </div>
-              <p class="calendar-item-title"><button type="button" class="link-btn" data-focus-key="cal:undated-${id}:open" aria-label="Ver detalhes: ${escapeHtml(o.showName)}" data-action="open-detail" data-show="${id}">Ver detalhes</button></p>
-            </div>
-          </li>`;
-            })
-            .join('')}
-        </ul>
+      <div class="calendar-day calendar-day--${group.phase}"${idAttr}>
+        <h3 class="calendar-day-title${isToday ? ' calendar-day-title--today' : ''}">${mark}${escapeHtml(this.dayHeading(group))}</h3>
+        ${group.items.length > 0 ? `<ul class="calendar-list">${group.items.map(item => this.renderItem(item)).join('')}</ul>` : ''}
       </div>
     `;
   }
@@ -232,13 +224,16 @@ class CalendarView {
            <span>Assistido</span>
          </button>`;
 
+    const past = item.daysFromToday < 0;
+    const released = past ? '<span class="calendar-item-released">Lançado</span>' : '';
     return `
-      <li class="calendar-item${item.watched ? ' calendar-item--watched' : ''}" data-show-id="${id}">
+      <li class="calendar-item${item.watched ? ' calendar-item--watched' : ''}${past ? ' calendar-item--past' : ''}" data-show-id="${id}">
         <div class="calendar-item-info">
           <div class="calendar-item-top">
             <span class="calendar-item-show">${escapeHtml(item.showName)}</span>
             ${window.ViewKit.typeBadge(item.type)}
             <span class="calendar-item-code">${escapeHtml(code)}</span>
+            ${released}
           </div>
           <p class="calendar-item-title"><button type="button" class="link-btn" data-focus-key="cal:${key}:open" data-action="open-detail" data-show="${id}">${escapeHtml(title)}</button></p>
         </div>

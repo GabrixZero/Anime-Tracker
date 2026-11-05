@@ -87,6 +87,23 @@ const TVMAZE_SHOWS = [
       ep(1, 3, 'Terceira Parte', dayFromToday(3)),
       ep(1, 4, 'Muito Mais Tarde', dayFromToday(20))
     ]
+  },
+  {
+    // Série semanal em exibição para a Agenda (janela de 90 dias): 1 episódio por semana, 8 já exibidos (de -56 a -7 dias) e 3 a exibir.
+    id: 9004,
+    name: 'Ronda Semanal',
+    type: 'Scripted',
+    language: 'Portuguese',
+    genres: ['Drama'],
+    status: 'Running',
+    premiered: dayFromToday(-56),
+    averageRuntime: 45,
+    rating: { average: null },
+    network: { name: 'Canal Fictício', country: { code: 'BR' } },
+    webChannel: null,
+    image: null,
+    summary: '<p>Série fictícia semanal, com episódios passados e futuros, usada só na Agenda dos testes.</p>',
+    episodes: [-56, -49, -42, -35, -28, -21, -14, -7, 7, 14, 21].map((d, i) => ep(1, i + 1, `Ronda ${i + 1}`, dayFromToday(d)))
   }
 ];
 
@@ -97,14 +114,20 @@ const TVMAZE_SHOWS = [
 // ---------------------------------------------------------------------------------------------------------------------------------
 const unix = iso => Math.floor(Date.parse(`${iso}T12:00:00Z`) / 1000);
 
-const anilistEntry = ({ id, idMal, romaji, english, from, season, seasonYear, episodes, score, relation, dates }) => {
+// `relation` é opcional (sem ela a obra não tem sequência). `status: 'RELEASING'` imita a AniList de verdade: a grade da obra (airingSchedule)
+// traz só os episódios a exibir e os já exibidos ficam em `fullSchedule`, que o servidor falso devolve na consulta `airingSchedules`.
+const anilistEntry = ({ id, idMal, romaji, english, from, season, seasonYear, episodes, score, relation, dates, status = 'FINISHED' }) => {
   const [year, month, day] = from.split('-').map(Number);
+  const todayUnix = unix(dayFromToday(0));
+  const all = dates.map((d, i) => ({ episode: i + 1, airingAt: unix(d) }));
+  const upcoming = all.filter(n => n.airingAt >= todayUnix);
+  const releasing = status === 'RELEASING';
   return {
     id,
     idMal,
     type: 'ANIME',
     format: 'TV',
-    status: 'FINISHED',
+    status,
     episodes,
     duration: 24,
     season,
@@ -122,14 +145,15 @@ const anilistEntry = ({ id, idMal, romaji, english, from, season, seasonYear, ep
       extraLarge: `https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx${id}.jpg`
     },
     bannerImage: null,
-    nextAiringEpisode: null,
+    nextAiringEpisode: releasing && upcoming.length ? upcoming[0] : null,
     // Só aparecem na consulta de uma obra (a busca não pede):
     relations: {
-      edges: [
-        { relationType: relation.type, node: { id: relation.id, idMal: relation.idMal, type: 'ANIME', format: 'TV', isAdult: false } }
-      ]
+      edges: relation
+        ? [{ relationType: relation.type, node: { id: relation.id, idMal: relation.idMal, type: 'ANIME', format: 'TV', isAdult: false } }]
+        : []
     },
-    airingSchedule: { nodes: dates.map((d, i) => ({ episode: i + 1, airingAt: unix(d) })) }
+    airingSchedule: { nodes: releasing ? upcoming : all },
+    fullSchedule: all
   };
 };
 
@@ -159,6 +183,33 @@ const ANILIST_MEDIA = [
     score: 84,
     relation: { type: 'PREQUEL', id: 190001, idMal: 90001 },
     dates: ['2024-04-05', '2024-04-12']
+  }),
+  // Anime semanal em exibição (sem total de episódios): 9 já exibidos (de -63 a -7 dias) e 3 a exibir.
+  anilistEntry({
+    id: 190003,
+    idMal: 90003,
+    romaji: 'Umi no Tsuki',
+    english: 'Maré Viva',
+    from: dayFromToday(-63),
+    season: 'FALL',
+    seasonYear: 2026,
+    episodes: null,
+    score: 77,
+    status: 'RELEASING',
+    dates: [-63, -56, -49, -42, -35, -28, -21, -14, -7, 7, 14, 21].map(dayFromToday)
+  }),
+  // Anime encerrado: o último episódio foi há 200 dias (fora da janela da Agenda).
+  anilistEntry({
+    id: 190004,
+    idMal: 90004,
+    romaji: 'Hai no Owari',
+    english: 'Cinza do Fim',
+    from: dayFromToday(-214),
+    season: 'SPRING',
+    seasonYear: 2026,
+    episodes: 3,
+    score: 70,
+    dates: [-214, -207, -200].map(dayFromToday)
   })
 ];
 
@@ -236,6 +287,22 @@ const JIKAN_EPISODES = {
 // ---------------------------------------------------------------------------------------------------------------------------------
 // TMDB (v3, pt-BR; só vale com TMDB_API_KEY): /search/movie  ·  /search/tv  ·  /movie/:id   (filmes novos)
 // ---------------------------------------------------------------------------------------------------------------------------------
+const tmdbMovie = (id, title, original_title, release_date, status) => ({
+  id,
+  title,
+  original_title,
+  original_language: 'pt',
+  overview: 'Filme fictício usado só nos testes ponta a ponta.',
+  poster_path: `/e2e-filme-${id}.jpg`,
+  backdrop_path: `/e2e-filme-${id}-fundo.jpg`,
+  vote_average: 6.5,
+  vote_count: 50,
+  release_date,
+  genres: [{ id: 35, name: 'Comédia' }],
+  runtime: 100,
+  status
+});
+
 const TMDB_MOVIES = [
   {
     id: 8801,
@@ -254,8 +321,21 @@ const TMDB_MOVIES = [
     ],
     runtime: 95,
     status: 'Released'
-  }
+  },
+  // Filmes da Agenda (datas relativas a hoje). O release_date global difere de propósito da estreia no Brasil (TMDB_RELEASE_DATES).
+  tmdbMovie(8802, 'Estreia Próxima', 'Coming Soon', dayFromToday(12), 'Post Production'),
+  tmdbMovie(8803, 'Lançamento Recente', 'Recent Release', dayFromToday(-35), 'Released'),
+  tmdbMovie(8804, 'Clássico Antigo', 'Old Classic', dayFromToday(-125), 'Released')
 ];
+
+// /movie/:id/release_dates: estreia no cinema (type 3) do Brasil. O 8801 só tem a dos EUA (o app cai no release_date).
+const tmdbBr = date => ({ iso_3166_1: 'BR', release_dates: [{ type: 3, release_date: `${date}T00:00:00.000Z`, certification: '12' }] });
+const TMDB_RELEASE_DATES = {
+  8801: [{ iso_3166_1: 'US', release_dates: [{ type: 3, release_date: '2022-06-01T00:00:00.000Z', certification: 'PG' }] }],
+  8802: [tmdbBr(dayFromToday(10))],
+  8803: [tmdbBr(dayFromToday(-30))],
+  8804: [tmdbBr(dayFromToday(-120))]
+};
 
 // O que os testes esperam ver na tela (ids internos = faixa da fonte + id externo; ver server/utils/ids.js).
 const EXPECTED = {
@@ -278,7 +358,16 @@ const EXPECTED = {
     in3days: 'Terceira Parte',
     in20days: 'Muito Mais Tarde'
   },
-  movie: { name: 'Cidade Fantasma', query: 'Cidade Fantasma', id: 30_000_000 + 8801, runtime: 95 }
+  movie: { name: 'Cidade Fantasma', query: 'Cidade Fantasma', id: 30_000_000 + 8801, runtime: 95 },
+  // Agenda de 90 dias (datas relativas a hoje; ver os dados acima)
+  agenda90: {
+    upcomingMovie: { name: 'Estreia Próxima', query: 'Estreia Próxima', id: 30_000_000 + 8802, inDays: 10 },
+    recentMovie: { name: 'Lançamento Recente', query: 'Lançamento Recente', id: 30_000_000 + 8803, inDays: -30 },
+    oldMovie: { name: 'Clássico Antigo', query: 'Clássico Antigo', id: 30_000_000 + 8804, inDays: -120 },
+    weeklySeries: { name: 'Ronda Semanal', query: 'Ronda Semanal', id: 1_000_000 + 9004, pastEpisodes: 8, futureEpisodes: 3 },
+    releasingAnime: { name: 'Maré Viva', query: 'Maré Viva', id: 10_000_000 + 90003, pastEpisodes: 9, futureEpisodes: 3 },
+    endedAnime: { name: 'Cinza do Fim', query: 'Cinza do Fim', id: 10_000_000 + 90004, lastEpisodeDaysAgo: 200 }
+  }
 };
 
-module.exports = { TVMAZE_SHOWS, ANILIST_MEDIA, JIKAN_ANIME, JIKAN_EPISODES, TMDB_MOVIES, EXPECTED };
+module.exports = { TVMAZE_SHOWS, ANILIST_MEDIA, JIKAN_ANIME, JIKAN_EPISODES, TMDB_MOVIES, TMDB_RELEASE_DATES, EXPECTED };

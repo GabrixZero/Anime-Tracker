@@ -5,14 +5,14 @@
 //   <falso>/tvmaze/...          TVMaze:  /search/shows?q=  ·  /shows/:id?embed=episodes
 //   <falso>/anilist             AniList: POST GraphQL (busca por texto e obra por id/idMal, com relações e grade de exibição)
 //   <falso>/jikan/v4/...        Jikan:   /anime?q=  ·  /anime/:id/full  ·  /anime/:id/episodes?page=
-//   <falso>/tmdb/3/...          TMDB:    /search/movie  ·  /search/tv  ·  /movie/:id   (exige api_key, como o de verdade)
+//   <falso>/tmdb/3/...          TMDB:    /search/movie  ·  /search/tv  ·  /movie/:id  ·  /movie/:id/release_dates   (exige api_key, como o de verdade)
 //   <falso>/externo/<host>/...  NÃO é uma fonte: é para onde o network-guard.js manda qualquer pedido do servidor do app para fora
 //                               de 127.0.0.1. Responde 503 e fica anotado em `unexpectedHosts()`; no fim da execução isso falha os
 //                               testes (nenhum teste pode usar a internet).
 'use strict';
 
 const http = require('http');
-const { TVMAZE_SHOWS, ANILIST_MEDIA, JIKAN_ANIME, JIKAN_EPISODES, TMDB_MOVIES } = require('./data');
+const { TVMAZE_SHOWS, ANILIST_MEDIA, JIKAN_ANIME, JIKAN_EPISODES, TMDB_MOVIES, TMDB_RELEASE_DATES } = require('./data');
 
 const normalize = s =>
   String(s || '')
@@ -65,9 +65,17 @@ function anilist(body, res) {
   const query = String(json.query || '');
   const variables = json.variables || {};
 
+  // Grade de exibição de uma obra (consulta extra de obras em exibição): episódios com airingAt > `after`, em ordem de data, até 50.
+  if (query.includes('airingSchedules')) {
+    const a = ANILIST_MEDIA.find(x => x.id === variables.id);
+    const after = Number(variables.after) || 0;
+    const airingSchedules = a ? a.fullSchedule.filter(n => n.airingAt > after).slice(0, 50) : [];
+    return send(res, 200, { data: { Page: { airingSchedules } } });
+  }
+
   if (query.includes('Page(')) {
     const media = ANILIST_MEDIA.filter(a => matches(variables.search, titlesOf(a))).map(a => {
-      const { relations: _relations, airingSchedule: _schedule, ...entry } = a; // a busca não pede relações nem grade
+      const { relations: _relations, airingSchedule: _schedule, fullSchedule: _full, ...entry } = a; // a busca não pede relações nem grade
       return entry;
     });
     return send(res, 200, { data: { Page: { media } } });
@@ -114,6 +122,12 @@ function tmdb(path, params, res) {
     return send(res, 200, { page: 1, total_results: results.length, total_pages: 1, results });
   }
   if (path === '/search/tv') return send(res, 200, { page: 1, total_results: 0, total_pages: 1, results: [] });
+  const rd = /^\/movie\/(\d+)\/release_dates$/.exec(path);
+  if (rd) {
+    const list = TMDB_RELEASE_DATES[rd[1]];
+    if (!list) return send(res, 404, { status_code: 34, status_message: 'The resource you requested could not be found.', success: false });
+    return send(res, 200, { id: Number(rd[1]), results: list });
+  }
   const m = /^\/movie\/(\d+)$/.exec(path);
   const movie = m && TMDB_MOVIES.find(x => x.id === Number(m[1]));
   if (movie) return send(res, 200, movie);

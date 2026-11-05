@@ -59,7 +59,8 @@ test('startOfWeek / weekRange: a semana vai de segunda a domingo (virada domingo
   assert.equal(C.weekRange('xx'), null);
 });
 
-test('rangeBounds: week, next7 e next30', () => {
+test('rangeBounds: week, next7, next30 (e all, que não tem fim)', () => {
+  assert.deepEqual(C.rangeBounds('2026-11-04', 'all'), { from: '2026-08-06', to: null });
   assert.deepEqual(C.rangeBounds('2026-11-04', 'week'), { from: '2026-11-02', to: '2026-11-08' });
   assert.deepEqual(C.rangeBounds('2026-11-04', 'next7'), { from: '2026-11-04', to: '2026-11-10' });
   assert.deepEqual(C.rangeBounds('2026-11-04', 'next30'), { from: '2026-11-04', to: '2026-12-03' });
@@ -111,9 +112,6 @@ function make(medias, { watched = [], statuses = {} } = {}) {
     includeTracked: t => t.status !== 'dropped',
     build(range) {
       return C.buildAgenda(tracked, this.getMedia, this.isWatched, HOJE, { range, includeTracked: this.includeTracked });
-    },
-    undated() {
-      return C.buildUndated(tracked, this.getMedia, HOJE, { includeTracked: this.includeTracked });
     }
   };
 }
@@ -207,27 +205,248 @@ test('buildAgenda: todos os status entram, menos Desisti', () => {
   );
 });
 
-test('buildUndated: obra sem data futura aparece; Desisti não; data fora do período não conta como sem data', () => {
-  const semEps = show(1, 'Zeta sem episódios', 'tv', []);
-  const soPassado = show(2, 'Alfa só passado', 'anime', [ep(1, 1, '2026-10-01'), ep(1, 2, null)]);
-  const longe = show(3, 'Longe', 'tv', [ep(1, 1, '2027-03-01')]); // fora do next30, mas tem data futura
-  const hoje = show(4, 'Hoje', 'tv', [ep(1, 1, HOJE)]);
-  const filmeSemData = { id: 5, name: 'Filme sem data', type: 'movie', first_air_date: null };
-  const filmePassado = { id: 6, name: 'Filme antigo', type: 'movie', first_air_date: '2020-01-01' };
-  const filmeFuturo = { id: 7, name: 'Filme futuro', type: 'movie', first_air_date: '2027-01-01' };
-  const desisti = show(8, 'Desisti', 'tv', []);
-  const pausado = show(9, 'Pausada', 'tv', []);
-  const finalizado = show(10, 'Finalizada', 'tv', []);
-  const a = make([semEps, soPassado, longe, hoje, filmeSemData, filmePassado, filmeFuturo, desisti, pausado, finalizado], {
-    statuses: { 8: 'dropped', 9: 'paused', 10: 'completed' }
-  });
+test('"Sem data prevista" foi removido: buildUndated não existe e a view não cria esse bloco', () => {
+  assert.equal(C.buildUndated, undefined);
+  const view = read('js', 'views', 'calendarView.js');
+  assert.ok(!/calendar-undated|buildUndated|Sem data prevista/i.test(view));
+  assert.ok(!/calendar-undated|Sem data prevista/i.test(read('index.html')));
+  for (const css of ['views.css', 'components.css', 'layout.css']) assert.ok(!/calendar-undated/.test(read('css', css)), css);
+});
+
+// ---------------------------------------------------------------- janela de 90 dias
+
+const filme = (id, name, date) => ({ id, name, type: 'movie', first_air_date: date });
+
+test('janela: PAST_DAYS = 90 e windowStart é hoje - 90 dias', () => {
+  assert.equal(C.PAST_DAYS, 90);
+  assert.equal(C.windowStart(HOJE), '2026-08-06');
+  assert.equal(C.windowStart(HOJE), C.addDays(HOJE, -90));
+  assert.equal(C.windowStart('lixo'), null);
+});
+
+test('fronteira inclusiva (episódio): hoje-90 entra e hoje-91 não, em todos os filtros que alcançam o passado', () => {
+  const borda = C.addDays(HOJE, -90);
+  const fora = C.addDays(HOJE, -91);
+  const m = show(1, 'Borda', 'tv', [ep(1, 1, fora), ep(1, 2, borda), ep(1, 3, C.addDays(HOJE, -89))]);
+  const a = make([m]);
   assert.deepEqual(
-    a.undated().map(o => o.showName),
-    ['Alfa só passado', 'Filme antigo', 'Filme sem data', 'Finalizada', 'Pausada', 'Zeta sem episódios']
+    a.build('all').map(i => i.episodeNumber),
+    [2, 3]
   );
-  assert.deepEqual(a.undated()[0], { showId: 2, showName: 'Alfa só passado', type: 'anime' });
-  assert.deepEqual(C.buildUndated(null, a.getMedia, HOJE), []);
-  assert.deepEqual(C.buildUndated(a.tracked, a.getMedia, 'invalida'), []);
+  assert.equal(a.build('all')[0].daysFromToday, -90);
+  // semana, 7 e 30 dias começam depois do piso, então não alcançam o passado distante
+  for (const r of ['week', 'next7', 'next30']) assert.deepEqual(a.build(r), [], r);
+});
+
+test('fronteira inclusiva (filme): estreia em hoje-90 entra; hoje-91 e 120 dias atrás não', () => {
+  const dentro = filme(1, 'Dentro', C.addDays(HOJE, -90));
+  const fora = filme(2, 'Fora', C.addDays(HOJE, -91));
+  const antigo = filme(3, 'Antigo', C.addDays(HOJE, -120));
+  const recente = filme(4, 'Recente', C.addDays(HOJE, -30));
+  const out = make([dentro, fora, antigo, recente]).build('all');
+  assert.deepEqual(
+    out.map(i => [i.showName, i.daysFromToday, i.title]),
+    [
+      ['Dentro', -90, 'Filme'],
+      ['Recente', -30, 'Filme']
+    ]
+  );
+});
+
+test('filtro Todos: passado, hoje e futuro sem limite (hoje+N)', () => {
+  const m = show(1, 'Longa', 'tv', [
+    ep(1, 1, C.addDays(HOJE, -90)),
+    ep(1, 2, C.addDays(HOJE, -1)),
+    ep(1, 3, HOJE),
+    ep(1, 4, C.addDays(HOJE, 1)),
+    ep(1, 5, C.addDays(HOJE, 30)),
+    ep(1, 6, C.addDays(HOJE, 365)),
+    ep(1, 7, '2099-12-31')
+  ]);
+  const a = make([m]);
+  assert.deepEqual(
+    a.build('all').map(i => i.episodeNumber),
+    [1, 2, 3, 4, 5, 6, 7]
+  );
+  assert.deepEqual(C.rangeBounds(HOJE, 'all'), { from: '2026-08-06', to: null });
+  // os outros filtros continuam com teto
+  assert.deepEqual(
+    a.build('next30').map(i => i.episodeNumber),
+    [3, 4]
+  );
+});
+
+test('rangeBounds: filtros curtos nunca começam antes do piso da janela', () => {
+  const floor = C.windowStart(HOJE);
+  for (const r of ['week', 'next7', 'next30', 'all']) {
+    const b = C.rangeBounds(HOJE, r);
+    assert.ok(b.from >= floor, `${r} começa em ${b.from}`);
+  }
+  assert.deepEqual(C.rangeBounds(HOJE, 'all'), { from: floor, to: null });
+  assert.equal(C.rangeBounds('invalido', 'all'), null);
+});
+
+test('virada de ano: hoje 2027-01-02 com episódio em 2026-10-04 (= -90) entra; 2026-10-03 (-91) não', () => {
+  const hoje = '2027-01-02';
+  assert.equal(C.windowStart(hoje), '2026-10-04');
+  const m = show(1, 'Virada', 'tv', [ep(1, 1, '2026-10-03'), ep(1, 2, '2026-10-04'), ep(1, 3, '2026-12-31'), ep(1, 4, '2027-01-01')]);
+  const out = C.buildAgenda(
+    [{ showId: 1 }],
+    () => m,
+    () => false,
+    hoje,
+    { range: 'all' }
+  );
+  assert.deepEqual(
+    out.map(i => [i.episodeNumber, i.daysFromToday]),
+    [
+      [2, -90],
+      [3, -2],
+      [4, -1]
+    ]
+  );
+  // semana de 2027-01-02 (sábado) começa em 2026-12-28, dentro da janela
+  const semana = C.buildAgenda(
+    [{ showId: 1 }],
+    () => m,
+    () => false,
+    hoje,
+    { range: 'week' }
+  );
+  assert.deepEqual(
+    semana.map(i => i.episodeNumber),
+    [3, 4]
+  );
+});
+
+test('virada de mês e ano bissexto na janela', () => {
+  assert.equal(C.windowStart('2026-03-01'), '2025-12-01'); // fev de 28 dias
+  assert.equal(C.windowStart('2028-03-01'), '2027-12-02'); // fev de 29 dias: 1 dia a menos de volta
+  assert.equal(C.windowStart('2026-12-31'), '2026-10-02');
+  const m = show(1, 'Mês', 'tv', [ep(1, 1, '2025-11-30'), ep(1, 2, '2025-12-01'), ep(1, 3, '2026-02-28')]);
+  const out = C.buildAgenda(
+    [{ showId: 1 }],
+    () => m,
+    () => false,
+    '2026-03-01',
+    { range: 'all' }
+  );
+  assert.deepEqual(
+    out.map(i => i.episodeNumber),
+    [2, 3]
+  );
+});
+
+test('datas são dia civil: com hora/UTC só o dia vale, sem deslocamento de fuso', () => {
+  const borda = `${C.addDays(HOJE, -90)}T23:59:59.000Z`;
+  const fora = `${C.addDays(HOJE, -91)}T23:59:59.000Z`;
+  const m = show(1, 'Fuso', 'tv', [ep(1, 1, fora), ep(1, 2, borda)]);
+  const out = make([m]).build('all');
+  assert.deepEqual(
+    out.map(i => [i.episodeNumber, i.airDate]),
+    [[2, '2026-08-06']]
+  );
+  const f = filme(2, 'Filme ISO', `${HOJE}T00:00:00.000Z`);
+  assert.equal(make([f]).build('week')[0].airDate, HOJE);
+});
+
+test('dayKey de um Date local vira o "hoje" da janela, em qualquer fuso do processo', () => {
+  const run = tz =>
+    execFileSync(
+      process.execPath,
+      [
+        '-e',
+        "const C = require(process.argv[1]); const t = C.dayKey(new Date(2026, 10, 4, 23, 30)); console.log(t + ' ' + C.windowStart(t))",
+        path.join(pub, 'js', 'utils', 'calendar.js')
+      ],
+      { env: { ...process.env, TZ: tz }, encoding: 'utf8' }
+    ).trim();
+  // 23:30 locais continuam sendo o dia 4 em qualquer fuso
+  for (const tz of ['America/Sao_Paulo', 'UTC', 'Asia/Tokyo']) assert.equal(run(tz), '2026-11-04 2026-08-06', tz);
+});
+
+test('filme usa a estreia (first_air_date); episódio usa air_date; filme sem data é ignorado', () => {
+  const f = {
+    ...filme(1, 'Filme', '2026-10-01'),
+    seasons: [{ season_number: 1, episodes: [{ episode_number: 1, air_date: '2026-11-04' }] }]
+  };
+  const semData = filme(2, 'Sem data', null);
+  const invalido = filme(3, 'Inválido', '2026-02-30');
+  const serie = show(4, 'Série', 'tv', [ep(1, 1, '2026-10-01')]);
+  const out = make([f, semData, invalido, serie]).build('all');
+  assert.deepEqual(
+    out.map(i => [i.showName, i.type, i.airDate, i.seasonNumber, i.title]),
+    [
+      ['Filme', 'movie', '2026-10-01', null, 'Filme'],
+      ['Série', 'tv', '2026-10-01', 1, 'Ep 1']
+    ]
+  );
+});
+
+test('Desisti fica de fora também no passado e em Todos', () => {
+  const a = show(1, 'Ativa', 'tv', [ep(1, 1, C.addDays(HOJE, -10))]);
+  const d = show(2, 'Desisti', 'tv', [ep(1, 1, C.addDays(HOJE, -10)), ep(1, 2, C.addDays(HOJE, 5))]);
+  const fd = filme(3, 'Filme desisti', C.addDays(HOJE, -5));
+  const out = make([a, d, fd], { statuses: { 2: 'dropped', 3: 'dropped' } }).build('all');
+  assert.deepEqual(
+    out.map(i => i.showName),
+    ['Ativa']
+  );
+});
+
+test('obra finalizada antiga (último episódio há mais de 90 dias) não mostra nada, nem em Todos', () => {
+  const antiga = show(
+    1,
+    'Cinza',
+    'anime',
+    [ep(1, 1, C.addDays(HOJE, -214)), ep(1, 2, C.addDays(HOJE, -207)), ep(1, 3, C.addDays(HOJE, -200))],
+    {
+      status: 'Finalizado'
+    }
+  );
+  const filmeAntigo = filme(2, 'Clássico', C.addDays(HOJE, -120));
+  const a = make([antiga, filmeAntigo], { statuses: { 1: 'completed' } });
+  for (const r of ['week', 'next7', 'next30', 'all']) assert.deepEqual(a.build(r), [], r);
+});
+
+test('data inválida é ignorada na janela (sem inventar nem quebrar)', () => {
+  const m = show(1, 'Datas ruins', 'tv', [
+    ep(1, 1, '2026-02-30'),
+    ep(1, 2, '31/10/2026'),
+    ep(1, 3, undefined),
+    ep(1, 4, 20261030),
+    ep(1, 5, '2026-10-30')
+  ]);
+  assert.deepEqual(
+    make([m])
+      .build('all')
+      .map(i => i.episodeNumber),
+    [5]
+  );
+});
+
+test('groupByDay devolve phase: past, today e future (e phaseOf)', () => {
+  const m = show(1, 'Fases', 'tv', [
+    ep(1, 1, C.addDays(HOJE, -90)),
+    ep(1, 2, C.addDays(HOJE, -1)),
+    ep(1, 3, HOJE),
+    ep(1, 4, C.addDays(HOJE, 1)),
+    ep(1, 5, C.addDays(HOJE, 400))
+  ]);
+  const groups = C.groupByDay(make([m]).build('all'));
+  assert.deepEqual(
+    groups.map(g => [g.key, g.daysFromToday, g.phase]),
+    [
+      ['2026-08-06', -90, 'past'],
+      ['2026-11-03', -1, 'past'],
+      ['2026-11-04', 0, 'today'],
+      ['2026-11-05', 1, 'future'],
+      ['2027-12-09', 400, 'future']
+    ]
+  );
+  assert.equal(C.phaseOf(-1), 'past');
+  assert.equal(C.phaseOf(0), 'today');
+  assert.equal(C.phaseOf(1), 'future');
 });
 
 test('buildAgenda: obra sem detalhe carregado e tipo desconhecido não quebram', () => {
@@ -294,8 +513,9 @@ test('a aba Agenda existe no HTML, com tabpanel, filtros com aria-pressed e scri
   const pills = [...section.matchAll(/<button[^>]*data-range="([a-z0-9]+)"[^>]*>/g)];
   assert.deepEqual(
     pills.map(m => m[1]),
-    ['week', 'next7', 'next30']
+    ['week', 'next7', 'next30', 'all']
   );
+  assert.ok(/data-range="all"[^>]*>Todos</.test(section));
   for (const [tag] of pills) assert.ok(/type="button"/.test(tag) && /aria-pressed="(true|false)"/.test(tag));
   const idx = f => html.indexOf(`js/${f}`);
   assert.ok(idx('utils/calendar.js') > -1 && idx('utils/calendar.js') < idx('views/nextUpView.js'));
@@ -309,6 +529,15 @@ test('a view da Agenda não usa on*/style inline e escapa o que vem do catálogo
   assert.ok(/escapeHtml\(item\.showName\)/.test(src) && /escapeHtml\(title\)/.test(src));
   assert.ok(/toInt\(item\.showId\)/.test(src));
   assert.ok(/data-action="quick-check"/.test(src) && /data-action="open-detail"/.test(src) && /data-action="retry-details"/.test(src));
+});
+
+test('a view da Agenda desenha os blocos Já lançados / Hoje / Próximos lançamentos, o marco de hoje e o selo Lançado', () => {
+  const src = read('js', 'views', 'calendarView.js');
+  assert.ok(src.includes('calendar-phase--${cls}') && src.includes('role="group" aria-label="${label}"'));
+  for (const label of ['Já lançados', 'Hoje', 'Próximos lançamentos']) assert.ok(src.includes(`'${label}'`), label);
+  assert.ok(src.includes('id="calendar-today"') && src.includes('calendar-today-mark'));
+  assert.ok(src.includes('calendar-item--past') && src.includes('calendar-item-released') && src.includes('>Lançado<'));
+  assert.ok(src.includes("'item' : 'itens'"));
 });
 
 test('AppController conhece a aba calendar (viewFor, refreshAll e abertura)', () => {

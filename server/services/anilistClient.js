@@ -49,6 +49,15 @@ const MEDIA_QUERY = `query ($id: Int, $idMal: Int) {
   }
 }`;
 
+// Os episódios dos últimos 90 dias de uma obra em exibição: a 1ª página da grade acima (sem ordem) pode só ter os primeiros 50 episódios
+// (One Piece), então uma consulta extra pede a grade a partir de "agora - 90 dias", em ordem de data.
+const RECENT_AIRING_QUERY = `query ($id: Int, $after: Int) {
+  Page(page: 1, perPage: 50) {
+    airingSchedules(mediaId: $id, airingAt_greater: $after, sort: TIME) { episode airingAt }
+  }
+}`;
+const RECENT_DAYS = 90;
+
 const FRANCHISE_RELATIONS = new Set(['SEQUEL', 'PREQUEL']);
 
 const isMedia = m => !!m && Number.isSafeInteger(m.id) && m.id > 0 && !!m.title && !!(m.title.english || m.title.romaji || m.title.native);
@@ -129,7 +138,17 @@ class AniListClient extends SourceClient {
     const m = data.Media;
     // só vale uma obra do tipo pedido, com o id pedido e um título; adulta não entra (como a busca)
     if (!isMedia(m) || (id && m.id !== id) || (idMal && m.idMal !== idMal) || m.isAdult) throw mediaErrors.notFound();
-    return m;
+    if (m.status !== 'RELEASING') return m;
+    // Em exibição: junta os episódios recentes (cópia; o objeto em cache não muda). Falha aqui não derruba a ingestão.
+    try {
+      const day = 24 * 60 * 60;
+      const after = Math.floor(Math.floor(this.now() / 1000) / day) * day - RECENT_DAYS * day; // arredondado ao dia: o cache funciona
+      const extra = await this.query(RECENT_AIRING_QUERY, { id: m.id, after }, { ttlMs: this.detailTtlMs, fresh });
+      const nodes = extra && extra.Page && Array.isArray(extra.Page.airingSchedules) ? extra.Page.airingSchedules : [];
+      return { ...m, recentSchedule: { nodes } };
+    } catch {
+      return m;
+    }
   }
 
   // Franquia = componente ligado por relações SEQUEL/PREQUEL (Spin-off, Side story, Summary etc. ficam de fora de propósito: o grafo

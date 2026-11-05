@@ -244,7 +244,7 @@ test('franquia Attack on Titan: 9 entradas (temporadas, OVA e especiais), uma se
 test('franquia One Piece: sem total de episódios, vale até o último já exibido; ONA de um episódio não vira "Temporada 2"', async () => {
   const work = mapper.buildAnimeWork(10000021, { malId: 21 }, await rawClient().getFranchise({ idMal: 21 }));
   assert.equal(work.status, 'Em Exibição');
-  assert.equal(work.seasons[0].episodes.length, 1180, 'próximo episódio é o 1181: já foram 1180');
+  assert.equal(work.seasons[0].episodes.length, 1181, 'próximo episódio (1181) tem data confirmada: entra na lista (D-AG-5)');
   assert.equal(work.seasons[0].episodes[1122].air_date.length, 10, 'episódios da grade têm data');
   assert.equal(work.seasons[0].episodes[10].air_date, '', 'sem grade: sem data');
   assert.match(work.seasons[1].name, /^ONA: MONSTERS/);
