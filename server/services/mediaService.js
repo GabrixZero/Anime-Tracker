@@ -851,10 +851,10 @@ class MediaService {
   static isTitleAnime(item) {
     return Boolean(
       item &&
-        item.type === 'anime' &&
-        item.ingestedAt &&
-        (item.mal_id || item.anilist_id) &&
-        ['jikan', 'anilist', 'seed'].includes(describeId(item.id).source)
+      item.type === 'anime' &&
+      item.ingestedAt &&
+      (item.mal_id || item.anilist_id) &&
+      ['jikan', 'anilist', 'seed'].includes(describeId(item.id).source)
     );
   }
 

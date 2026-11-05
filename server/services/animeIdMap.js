@@ -115,7 +115,9 @@ class AnimeIdMap {
       this.lastFailureAt = 0;
     } catch (err) {
       this.lastFailureAt = this.now();
-      console.warn(`[AnimeIdMap] Não foi possível atualizar o mapa de ids (${(err && err.code) || (err && err.message) || 'erro'}); usando a última cópia, se houver.`);
+      console.warn(
+        `[AnimeIdMap] Não foi possível atualizar o mapa de ids (${(err && err.code) || (err && err.message) || 'erro'}); usando a última cópia, se houver.`
+      );
     }
   }
 

@@ -151,7 +151,9 @@ class TmdbClient {
     const tv = await this.get(`/tv/${tmdbId}`, {}, { ttlMs: 60 * 60 * 1000 });
     if (!tv || tv.id !== tmdbId) throw mediaErrors.notFound();
     const seasons = (Array.isArray(tv.seasons) ? tv.seasons : [])
-      .filter(s => s && Number.isInteger(s.season_number) && s.season_number > 0 && Number.isInteger(s.episode_count) && s.episode_count > 0)
+      .filter(
+        s => s && Number.isInteger(s.season_number) && s.season_number > 0 && Number.isInteger(s.episode_count) && s.episode_count > 0
+      )
       .slice(0, MAX_SEASONS * 2)
       .map(s => ({ season_number: s.season_number, episode_count: s.episode_count }));
     return { seasons };
@@ -181,7 +183,20 @@ class TmdbClient {
         /* sem o inglês: segue só com o que o pt-BR trouxe */
       }
     }
-    return { name: s && s.name, episodes };
+    // Formato normalizado: `name` = título de verdade já resolvido (pt-BR, senão en-US; '' se nenhum), `raw_name` = o que o TMDB mandou,
+    // `still_path` = endereço completo da miniatura (w300) no image.tmdb.org.
+    return {
+      name: s && s.name,
+      episodes: episodes.map(e => ({
+        episode_number: e.episode_number,
+        name: e.title,
+        raw_name: e.name,
+        air_date: dateOnly(e.air_date),
+        runtime: e.runtime,
+        overview: e.overview,
+        still_path: img(e.still_path, 'w300')
+      }))
+    };
   }
 
   // Série + uma requisição por temporada (o TMDB só entrega os episódios por temporada). Temporada 0 (extras) fica de fora.
@@ -197,11 +212,11 @@ class TmdbClient {
       const s = await this.seasonEpisodes(tmdbId, n);
       const episodes = s.episodes.map(e => ({
         episode_number: e.episode_number,
-        name: e.title || stripHtml(e.name, 300) || `Episódio ${e.episode_number}`,
+        name: e.name || stripHtml(e.raw_name, 300) || `Episódio ${e.episode_number}`,
         runtime: Number(e.runtime) > 0 ? Number(e.runtime) : Number(tv.episode_run_time && tv.episode_run_time[0]) || null,
-        air_date: dateOnly(e.air_date),
+        air_date: e.air_date,
         overview: stripHtml(e.overview),
-        still_path: safeHttpUrl(img(e.still_path, 'w300'), null)
+        still_path: safeHttpUrl(e.still_path, null)
       }));
       if (episodes.length) seasons.push({ season_number: n, name: stripHtml(s.name, 80) || `Temporada ${n}`, episodes });
     }
