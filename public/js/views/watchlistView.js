@@ -160,7 +160,7 @@ class WatchlistView {
 
     const typeBadge = window.ViewKit.typeBadge(media.type);
 
-    const seasonCount = Array.isArray(media.seasons) ? media.seasons.length : Number(media.season_count) || 1;
+    const seasonCount = Array.isArray(media.seasons) ? window.WatchStatus.mainSeasons(media).length : Number(media.season_count) || 1;
 
     return `
           <div class="show-card" data-show-id="${toInt(media.id)}">

@@ -14,6 +14,7 @@ const anilistMapper = require('./anilistMapper');
 const jikanMapper = require('./jikanMapper');
 const { migrateLegacyCatalog } = require('./catalogMigration');
 const { migrateCatalogImages } = require('./imageMigration');
+const { migrateAnimeSeasons } = require('./animeMigration');
 
 const TVMAZE_BASE = 'https://api.tvmaze.com';
 const SEED_PATH = path.join(__dirname, '..', 'data', 'mediaCatalog.seed.json');
@@ -145,6 +146,15 @@ class MediaService {
       const imgs = migrateCatalogImages(items);
       if (imgs.changed > 0 && this.backupBeforeMigration(runtime, new Array(imgs.changed), 's18')) {
         items = imgs.items;
+        migrated = true;
+      }
+    }
+
+    // Extras separados: filme/OVA/ONA solta deixa de ser "Temporada N" (ganha `category`; sem rede, idempotente, com backup antes).
+    if (runtime) {
+      const anime = migrateAnimeSeasons(items);
+      if (anime.changed.length > 0 && this.backupBeforeMigration(runtime, anime.changed, 'anime-extras')) {
+        items = anime.items;
         migrated = true;
       }
     }

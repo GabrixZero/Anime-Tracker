@@ -176,7 +176,7 @@ class ExploreView {
   metaText(item) {
     if (item.type === 'movie') return window.MediaDisplay.runtimeText(item.runtime) || 'Filme';
     // obra do catálogo: a lista leve traz `season_count`; o detalhe completo traz as temporadas
-    const seasonCount = Array.isArray(item.seasons) ? item.seasons.length : Number(item.season_count) || 0;
+    const seasonCount = Array.isArray(item.seasons) ? window.WatchStatus.mainSeasons(item).length : Number(item.season_count) || 0;
     if (seasonCount > 0) {
       return `${seasonCount} ${seasonCount === 1 ? 'temporada' : 'temporadas'}`;
     }

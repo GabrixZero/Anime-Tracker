@@ -5,6 +5,7 @@
 const { stripHtml, stripHtmlList, safeHttpUrl } = require('../utils/sanitize');
 const { toInternalId } = require('../utils/ids');
 const { cleanSynopsis } = require('./jikanMapper');
+const { categoryOf, reclassifyWork } = require('./animeSeasons');
 
 const STATUS_PT = {
   FINISHED: 'Finalizada',
@@ -244,7 +245,7 @@ function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
     const title = titleOf(a);
     let name;
     // ONA de um episódio só (ex.: "MONSTERS", ligado a One Piece pela AniList) não é "Temporada 2": entra com o nome do tipo
-    if (isTvLike(a) && !(a.format === 'ONA' && eps.length === 1)) {
+    if (categoryOf(a.format, eps.length) === 'season') {
       tvIndex++;
       const label = seasonLabel(a);
       name = `Temporada ${tvIndex}${label ? ` · ${label}` : ''}`;
@@ -283,7 +284,7 @@ function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
   if (malId) work.mal_id = malId;
   else delete work.mal_id;
   work.anilist_id = (wanted || root).id;
-  return work;
+  return reclassifyWork(work);
 }
 
 module.exports = {

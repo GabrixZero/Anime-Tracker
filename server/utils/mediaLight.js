@@ -59,17 +59,21 @@ function toSummaryItem(item) {
   if (overview) out.overview = overview;
   if (item.backdrop_path) out.backdrop_path = item.backdrop_path;
   if (Array.isArray(item.seasons)) {
-    out.seasons = item.seasons.map(season => ({
-      season_number: season.season_number,
-      name: season.name,
-      episodes: (Array.isArray(season.episodes) ? season.episodes : []).map(ep => ({
-        episode_number: ep.episode_number,
-        name: ep.name,
-        air_date: ep.air_date,
-        runtime: ep.runtime,
-        still_path: ep.still_path
-      }))
-    }));
+    out.seasons = item.seasons.map(season => {
+      const light = {
+        season_number: season.season_number,
+        name: season.name,
+        episodes: (Array.isArray(season.episodes) ? season.episodes : []).map(ep => ({
+          episode_number: ep.episode_number,
+          name: ep.name,
+          air_date: ep.air_date,
+          runtime: ep.runtime,
+          still_path: ep.still_path
+        }))
+      };
+      if (season.category) light.category = season.category; // 'season' | 'movie' | 'special' (animes)
+      return light;
+    });
   }
   return out;
 }
