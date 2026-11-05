@@ -133,6 +133,12 @@ class AppState {
     this.save();
   }
 
+  // Importar histórico (S16): o resultado JÁ é a biblioteca atual somada ao arquivo (nada some); grava e agenda o envio.
+  applyImported(data) {
+    this.replaceData(data);
+    if (window.syncService) window.syncService.schedulePush();
+  }
+
   // ----- horários e marcas de exclusão -----
   // ISO de agora, nunca anterior (nem igual) aos horários informados: a ação mais nova sempre vence um empate.
   stamp(...previous) {

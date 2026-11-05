@@ -2,9 +2,9 @@
   "secao": "S16",
   "titulo": "Importar e exportar histórico",
   "arquivo": "Documentacao/secoes/S16-importar-exportar.md",
-  "status": "pendente",
-  "branch": "",
-  "concluidaEm": "",
+  "status": "concluida",
+  "branch": "feature/s16-importar-exportar",
+  "concluidaEm": "2026-11-04",
   "commit": "",
-  "notas": ""
+  "notas": "Importa MAL (XML) e TV Time (CSV) com previa e revisao; exporta CSV e XML da MAL. Tudo no navegador (utils/importExport.js + views/importView.js), sem endpoint novo."
 }
