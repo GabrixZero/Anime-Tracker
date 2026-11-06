@@ -1,0 +1,14 @@
+# 2026-11-05 · CL · Créditos em página própria e landing com pôsteres reais · branch feature/creditos-landing-posteres
+- Feito (pedido do Gabriel, não é seção S):
+  - Rodapé "Créditos dos dados" removido da landing e do app (HTML, CSS, teste antigo). O service worker nunca pré-carregou nada por causa dele.
+  - Nova página estática `public/creditos.html` (+ `css/creditos.css`): textos copiados do rodapé (TMDB em inglês e pt-BR, TVMaze CC BY-SA 4.0, AniList, mapa de ids Fribb/anime-offline-database ODbL/Anime-Lists, que a PR 46 acrescentou) e a Jikan (que só era mencionada nos termos). Só texto e links, sem logo do TMDB. Links "Créditos" no modal Entrar/Cadastrar, no modal Minha conta e na legenda sob o mockup da landing (D-CL-1, D-CL-2).
+  - Landing: mockup com Harry Potter (série HBO, TMDB tv 224377), Naruto Shippuden (tv 31910) e Homem-Aranha: Através do Aranhaverso (filme 569094). Novo `GET /api/landing/featured` (cache 7 dias, máx. 6 meses, só o caminho do pôster, w342) e `js/utils/landingPosters.js` (D-CL-3). Barras e estrela do mockup são só desenho.
+- Testes: `tests/landing-featured.test.js` (9), ajustes em `s13-frontend` e `layout`, E2E `22-landing.spec.js` (28 execuções); `npm test`, `lint`, `format:check` e `test:e2e` completos verdes (ver PR).
+- Verificação REAL com a chave do TMDB (uma vez, manual, porta 3031, `node --env-file=.env`, pasta de dados temporária; servidor encerrado):
+  - Série: `search/tv "Harry Potter"` → id 224377, nome "Harry Potter", primeira exibição 2026-12-25, a série de TV (os outros resultados eram documentários/podcasts); filme Aranhaverso 569094 (2023-05-31, pt-BR "Homem-Aranha: Através do Aranhaverso"); Naruto Shippuden 31910 confirmado.
+  - O endpoint devolveu os 3 `posterUrl` de image.tmdb.org; no navegador (desktop e 375×812) os 3 pôsteres carregaram (342 px de largura natural), sem violação de CSP, sem rolagem horizontal; a página Créditos abre e não rola para o lado em 375.
+  - Observação do navegador do app: com `loading="lazy"` ele não começou o download sozinho (o painel pode estar tratando a página como oculta); forçando `eager` pela consola as imagens carregaram na hora. Os testes automáticos checam o atributo; num Chrome normal, com a imagem na tela, o lazy carrega.
+- Não verificado: Chrome/Firefox/Safari de verdade (só Chromium do Playwright e o painel do app); o modo offline real com `creditos.html` (a página só entra no cache depois de visitada uma vez).
+- Pendente / ideias: se o Gabriel quiser o logo do TMDB na página Créditos, precisa da permissão dele para baixar o arquivo oficial (hoje só texto, D-AM-2).
+- Descobertas fora do escopo: nada além da observação do CI abaixo (preenchida na PR).
+- Decisões: D-CL-1 a D-CL-4. Seções liberadas: nenhuma (não é seção S).

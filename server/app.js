@@ -11,6 +11,7 @@ const { requireActiveUser } = require('./middleware/auth');
 const authRoutes = require('./routes/authRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const userRoutes = require('./routes/userRoutes');
+const landingRoutes = require('./routes/landingRoutes');
 
 // Resolve o segredo JWT já na partida (gera o arquivo local na primeira vez; em produção falha sem JWT_SECRET seguro).
 void config.JWT_SECRET;
@@ -65,6 +66,7 @@ app.use('/api', (req, res, next) => {
 // Rotas da API REST
 app.use('/api/auth', authRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/landing', landingRoutes);
 // A biblioteca só serve contas que ainda existem (conta excluída / senha trocada derrubam sessões antigas).
 app.use('/api/user', requireActiveUser, userRoutes);
 

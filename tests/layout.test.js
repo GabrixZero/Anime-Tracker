@@ -70,6 +70,8 @@ test('o CSS novo tem chaves balanceadas e todos os arquivos estão ligados no HT
   for (const f of cssFiles) {
     const css = read('css', f);
     assert.equal((css.match(/{/g) || []).length, (css.match(/}/g) || []).length, `${f} com chaves desbalanceadas`);
-    assert.ok(html.includes(`css/${f}`), `${f} não está no index.html`);
+    // creditos.css é da página estática creditos.html (D-CL-1), não do index.html
+    const page = f === 'creditos.css' ? read('creditos.html') : html;
+    assert.ok(page.includes(`css/${f}`), `${f} não está no HTML da sua página`);
   }
 });

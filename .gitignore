@@ -24,6 +24,7 @@ server/data/jwt.secret
 server/data/invites.json
 
 server/data/mediaCatalog.runtime.json
+server/data/landing-featured.cache.json
 server/data/mediaCatalog.json
 server/data/*.bak
 server/data/*.tmp
