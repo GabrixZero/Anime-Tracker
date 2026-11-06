@@ -92,52 +92,58 @@
               </p>
             </div>
 
-            <!-- Ilustração própria (mockup simples em CSS, sem obras nem dados reais) -->
+            <!-- Mockup: os 3 títulos são reais (pôster vindo do TMDB por js/utils/landingPosters.js); barras e nota são só desenho, sem dado de verdade -->
 
-            <div class="lp-mock" role="img" aria-label="Ilustração: uma lista com três títulos de exemplo, barras de progresso e uma nota">
-              <div class="lp-mock-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="lp-mock-wrap">
+              <div class="lp-mock" role="group" aria-label="Exemplo de lista com três títulos">
+                <div class="lp-mock-bar" aria-hidden="true"><span></span><span></span><span></span></div>
 
-              <div class="lp-mock-row" aria-hidden="true">
-                <span class="lp-mock-poster lp-tone-a"></span>
+                <div class="lp-mock-row">
+                  <span class="lp-mock-poster lp-tone-a" data-featured="tv"></span>
 
-                <span class="lp-mock-info">
-                  <span class="lp-mock-title">Série de exemplo</span>
+                  <span class="lp-mock-info">
+                    <span class="lp-mock-title">Harry Potter</span>
 
-                  <span class="lp-mock-track"><span class="lp-fill lp-w-70"></span></span>
+                    <span class="lp-mock-track" aria-hidden="true"><span class="lp-fill lp-w-70"></span></span>
 
-                  <span class="lp-mock-meta">Temporada 2 · episódio 5</span>
-                </span>
+                    <span class="lp-mock-meta">Série</span>
+                  </span>
 
-                <span class="lp-mock-score">9</span>
+                  <span class="lp-mock-score" aria-hidden="true"></span>
+                </div>
+
+                <div class="lp-mock-row">
+                  <span class="lp-mock-poster lp-tone-b" data-featured="anime"></span>
+
+                  <span class="lp-mock-info">
+                    <span class="lp-mock-title">Naruto Shippuden</span>
+
+                    <span class="lp-mock-track" aria-hidden="true"><span class="lp-fill lp-w-35"></span></span>
+
+                    <span class="lp-mock-meta">Anime</span>
+                  </span>
+
+                  <span class="lp-mock-score" aria-hidden="true"></span>
+                </div>
+
+                <div class="lp-mock-row">
+                  <span class="lp-mock-poster lp-tone-c" data-featured="movie"></span>
+
+                  <span class="lp-mock-info">
+                    <span class="lp-mock-title">Homem-Aranha: Através do Aranhaverso</span>
+
+                    <span class="lp-mock-track" aria-hidden="true"><span class="lp-fill lp-w-100"></span></span>
+
+                    <span class="lp-mock-meta">Filme</span>
+                  </span>
+
+                  <span class="lp-mock-score" aria-hidden="true"></span>
+                </div>
               </div>
 
-              <div class="lp-mock-row" aria-hidden="true">
-                <span class="lp-mock-poster lp-tone-b"></span>
-
-                <span class="lp-mock-info">
-                  <span class="lp-mock-title">Anime de exemplo</span>
-
-                  <span class="lp-mock-track"><span class="lp-fill lp-w-35"></span></span>
-
-                  <span class="lp-mock-meta">Em andamento</span>
-                </span>
-
-                <span class="lp-mock-score">8</span>
-              </div>
-
-              <div class="lp-mock-row" aria-hidden="true">
-                <span class="lp-mock-poster lp-tone-c"></span>
-
-                <span class="lp-mock-info">
-                  <span class="lp-mock-title">Filme de exemplo</span>
-
-                  <span class="lp-mock-track"><span class="lp-fill lp-w-100"></span></span>
-
-                  <span class="lp-mock-meta">Finalizado</span>
-                </span>
-
-                <span class="lp-mock-score">10</span>
-              </div>
+              <p class="lp-mock-credit">
+                Exemplo ilustrativo: o progresso e a nota são só desenho. Capas do <a href="creditos.html">TMDB (Créditos)</a>.
+              </p>
             </div>
           </div>
         </section>
@@ -395,30 +401,6 @@
           </div>
         </section>
       </main>
-
-      <footer class="lp-footer">
-        <div class="lp-wrap">
-          <h2 class="lp-footer-title">Créditos dos dados</h2>
-
-          <p>
-            Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB.
-
-            <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">themoviedb.org</a>
-          </p>
-
-          <p>
-            Dados de séries também do TVMaze (CC BY-SA 4.0).
-
-            <a href="https://www.tvmaze.com/" target="_blank" rel="noopener noreferrer">tvmaze.com</a>
-          </p>
-
-          <p>
-            Dados de animes da AniList; ShowVault é não oficial.
-
-            <a href="https://anilist.co/" target="_blank" rel="noopener noreferrer">anilist.co</a>
-          </p>
-        </div>
-      </footer>
     </div>
 
     <div id="app" class="app-container">
@@ -1000,23 +982,6 @@
         </section>
       </main>
 
-      <!-- ================= CRÉDITOS DOS DADOS ================= -->
-      <footer class="app-credits" id="app-credits">
-        <h2>Créditos dos dados</h2>
-        <p>
-          Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB.
-          <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">themoviedb.org</a>
-        </p>
-        <p>
-          Dados de séries também do TVMaze (CC BY-SA 4.0).
-          <a href="https://www.tvmaze.com/" target="_blank" rel="noopener noreferrer">tvmaze.com</a>
-        </p>
-        <p>
-          Dados de animes da AniList; ShowVault é não oficial.
-          <a href="https://anilist.co/" target="_blank" rel="noopener noreferrer">anilist.co</a>
-        </p>
-      </footer>
-
       <!-- ================= MODAL: ENTRAR / CADASTRAR ================= -->
       <div class="tvtime-auth-overlay hidden" id="tvtime-auth-modal">
         <div class="tvtime-auth-card" role="dialog" aria-modal="true" aria-labelledby="tvtime-auth-title">
@@ -1142,6 +1107,8 @@
 
               <button type="submit" class="btn-tvtime-submit" id="btn-tvtime-auth-submit">Entrar na Conta</button>
             </form>
+
+            <p class="credits-link-wrap"><a class="credits-link" href="creditos.html">Créditos</a></p>
           </div>
         </div>
       </div>
@@ -1245,6 +1212,8 @@
                 <button type="submit" class="btn-account-danger" id="btn-account-delete">Excluir minha conta</button>
               </form>
             </section>
+
+            <p class="credits-link-wrap"><a class="credits-link" href="creditos.html">Créditos</a></p>
           </div>
         </div>
       </div>
@@ -1532,6 +1501,7 @@
     <script src="js/views/detailModalView.js"></script>
     <script src="js/controllers/appController.js"></script>
     <script src="js/controllers/actionHandlers.js"></script>
+    <script src="js/utils/landingPosters.js" defer></script>
     <script src="js/pwa.js"></script>
   </body>
 </html>

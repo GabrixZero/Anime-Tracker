@@ -204,7 +204,7 @@ class NextUpView {
             ${typeBadge}
           </div>
 
-          <h3 class="next-up-ep-title"><button type="button" class="link-btn" data-focus-key="nu:${toInt(item.showId)}:open" data-action="open-detail" data-show="${toInt(item.showId)}">${escapeHtml(item.title)}</button></h3>
+          <h3 class="next-up-ep-title${item.isMovie ? '' : window.MediaDisplay.episodeNameClass(item.title)}"><button type="button" class="link-btn" data-focus-key="nu:${toInt(item.showId)}:open" data-action="open-detail" data-show="${toInt(item.showId)}">${escapeHtml(item.title)}</button></h3>
           <p class="next-up-overview">${escapeHtml(item.overview || 'Sem descrição cadastrada.')}</p>
           
           <div class="next-up-footer">

@@ -128,6 +128,9 @@ function tmdb(path, params, res) {
     if (!list) return send(res, 404, { status_code: 34, status_message: 'The resource you requested could not be found.', success: false });
     return send(res, 200, { id: Number(rd[1]), results: list });
   }
+  // destaques da landing (D-CL-3): só o necessário, com pôster
+  const lp = /^\/(tv|movie)\/(224377|31910|569094)$/.exec(path);
+  if (lp) return send(res, 200, { id: Number(lp[2]), poster_path: '/landing-e2e.jpg' });
   const m = /^\/movie\/(\d+)$/.exec(path);
   const movie = m && TMDB_MOVIES.find(x => x.id === Number(m[1]));
   if (movie) return send(res, 200, movie);

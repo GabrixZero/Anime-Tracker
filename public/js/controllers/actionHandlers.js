@@ -14,6 +14,7 @@
 
   A.fallbacks.poster = window.MediaDisplay.POSTER_PLACEHOLDER;
   A.fallbacks.still = window.MediaDisplay.STILL_PLACEHOLDER;
+  A.fallbacks.epthumb = window.MediaDisplay.EP_THUMB_BLANK; // miniatura de episódio que falhou: espaço liso, sem ícone
 
   // Navegação e listas
   A.on('goto-tab', el => window.appController.switchTab(el.getAttribute('data-goto')));

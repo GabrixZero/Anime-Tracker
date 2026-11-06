@@ -1,0 +1,97 @@
+/* Página estática "Créditos" (D-CL-1): mesma identidade do app (variables.css), sem scripts e sem rolagem horizontal. */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body.credits-page {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.credits-wrap {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+.credits-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--tvtime-yellow);
+  color: var(--tvtime-dark);
+  padding: 0.5rem 1rem;
+  z-index: 10;
+}
+.credits-skip:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+.credits-header {
+  border-bottom: 1px solid var(--bg-card-border);
+  padding: 0.9rem 0;
+  margin-bottom: 1.5rem;
+}
+.credits-header-in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.credits-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  text-decoration: none;
+}
+.credits-brand strong {
+  color: var(--tvtime-yellow);
+}
+.credits-back,
+.credits-page a {
+  color: var(--tvtime-yellow);
+}
+.credits-page a:focus-visible,
+.credits-skip:focus-visible {
+  outline: 3px solid var(--tvtime-yellow);
+  outline-offset: 2px;
+}
+.credits-page h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  margin: 0 0 0.5rem;
+}
+.credits-lead {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+.credits-section {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.credits-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0 0 0.4rem;
+}
+.credits-section p {
+  margin: 0 0 0.5rem;
+  color: var(--text-secondary);
+}
+.credits-section p:last-child {
+  margin-bottom: 0;
+}
+.credits-section a + a {
+  margin-left: 1rem;
+}
+main.credits-wrap {
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}

@@ -46,6 +46,7 @@
       const kind = img.getAttribute('data-fallback');
       const url = kind && fallbacks[kind];
       if (!url || img.getAttribute('src') === url) return;
+      if (kind === 'epthumb') img.removeAttribute('srcset');
       img.setAttribute('src', url);
     }
 

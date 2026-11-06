@@ -164,6 +164,7 @@ test('Agenda: extra mostra FILME ou OVA/ESPECIAL no lugar de T:E e mantém data-
   const ctx = { document: { getElementById: () => null, querySelectorAll: () => [] }, console, Date };
   ctx.window = ctx;
   ctx.ViewKit = { typeBadge: () => '' };
+  ctx.MediaDisplay = require('../public/js/utils/mediaDisplay.js'); // D-TE-1: título atenuado quando é só "Episódio N"
   vm.createContext(ctx);
   vm.runInContext(read('utils/dom.js'), ctx);
   vm.runInContext(read('views/calendarView.js'), ctx);

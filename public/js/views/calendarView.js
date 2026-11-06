@@ -239,7 +239,7 @@ class CalendarView {
             <span class="calendar-item-code">${escapeHtml(code)}</span>
             ${released}
           </div>
-          <p class="calendar-item-title"><button type="button" class="link-btn" data-focus-key="cal:${key}:open" data-action="open-detail" data-show="${id}">${escapeHtml(title)}</button></p>
+          <p class="calendar-item-title${isMovie ? '' : window.MediaDisplay.episodeNameClass(title)}"><button type="button" class="link-btn" data-focus-key="cal:${key}:open" data-action="open-detail" data-show="${id}">${escapeHtml(title)}</button></p>
         </div>
         ${button}
       </li>

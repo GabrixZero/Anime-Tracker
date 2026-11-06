@@ -26,8 +26,9 @@
   // (a troca em caso de erro é feita por Actions, sem onerror inline).
   function imgAttrs(url, kind = 'poster') {
     const MD = media();
-    const placeholder = kind === 'still' ? MD.STILL_PLACEHOLDER : MD.POSTER_PLACEHOLDER;
-    return `src="${dom().safeSrc(url) || placeholder}" data-fallback="${kind === 'still' ? 'still' : 'poster'}"`;
+    const known = kind === 'still' || kind === 'epthumb' ? kind : 'poster';
+    const placeholder = known === 'epthumb' ? MD.EP_THUMB_BLANK : known === 'still' ? MD.STILL_PLACEHOLDER : MD.POSTER_PLACEHOLDER;
+    return `src="${dom().safeSrc(url) || placeholder}" data-fallback="${known}"`;
   }
 
   // Chave de episódio -> { showId, seasonNum, epNum, isMovie }; chave fora do padrão = null.

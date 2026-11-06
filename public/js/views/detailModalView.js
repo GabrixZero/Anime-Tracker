@@ -496,7 +496,11 @@ class DetailModalView {
     return episodes
       .map(ep => {
         const date = ep.air_date ? String(ep.air_date).slice(0, 10) : '';
-        return `<li class="episode-line"><span class="episode-code">E${escapeHtml(ep.episode_number)}</span> · <span class="episode-name">${escapeHtml(ep.name)}</span>${date ? ` · <span class="episode-date">${escapeHtml(date)}</span>` : ''}</li>`;
+        // Miniatura (TMDB/TVMaze) só quando a fonte deu uma; tamanho reservado (64x36) e carregamento preguiçoso, como no quadro completo.
+        const thumb = safeUrl(ep.still_path)
+          ? `<img ${window.ViewKit.imgAttrs(safeUrl(ep.still_path), 'epthumb')} alt="" class="episode-line-thumb" width="64" height="36" loading="lazy" decoding="async">`
+          : '';
+        return `<li class="episode-line">${thumb}<span class="episode-code">E${escapeHtml(ep.episode_number)}</span> · <span class="episode-name${window.MediaDisplay.episodeNameClass(ep.name)}">${escapeHtml(ep.name)}</span>${date ? ` · <span class="episode-date">${escapeHtml(date)}</span>` : ''}</li>`;
       })
       .join('');
   }
@@ -679,11 +683,11 @@ class DetailModalView {
             <span aria-hidden="true">${isWatched ? '✓' : ''}</span>
           </button>
 
-          <img ${window.ViewKit.imgAttrs(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path, 'still')} alt="" class="episode-thumb" loading="lazy" decoding="async">
+          <img ${window.ViewKit.imgAttrs(safeUrl(ep.still_path) || safeUrl(media.backdrop_path) || media.poster_path, safeUrl(ep.still_path) ? 'epthumb' : 'still')} alt="" class="episode-thumb" width="80" height="50" loading="lazy" decoding="async">
 
           <div class="episode-info">
             <span class="episode-code">E${escapeHtml(ep.episode_number)}${ep.air_date ? ` · ${escapeHtml(String(ep.air_date).slice(0, 10))}` : ''}</span>
-            <div class="episode-name">${escapeHtml(ep.name)}</div>
+            <div class="episode-name${window.MediaDisplay.episodeNameClass(ep.name)}">${escapeHtml(ep.name)}</div>
             ${window.MediaDisplay.runtimeText(ep.runtime) ? `<span class="episode-runtime">${escapeHtml(window.MediaDisplay.runtimeText(ep.runtime))}</span>` : ''}
             ${hasNote ? `<span class="episode-note-tag">Anotação salva</span>` : ''}
           </div>

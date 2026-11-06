@@ -6,6 +6,7 @@ const { stripHtml, stripHtmlList, safeHttpUrl } = require('../utils/sanitize');
 const { toInternalId } = require('../utils/ids');
 const { cleanSynopsis } = require('./jikanMapper');
 const { categoryOf, reclassifyWork } = require('./animeSeasons');
+const { applyTmdbEpisodes } = require('./animeTmdbEpisodes');
 
 const STATUS_PT = {
   FINISHED: 'Finalizada',
@@ -211,13 +212,29 @@ function carryOverEpisodeData(previous, work) {
         if (!before) return ep;
         const lostName = ep.name === `Episódio ${ep.episode_number}` && before.name && before.name !== ep.name;
         const lostDate = !ep.air_date && before.air_date;
-        return lostName || lostDate
-          ? { ...ep, name: lostName ? before.name : ep.name, air_date: lostDate ? before.air_date : ep.air_date }
+        const lostStill = !ep.still_path && before.still_path;
+        return lostName || lostDate || lostStill
+          ? {
+              ...ep,
+              name: lostName ? before.name : ep.name,
+              air_date: lostDate ? before.air_date : ep.air_date,
+              still_path: lostStill ? before.still_path : ep.still_path
+            }
           : ep;
       })
     };
   });
   return { ...work, seasons };
+}
+
+// Entradas da franquia na ordem da obra (mesma regra do buildAnimeWork) com os episódios da AniList (numeração intocada): usado para
+// alinhar com o TMDB (D-TE-3). Quem decide o que é temporada de TV é quem chama (categoryOf).
+function orderedEntries(franchise) {
+  return franchise.nodes
+    .filter(a => (!a.format || KEPT_FORMATS.has(a.format)) && !a.isAdult)
+    .sort((x, y) => startKey(x).localeCompare(startKey(y)) || x.id - y.id)
+    .map(node => ({ node, episodes: episodesFor(node) }))
+    .filter(e => e.episodes.length > 0);
 }
 
 function startKey(a) {
@@ -228,8 +245,9 @@ const isTvLike = a => !a.format || TV_LIKE.has(a.format);
 
 // Monta UMA obra a partir da franquia (cadeia SEQUEL/PREQUEL da AniList), cada entrada vira uma "temporada" (mesmas regras da Jikan).
 // numId = id interno pedido (a obra é gravada com ele); requested = {malId?, anilistId?}; franchise = {nodes: [media], visited: [id], truncated}.
-// `titlesFor` (opcional) = Map(anilistId -> lista de episódios da Jikan) para completar títulos.
-function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
+// `tmdbFor` (opcional) = Map(anilistId -> lista já alinhada e conferida do TMDB: título e miniatura; D-TE-3); vem primeiro.
+// `titlesFor` (opcional) = Map(anilistId -> lista de episódios da Jikan) para completar o que o TMDB não deu.
+function buildAnimeWork(numId, requested, franchise, { titlesFor, tmdbFor } = {}) {
   const ordered = franchise.nodes
     .filter(a => (!a.format || KEPT_FORMATS.has(a.format)) && !a.isAdult)
     .sort((x, y) => startKey(x).localeCompare(startKey(y)) || x.id - y.id);
@@ -241,6 +259,7 @@ function buildAnimeWork(numId, requested, franchise, { titlesFor } = {}) {
   for (const a of ordered) {
     let eps = episodesFor(a);
     if (eps.length === 0) continue; // anúncio/sem episódios conhecidos: fica de fora
+    if (tmdbFor && tmdbFor.has(a.id)) eps = applyTmdbEpisodes(eps, tmdbFor.get(a.id));
     if (titlesFor && titlesFor.has(a.id)) eps = enrichEpisodes(eps, titlesFor.get(a.id));
     const title = titleOf(a);
     let name;
@@ -291,6 +310,7 @@ module.exports = {
   mapAnimeBase,
   mapAnimeSearchEntry,
   buildAnimeWork,
+  orderedEntries,
   episodesFor,
   enrichEpisodes,
   carryOverEpisodeData,

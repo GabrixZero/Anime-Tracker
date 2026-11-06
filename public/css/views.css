@@ -962,6 +962,31 @@
   color: var(--text-main);
 }
 
+/* Miniatura de episódio no Explorar (somente leitura): caixa reservada, sem pular o layout */
+.episode-line-thumb {
+  width: 64px;
+  height: 36px;
+  border-radius: 3px;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 0.6rem;
+  background: var(--bg-surface);
+}
+
+/* Episódio sem título ("Episódio N" é só o número): atenuado, para não parecer título de verdade (D-TE-1) */
+.is-placeholder,
+.is-placeholder .link-btn,
+.episode-line .episode-name.is-placeholder,
+.episode-name.is-placeholder,
+.next-up-ep-title.is-placeholder,
+.next-up-ep-title.is-placeholder .link-btn,
+.calendar-item-title.is-placeholder,
+.calendar-item-title.is-placeholder .link-btn {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
 .episode-date {
   font-size: var(--fs-meta);
   color: var(--text-muted);
